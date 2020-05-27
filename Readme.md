@@ -15,11 +15,11 @@ Development of Kastri can be helped along with [Github Sponsorship](https://gith
 
 You'll find demo applications in the Demos folder, including those associated with articles posted on the [Delphi Worlds blog](http://www.delphiworlds.com/blog)
 
-Kastri is licensed under MIT, and license file is included in this folder.
+Kastri is licensed under MIT, and the license file is included in this folder.
 
 [Slack](https://slack.com/) users:
 
-I have a Slack team for Delphi Worlds, which contains a channel for discussion about Kastri Free (as well as other channels). If you would like to join, [please visit this link](https://slack.delphiworlds.com)
+I have a Slack team for Delphi Worlds, which contains a channel for discussion about Kastri (as well as other channels). If you would like to join, [please visit this link](https://slack.delphiworlds.com)
 
 ![](https://tokei.rs/b1/github/DelphiWorlds/Kastri)
 
