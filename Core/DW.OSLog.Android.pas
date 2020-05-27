@@ -1,0 +1,77 @@
+unit DW.OSLog.Android;
+
+{*******************************************************}
+{                                                       }
+{                      Kastri                           }
+{                                                       }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{    Copyright 2020 Dave Nottage under MIT license      }
+{  which is located in the root folder of this library  }
+{                                                       }
+{*******************************************************}
+
+{$I DW.GlobalDefines.inc}
+
+interface
+
+uses
+  // Android
+  Androidapi.JNI.JavaTypes,
+  // DW
+  DW.OSLog;
+
+type
+  /// <remarks>
+  ///   DO NOT ADD ANY FMX UNITS TO THESE FUNCTIONS
+  /// </remarks>
+  TPlatformOSLog = record
+  private
+    class var FTag: JString;
+  public
+    class function GetTrace: string; static;
+    class procedure Log(const ALogType: TLogType; const AMsg: string); static;
+    class procedure Trace; static;
+  end;
+
+implementation
+
+uses
+  // RTL
+  System.SysUtils, System.IOUtils,
+  // Android
+  Androidapi.Helpers,
+  // DW
+  DW.Androidapi.JNI.Util;
+
+{ TPlatformOSLog }
+
+class procedure TPlatformOSLog.Log(const ALogType: TLogType; const AMsg: string);
+var
+  LMsg: JString;
+begin
+  if (FTag = nil) and not TOSLog.Tag.IsEmpty then
+    FTag := StringToJString(TOSLog.Tag);
+  LMsg := StringToJString(AMsg);
+  case ALogType of
+    TLogType.Debug:
+      TJutil_Log.JavaClass.d(FTag, LMsg);
+    TLogType.Warning:
+      TJutil_Log.JavaClass.w(FTag, LMsg);
+    TLogType.Error:
+      TJutil_Log.JavaClass.e(FTag, LMsg);
+  end;
+end;
+
+class function TPlatformOSLog.GetTrace: string;
+begin
+  Result := JStringToString(TJutil_Log.JavaClass.getStackTraceString(TJException.JavaClass.init));
+end;
+
+class procedure TPlatformOSLog.Trace;
+begin
+  Log(TLogType.Debug, GetTrace);
+end;
+
+end.
+

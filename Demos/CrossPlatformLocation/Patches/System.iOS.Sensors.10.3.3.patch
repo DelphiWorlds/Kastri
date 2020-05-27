@@ -1,0 +1,46 @@
+diff -r C:\Program Files (x86)\Embarcadero\Studio\20.0\source\rtl\common\System.iOS.Sensors.pas Z:\Source\DelphiWorlds\Patches\Delphi\10.3.3\System.iOS.Sensors.pas
+36c36,38
+<   iOSapi.CocoaTypes, iOSapi.CoreLocation, iOSapi.CoreMotion, Macapi.Helpers, Macapi.Consts;
+---
+>   iOSapi.CocoaTypes, iOSapi.CoreLocation, iOSapi.CoreMotion, Macapi.Helpers, Macapi.Consts,
+>   // DW - helper units
+>   DW.iOSapi.Helpers, DW.iOS.Sensors;
+81a84,85
+>   // DW
+>   LCircularRegion: CLCircularRegion;
+84,85c88,91
+<   UniqueID := TNSString.Wrap(TNSString.OCClass.stringWithUTF8String(MarshaledAString(UTF8Encode(Region.ID))));
+< 
+---
+>   // DW - commenting out unnecessary code
+>   UniqueID := StrToNSStr(Region.ID); //  TNSString.Wrap(TNSString.OCClass.stringWithUTF8String(MarshaledAString(UTF8Encode(Region.ID))));
+> 
+>   // DW - commenting out deprecated code, adding current code
+87,90c93,99
+<   CLRegionPtr := objc_msgSend(objc_getClass('CLRegion'), sel_getUid('alloc'));
+<   Result := TCLRegion.Wrap(
+<     objc_msgSendPD3(CLRegionPtr, sel_getUid('initCircularRegionWithCenter:radius:identifier:'),
+<       Center, Region.Radius, NSStringToID(UniqueID)) );
+---
+>   // CLRegionPtr := objc_msgSend(objc_getClass('CLRegion'), sel_getUid('alloc'));
+>   // Result := TCLRegion.Wrap(
+>   //  objc_msgSendPD3(CLRegionPtr, sel_getUid('initCircularRegionWithCenter:radius:identifier:'),
+>   //    Center, Region.Radius, NSStringToID(UniqueID)) );
+>   LCircularRegion := TCLCircularRegion.Create;
+>   LCircularRegion.initWithCenter(Center, Region.Radius, (UniqueID as ILocalObject).GetObjectID);
+>   Result := LCircularRegion;
+513a523,524
+>   // DW
+>   TiOSLocationSensorHelper.Locater := FLocater;
+518a530,531
+>   // DW
+>   TiOSLocationSensorHelper.Locater := nil;
+579a593,595
+>   // DW - explicitly set allowance for background updates since iOS requires it on iOS >= 9.0
+>   if TOSVersion.Check(9) and (FLocater <> nil) and TiOSHelperEx.HasBackgroundMode('location') then
+>     FLocater.setAllowsBackgroundLocationUpdates(True);
+1006c1022,1023
+<     kCLAuthorizationStatusAuthorized:
+---
+>     // DW - add missing case value
+>     kCLAuthorizationStatusAuthorized, kCLAuthorizationStatusAuthorizedWhenInUse:

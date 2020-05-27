@@ -1,0 +1,41 @@
+object frmMain: TfrmMain
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 429
+  ClientWidth = 332
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object ClockLabel: TLabel
+    Align = Center
+    StyledSettings = [Family, Style, FontColor]
+    Size.Width = 134.000000000000000000
+    Size.Height = 35.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.Font.Size = 22.000000000000000000
+    TextSettings.HorzAlign = Center
+    TabOrder = 1
+  end
+  object TopLayout: TLayout
+    Align = Top
+    Padding.Left = 4.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 4.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Size.Width = 332.000000000000000000
+    Size.Height = 41.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object StartStopButton: TButton
+      Align = Center
+      Size.Width = 117.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Start'
+      OnClick = StartStopButtonClick
+    end
+  end
+end

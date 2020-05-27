@@ -1,0 +1,22 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 526
+  ClientWidth = 337
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Label1: TLabel
+    Align = Center
+    StyledSettings = [Family, Style, FontColor]
+    Size.Width = 244.000000000000000000
+    Size.Height = 43.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.Font.Size = 32.000000000000000000
+    TextSettings.HorzAlign = Center
+    Text = 'Started At Boot!'
+    TabOrder = 1
+  end
+end

@@ -1,0 +1,44 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 742
+  ClientWidth = 837
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object RichEditLayout: TLayout
+    Align = Client
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Size.Width = 829.000000000000000000
+    Size.Height = 694.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+  end
+  object Layout1: TLayout
+    Align = Bottom
+    Position.Y = 702.000000000000000000
+    Size.Width = 837.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object LoadFileButton: TButton
+      Align = Center
+      Size.Width = 111.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Load File..'
+      OnClick = LoadFileButtonClick
+    end
+  end
+  object OpenDialog: TOpenDialog
+    Filter = 'RTF files (*.rtf)|*.rtf'
+    Left = 412
+    Top = 272
+  end
+end

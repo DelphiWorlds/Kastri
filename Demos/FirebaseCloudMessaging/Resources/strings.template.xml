@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="default_web_client_id" translatable="false">[client/oauth_client/client_id]</string>
+  <string name="firebase_database_url" translatable="false">[project_info/firebase_url]</string>
+  <string name="gcm_defaultSenderId" translatable="false">[porject_info/project_numbe]</string>
+  <string name="google_api_key" translatable="false">[client/api_key/current_key]</string>
+  <string name="google_app_id" translatable="false">[client/client_info/mobilesdk_app_id]</string>
+  <string name="google_crash_reporting_api_key" translatable="false">[client/api_key/current_key]</string>
+  <string name="google_storage_bucket" translatable="false">[project_info/storage_bucket]</string>
+</resources>

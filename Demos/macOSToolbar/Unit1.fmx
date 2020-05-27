@@ -1,0 +1,27 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Memo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Top
+    Size.Width = 640.000000000000000000
+    Size.Height = 261.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Viewport.Width = 636.000000000000000000
+    Viewport.Height = 257.000000000000000000
+  end
+  object OpenDialog: TOpenDialog
+    Filter = 'Text files (*.txt)|*.txt'
+    Left = 176
+    Top = 180
+  end
+end

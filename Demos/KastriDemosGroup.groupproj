@@ -1,0 +1,216 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{7E5174C8-B4FA-4D50-A6C3-34663718200F}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="AndroidStartAtBoot\AndroidStartAtBoot.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Biometric\BiometricDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Connectivity\ConnectivityDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ElasticLayout\ElasticLayoutDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="FirebaseCloudMessaging\FCMDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="iOSGestureLag\GestureLagDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="macOSStatusBar\macOSStatusBarDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NFC\NFCDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="OSInfo\OSInfoDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="OSTimer\OSTimerDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="RichEdit\RichEditFMXDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ScrollNoClick\ScrollNoClickDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SpeechRecognition\SpeechRecognitionDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Swizzler\SwizzlerDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="VKVertScrollbox\VKVertScrollboxDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WebBrowserFileChooser\WBFileChooserDemo.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="AndroidStartAtBoot">
+        <MSBuild Projects="AndroidStartAtBoot\AndroidStartAtBoot.dproj"/>
+    </Target>
+    <Target Name="AndroidStartAtBoot:Clean">
+        <MSBuild Projects="AndroidStartAtBoot\AndroidStartAtBoot.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AndroidStartAtBoot:Make">
+        <MSBuild Projects="AndroidStartAtBoot\AndroidStartAtBoot.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BiometricDemo">
+        <MSBuild Projects="Biometric\BiometricDemo.dproj"/>
+    </Target>
+    <Target Name="BiometricDemo:Clean">
+        <MSBuild Projects="Biometric\BiometricDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BiometricDemo:Make">
+        <MSBuild Projects="Biometric\BiometricDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ConnectivityDemo">
+        <MSBuild Projects="Connectivity\ConnectivityDemo.dproj"/>
+    </Target>
+    <Target Name="ConnectivityDemo:Clean">
+        <MSBuild Projects="Connectivity\ConnectivityDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ConnectivityDemo:Make">
+        <MSBuild Projects="Connectivity\ConnectivityDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ElasticLayoutDemo">
+        <MSBuild Projects="ElasticLayout\ElasticLayoutDemo.dproj"/>
+    </Target>
+    <Target Name="ElasticLayoutDemo:Clean">
+        <MSBuild Projects="ElasticLayout\ElasticLayoutDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ElasticLayoutDemo:Make">
+        <MSBuild Projects="ElasticLayout\ElasticLayoutDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FCMDemo">
+        <MSBuild Projects="FirebaseCloudMessaging\FCMDemo.dproj"/>
+    </Target>
+    <Target Name="FCMDemo:Clean">
+        <MSBuild Projects="FirebaseCloudMessaging\FCMDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FCMDemo:Make">
+        <MSBuild Projects="FirebaseCloudMessaging\FCMDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GestureLagDemo">
+        <MSBuild Projects="iOSGestureLag\GestureLagDemo.dproj"/>
+    </Target>
+    <Target Name="GestureLagDemo:Clean">
+        <MSBuild Projects="iOSGestureLag\GestureLagDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GestureLagDemo:Make">
+        <MSBuild Projects="iOSGestureLag\GestureLagDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="macOSStatusBarDemo">
+        <MSBuild Projects="macOSStatusBar\macOSStatusBarDemo.dproj"/>
+    </Target>
+    <Target Name="macOSStatusBarDemo:Clean">
+        <MSBuild Projects="macOSStatusBar\macOSStatusBarDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="macOSStatusBarDemo:Make">
+        <MSBuild Projects="macOSStatusBar\macOSStatusBarDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NFCDemo">
+        <MSBuild Projects="NFC\NFCDemo.dproj"/>
+    </Target>
+    <Target Name="NFCDemo:Clean">
+        <MSBuild Projects="NFC\NFCDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NFCDemo:Make">
+        <MSBuild Projects="NFC\NFCDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OSInfoDemo">
+        <MSBuild Projects="OSInfo\OSInfoDemo.dproj"/>
+    </Target>
+    <Target Name="OSInfoDemo:Clean">
+        <MSBuild Projects="OSInfo\OSInfoDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OSInfoDemo:Make">
+        <MSBuild Projects="OSInfo\OSInfoDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OSTimerDemo">
+        <MSBuild Projects="OSTimer\OSTimerDemo.dproj"/>
+    </Target>
+    <Target Name="OSTimerDemo:Clean">
+        <MSBuild Projects="OSTimer\OSTimerDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OSTimerDemo:Make">
+        <MSBuild Projects="OSTimer\OSTimerDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="RichEditFMXDemo">
+        <MSBuild Projects="RichEdit\RichEditFMXDemo.dproj"/>
+    </Target>
+    <Target Name="RichEditFMXDemo:Clean">
+        <MSBuild Projects="RichEdit\RichEditFMXDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RichEditFMXDemo:Make">
+        <MSBuild Projects="RichEdit\RichEditFMXDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ScrollNoClickDemo">
+        <MSBuild Projects="ScrollNoClick\ScrollNoClickDemo.dproj"/>
+    </Target>
+    <Target Name="ScrollNoClickDemo:Clean">
+        <MSBuild Projects="ScrollNoClick\ScrollNoClickDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ScrollNoClickDemo:Make">
+        <MSBuild Projects="ScrollNoClick\ScrollNoClickDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SpeechRecognitionDemo">
+        <MSBuild Projects="SpeechRecognition\SpeechRecognitionDemo.dproj"/>
+    </Target>
+    <Target Name="SpeechRecognitionDemo:Clean">
+        <MSBuild Projects="SpeechRecognition\SpeechRecognitionDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SpeechRecognitionDemo:Make">
+        <MSBuild Projects="SpeechRecognition\SpeechRecognitionDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SwizzlerDemo">
+        <MSBuild Projects="Swizzler\SwizzlerDemo.dproj"/>
+    </Target>
+    <Target Name="SwizzlerDemo:Clean">
+        <MSBuild Projects="Swizzler\SwizzlerDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SwizzlerDemo:Make">
+        <MSBuild Projects="Swizzler\SwizzlerDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="VKVertScrollboxDemo">
+        <MSBuild Projects="VKVertScrollbox\VKVertScrollboxDemo.dproj"/>
+    </Target>
+    <Target Name="VKVertScrollboxDemo:Clean">
+        <MSBuild Projects="VKVertScrollbox\VKVertScrollboxDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VKVertScrollboxDemo:Make">
+        <MSBuild Projects="VKVertScrollbox\VKVertScrollboxDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WBFileChooserDemo">
+        <MSBuild Projects="WebBrowserFileChooser\WBFileChooserDemo.dproj"/>
+    </Target>
+    <Target Name="WBFileChooserDemo:Clean">
+        <MSBuild Projects="WebBrowserFileChooser\WBFileChooserDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WBFileChooserDemo:Make">
+        <MSBuild Projects="WebBrowserFileChooser\WBFileChooserDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="AndroidStartAtBoot;BiometricDemo;ConnectivityDemo;ElasticLayoutDemo;FCMDemo;GestureLagDemo;macOSStatusBarDemo;NFCDemo;OSInfoDemo;OSTimerDemo;RichEditFMXDemo;ScrollNoClickDemo;SpeechRecognitionDemo;SwizzlerDemo;VKVertScrollboxDemo;WBFileChooserDemo"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="AndroidStartAtBoot:Clean;BiometricDemo:Clean;ConnectivityDemo:Clean;ElasticLayoutDemo:Clean;FCMDemo:Clean;GestureLagDemo:Clean;macOSStatusBarDemo:Clean;NFCDemo:Clean;OSInfoDemo:Clean;OSTimerDemo:Clean;RichEditFMXDemo:Clean;ScrollNoClickDemo:Clean;SpeechRecognitionDemo:Clean;SwizzlerDemo:Clean;VKVertScrollboxDemo:Clean;WBFileChooserDemo:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="AndroidStartAtBoot:Make;BiometricDemo:Make;ConnectivityDemo:Make;ElasticLayoutDemo:Make;FCMDemo:Make;GestureLagDemo:Make;macOSStatusBarDemo:Make;NFCDemo:Make;OSInfoDemo:Make;OSTimerDemo:Make;RichEditFMXDemo:Make;ScrollNoClickDemo:Make;SpeechRecognitionDemo:Make;SwizzlerDemo:Make;VKVertScrollboxDemo:Make;WBFileChooserDemo:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

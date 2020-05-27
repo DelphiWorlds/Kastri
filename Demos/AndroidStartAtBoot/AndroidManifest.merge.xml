@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest>
+  <application>
+    <!-- ***** Metadata for the receiver ***** -->
+    <!-- Start at device boot -->
+    <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_ON_BOOT" android:value="true" />
+    <!-- Start after package replaced -->
+    <meta-data android:name="DWMultiBroadcastReceiver.KEY_RESTART_AFTER_REPLACE" android:value="true" />
+    <!-- **** This is the BroadcastReceiver **** -->
+    <receiver android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver">
+      <intent-filter>
+        <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+        <action android:name="android.intent.action.BOOT_COMPLETED"/>
+        <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+      </intent-filter>
+    </receiver>
+  </application>
+</manifest>

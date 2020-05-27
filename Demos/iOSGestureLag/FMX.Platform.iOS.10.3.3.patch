@@ -1,0 +1,32 @@
+diff -r Z:\Source\ThirdParty\DelphiSource\Rio 10.3.3\fmx\FMX.Platform.iOS.pas Z:\Source\DelphiWorlds\Kastri\Demos\iOSGestureLag\FMX.Platform.iOS.pas
+74c74,76
+<   FMX.Platform.Screen.iOS, FMX.Platform.Logger.iOS;
+---
+>   FMX.Platform.Screen.iOS, FMX.Platform.Logger.iOS,
+>   // DW
+>   DW.ScreenEdgeManager;
+182c184,186
+<  end;
+---
+>     // DW
+>     function preferredScreenEdgesDeferringSystemGestures: UIRectEdge; cdecl;
+>   end;
+217a222,223
+> 	// DW
+>     function preferredScreenEdgesDeferringSystemGestures: UIRectEdge; cdecl;
+2065a2072,2086
+> // DW
+> function TFMXViewController.preferredScreenEdgesDeferringSystemGestures: UIRectEdge;
+> const
+>   UIRectEdges: array[TScreenEdge] of UIRectEdge = (UIRectEdgeTop, UIRectEdgeLeft, UIRectEdgeBottom, UIRectEdgeRight);
+> var
+>   LScreenEdge: TScreenEdge;
+> begin
+>   Result := UIRectEdgeNone;
+>   for LScreenEdge := Low(TScreenEdge) to High(TScreenEdge) do
+>   begin
+>     if LScreenEdge in TScreenEdgeManager.PreferredScreenEdges then
+>       Result := Result or UIRectEdges[LScreenEdge];
+>   end;
+> end;
+> 
