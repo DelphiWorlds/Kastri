@@ -73,10 +73,5 @@ begin
   Log(TLogType.Debug, GetTrace);
 end;
 
-initialization
-  {$IF CompilerVersion = 34}
-  TOSLog.Tag := TPlatformOSDevice.GetPackageID;
-  {$ENDIF}
-
 end.
 
