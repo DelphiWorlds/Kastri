@@ -42,7 +42,7 @@ uses
   // Android
   Androidapi.Helpers,
   // DW
-  DW.Androidapi.JNI.Util;
+  DW.Androidapi.JNI.Util, DW.OSDevice.Android;
 
 { TPlatformOSLog }
 
@@ -50,7 +50,7 @@ class procedure TPlatformOSLog.Log(const ALogType: TLogType; const AMsg: string)
 var
   LMsg: JString;
 begin
-  if (FTag = nil) and not TOSLog.Tag.IsEmpty then
+  if FTag = nil then
     FTag := StringToJString(TOSLog.Tag);
   LMsg := StringToJString(AMsg);
   case ALogType of
@@ -72,6 +72,11 @@ class procedure TPlatformOSLog.Trace;
 begin
   Log(TLogType.Debug, GetTrace);
 end;
+
+initialization
+  {$IF CompilerVersion = 34}
+  TOSLog.Tag := TPlatformOSDevice.GetPackageID;
+  {$ENDIF}
 
 end.
 
