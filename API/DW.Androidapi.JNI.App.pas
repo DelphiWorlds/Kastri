@@ -24,8 +24,10 @@ type
   JKeyguardManager = interface;
   JKeyguardManager_KeyguardLock = interface;
   JKeyguardManager_OnKeyguardExitResult = interface;
+  {$IF CompilerVersion < 33}
   JNotificationChannel = interface;
   JNotificationChannelGroup = interface;
+  {$ENDIF}
 
   JKeyguardManagerClass = interface(JObjectClass)
     ['{44F9A483-0683-4391-94D1-F0BB6DB7340B}']
@@ -68,6 +70,7 @@ type
   end;
   TJKeyguardManager_OnKeyguardExitResult = class(TJavaGenericImport<JKeyguardManager_OnKeyguardExitResultClass, JKeyguardManager_OnKeyguardExitResult>) end;
 
+  {$IF CompilerVersion < 33}
   JNotificationChannelClass = interface(JObjectClass)
     ['{2C435911-AD3A-4461-8860-779ECA70D332}']
     function _GetCREATOR: JParcelable_Creator; cdecl;
@@ -153,6 +156,7 @@ type
   end;
   TJNotificationManager = class(TJavaGenericImport<JNotificationManagerClass, JNotificationManager>)
   end;
+  {$ENDIF}
 
 implementation
 
