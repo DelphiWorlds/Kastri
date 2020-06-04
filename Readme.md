@@ -11,7 +11,7 @@ Development of Kastri can be helped along with [Github Sponsorship](https://gith
 * Is structured in a way so as to avoid creating unnecessary dependencies
 * Follows strict coding standards to ensure consistency and readability
 * Is kept as simple as practicable
-* Is named after the [place in Italy](https://en.wikipedia.org/wiki/Kastri,_Phocis) where [Delphi](https://en.wikipedia.org/wiki/Delphi) once stood
+* Is named after the [place in Greece](https://en.wikipedia.org/wiki/Kastri,_Phocis) where [Delphi](https://en.wikipedia.org/wiki/Delphi) once stood
 
 You'll find demo applications in the Demos folder, including those associated with articles posted on the [Delphi Worlds blog](http://www.delphiworlds.com/blog)
 
