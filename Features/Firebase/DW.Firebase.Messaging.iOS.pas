@@ -23,7 +23,7 @@ uses
   // iOS
   iOSapi.Foundation,
   // DW
-  DW.Firebase.Messaging, DW.iOSapi.UserNotifications, DW.iOSapi.Firebase; // , DW.Notifications;
+  DW.Firebase.Messaging, DW.iOSapi.UserNotifications, DW.iOSapi.Firebase; // DW.Notifications;
 
 type
   TPlatformFirebaseMessaging = class;
@@ -135,7 +135,6 @@ begin
   inherited;
   TMessageManager.DefaultManager.SubscribeToMessage(TPushStartupNotificationMessage, PushStartupNotificationMessageMessageHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TPushDeviceTokenMessage, PushDeviceTokenMessageHandler);
-  Start;
 end;
 
 destructor TPlatformFirebaseMessaging.Destroy;
@@ -211,7 +210,7 @@ end;
 
 procedure TPlatformFirebaseMessaging.TokenReceived(const AToken: string);
 begin
-  TThread.Queue(nil,
+  TThread.Synchronize(nil,
     procedure
     begin
       DoTokenReceived(AToken);
@@ -228,8 +227,6 @@ end;
 procedure TPlatformFirebaseMessaging.RegisterRemoteNotificationsIOS10OrLater;
 begin
   UserNotificationCenter.getNotificationSettingsWithCompletionHandler(CheckNotificationsAuthorizationHandler);
-  if not TiOSHelperEx.SharedApplication.isRegisteredForRemoteNotifications then
-    TiOSHelperEx.SharedApplication.registerForRemoteNotifications;
 end;
 
 procedure TPlatformFirebaseMessaging.CheckNotificationsAuthorizationHandler(settings: UNNotificationSettings);
@@ -249,14 +246,13 @@ var
 begin
   LSettings := TUIUserNotificationSettings.Wrap(TUIUserNotificationSettings.OCClass.settingsForTypes(FAuthOptions, nil));
   TiOSHelper.SharedApplication.registerUserNotificationSettings(LSettings);
-  if not TiOSHelperEx.SharedApplication.isRegisteredForRemoteNotifications then
-    TiOSHelper.SharedApplication.registerForRemoteNotifications;
   DoAuthorizationResult(True);
 end;
 
 procedure TPlatformFirebaseMessaging.RequestAuthorization;
 begin
-  TOSLog.d('+TPlatformFirebaseMessaging.RequestAuthorization');
+  TOSLog.d('TPlatformFirebaseMessaging.RequestAuthorization');
+  TPlatformNotifications.UpdateDelegate;
   FAuthOptions := UNAuthorizationOptionSound or UNAuthorizationOptionAlert or UNAuthorizationOptionBadge;
   if TOSVersion.Check(10) then
     RegisterRemoteNotificationsIOS10OrLater
@@ -269,7 +265,16 @@ end;
 procedure TPlatformFirebaseMessaging.RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
 begin
   if granted then
-    TOSLog.d('Authorization GRANTED')
+  begin
+    TOSLog.d('Authorization GRANTED');
+    if not TiOSHelperEx.SharedApplication.isRegisteredForRemoteNotifications then
+    begin
+      TiOSHelperEx.SharedApplication.registerForRemoteNotifications;
+      TOSLog.d('Registered for remote notifications');
+    end
+    else
+      TOSLog.d('ALREADY registered for remote notifications');
+  end
   else
     TOSLog.d('Authorization NOT GRANTED');
   TThread.Queue(nil,
@@ -296,9 +301,5 @@ procedure TPlatformFirebaseMessaging.UnsubscribeFromTopic(const ATopicName: stri
 begin
   Messaging.unsubscribeFromTopic(StrToNSStr(ATopicName));
 end;
-
-//initialization
-//  TOSLog.d('Calling TPlatformNotifications.UpdateDelegate');
-//  TPlatformNotifications.UpdateDelegate;
 
 end.

@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.ScrollBox, FMX.Memo, FMX.Controls.Presentation,
-  FMX.StdCtrls, FMX.Layouts, FMX.Objects,
+  FMX.StdCtrls, FMX.Layouts, FMX.Objects, FMX.Memo.Types,
   DW.Firebase.Messaging;
 
 type
@@ -53,9 +53,10 @@ procedure TfrmMain.CreateFirebaseMessaging;
 begin
   FFCM := TFirebaseMessaging.Create;
   FFCM.OnAuthorizationResult := FCMAuthorizationResultHandler;
-  FFCM.RequestAuthorization;
   FFCM.OnTokenReceived := FCMTokenReceivedHandler;
   FFCM.OnMessageReceived := FCMMessageReceivedHandler;
+  // Kick everything off now that the handlers are in place. Start will call RequestAuthorization internally
+  FFCM.Start;
 end;
 
 destructor TfrmMain.Destroy;
@@ -85,7 +86,6 @@ end;
 procedure TfrmMain.FCMTokenReceivedHandler(Sender: TObject; const AToken: string);
 begin
   TokenMemo.Lines.Text := AToken;
-  // TokenMemo.Lines.Text := FFCM.DeviceToken;
   TOSLog.d('Token in FCMTokenReceivedHandler: %s', [AToken]);
 end;
 

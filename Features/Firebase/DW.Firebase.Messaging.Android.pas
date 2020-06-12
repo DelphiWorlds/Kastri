@@ -48,6 +48,7 @@ type
     procedure PublishNotification(const data: JIntent);
     procedure RequestAuthorization; override;
     procedure SubscribeToTopic(const ATopicName: string); override;
+    function Start: Boolean; override;
     procedure UnsubscribeFromTopic(const ATopicName: string); override;
   public
     constructor Create(const AFirebaseMessaging: TFirebaseMessaging); override;
@@ -90,17 +91,10 @@ end;
 { TPlatformFirebaseMessaging }
 
 constructor TPlatformFirebaseMessaging.Create(const AFirebaseMessaging: TFirebaseMessaging);
-var
-  LIntentFilter: JIntentFilter;
 begin
   inherited;
-  TPlatformFirebaseApp.Start;
   FFirebaseMessagingReceiverListener := TFirebaseMessagingReceiverListener.Create(Self);
   FFirebaseMessagingBroadcastReceiver := TJFMXBroadcastReceiver.JavaClass.init(FFirebaseMessagingReceiverListener);
-  LIntentFilter := TJIntentFilter.JavaClass.init;
-  LIntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_NEW_TOKEN);
-  LIntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_MESSAGE_RECEIVED);
-  TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FFirebaseMessagingBroadcastReceiver, LIntentFilter);
 end;
 
 destructor TPlatformFirebaseMessaging.Destroy;
@@ -108,6 +102,18 @@ begin
   FFirebaseMessagingReceiverListener.Free;
   FFirebaseMessagingBroadcastReceiver := nil;
   inherited;
+end;
+
+function TPlatformFirebaseMessaging.Start: Boolean;
+var
+  LIntentFilter: JIntentFilter;
+begin
+  TPlatformFirebaseApp.Start;
+  LIntentFilter := TJIntentFilter.JavaClass.init;
+  LIntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_NEW_TOKEN);
+  LIntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_MESSAGE_RECEIVED);
+  TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FFirebaseMessagingBroadcastReceiver, LIntentFilter);
+  Result := True;
 end;
 
 procedure TPlatformFirebaseMessaging.Connect;

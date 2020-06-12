@@ -82,7 +82,6 @@ type
     destructor Destroy; override;
     procedure Connect;
     procedure Disconnect;
-    procedure RequestAuthorization;
     procedure SubscribeToTopic(const ATopicName: string);
     function Start: Boolean;
     procedure UnsubscribeFromTopic(const ATopicName: string);
@@ -287,11 +286,6 @@ begin
   end;
 end;
 
-procedure TFirebaseMessaging.RequestAuthorization;
-begin
-  FPlatformFirebaseMessaging.RequestAuthorization;
-end;
-
 procedure TFirebaseMessaging.SetShowBannerWhenForeground(const Value: Boolean);
 begin
   FPlatformFirebaseMessaging.ShowBannerWhenForeground := Value;
@@ -303,6 +297,8 @@ begin
   if not Result then
     Result := FPlatformFirebaseMessaging.Start;
   FIsActive := Result;
+  if Result then
+    FPlatformFirebaseMessaging.RequestAuthorization;
 end;
 
 procedure TFirebaseMessaging.SubscribeToTopic(const ATopicName: string);
