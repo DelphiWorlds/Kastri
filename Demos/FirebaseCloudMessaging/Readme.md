@@ -27,10 +27,15 @@ In order to use this demo, you will need to:
 * Unzip the latest Firebase SDK in the ThirdParty\Firebase\iOS folder of Kastri
 * In the IDE Options > Environment Variables, create a user override called Firebase which points to the unzipped SDK, **or** modify the search paths in the Project Options for iOS Device 64-bit to point to the unzipped SDK
 * In the Project Options for iOS Device 64-bit, modify the CFBundleIndentifier value  in the Version Info section to use the identifier that corresponds to your App ID
+* Put your Google-Services.info.plist file from Firebase Console into the Resources folder of the demo
+* Unzip the Firebase-6.18.zip file in the Kastri\ThirdParty\Firebase\iOS folder in-place
 
-#### Android
+#### Android (32 bit and 64 bit where required)
 
-* In the Project Options for Android (32 bit and 64 bit where required), modify the Package value in the Version Info section to be the value specified in your Firebase Project
+In the Project Options:
+
+* Modify the Package value in the Version Info section to be the value specified in your Firebase Project
+* Import the google-services.json file from Firebase Console in the Services section
 
 ## Sending messages
 
@@ -54,6 +59,13 @@ Send only 'notification' messages to iOS devices. From testing recently carried 
 ### PushItServer
 
 PushItServer is a framework being developed to help create push servers that manage registration of tokens, creation of groups, sending of the correct types of messages etc. Stay tuned to [Delphi Worlds](https://github.com/sponsors/DelphiWorlds) to find out more
+
+## Integration into a new or existing project (not the demo)
+
+* Please follow the steps as per the Using the demo section
+* In the Project Manager, under the Android target, right-click the Libraries node and add the dw-kastri-base.jar and dw-firebase-messaging.jar files from the Kastri\Lib folder
+* In the Project Options, ensure that the search path for **all** platforms includes folders from the Kastri repo as per the demo
+* In the Project Options, ensure that the search path for iOS Device 64-bit includes the Firebase SDK paths as per the demo
 
 
 
