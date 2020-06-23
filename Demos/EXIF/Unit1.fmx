@@ -1,0 +1,71 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 531
+  ClientWidth = 363
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object Image1: TImage
+    MultiResBitmap = <
+      item
+      end>
+    Align = Client
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Size.Width = 355.000000000000000000
+    Size.Height = 335.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Bottom
+    Position.Y = 343.000000000000000000
+    Size.Width = 363.000000000000000000
+    Size.Height = 136.000000000000000000
+    Size.PlatformDefault = False
+    Viewport.Width = 359.000000000000000000
+    Viewport.Height = 132.000000000000000000
+  end
+  object Layout1: TLayout
+    Align = Bottom
+    Padding.Left = 4.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 4.000000000000000000
+    Padding.Bottom = 12.000000000000000000
+    Position.Y = 479.000000000000000000
+    Size.Width = 363.000000000000000000
+    Size.Height = 52.000000000000000000
+    Size.PlatformDefault = False
+    object PrevButton: TButton
+      Align = Left
+      Enabled = False
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 85.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'arrowlefttoolbutton'
+      Text = 'PrevAction'
+      OnClick = PrevButtonClick
+    end
+    object NextButton: TButton
+      Align = Right
+      Enabled = False
+      Position.X = 274.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 85.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'arrowrighttoolbutton'
+      Text = 'NextAction'
+      OnClick = NextButtonClick
+    end
+  end
+end
