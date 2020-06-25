@@ -94,7 +94,7 @@ public class DWNotificationPublisher {
   }
 
   public static void sendNotification(Context context, Intent intent, boolean pending) {
-    Log.v(TAG, "+sendNotification");
+    Log.d(TAG, "+sendNotification");
     initialize(context);
     String channelId = "";
     if (Build.VERSION.SDK_INT >= 26) {
@@ -105,9 +105,10 @@ public class DWNotificationPublisher {
         if (mNotificationManager.getNotificationChannel(id) != null)
           channelId = id;
         else
-          Log.v(TAG, "Channel not registered: " + id);
+          Log.w(TAG, "Channel not registered: " + id);
       }
     }
+    Log.d(TAG, "channelId is: " + channelId);
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId);
     if (intent.hasExtra("notification_color")) { 
       builder = builder.setColor(Integer.parseInt(intent.getStringExtra("notification_color")));
@@ -115,13 +116,15 @@ public class DWNotificationPublisher {
     String text = null;
     if (intent.hasExtra("body")) {
       text = intent.getStringExtra("body");      
+      Log.d(TAG, "text is: " + text);
     }
     builder = builder.setContentText(text);
     if (intent.hasExtra("big_text") && (Integer.parseInt(intent.getStringExtra("big_text")) == 1)) {
-      Log.v(TAG, "Notification has big text flag");
+      Log.d(TAG, "Notification has big text flag");
       builder = builder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
     }
     if (intent.hasExtra("title")) { 
+      Log.d(TAG, "title is: " + intent.getStringExtra("title"));
       builder = builder.setContentTitle(intent.getStringExtra("title"));
     }
 /*
@@ -135,6 +138,7 @@ public class DWNotificationPublisher {
     if (smallIcon == 0)
       smallIcon = mDefaultSmallIcon;
 */
+    mDefaultSmallIcon = context.getApplicationInfo().icon;
     builder.setSmallIcon(mDefaultSmallIcon);
     if (intent.hasExtra("image")) { 
       try {
@@ -157,6 +161,7 @@ public class DWNotificationPublisher {
       builder = builder.setVisibility(Integer.parseInt(intent.getStringExtra("visibility")));
     }
     if (intent.hasExtra("priority")) {  
+      Log.d(TAG, "priority is: " + intent.getStringExtra("priority"));
       builder = builder.setPriority(Integer.parseInt(intent.getStringExtra("priority")));
     }
     if (mDefaultPriority > -1)
@@ -167,6 +172,10 @@ public class DWNotificationPublisher {
       mUniqueId = mUniqueId + 1;
       PendingIntent pendingIntent = PendingIntent.getActivity(context, mUniqueId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
       builder = builder.setContentIntent(pendingIntent); 
+      if (intent.hasExtra("fullscreen") && intent.getStringExtra("fullscreen").equals("1")) { 
+        Log.d(TAG, "fullscreen intent");
+        builder = builder.setFullScreenIntent(pendingIntent, true);
+      } 
     }
     builder = builder.setDefaults(NotificationCompat.DEFAULT_LIGHTS)
       .setWhen(System.currentTimeMillis())
@@ -174,8 +183,8 @@ public class DWNotificationPublisher {
       .setAutoCancel(true);
     // if (intent.hasExtra("notification_badgecount")) 
     //  ShortcutBadger.applyCount(this.getApplicationContext(), Integer.parseInt(intent.getStringExtra("notification_badgecount")));
-    DWWakeUp.checkWakeUp(context, WAKE_ON_NOTIFICATION);
+    DWWakeUp.checkWakeUp(context, WAKE_ON_NOTIFICATION, pending);
     mNotificationManager.notify(mUniqueId, builder.build());
-    Log.v(TAG, "-sendNotification");
+    Log.d(TAG, "-sendNotification");
   }
 }
