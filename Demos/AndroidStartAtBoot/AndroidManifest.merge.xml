@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <application>
+  <application merge:update="existing">
     <!-- ***** Metadata for the receiver ***** -->
     <!-- Start at device boot -->
     <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_ON_BOOT" android:value="true" />
