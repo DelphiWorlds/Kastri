@@ -59,6 +59,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -90,6 +91,17 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 
   private boolean startApp(Context context) {
     context.startActivity(context.getPackageManager().getLaunchIntentForPackage(context.getPackageName()));
+    return true;
+  }
+
+  private boolean sendStartupNotification(Context context) {
+    Log.d(TAG, "Sending startup notification");
+    Intent intent = new Intent();
+    intent.putExtra("title", "Start At Boot");
+    intent.putExtra("body", "Please tap this notification for the application to start");
+    intent.putExtra("priority", Integer.toString(NotificationCompat.PRIORITY_HIGH));
+    intent.putExtra("fullscreen", "1");
+    DWNotificationPublisher.sendNotification(context, intent, true);
     return true;
   }
 
@@ -128,14 +140,18 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
     // This action will start the application or service on bootup of the device
     // Note: This action also needs <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />  in the manifest    
     if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-      Log.v(TAG, "Intent.ACTION_BOOT_COMPLETED");
+      Log.d(TAG, "Intent.ACTION_BOOT_COMPLETED");
       if ((metaData != null) && metaData.containsKey(KEY_START_ON_BOOT)) {
-        if (metaData.getBoolean(KEY_START_ON_BOOT))
-          return startApp(context);
+        if (metaData.getBoolean(KEY_START_ON_BOOT)) {
+          if (Build.VERSION.SDK_INT < 29)
+            return startApp(context);
+          else
+            return sendStartupNotification(context);
+        }
       }
       if ((metaData != null) && metaData.containsKey(KEY_START_SERVICE_ON_BOOT)) {
         String serviceName = "com.embarcadero.services." + metaData.getString(KEY_START_SERVICE_ON_BOOT);
-        Log.v(TAG, "Attempting to start service from boot: " + serviceName);
+        Log.d(TAG, "Attempting to start service from boot: " + serviceName);
         Intent serviceIntent = new Intent();
         serviceIntent.setClassName(context.getPackageName(), serviceName);
         if (checkBuildAndTarget(context, 26)) 
@@ -148,7 +164,7 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 
     // Starting a service from an alarm or restart. The intent should already have the class name set in the intent
     if (intent.getAction().equals(ACTION_SERVICE_ALARM) || intent.getAction().equals(ACTION_SERVICE_RESTART)) {
-      Log.v(TAG, "Attempting to restart service or start service from alarm");
+      Log.d(TAG, "Attempting to restart service or start service from alarm");
       intent.setClassName(context.getPackageName(), intent.getStringExtra("ServiceName"));
       if (intent.getAction().equals(ACTION_SERVICE_RESTART))
         intent.putExtra(EXTRA_SERVICE_RESTART, 1);
@@ -161,19 +177,19 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 
     // Starting the application from an alarm. 
     if (intent.getAction().equals(ACTION_START_ALARM)) {
-      Log.v(TAG, "Attempting to start the application from an alarm");
+      Log.d(TAG, "Attempting to start the application from an alarm");
       PowerManager.WakeLock wakeLock = null;
       if (intent.getBooleanExtra(EXTRA_START_UNLOCK, false)) {
-        Log.v(TAG, "Attempting to start from lock screen (if locked)");
+        Log.d(TAG, "Attempting to start from lock screen (if locked)");
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         int wakeLevel = PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP;
         wakeLock = powerManager.newWakeLock(wakeLevel, WAKE_LOCK_ID);
         wakeLock.acquire();
-        Log.v(TAG, "Acquired WakeLock");
+        Log.d(TAG, "Acquired WakeLock");
         KeyguardManager manager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
         KeyguardManager.KeyguardLock keyguardLock = manager.newKeyguardLock(TAG);
         keyguardLock.disableKeyguard();
-        Log.v(TAG, "Disabled Keyguard");
+        Log.d(TAG, "Disabled Keyguard");
       }
       boolean result = startApp(context);
       if (wakeLock != null)
@@ -233,7 +249,7 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 
   private void setRepeatAlarm(Context context, Intent intent, long alarmTime) {
     int id = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
-    Log.v(TAG, "Setting repeat alarm for id: " + id);
+    Log.d(TAG, "Setting repeat alarm for id: " + id);
     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     if (Build.VERSION.SDK_INT >= 21)
@@ -243,16 +259,16 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
   }
 
   public void onReceive(Context context, Intent intent) {
-    Log.v(TAG, "Received intent with action: " + intent.getAction());
+    Log.d(TAG, "Received intent with action: " + intent.getAction());
     if (ACTION_NOTIFICATION.equals(intent.getAction())) {
       // Broadcast to the app to handle the notification if the app is running
       LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
       Notification notification = intent.getParcelableExtra(EXTRA_NOTIFICATION);
       NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-      DWWakeUp.checkWakeUp(context, WAKE_ON_NOTIFICATION);
+      DWWakeUp.checkWakeUp(context, WAKE_ON_NOTIFICATION, false);
       // Dispatch the notification to the OS
       int id = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
-      Log.v(TAG, "Notifying with id: " + id);
+      Log.d(TAG, "Notifying with id: " + id);
       manager.notify(id, notification);
       // Set alarm if repeating
       long alarmTime = getAlarmTime(notification.extras.getInt(EXTRA_NOTIFICATION_REPEATINTERVAL, 0));
@@ -260,7 +276,7 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
         setRepeatAlarm(context, intent, alarmTime);
 		}
     else if (intent.getAction().equals(ACTION_ALARM_TIMER)) {
-      Log.v(TAG, "Alarm timer");
+      Log.d(TAG, "Alarm timer");
       LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     } else if (!checkStartupIntent(context, intent))
       // Simply forward on the intent in a local broadcast
