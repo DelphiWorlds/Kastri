@@ -36,6 +36,7 @@ type
     procedure CreateNotificationChannel;
     procedure CreateObjects;
     procedure DestroyObjects;
+    procedure DoMessage(const AMsg: string);
     function IsForeground: Boolean;
     procedure LocationChangeHandler(Sender: TObject; const ALocation: TLocationCoord2D; const ASource: TLocationSource);
     procedure RestartService;
@@ -63,7 +64,7 @@ uses
   Grijjy.CloudLogging,
   {$ENDIF}
   DW.OSLog,
-  DW.Android.Helpers, DW.Consts.Android, DW.OSDevice,
+  DW.Android.Helpers, DW.Consts.Android, DW.OSDevice, DW.Androidapi.JNI.SupportV4,
   CPL.LocationsDataModule,
   CPL.Consts;
 
@@ -82,6 +83,11 @@ const
   cLocationTimerInterval = 120000; // Milliseconds
 
   cUpdaterLocationURL = ''; // Replace this with the URL you send updates to
+
+function GetLogTime: string;
+begin
+  Result := FormatDateTime('mm-dd hh:nn:ss.zzz', Now);
+end;
 
 { TLocalReceiver }
 
@@ -140,7 +146,7 @@ begin
   if FLocation = nil then
   begin
     FLocation := TLocation.Create;
-    FLocation.NeedsBackground := True;
+    FLocation.NeedsBackgroundAccess := True;
     FLocation.MinimumChangeInterval := cMinimumChangeInterval;
     FLocation.OnLocationChange := LocationChangeHandler;
     FLocation.TimerTask.Schedule(cLocationTimerInterval);
@@ -160,6 +166,15 @@ begin
   FBackgroundMonitor := nil;
   FLocation.DisposeOf;
   FLocation := nil;
+end;
+
+procedure TServiceModule.DoMessage(const AMsg: string);
+var
+  LIntent: JIntent;
+begin
+  LIntent := TJIntent.JavaClass.init(StringToJString(cServiceMessageAction));
+  LIntent.putExtra(StringToJString(cServiceBroadcastParamMessage), StringToJString(GetLogTime + ': ' + AMsg));
+  TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).sendBroadcast(LIntent);
 end;
 
 procedure TServiceModule.RestartService;
@@ -274,6 +289,7 @@ begin
   LBuilder.setTicker(StrToJCharSequence(cServiceNotificationCaption));
   LBuilder.setPriority(TJNotification.JavaClass.PRIORITY_MIN);
   JavaService.startForeground(cServiceForegroundId, LBuilder.build);
+  DoMessage('Service entered foreground mode');
 end;
 
 procedure TServiceModule.StopForeground;
@@ -283,6 +299,7 @@ begin
     Exit; // <======
   TOSLog.d('StopForeground');
   JavaService.stopForeground(True);
+  DoMessage('Service exited foreground mode');
 end;
 
 procedure TServiceModule.LocationChangeHandler(Sender: TObject; const ALocation: TLocationCoord2D; const ASource: TLocationSource);
