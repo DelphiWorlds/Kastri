@@ -5,9 +5,29 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, System.Sensors,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.Layouts,
+  FMX.Memo.Types,
+  {$IF Defined(ANDROID)}
+  Androidapi.JNI.GraphicsContentViewText,
+  DW.MultiReceiver.Android,
+  {$ENDIF}
   DW.Location;
 
 type
+  TMessageReceivedEvent = procedure(Sender: TObject; const Msg: string) of object;
+
+  {$IF Defined(ANDROID)}
+  TLocalReceiver = class(TMultiReceiver)
+  private
+    FOnMessageReceived: TMessageReceivedEvent;
+    procedure DoMessageReceived(const AMsg: string);
+  protected
+    procedure Receive(context: JContext; intent: JIntent); override;
+    procedure ConfigureActions; override;
+  public
+    property OnMessageReceived: TMessageReceivedEvent read FOnMessageReceived write FOnMessageReceived;
+  end;
+  {$ENDIF}
+
   TMainView = class(TForm)
     Memo: TMemo;
     ClearButton: TButton;
@@ -15,7 +35,11 @@ type
     procedure ClearButtonClick(Sender: TObject);
   private
     FLocation: TLocation;
+    {$IF Defined(ANDROID)}
+    FReceiver: TLocalReceiver;
+    {$ENDIF}
     procedure LocationChangedHandler(Sender: TObject; const ALocation: TLocationCoord2D);
+    procedure ReceiverMessageReceivedHandler(Sender: TObject; const AMsg: string);
     procedure RequestLocationPermissions;
     procedure StartLocation;
   protected
@@ -40,6 +64,7 @@ uses
   {$ENDIF}
   DW.OSLog, DW.OSDevice,
   {$IF Defined(ANDROID)}
+  Androidapi.Helpers,
   DW.ServiceCommander.Android,
   {$ENDIF}
   DW.Sensors, DW.Consts.Android, DW.UIHelper,
@@ -67,6 +92,27 @@ begin
   Result := True;
 end;
 
+{$IF Defined(ANDROID)}
+{ TLocalReceiver }
+
+procedure TLocalReceiver.ConfigureActions;
+begin
+  IntentFilter.addAction(StringToJString(cServiceMessageAction));
+end;
+
+procedure TLocalReceiver.DoMessageReceived(const AMsg: string);
+begin
+  if Assigned(FOnMessageReceived) then
+    FOnMessageReceived(Self, AMsg);
+end;
+
+procedure TLocalReceiver.Receive(context: JContext; intent: JIntent);
+begin
+  if intent.getAction.equals(StringToJString(cServiceMessageAction)) then
+    DoMessageReceived(JStringToString(intent.getStringExtra(StringToJString(cServiceBroadcastParamMessage))));
+end;
+{$ENDIF}
+
 { TMainView }
 
 constructor TMainView.Create(AOwner: TComponent);
@@ -75,6 +121,10 @@ begin
   {$IF Defined(CLOUDLOGGING)}
   GrijjyLog.SetLogLevel(TgoLogLevel.Info);
   GrijjyLog.Connect(cCloudLoggingHost, cCloudLoggingName);
+  {$ENDIF}
+  {$IF Defined(ANDROID)}
+  FReceiver := TLocalReceiver.Create(True);
+  FReceiver.OnMessageReceived := ReceiverMessageReceivedHandler;
   {$ENDIF}
   FLocation := TLocation.Create;
   FLocation.Usage := TLocationUsage.Always;
@@ -85,6 +135,9 @@ end;
 
 destructor TMainView.Destroy;
 begin
+  {$IF Defined(ANDROID)}
+  FReceiver.Free;
+  {$ENDIF}
   FLocation.Free;
   inherited;
 end;
@@ -103,6 +156,11 @@ procedure TMainView.Resize;
 begin
   inherited;
   ContentLayout.Padding.Rect := TUIHelper.GetOffsetRect;
+end;
+
+procedure TMainView.ReceiverMessageReceivedHandler(Sender: TObject; const AMsg: string);
+begin
+  Memo.Lines.Add('Message from service: ' + AMsg);
 end;
 
 procedure TMainView.RequestLocationPermissions;
