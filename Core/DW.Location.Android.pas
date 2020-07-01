@@ -51,7 +51,7 @@ type
     FMinimumChangeInterval: Integer;
     FMonitoringDistance: Integer;
     FMonitoringInterval: Integer;
-    FNeedsBackground: Boolean;
+    FNeedsBackgroundAccess: Boolean;
     FNetworkLocationListener: JLocationListener;
     FTimerTask: TTimerTask;
     FOnLocationChange: TLocationChangeEvent;
@@ -79,7 +79,7 @@ type
     property MinimumChangeInterval: Integer read FMinimumChangeInterval write FMinimumChangeInterval;
     property MonitoringDistance: Integer read FMonitoringDistance write SetMonitoringDistance;
     property MonitoringInterval: Integer read FMonitoringInterval write SetMonitoringInterval;
-    property NeedsBackground: Boolean read FNeedsBackground write FNeedsBackground;
+    property NeedsBackgroundAccess: Boolean read FNeedsBackgroundAccess write FNeedsBackgroundAccess;
     property TimerTask: TTimerTask read FTimerTask;
     property OnLocationChange: TLocationChangeEvent read FOnLocationChange write FOnLocationChange;
   end;
@@ -297,7 +297,7 @@ var
   LPermissions: TArray<string>;
 begin
   LPermissions := [cPermissionAccessCoarseLocation, cPermissionAccessFineLocation];
-  if FNeedsBackground and TOSVersion.Check(10) then
+  if FNeedsBackgroundAccess and TOSVersion.Check(10) then
     LPermissions := LPermissions + [cPermissionAccessBackgroundLocation];
   Result := PermissionsService.IsEveryPermissionGranted(LPermissions);
 end;
