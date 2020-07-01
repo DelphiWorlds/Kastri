@@ -62,7 +62,8 @@ type
 
   JNotificationCompat_BuilderClass = interface(JObjectClass)
     ['{6EC74C2C-EBCC-4A55-98B6-6DD36DE3BA8C}']
-    {class} function init(context: JContext): JNotificationCompat_Builder; cdecl;
+    {class} function init(context: JContext): JNotificationCompat_Builder; cdecl; overload;
+    {class} function init(context: JContext; channelId: JString): JNotificationCompat_Builder; cdecl; overload;
   end;
 
   [JavaSignature('android/support/v4/app/NotificationCompat$Builder')]
