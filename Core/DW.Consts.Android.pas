@@ -30,6 +30,7 @@ const
   cPermissionRecordAudio = 'android.permission.RECORD_AUDIO';
   cPermissionSendSMS = 'android.permission.SEND_SMS';
   cPermissionUseFingerprint = 'android.permission.USE_FINGERPRINT';
+  cPermissionWriteContacts = 'android.permission.WRITE_CONTACTS';
   cPermissionWriteExternalStorage = 'android.permission.WRITE_EXTERNAL_STORAGE';
 
   cMetadataFCMDefaultChannelId = 'com.google.firebase.messaging.default_notification_channel_id';
