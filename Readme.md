@@ -2,6 +2,8 @@
 
 From [Delphi Worlds](http://www.delphiworlds.com)
 
+Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi)
+
 Development of Kastri can be helped along with [Github Sponsorship](https://github.com/sponsors/DelphiWorlds), so please consider sponsoring today!
 
 ## Kastri
@@ -39,7 +41,7 @@ You'll find demo applications in the Demos folder, including those associated wi
 
 ### API imports
 
-In the API folder you will find imports for a number of iOS and Android and Linux APIs that are either not included with Delphi, serve to complete missing APIs, or are imports for Java code contained in Kastri
+In the API folder you will find imports for a number of iOS, Android and Linux APIs that are either not included with Delphi, serve to complete missing APIs, or are imports for Java code contained in Kastri
 Most of these are used in the Kastri Features and/or demos however some are included due to interest from developers.
 
 ### Core units
@@ -69,7 +71,7 @@ Features include:
 
 Android and iOS implementations of biometric functions, namely: Fingerprint recognition on Android, and Fingerprint and FaceID on iOS
 
-#### Connecitivity
+#### Connectivity
 
 Android and iOS implementations of code for checking network connectivity of a device
 
@@ -91,7 +93,7 @@ Android and iOS implementations for speech-to-text services. On Android, the act
 
 ### Planned Features
 
-In addition to the features listed above, several other features are planned for Kastri, namely:
+In addition to the features listed above, several other features are [planned for Kastri](https://github.com/DelphiWorlds/Kastri/milestones), namely:
 
 #### Apple Sign-In
 
