@@ -15,6 +15,10 @@ Development of Kastri can be helped along with [Github Sponsorship](https://gith
 * Is kept as simple as practicable
 * Is named after the [place in Greece](https://en.wikipedia.org/wiki/Kastri,_Phocis) where [Delphi](https://en.wikipedia.org/wiki/Delphi) once stood
 
+## Intro video
+
+[This is a link to an intro video for Kastri](https://delphiworlds.s3-us-west-2.amazonaws.com/kastri-sponsor-video.mp4)
+
 ## How To Use Kastri
 
 With Kastri, there are no components to install. Simply clone the repo ([Fork](https://git-fork.com/) is a highly recommended Git client), or download/unzip and ensure that your Project (recommended) or IDE paths point to the folders of the units that you use.
