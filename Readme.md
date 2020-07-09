@@ -1,5 +1,7 @@
 # Kastri
 
+<img src="kastri-logo.png" alt="logo" height="250">
+
 From [Delphi Worlds](http://www.delphiworlds.com)
 
 Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi)
