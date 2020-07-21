@@ -197,7 +197,7 @@ var
   LNFCPayload: TNFCPayload;
 begin
   TOSLog.d('+TPlatformNFCReader.HandleNfcIntent');
-  if (AIntent <> nil) and AIntent.getAction.equals(TJNfcAdapter.JavaClass.ACTION_NDEF_DISCOVERED) then
+  if (AIntent <> nil) and (AIntent.getAction <> nil) and AIntent.getAction.equals(TJNfcAdapter.JavaClass.ACTION_NDEF_DISCOVERED) then
   begin
     LMessages := AIntent.getParcelableArrayExtra(TJNfcAdapter.JavaClass.EXTRA_NDEF_MESSAGES);
     SetLength(LNFCMessages, LMessages.Length);
