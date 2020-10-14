@@ -18,7 +18,7 @@ interface
 uses
   // RTL
   System.Net.Socket,
-  // macOS
+  // Mac
   Macapi.CoreFoundation,
   // DW
   DW.iOSapi.SystemConfiguration, DW.Connectivity;
@@ -29,6 +29,7 @@ type
     FConnectivity: TConnectivity;
   public
     class function IsConnectedToInternet: Boolean;
+    class function IsWifiEnabled: Boolean;
     class function IsWifiInternetConnection: Boolean;
   public
     constructor Create(const AConnectivity: TConnectivity);
@@ -37,8 +38,12 @@ type
 implementation
 
 uses
+  // Mac
+  Macapi.Helpers,
+  // iOS
+  iOSapi.Foundation,
   // Posix
-  Posix.SysSocket, Posix.NetinetIn, Posix.ArpaInet;
+  Posix.Base, Posix.SysSocket, Posix.NetinetIn, Posix.ArpaInet, Posix.NetIf;
 
 type
   TReachability = class(TObject)
@@ -68,6 +73,12 @@ type
 
   TOpenConnectivity = class(TConnectivity);
 
+const
+  cWifiInterfaceName = 'awdl0'; // <----- That's a small L (l), not a one (1)
+
+function getifaddrs(var ifap: pifaddrs): Integer; cdecl; external libc name _PU + 'getifaddrs'; {do not localize}
+procedure freeifaddrs(ifap: pifaddrs); cdecl; external libc name _PU + 'freeifaddrs'; {do not localize}
+
 constructor TPlatformConnectivity.Create(const AConnectivity: TConnectivity);
 begin
   inherited Create;
@@ -83,6 +94,27 @@ end;
 class function TPlatformConnectivity.IsWifiInternetConnection: Boolean;
 begin
   Result := TReachability.Current.IsWifiInternetConnection;
+end;
+
+class function TPlatformConnectivity.IsWifiEnabled: Boolean;
+var
+  LAddrList, LAddrInfo: pifaddrs;
+  LSet: NSCountedSet;
+begin
+  Result := False;
+  if getifaddrs(LAddrList) = 0 then
+  try
+    LSet := TNSCountedSet.Create;
+    LAddrInfo := LAddrList;
+    repeat
+      if (LAddrInfo.ifa_flags and IFF_UP) = IFF_UP then
+        LSet.addObject(TNSString.OCClass.stringWithUTF8String(LAddrInfo.ifa_name));
+      LAddrInfo := LAddrInfo^.ifa_next;
+    until LAddrInfo = nil;
+    Result := LSet.countForObject(StringToID(cWifiInterfaceName)) > 1;
+  finally
+    freeifaddrs(LAddrList);
+  end;
 end;
 
 { TReachability }
