@@ -12,4 +12,4 @@ Currently supported platforms are Windows, iOS and Android
 
 ### Compiling for iOS
 
-If compiling for iOS, you will need to add the SystemConfiguration framework to the iOS SDK. There are some instructions on how to add a framework here (needs updating, however it should still work)
+If compiling for iOS, you will need to add the SystemConfiguration framework to the iOS SDK. There are some instructions on [how to add a framework here](https://delphiworlds.com/2013/10/adding-other-ios-frameworks-to-the-sdk-manager) (needs updating, however it should still work)
