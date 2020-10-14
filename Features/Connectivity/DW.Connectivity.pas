@@ -42,6 +42,9 @@ uses
 {$ELSEIF Defined(IOS)}
 uses
   DW.Connectivity.iOS;
+{$ELSEIF Defined(MSWINDOWS)}
+uses
+  DW.Connectivity.Win;
 {$ELSE}
 uses
   DW.Connectivity.Default;
