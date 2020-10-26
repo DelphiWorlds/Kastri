@@ -53,11 +53,35 @@ type
     procedure ReceiverReceive(intent: JIntent);
   public
     constructor Create;
+    /// <summary>
+    ///   Creates an alarm that is used to wake up the service
+    /// </summary>
+    /// <remarks>
+    ///   Requires the use of dw-kastri-base.jar, which contains a broadcast receiver which processes the alarm
+    /// </remarks>
     procedure StartDozeAlarm;
+    /// <summary>
+    ///   Removes the doze alarm
+    /// </summary>
     procedure StopDozeAlarm;
+    /// <summary>
+    ///   Determines the interval, in milliseconds, of the alarm when next set
+    /// </summary>
     property DozeAlarmInterval: Integer read FDozeAlarmInterval write FDozeAlarmInterval;
+    /// <summary>
+    ///   Indicates whether or not the device is in doze mode
+    /// </summary>
     property IsDozed: Boolean read GetIsDozed;
+    /// <summary>
+    ///   Indicates whether or not the device is locked
+    /// </summary>
     property IsScreenLocked: Boolean read GetIsScreenLocked;
+    /// <summary>
+    ///   The fully qualified name of the service that the doze alarm is being used for
+    /// </summary>
+    /// <remarks>
+    ///   Example: com.embarcadero.services.SomeService
+    /// </remarks>
     property ServiceName: string read FServiceName write FServiceName;
     property OnDozeChange: TBackgroundStateChangeEvent read FOnDozeChange write FOnDozeChange;
     property OnScreenLockChange: TBackgroundStateChangeEvent read FOnScreenLockChange write FOnScreenLockChange;
