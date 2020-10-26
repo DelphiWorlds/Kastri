@@ -24,8 +24,14 @@ type
     Latitude: Double;
   end;
 
+  /// <summary>
+  ///   Helper for extracting EXIF data on Android and iOS
+  /// </summary>
   TEXIF = record
   public
+    /// <summary>
+    ///   Extract EXIF data from the specified file
+    /// </summary>
     class function GetEXIF(const AFileName: string; out AProperties: TEXIFProperties): Boolean; static;
   end;
 
