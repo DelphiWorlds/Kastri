@@ -13,16 +13,43 @@ unit DW.Connectivity.Android;
 
 {$I DW.GlobalDefines.inc}
 
+// **** NOTE **** If the target device has API level 21 or greater, you need to add dw-kastri-bade.jar from the Lib folder to the Libraries node of the 
+// Android platform of the project in Project Manager
+
 interface
 
 uses
   // Android
-  Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNIBridge,
   // DW
-  DW.MultiReceiver.Android, DW.Connectivity;
+  DW.Androidapi.JNI.DWNetworkCallback, DW.MultiReceiver.Android, DW.Connectivity;
 
 type
   TPlatformConnectivity = class;
+
+  TNetworks = TArray<JNetwork>;
+
+  TNetworkCallbackDelegate = class(TJavaLocal, JDWNetworkCallbackDelegate)
+  private
+    class var FConnectivityManager: JConnectivityManager;
+  private
+    FCallback: JDWNetworkCallback;
+    FConnectedNetworks: TNetworks;
+    FPlatformConnectivity: TPlatformConnectivity;
+    function IsConnectedToInternet: Boolean;
+    function IndexOfNetwork(const ANetwork: JNetwork): Integer;
+  protected
+    class function ConnectivityManager: JConnectivityManager; static;
+    class function GetConnectedNetworkInfoFromNetwork(const ANetwork: JNetwork): JNetworkInfo; static;
+    class function GetConnectedNetworkInfo: JNetworkInfo; static;
+  public
+    { JDWNetworkCallbackDelegate }
+    procedure onAvailable(network: JNetwork); cdecl;
+    procedure onLost(network: JNetwork); cdecl;
+    procedure onUnavailable; cdecl;
+  public
+    constructor Create(const APlatformConnectivity: TPlatformConnectivity);
+  end;
 
   TConnectivityReceiver = class(TMultiReceiver)
   private
@@ -36,14 +63,13 @@ type
 
   TPlatformConnectivity = class(TObject)
   private
+    FCallbackDelegate: JDWNetworkCallbackDelegate;
     FConnectivity: TConnectivity;
+    FIsConnectedToInternet: Boolean;
     FReceiver: TConnectivityReceiver;
-  private
-    class function ConnectivityManager: JConnectivityManager; static;
   protected
-    procedure ConnectivityChange(const AConnectivity: Boolean);
+    procedure ConnectivityChange(const AIsConnected: Boolean);
   public
-    class function GetConnectedNetworkInfo: JNetworkInfo; static;
     class function IsConnectedToInternet: Boolean; static;
     class function IsWifiInternetConnection: Boolean; static;
   public
