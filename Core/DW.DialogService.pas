@@ -16,23 +16,29 @@ unit DW.DialogService;
 interface
 
 uses
+  // RTL
   System.UITypes,
+  // FMX
   FMX.Dialogs;
 
 type
+  /// <summary>
+  ///   Provides convenience methods for showing dialogs
+  /// </summary>
   TDialog = class(TObject)
   private
     class procedure ModalResultIgnore(const AResult: TModalResult);
   public
     class procedure Confirm(const AMsg: string; const ADefaultNo: Boolean; const ACloseProc: TInputCloseDialogProc);
-    class procedure General(const AMsg: string; const AType: TMsgDlgType);
-    class procedure Information(const AMsg: string);
-    class procedure Warning(const AMsg: string);
+    class procedure General(const AMsg: string; const AType: TMsgDlgType; const ACloseProc: TInputCloseDialogProc = nil);
+    class procedure Information(const AMsg: string; const ACloseProc: TInputCloseDialogProc = nil);
+    class procedure Warning(const AMsg: string; const ACloseProc: TInputCloseDialogProc = nil);
   end;
 
 implementation
 
 uses
+  // FMX
   FMX.DialogService;
 
 { TDialog }
@@ -49,19 +55,22 @@ begin
   TDialogService.MessageDialog(AMsg, TMsgDlgType.mtConfirmation, mbYesNo, cDefaultButtons[ADefaultNo], 0, ACloseProc);
 end;
 
-class procedure TDialog.General(const AMsg: string; const AType: TMsgDlgType);
+class procedure TDialog.General(const AMsg: string; const AType: TMsgDlgType; const ACloseProc: TInputCloseDialogProc = nil);
 begin
-  TDialogService.MessageDialog(AMsg, AType, [TMsgDlgBtn.mbOK], TMsgDlgBtn.mbOK, 0, ModalResultIgnore);
+  if Assigned(ACloseProc) then
+    TDialogService.MessageDialog(AMsg, AType, [TMsgDlgBtn.mbOK], TMsgDlgBtn.mbOK, 0, ACloseProc)
+  else
+    TDialogService.MessageDialog(AMsg, AType, [TMsgDlgBtn.mbOK], TMsgDlgBtn.mbOK, 0, ModalResultIgnore);
 end;
 
-class procedure TDialog.Information(const AMsg: string);
+class procedure TDialog.Information(const AMsg: string; const ACloseProc: TInputCloseDialogProc = nil);
 begin
-  General(AMsg, TMsgDlgType.mtInformation);
+  General(AMsg, TMsgDlgType.mtInformation, ACloseProc);
 end;
 
-class procedure TDialog.Warning(const AMsg: string);
+class procedure TDialog.Warning(const AMsg: string; const ACloseProc: TInputCloseDialogProc = nil);
 begin
-  General(AMsg, TMsgDlgType.mtWarning);
+  General(AMsg, TMsgDlgType.mtWarning, ACloseProc);
 end;
 
 end.
