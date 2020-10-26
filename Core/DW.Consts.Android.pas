@@ -43,6 +43,8 @@ const
   cLocationBroadcastAction = 'com.delphiworlds.kastri.LOCATION_BROADCAST_ACTION';
   cLocationBroadcastExtraLatitude = 'Latitude';
   cLocationBroadcastExtraLongitude = 'Longitude';
+  cLocationBroadcastExtraAccuracy = 'Accuracy';
+  cLocationBroadcastExtraSource = 'Source';
 
   cDWBroadcastReceiverName = 'com.delphiworlds.kastri.DWMultiBroadcastReceiver';
   cDWBroadcastReceiverActionAlarmTimer = cDWBroadcastReceiverName + '.ACTION_ALARM_TIMER';
