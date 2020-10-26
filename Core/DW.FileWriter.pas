@@ -28,12 +28,17 @@ type
   /// </remarks>
   TFileWriter = class(TStreamWriter)
   private
+    FFileName: string;
     FStream: TStream;
   public
-    constructor Create(const Filename: string; Append: Boolean = False); overload; virtual;
+    constructor Create(const AFilename: string; AAppend: Boolean); overload; virtual;
     destructor Destroy; override;
+    property FileName: string read FFileName;
   end;
 
+  /// <summary>
+  ///   Adds/overrides methods specifically to help with writing log files
+  /// </summary>
   TLogWriter = class(TFileWriter)
   private
     FTimestampFormat: string;
@@ -53,19 +58,20 @@ uses
 
 { TFileWriter }
 
-constructor TFileWriter.Create(const Filename: string; Append: Boolean);
+constructor TFileWriter.Create(const AFilename: string; AAppend: Boolean);
 var
   LShareMode: Word;
 begin
+  FFilename := AFileName;
   if TOSVersion.Platform <> TOSVersion.TPlatform.pfiOS then
     LShareMode := fmShareDenyWrite
   else
     LShareMode := 0;
-  if (not TFile.Exists(Filename)) or (not Append) then
-    FStream := TFileStream.Create(Filename, fmCreate or LShareMode)
+  if not TFile.Exists(FFileName) or not AAppend then
+    FStream := TFileStream.Create(FFileName, fmCreate or LShareMode)
   else
   begin
-    FStream := TFileStream.Create(Filename, fmOpenWrite or LShareMode);
+    FStream := TFileStream.Create(FFileName, fmOpenWrite or LShareMode);
     FStream.Seek(0, soEnd);
   end;
   inherited Create(FStream);
