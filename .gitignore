@@ -73,3 +73,8 @@ AndroidManifest.template.xml
 Entitlement.TemplateOSX.xml
 info.plist.TemplateIOS.xml
 *.res
+.DS_Store
+Unused
+LaunchScreen.TemplateiOS
+Settings.bundle
+iOSDevice64
