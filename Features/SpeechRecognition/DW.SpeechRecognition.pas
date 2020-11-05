@@ -4,7 +4,10 @@ unit DW.SpeechRecognition;
 {                                                       }
 {                      Kastri                           }
 {                                                       }
-{          DelphiWorlds Cross-Platform Library          }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{    Copyright 2020 Dave Nottage under MIT license      }
+{  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
@@ -29,12 +32,11 @@ type
   private
     FSpeech: TSpeechRecognition;
   protected
-    class function IsSupported: Boolean; virtual;
-  protected
     procedure DoRecognition(const AText: string; const AStop: Boolean);
     procedure DoAuthorizationStatus(const AStatus: TAuthorizationStatus);
     procedure DoRecordingStatusChanged;
     function IsRecording: Boolean; virtual; abstract;
+    procedure RequestPermission; virtual; abstract;
     procedure StartRecording; virtual; abstract;
     procedure StopRecording; virtual; abstract;
     procedure Stopped;
@@ -45,9 +47,9 @@ type
 
   TSpeechRecognition = class(TObject)
   private
+    FAuthorizationStatus: TAuthorizationStatus;
     FPlatformSpeech: TCustomPlatformSpeechRecognition;
     FPrompt: string;
-    FStatus: TAuthorizationStatus;
     FStopInterval: Integer;
     FText: string;
     FOnAuthorizationStatus: TAuthorizationStatusEvent;
@@ -69,6 +71,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    procedure RequestPermission;
     /// <summary>
     ///   Starts recording
     /// </summary>
@@ -77,6 +80,10 @@ type
     ///   Stops recording
     /// </summary>
     procedure StopRecording;
+    /// <summary>
+    ///   Indicates status of authorization
+    /// </summary>
+    property AuthorizationStatus: TAuthorizationStatus read FAuthorizationStatus;
     /// <summary>
     ///   Indicates whether or not speech recognition has been authorized
     /// </summary>
@@ -156,13 +163,7 @@ end;
 
 procedure TCustomPlatformSpeechRecognition.DoRecordingStatusChanged;
 begin
-  TOSLog.d('TCustomPlatformSpeechRecognition.DoRecordingStatusChanged');
   FSpeech.RecordingStatusChanged;
-end;
-
-class function TCustomPlatformSpeechRecognition.IsSupported: Boolean;
-begin
-  Result := False;
 end;
 
 procedure TCustomPlatformSpeechRecognition.Stopped;
@@ -175,7 +176,7 @@ end;
 constructor TSpeechRecognition.Create;
 begin
   inherited;
-  FStatus := TAuthorizationStatus.NotDetermined;
+  FAuthorizationStatus := TAuthorizationStatus.NotDetermined;
   FPlatformSpeech := TPlatformSpeechRecognition.Create(Self);
 end;
 
@@ -187,9 +188,9 @@ end;
 
 procedure TSpeechRecognition.DoAuthorizationStatus(const AStatus: TAuthorizationStatus);
 begin
-  FStatus := AStatus;
+  FAuthorizationStatus := AStatus;
   if Assigned(FOnAuthorizationStatus) then
-    FOnAuthorizationStatus(Self, FStatus);
+    FOnAuthorizationStatus(Self, FAuthorizationStatus);
 end;
 
 procedure TSpeechRecognition.DoRecognition(const AText: string; const AStop: Boolean);
@@ -203,14 +204,18 @@ end;
 
 procedure TSpeechRecognition.RecordingStatusChanged;
 begin
-  TOSLog.d('TSpeechRecognition.RecordingStatusChanged IsRecording = %s', [BoolToStr(IsRecording, True)]);
   if Assigned(FOnRecording) then
     FOnRecording(Self, IsRecording);
 end;
 
+procedure TSpeechRecognition.RequestPermission;
+begin
+  FPlatformSpeech.RequestPermission;
+end;
+
 function TSpeechRecognition.GetIsAuthorized: Boolean;
 begin
-  Result := FStatus = TAuthorizationStatus.Authorized;
+  Result := FAuthorizationStatus = TAuthorizationStatus.Authorized;
 end;
 
 function TSpeechRecognition.GetIsRecording: Boolean;
