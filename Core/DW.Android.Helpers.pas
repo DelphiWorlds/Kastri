@@ -16,10 +16,17 @@ unit DW.Android.Helpers;
 interface
 
 uses
+  // RTL
+  System.Classes,
   // Android
-  Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App,
+  Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App, Androidapi.JNI.Media,
+  Androidapi.JNIBridge,
   // DW
   DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os;
+
+const
+  cMultiBroadcastReceiverClassName = 'DWMultiBroadcastReceiver';
+  cMultiBroadcastReceiverName = 'com.delphiworlds.kastri.' + cMultiBroadcastReceiverClassName;
 
 type
   TAndroidHelperEx = record
@@ -143,21 +150,42 @@ type
     class function UriFromFileName(const AFileName: string): Jnet_Uri; static;
   end;
 
+  TJImageHelper = record
+  private
+    class function RotateBytes(const ABytes: TJavaArray<Byte>; const ARotation: Integer): TJavaArray<Byte>; static;
+    class function JImageToByteArray(const AImage: JImage): TJavaArray<Byte>; static;
+    class function NV21ToJPEG(const ABytes: TJavaArray<Byte>; const AWidth, AHeight: Integer): TJavaArray<Byte>; static;
+    class function YUV_420_888ToNV21(const AImage: JImage): TJavaArray<Byte>; static;
+  public
+    /// <summary>
+    ///   Converts a JImage to a JBitmap
+    /// </summary>
+    /// <remarks>
+    ///   Uses the private JImageToByteArray method to convert from the appropriate image format
+    /// </remarks>
+    class function JImageToJBitmap(const AImage: JImage): JBitmap; static;
+    /// <summary>
+    ///   Converts a JImage to a JStream, applying rotation (if any)
+    /// </summary>
+    /// <remarks>
+    ///   Used by the Camera support to orient the captured image
+    /// </remarks>
+    class function JImageToStream(const AImage: JImage; const ARotation: Integer = 0): TStream; static;
+  end;
+
 implementation
 
 uses
   // RTL
   System.SysUtils, System.DateUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.Media, Androidapi.JNI.Provider, Androidapi.JNIBridge,
+  Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI,
   // DW
   DW.Androidapi.JNI.SupportV4;
 
 const
-  cReceiverClassName = 'DWMultiBroadcastReceiver';
-  cReceiverName = 'com.delphiworlds.kastri.' + cReceiverClassName;
-  cActionStartAlarm = cReceiverName + '.ACTION_START_ALARM';
-  cExtraStartUnlock = cReceiverClassName + '.EXTRA_START_UNLOCK';
+  cActionStartAlarm = cMultiBroadcastReceiverName + '.ACTION_START_ALARM';
+  cExtraStartUnlock = cMultiBroadcastReceiverClassName + '.EXTRA_START_UNLOCK';
 
 { TAndroidHelperEx }
 
@@ -370,7 +398,7 @@ var
   LStartAt: Int64;
 begin
   LActionIntent := TJIntent.JavaClass.init(StringToJString(cActionStartAlarm));
-  LActionIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cReceiverName));
+  LActionIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cMultiBroadcastReceiverName));
   LActionIntent.putExtra(StringToJString(cExtraStartUnlock), AStartFromLock);
   LAlarmIntent := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, 0, LActionIntent, TJPendingIntent.JavaClass.FLAG_CANCEL_CURRENT);
   LStartAt := GetTimeFromNowInMillis(SecondsBetween(Now, AAlarm));
@@ -379,6 +407,93 @@ begin
     TAndroidHelper.AlarmManager.setExactAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, LAlarmIntent)
   else
     TAndroidHelper.AlarmManager.&set(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, LAlarmIntent);
+end;
+
+{ TJImageHelper }
+
+class function TJImageHelper.RotateBytes(const ABytes: TJavaArray<Byte>; const ARotation: Integer): TJavaArray<Byte>;
+var
+  LMatrix: JMatrix;
+  LBitmap, LRotatedBitmap: JBitmap;
+  LOutputStream: JByteArrayOutputStream;
+begin
+  LMatrix := TJMatrix.JavaClass.init;
+  LMatrix.postRotate(ARotation);
+  LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(ABytes, 0, ABytes.Length);
+  try
+    try
+      LRotatedBitmap := TJBitmap.JavaClass.createBitmap(LBitmap, 0, 0, LBitmap.getWidth, LBitmap.getHeight, LMatrix, True);
+      LOutputStream := TJByteArrayOutputStream.JavaClass.init(0);
+      LRotatedBitmap.compress(TJBitmap_CompressFormat.JavaClass.JPEG, 100, LOutputStream);
+      Result := LOutputStream.toByteArray;
+    finally
+      LRotatedBitmap.recycle;
+    end;
+  finally
+    LBitmap.recycle;
+  end;
+end;
+
+class function TJImageHelper.JImageToByteArray(const AImage: JImage): TJavaArray<Byte>;
+var
+  LBuffer: JByteBuffer;
+begin
+  Result := nil;
+  if AImage.getFormat = TJImageFormat.JavaClass.JPEG then
+  begin
+    LBuffer := AImage.getPlanes.Items[0].getBuffer;
+    Result := TJavaArray<Byte>.Create(LBuffer.capacity);
+    LBuffer.get(Result);
+  end
+  else if AImage.getFormat = TJImageFormat.JavaClass.YUV_420_888 then
+    Result := NV21ToJPEG(YUV_420_888ToNV21(AImage), AImage.getWidth, AImage.getHeight);
+end;
+
+class function TJImageHelper.JImageToJBitmap(const AImage: JImage): JBitmap;
+var
+  LBytes: TJavaArray<Byte>;
+begin
+  LBytes := JImageToByteArray(AImage);
+  Result := TJBitmapFactory.JavaClass.decodeByteArray(LBytes, 0, LBytes.Length);
+end;
+
+class function TJImageHelper.JImageToStream(const AImage: JImage; const ARotation: Integer = 0): TStream;
+var
+  LBytes: TJavaArray<Byte>;
+begin
+  LBytes := JImageToByteArray(AImage);
+  if ARotation > 0 then
+    LBytes := RotateBytes(LBytes, ARotation);
+  Result := TMemoryStream.Create;
+  Result.WriteBuffer(LBytes.Data^, LBytes.Length);
+end;
+
+class function TJImageHelper.NV21ToJPEG(const ABytes: TJavaArray<Byte>; const AWidth, AHeight: Integer): TJavaArray<Byte>;
+var
+  LStream: JByteArrayOutputStream;
+  LYUV21Image: JYuvImage;
+begin
+  LStream := TJByteArrayOutputStream.Create;
+  LYUV21Image := TJYuvImage.JavaClass.init(ABytes, TJImageFormat.JavaClass.NV21, AWidth, AHeight, nil);
+  LYUV21Image.compressToJpeg(TJRect.JavaClass.init(0, 0, AWidth, AHeight), 100, LStream);
+  Result := LStream.toByteArray;
+end;
+
+class function TJImageHelper.YUV_420_888ToNV21(const AImage: JImage): TJavaArray<Byte>;
+var
+  LYBuffer, LUBuffer, LVBuffer: JByteBuffer;
+  LYSize, LUSize, LVSize: Integer;
+begin
+  LYBuffer := AImage.getPlanes.Items[0].getBuffer;
+  LUBuffer := AImage.getPlanes.Items[1].getBuffer;
+  LVBuffer := AImage.getPlanes.Items[2].getBuffer;
+  LYSize := LYBuffer.remaining;
+  LUSize := LUBuffer.remaining;
+  LVSize := LVBuffer.remaining;
+  Result := TJavaArray<Byte>.Create(LYSize + LUSize + LVSize);
+  LYBuffer.get(Result, 0, LYSize);
+  LVBuffer.get(Result, LYSize, LVSize);
+  LUBuffer.get(Result, LYSize + LVSize, LUSize);
 end;
 
 end.
