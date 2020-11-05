@@ -53,16 +53,17 @@ type
     {class} function _GetSTART: Integer; cdecl;
     {class} function _GetTOP: Integer; cdecl;
     {class} function _GetVERTICAL_GRAVITY_MASK: Integer; cdecl;
-    {class} function init: JGravity; cdecl;//Deprecated
-    {class} procedure apply(gravity: Integer; w: Integer; h: Integer; container: JRect; outRect: JRect); cdecl; overload;//Deprecated
-    {class} procedure apply(gravity: Integer; w: Integer; h: Integer; container: JRect; outRect: JRect; layoutDirection: Integer); cdecl; overload;//Deprecated
-    {class} procedure apply(gravity: Integer; w: Integer; h: Integer; container: JRect; xAdj: Integer; yAdj: Integer; outRect: JRect); cdecl; overload;//Deprecated
-    {class} procedure apply(gravity: Integer; w: Integer; h: Integer; container: JRect; xAdj: Integer; yAdj: Integer; outRect: JRect; layoutDirection: Integer); cdecl; overload;//Deprecated
-    {class} procedure applyDisplay(gravity: Integer; display: JRect; inoutObj: JRect); cdecl; overload;//Deprecated
-    {class} procedure applyDisplay(gravity: Integer; display: JRect; inoutObj: JRect; layoutDirection: Integer); cdecl; overload;//Deprecated
-    {class} function getAbsoluteGravity(gravity: Integer; layoutDirection: Integer): Integer; cdecl;//Deprecated
-    {class} function isHorizontal(gravity: Integer): Boolean; cdecl;//Deprecated
-    {class} function isVertical(gravity: Integer): Boolean; cdecl;//Deprecated
+    {class} function init: JGravity; cdecl;
+    {class} procedure apply(gravity: Integer; w: Integer; h: Integer; container: JRect; outRect: JRect); cdecl; overload;
+    {class} procedure apply(gravity: Integer; w: Integer; h: Integer; container: JRect; outRect: JRect; layoutDirection: Integer); cdecl; overload;
+    {class} procedure apply(gravity: Integer; w: Integer; h: Integer; container: JRect; xAdj: Integer; yAdj: Integer; outRect: JRect); cdecl; overload;
+    {class} procedure apply(gravity: Integer; w: Integer; h: Integer; container: JRect; xAdj: Integer; yAdj: Integer; outRect: JRect;
+      layoutDirection: Integer); cdecl; overload;
+    {class} procedure applyDisplay(gravity: Integer; display: JRect; inoutObj: JRect); cdecl; overload;
+    {class} procedure applyDisplay(gravity: Integer; display: JRect; inoutObj: JRect; layoutDirection: Integer); cdecl; overload;
+    {class} function getAbsoluteGravity(gravity: Integer; layoutDirection: Integer): Integer; cdecl;
+    {class} function isHorizontal(gravity: Integer): Boolean; cdecl;
+    {class} function isVertical(gravity: Integer): Boolean; cdecl;
     {class} property AXIS_CLIP: Integer read _GetAXIS_CLIP;
     {class} property AXIS_PULL_AFTER: Integer read _GetAXIS_PULL_AFTER;
     {class} property AXIS_PULL_BEFORE: Integer read _GetAXIS_PULL_BEFORE;
@@ -77,7 +78,7 @@ type
     {class} property CLIP_VERTICAL: Integer read _GetCLIP_VERTICAL;
     {class} property DISPLAY_CLIP_HORIZONTAL: Integer read _GetDISPLAY_CLIP_HORIZONTAL;
     {class} property DISPLAY_CLIP_VERTICAL: Integer read _GetDISPLAY_CLIP_VERTICAL;
-    // {class} property END: Integer read _GetEND; // use &??
+    {class} property &END: Integer read _GetEND;
     {class} property FILL: Integer read _GetFILL;
     {class} property FILL_HORIZONTAL: Integer read _GetFILL_HORIZONTAL;
     {class} property FILL_VERTICAL: Integer read _GetFILL_VERTICAL;
