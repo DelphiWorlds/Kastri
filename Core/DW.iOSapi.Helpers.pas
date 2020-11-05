@@ -32,6 +32,10 @@ type
 
   TiOSHelperEx = record
   public
+    class procedure AddObserver(const AObserver: Pointer; const AMethod: MarshaledAString; const AName: NSString;
+      const AObject: NSObject = nil); overload; static;
+    class procedure AddObserver(const AObserver: Pointer; const AMethod: MarshaledAString; const AName: string;
+      const AObject: NSObject = nil); overload; static;
     class function GetLocationManagerAuthorization: TAuthorizationType; static;
     class function HasBackgroundMode(const AMode: string): Boolean; static;
     class function IsBackground: Boolean; static;
@@ -52,6 +56,22 @@ uses
   iOSapi.CoreLocation, iOSapi.Helpers,
   // macOS
   Macapi.ObjCRuntime, Macapi.Helpers;
+
+class procedure TiOSHelperEx.AddObserver(const AObserver: Pointer; const AMethod: MarshaledAString; const AName: NSString; const AObject: NSObject = nil);
+var
+  LObject: Pointer;
+begin
+  if AObject <> nil then
+    LObject := NSObjectToID(AObject)
+  else
+    LObject := nil;
+  TiOSHelper.DefaultNotificationCenter.addObserver(AObserver, sel_getUid(AMethod), NSObjectToID(AName), LObject);
+end;
+
+class procedure TiOSHelperEx.AddObserver(const AObserver: Pointer; const AMethod: MarshaledAString; const AName: string; const AObject: NSObject = nil);
+begin
+  AddObserver(AObserver, AMethod, StrToNSStr(AName), AObject);
+end;
 
 class function TiOSHelperEx.GetLocationManagerAuthorization: TAuthorizationType;
 begin
