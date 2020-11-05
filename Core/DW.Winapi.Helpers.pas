@@ -22,13 +22,13 @@ uses
 type
   TWinapiHelper = record
   public
-    class function ExpandEnvironmentVar(var Value: string): Boolean; static;
+    class function ExpandEnvironmentVar(var AValue: string): Boolean; static;
     class function ExpandPath(const ABaseDir, ARelativeDir: string): string; static;
     /// <summary>
     ///  Expands the variables contained in ASource
     /// </summary>
     class function ExpandVars(const ASource: string): string; static;
-    class function GetEnvironmentVars(const Vars: TStrings; Expand: Boolean): Boolean; static;
+    class function GetEnvironmentVars(const AVars: TStrings; AExpand: Boolean): Boolean; static;
   end;
 
 implementation
@@ -83,49 +83,49 @@ begin
     Result := LBuffer;
 end;
 
-class function TWinapiHelper.ExpandEnvironmentVar(var Value: string): Boolean;
+class function TWinapiHelper.ExpandEnvironmentVar(var AValue: string): Boolean;
 var
-  R: Integer;
-  Expanded: string;
+  LLength: Integer;
+  LExpanded: string;
 begin
-  SetLength(Expanded, 1);
-  R := ExpandEnvironmentStrings(PChar(Value), PChar(Expanded), 0);
-  SetLength(Expanded, R);
-  Result := ExpandEnvironmentStrings(PChar(Value), PChar(Expanded), R) <> 0;
+  SetLength(LExpanded, 1);
+  LLength := ExpandEnvironmentStrings(PChar(AValue), PChar(LExpanded), 0);
+  SetLength(LExpanded, LLength);
+  Result := ExpandEnvironmentStrings(PChar(AValue), PChar(LExpanded), LLength) <> 0;
   if Result then
   begin
-    StrResetLength(Expanded);
-    Value := Expanded;
+    StrResetLength(LExpanded);
+    AValue := LExpanded;
   end;
 end;
 
-class function TWinapiHelper.GetEnvironmentVars(const Vars: TStrings; Expand: Boolean): Boolean;
+class function TWinapiHelper.GetEnvironmentVars(const AVars: TStrings; AExpand: Boolean): Boolean;
 var
-  Raw: PChar;
-  Expanded: string;
+  LRaw: PChar;
+  LExpanded: string;
   I: Integer;
 begin
-  Vars.BeginUpdate;
+  AVars.BeginUpdate;
   try
-    Vars.Clear;
-    Raw := GetEnvironmentStrings;
+    AVars.Clear;
+    LRaw := GetEnvironmentStrings;
     try
-      MultiSzToStrings(Vars, Raw);
+      MultiSzToStrings(AVars, LRaw);
       Result := True;
     finally
-      FreeEnvironmentStrings(Raw);
+      FreeEnvironmentStrings(LRaw);
     end;
-    if Expand then
+    if AExpand then
     begin
-      for I := 0 to Vars.Count - 1 do
+      for I := 0 to AVars.Count - 1 do
       begin
-        Expanded := Vars[I];
-        if ExpandEnvironmentVar(Expanded) then
-          Vars[I] := Expanded;
+        LExpanded := AVars[I];
+        if ExpandEnvironmentVar(LExpanded) then
+          AVars[I] := LExpanded;
       end;
     end;
   finally
-    Vars.EndUpdate;
+    AVars.EndUpdate;
   end;
 end;
 
