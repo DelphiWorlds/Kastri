@@ -28,6 +28,7 @@ type
     function Add(const AValue: string; const AAllowDupes: Boolean = True): Integer;
     procedure AssignToStrings(const AStrings: TStrings; const AOverwrite: Boolean = True);
     procedure Clear;
+    function Clone: TStringDynArray;
     function Count: Integer;
     procedure Delete(const AIndex: Integer);
     function IndexOf(const AValue: string): Integer;
@@ -111,6 +112,14 @@ end;
 procedure TStringDynArrayHelper.Clear;
 begin
   SetLength(Self, 0);
+end;
+
+function TStringDynArrayHelper.Clone: TStringDynArray;
+var
+  LItem: string;
+begin
+  for LItem in Self do
+    Result := Result + [LItem];
 end;
 
 function TStringDynArrayHelper.Count: Integer;
