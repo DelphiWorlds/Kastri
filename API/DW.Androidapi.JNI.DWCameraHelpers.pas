@@ -16,7 +16,9 @@ unit DW.Androidapi.JNI.DWCameraHelpers;
 interface
 
 uses
+  // Android
   Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.JNI.Os, Androidapi.JNI.Util,
+  // DW
   DW.Androidapi.JNI.Hardware.Camera2, DW.Androidapi.JNI.View;
 
 type
@@ -56,6 +58,7 @@ type
   [JavaSignature('com/delphiworlds/kastri/DWCaptureRequestBuilderHelper')]
   JDWCaptureRequestBuilderHelper = interface(JObject)
     ['{ECDB6573-589C-4C0E-B8B9-D68F43425D98}']
+    function getIntegerValue(key: JCaptureRequest_Key): Integer; cdecl;
     procedure setCaptureRequestBuilder(builder: JCaptureRequest_Builder); cdecl;
     procedure setFaceDetectMode(mode: Integer); cdecl;
     procedure setIntegerValue(key: JCaptureRequest_Key; value: Integer); cdecl;
