@@ -43,6 +43,7 @@ type
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     procedure EnableForegroundDispatch;
     procedure HandleNfcIntent(const AIntent: JIntent);
+    function IsNFCIntent(const AIntent: JIntent): Boolean;
     procedure MessageReceivedNotificationHandler(const Sender: TObject; const M: TMessage);
     procedure RequestEnableNfc;
   protected
@@ -95,6 +96,13 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TMessageReceivedNotification, MessageReceivedNotificationHandler);
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
   inherited;
+end;
+
+function TPlatformNFCReader.IsNFCIntent(const AIntent: JIntent): Boolean;
+begin
+  Result := (AIntent <> nil) and (TJNfcAdapter.JavaClass.ACTION_NDEF_DISCOVERED.equals(AIntent.getAction) or
+    TJNfcAdapter.JavaClass.ACTION_TECH_DISCOVERED.equals(AIntent.getAction) or
+    TJNfcAdapter.JavaClass.ACTION_TAG_DISCOVERED.equals(AIntent.getAction));
 end;
 
 class function TPlatformNFCReader.IsSupported: Boolean;
@@ -152,7 +160,7 @@ begin
     TApplicationEvent.BecameActive:
     begin
       LIntent := TAndroidHelper.Activity.getIntent;
-      if (LIntent <> nil) and not TJIntent.JavaClass.ACTION_MAIN.equals(LIntent.getAction) then
+      if (LIntent <> nil) and IsNFCIntent(LIntent) then
       begin
         TOSLog.d('TPlatformNFCReader.ApplicationEventMessageHandler HandleNfcIntent');
         HandleNfcIntent(LIntent);
@@ -168,9 +176,7 @@ begin
   LIntent := TMessageReceivedNotification(M).Value;
   if LIntent <> nil then
   begin
-    if TJNfcAdapter.JavaClass.ACTION_NDEF_DISCOVERED.equals(LIntent.getAction) or
-       TJNfcAdapter.JavaClass.ACTION_TECH_DISCOVERED.equals(LIntent.getAction) or
-       TJNfcAdapter.JavaClass.ACTION_TAG_DISCOVERED.equals(LIntent.getAction) then
+    if IsNFCIntent(LIntent) then
     begin
       TOSLog.d('TPlatformNFCReader.MessageReceivedNotificationHandler HandleNfcIntent');
       HandleNfcIntent(LIntent);
@@ -197,9 +203,9 @@ var
   LNFCPayload: TNFCPayload;
 begin
   TOSLog.d('+TPlatformNFCReader.HandleNfcIntent');
-  if (AIntent <> nil) and (AIntent.getAction <> nil) and AIntent.getAction.equals(TJNfcAdapter.JavaClass.ACTION_NDEF_DISCOVERED) then
+  LMessages := AIntent.getParcelableArrayExtra(TJNfcAdapter.JavaClass.EXTRA_NDEF_MESSAGES);
+  if LMessages <> nil then
   begin
-    LMessages := AIntent.getParcelableArrayExtra(TJNfcAdapter.JavaClass.EXTRA_NDEF_MESSAGES);
     SetLength(LNFCMessages, LMessages.Length);
     TOSLog.d('Processing messages');
     for I := 0 to LMessages.Length - 1 do
@@ -219,17 +225,9 @@ begin
     end;
     if Length(LNFCMessages) > 0 then
       DoDetectedNDEFs(LNFCMessages);
-{
-    begin
-      //!!!! On main thread anyway??
-      TThread.Synchronize(nil,
-        procedure
-        begin
-        end
-      );
-    end;
-}
-  end;
+  end
+  else
+    TOSLog.d('AIntent: %s', [JStringToString(AIntent.toUri(0))]);
   TOSLog.d('-TPlatformNFCReader.HandleNfcIntent');
 end;
 
