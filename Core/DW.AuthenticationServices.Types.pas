@@ -1,0 +1,52 @@
+unit DW.AuthenticationServices.Types;
+
+{*******************************************************}
+{                                                       }
+{                      Kastri                           }
+{                                                       }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{    Copyright 2020 Dave Nottage under MIT license      }
+{  which is located in the root folder of this library  }
+{                                                       }
+{*******************************************************}
+
+{$I DW.GlobalDefines.inc}
+
+interface
+
+uses
+  // RTL
+  System.Messaging;
+
+type
+  TAppleIDAuthorizationFailReason = (None, Unknown, Canceled, Failed, InvalidResponse, NotHandled);
+  TAppleIDAuthorizationCredential = (Invalid, AppleID, Password);
+  // TAppleIDUserDetectionRealUserStatus = (Unknown, LikelyReal, Unsupported);
+
+  TAppleIDCredentials = record
+    AuthorizationCode: string;
+    Credential: TAppleIDAuthorizationCredential;
+    Email: string;
+    Password: string;
+    User: string;
+  end;
+
+  TAppleIDAuthorizationResponse = record
+    Credentials: TAppleIDCredentials;
+    FailReason: TAppleIDAuthorizationFailReason;
+    function IsAuthorized: Boolean;
+  end;
+
+  TAppleIDAuthorizationResponseMessage = TMessage<TAppleIDAuthorizationResponse>;
+
+implementation
+
+{ TAppleIDAuthorizationResponse }
+
+function TAppleIDAuthorizationResponse.IsAuthorized: Boolean;
+begin
+  Result := FailReason = TAppleIDAuthorizationFailReason.None;
+end;
+
+end.
