@@ -4,7 +4,10 @@ unit DW.SpeechRecognition.Android;
 {                                                       }
 {                      Kastri                           }
 {                                                       }
-{          DelphiWorlds Cross-Platform Library          }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{    Copyright 2020 Dave Nottage under MIT license      }
+{  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
@@ -52,8 +55,6 @@ type
     procedure DoStartRecording;
     procedure RequestAuthorization;
   protected
-    class function IsSupported: Boolean; override;
-  protected
     procedure BeginningOfSpeech;
     procedure BufferReceived(buffer: TJavaArray<Byte>);
     procedure EndOfSpeech;
@@ -62,10 +63,13 @@ type
     function IsRecording: Boolean; override;
     procedure PartialResults(partialResults: JBundle);
     procedure ReadyForSpeech(params: JBundle);
+    procedure RequestPermission; override;
     procedure Results(results: JBundle);
     procedure RmsChanged(rmsdB: Single);
     procedure StartRecording; override;
     procedure StopRecording; override;
+  public
+    class function IsSupported: Boolean;
   public
     constructor Create(const ASpeech: TSpeechRecognition); override;
     destructor Destroy; override;
@@ -170,6 +174,12 @@ begin
       FIsRecordingPending := False;
     end
   );
+end;
+
+procedure TPlatformSpeechRecognition.RequestPermission;
+begin
+  FIsRecordingPending := False;
+  RequestAuthorization;
 end;
 
 procedure TPlatformSpeechRecognition.DoStartRecording;
