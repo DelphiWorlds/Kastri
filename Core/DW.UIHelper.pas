@@ -18,6 +18,7 @@ interface
 uses
   // RTL
   System.Types, System.UITypes, System.Messaging,
+  System.Classes,
   // FMX
   FMX.Types, FMX.Forms;
 
@@ -30,6 +31,8 @@ type
   /// </summary>
   TUIHelper = record
   public
+    class procedure CopyImageToClipboard(const AImage: TStream); static;
+    class function GetStatusBarOffset: Single; static;
     /// <summary>
     ///   Special function for handling of "notch" based devices
     /// </summary>
@@ -39,7 +42,9 @@ type
     ///   Returns Black or White, depending on the background color supplied
     /// </summary>
     class function GetTextColor(const ABackgroundColor: TAlphaColor): TAlphaColor; static;
+    class function GetScreenOrientation: TScreenOrientation; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
+    class procedure OpenSettings; static;
     /// <summary>
     ///   Force a repaint of the form
     /// </summary>
@@ -64,6 +69,15 @@ begin
   Result := TPlatformUIHelper.GetOffsetRect;
   {$ELSE}
   Result := RectF(0, 0, 0, 0);
+  {$ENDIF}
+end;
+
+class procedure TUIHelper.CopyImageToClipboard(const AImage: TStream);
+begin
+  {$IF Defined(IOS)}
+  TPlatformUIHelper.CopyImageToClipboard(AImage);
+  {$ELSE}
+  //
   {$ENDIF}
 end;
 
@@ -101,6 +115,33 @@ begin
   Result := TPlatformUIHelper.GetUserInterfaceStyle;
   {$ELSE}
   Result := TUserInterfaceStyle.Light;
+  {$ENDIF}
+end;
+
+class procedure TUIHelper.OpenSettings;
+begin
+  {$IF Defined(IOS)} // or Defined(Android)}
+  TPlatformUIHelper.OpenSettings;
+  {$ELSE}
+  //
+  {$ENDIF}
+end;
+
+class function TUIHelper.GetScreenOrientation: TScreenOrientation;
+begin
+  {$IF Defined(IOS) or Defined(Android)}
+  Result := TPlatformUIHelper.GetScreenOrientation;
+  {$ELSE}
+  Result := TScreenOrientation.Portrait;
+  {$ENDIF}
+end;
+
+class function TUIHelper.GetStatusBarOffset: Single;
+begin
+  {$IF Defined(IOS) or Defined(Android)}
+  Result := TPlatformUIHelper.GetStatusBarOffset;
+  {$ELSE}
+  Result := 0;
   {$ENDIF}
 end;
 

@@ -34,6 +34,8 @@ type
     /// </summary>
     class function GetOffsetRect: TRectF; overload; static;
     class function GetOffsetRect(const AHandle: TWindowHandle): TRectF; overload; static;
+    class function GetScreenOrientation: TScreenOrientation; static;
+    class function GetStatusBarOffset: Single; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
     class procedure Render(const AForm: TForm); static;
   end;
@@ -41,6 +43,11 @@ type
 implementation
 
 uses
+  // RTL
+  System.SysUtils,
+  // Android
+  Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText,
+  // FMX
   FMX.Platform.UI.Android;
 
 { TPlatformUIHelper }
@@ -55,6 +62,26 @@ class function TPlatformUIHelper.GetOffsetRect(const AHandle: TWindowHandle): TR
 begin
   // Yet to be implemented. Work is in progress
   Result := TRectF.Empty;
+end;
+
+class function TPlatformUIHelper.GetScreenOrientation: TScreenOrientation;
+var
+  LRotation: Integer;
+begin
+  LRotation := TAndroidHelper.Activity.getWindowManager.getDefaultDisplay.getRotation;
+  if LRotation = TJSurface.JavaClass.ROTATION_180 then
+    Result := TScreenOrientation.InvertedPortrait
+  else if LRotation = TJSurface.JavaClass.ROTATION_90 then
+    Result := TScreenOrientation.Landscape
+  else if LRotation = TJSurface.JavaClass.ROTATION_270 then
+    Result := TScreenOrientation.InvertedLandscape
+  else
+    Result := TScreenOrientation.Portrait;
+end;
+
+class function TPlatformUIHelper.GetStatusBarOffset: Single;
+begin
+  Result := 0;
 end;
 
 class function TPlatformUIHelper.GetUserInterfaceStyle: TUserInterfaceStyle;
