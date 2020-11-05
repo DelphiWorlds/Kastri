@@ -39,9 +39,17 @@ type
     /// </summary>
     class procedure DecodeDecompress(const ASource: string; const AStream: TStream); overload; static;
     /// <summary>
+    ///   Decodes a Base64 string, decompresses it, and saves it to a file
+    /// </summary>
+    class procedure DecodeDecompressToFile(const ASource, AFileName: string); static;
+    /// <summary>
     ///   Decodes a Base64 string and saves it to a file
     /// </summary>
     class procedure DecodeToFile(const ASource, AFileName: string); static;
+    /// <summary>
+    ///   Encodes a Base64 file to a string
+    /// </summary>
+    class function CompressEncodeFromFile(const AFileName: string): string; static;
   end;
 
 implementation
@@ -120,6 +128,19 @@ begin
   end;
 end;
 
+class procedure TBase64Helper.DecodeDecompressToFile(const ASource, AFileName: string);
+var
+  LStream: TMemoryStream;
+begin
+  LStream := TMemoryStream.Create;
+  try
+    DecodeDecompress(ASource, LStream);
+    LStream.SaveToFile(AFileName);
+  finally
+    LStream.Free;
+  end;
+end;
+
 class procedure TBase64Helper.DecodeToFile(const ASource, AFileName: string);
 var
   LStream: TMemoryStream;
@@ -130,6 +151,19 @@ begin
     LBytes := TNetEncoding.Base64.DecodeStringToBytes(ASource);
     LStream.Write(LBytes, Length(LBytes));
     LStream.SaveToFile(AFileName);
+  finally
+    LStream.Free;
+  end;
+end;
+
+class function TBase64Helper.CompressEncodeFromFile(const AFileName: string): string;
+var
+  LStream: TMemoryStream;
+begin
+  LStream := TMemoryStream.Create;
+  try
+    LStream.LoadFromFile(AFileName);
+    Result := CompressEncode(LStream);
   finally
     LStream.Free;
   end;
