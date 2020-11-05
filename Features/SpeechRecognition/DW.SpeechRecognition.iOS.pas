@@ -4,7 +4,10 @@ unit DW.SpeechRecognition.iOS;
 {                                                       }
 {                      Kastri                           }
 {                                                       }
-{          DelphiWorlds Cross-Platform Library          }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{    Copyright 2020 Dave Nottage under MIT license      }
+{  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
@@ -56,12 +59,14 @@ type
     FInputNode: AVAudioInputNode;
     FIsRecording: Boolean;
     FIsRecordingPending: Boolean;
+    FIsStopped: Boolean;
     FRecognizer: SFSpeechRecognizer;
     FRequest: SFSpeechAudioBufferRecognitionRequest;
     FTask: SFSpeechRecognitionTask;
     FTimer: TMacOSTimer;
-    procedure Activate;
     procedure DoStartRecording;
+    function GetRecordAuthorizationStatus(const APlatformStatus: AVAuthorizationStatus): TAuthorizationStatus;
+    function GetSpeechAuthorizationStatus(const APlatformStatus: SFSpeechRecognizerAuthorizationStatus): TAuthorizationStatus;
     procedure InputNodeInstallTapOnBusHandler(buffer: AVAudioPCMBuffer; when: AVAudioTime);
     procedure QueueAuthorizationStatus(const AStatus: TAuthorizationStatus);
     procedure QueueRecordingStatusChanged;
@@ -72,11 +77,12 @@ type
     procedure RequestRecordAudioHandler(granted: Boolean);
     procedure TimerHandler;
   protected
-    class function IsSupported: Boolean; override;
-  protected
     function IsRecording: Boolean; override;
+    procedure RequestPermission; override;
     procedure StartRecording; override;
     procedure StopRecording; override;
+  public
+    class function IsSupported: Boolean;
   public
     constructor Create(const ASpeech: TSpeechRecognition); override;
     destructor Destroy; override;
@@ -175,9 +181,22 @@ end;
 { TPlatformSpeechRecognition }
 
 constructor TPlatformSpeechRecognition.Create(const ASpeech: TSpeechRecognition);
+var
+  LSpeechStatus, LRecordStatus: TAuthorizationStatus;
 begin
   inherited;
+  FIsStopped := True;
   FTimer := TMacOSTimer.Create(TimerHandler);
+  LRecordStatus := GetRecordAuthorizationStatus(TAVCaptureDevice.OCClass.authorizationStatusForMediaType(AVMediaTypeAudio));
+  LSpeechStatus := GetSpeechAuthorizationStatus(TSFSpeechRecognizer.OCClass.authorizationStatus);
+  if (LSpeechStatus = TAuthorizationStatus.Denied) or (LRecordStatus = TAuthorizationStatus.Denied) then
+    DoAuthorizationStatus(TAuthorizationStatus.Denied)
+  else if (LSpeechStatus = TAuthorizationStatus.Restricted) or (LRecordStatus = TAuthorizationStatus.Restricted) then
+    DoAuthorizationStatus(TAuthorizationStatus.Restricted)
+  else if (LSpeechStatus = TAuthorizationStatus.Authorized) and (LRecordStatus = TAuthorizationStatus.Authorized) then
+    DoAuthorizationStatus(TAuthorizationStatus.Authorized)
+  else if (LSpeechStatus = TAuthorizationStatus.NotDetermined) and (LRecordStatus = TAuthorizationStatus.NotDetermined) then
+    DoAuthorizationStatus(TAuthorizationStatus.NotDetermined);
 end;
 
 destructor TPlatformSpeechRecognition.Destroy;
@@ -192,6 +211,38 @@ begin
   inherited;
 end;
 
+function TPlatformSpeechRecognition.GetRecordAuthorizationStatus(const APlatformStatus: AVAuthorizationStatus): TAuthorizationStatus;
+begin
+  case APlatformStatus of
+    AVAuthorizationStatusAuthorized:
+      Result := TAuthorizationStatus.Authorized;
+    AVAuthorizationStatusDenied:
+      Result := TAuthorizationStatus.Denied;
+    AVAuthorizationStatusRestricted:
+      Result := TAuthorizationStatus.Restricted;
+    AVAuthorizationStatusNotDetermined:
+      Result := TAuthorizationStatus.NotDetermined;
+  else
+    Result := TAuthorizationStatus.NotDetermined;
+  end;
+end;
+
+function TPlatformSpeechRecognition.GetSpeechAuthorizationStatus(const APlatformStatus: SFSpeechRecognizerAuthorizationStatus): TAuthorizationStatus;
+begin
+  case APlatformStatus of
+    SFSpeechRecognizerAuthorizationStatusAuthorized:
+      Result := TAuthorizationStatus.Authorized;
+    SFSpeechRecognizerAuthorizationStatusDenied:
+      Result := TAuthorizationStatus.Denied;
+    SFSpeechRecognizerAuthorizationStatusRestricted:
+      Result := TAuthorizationStatus.Restricted;
+    SFSpeechRecognizerAuthorizationStatusNotDetermined:
+      Result := TAuthorizationStatus.NotDetermined;
+  else
+    Result := TAuthorizationStatus.NotDetermined;
+  end;
+end;
+
 procedure TPlatformSpeechRecognition.TimerHandler;
 begin
   FTimer.IsEnabled := False;
@@ -199,9 +250,13 @@ begin
   Stopped;
 end;
 
-procedure TPlatformSpeechRecognition.Activate;
+procedure TPlatformSpeechRecognition.DoStartRecording;
+var
+  LAudioSession: AVAudioSession;
+  LPointer: Pointer;
 begin
-  TOSLog.d('TPlatformSpeechRecognition.Activate');
+  FIsRecordingPending := False;
+  LPointer := nil;
   if FRecognizer = nil then
   begin
     FRecognizer := TSFSpeechRecognizer.Create;
@@ -209,20 +264,6 @@ begin
   end;
   if FAudioEngine = nil then
     FAudioEngine := TAVAudioEngine.Create;
-  if FIsRecordingPending then
-  begin
-    FIsRecordingPending := False;
-    DoStartRecording;
-  end;
-end;
-
-procedure TPlatformSpeechRecognition.DoStartRecording;
-var
-  LAudioSession: AVAudioSession;
-  LPointer: Pointer;
-  // LError: NSError;
-begin
-  TOSLog.d('TPlatformSpeechRecognition.DoStartRecording');
   LAudioSession := TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance);
   LAudioSession.setCategoryError(AVAudioSessionCategoryRecord, @LPointer);
   // LAudioSession.setMode(AVAudioSessionModeMeasurement, @LPointer);
@@ -236,13 +277,12 @@ begin
   FAudioEngine.prepare;
   FAudioEngine.startAndReturnError(@LPointer);
   FIsRecording := True;
-  TOSLog.d('> DoRecordingStatusChanged True');
+  FIsStopped := False;
   QueueRecordingStatusChanged;
 end;
 
 procedure TPlatformSpeechRecognition.StartRecording;
 begin
-  TOSLog.d('TPlatformSpeechRecognition.StartRecording');
   FIsRecordingPending := False;
   if not Speech.IsAuthorized then
   begin
@@ -255,7 +295,8 @@ end;
 
 procedure TPlatformSpeechRecognition.StopRecording;
 begin
-  TOSLog.d('TPlatformSpeechRecognition.StopRecording');
+  if FIsStopped then
+    Exit; // <=======
   if FAudioEngine.isRunning then
   begin
     FAudioEngine.stop;
@@ -267,7 +308,7 @@ begin
   FTask := nil;
   FInputNode := nil;
   FIsRecording := False;
-  TOSLog.d('> DoRecordingStatusChanged False');
+  FIsStopped := True;
   QueueRecordingStatusChanged;
 end;
 
@@ -298,16 +339,13 @@ begin
     begin
       FTimer.Restart(Speech.StopInterval);
       LText := NSStrToStr(result.bestTranscription.formattedString);
-      TOSLog.d('Text: %s', [LText]);
+      LFinished := result.isFinal;
       TThread.Queue(nil,
         procedure
         begin
           DoRecognition(LText, False);
         end
       );
-      LFinished := result.isFinal;
-      if LFinished then
-        TOSLog.d('TPlatformSpeechRecognition.RecognitionRequestSpeechResultHandler final, apparently');
     end;
   end;
   if (error <> nil) or LFinished or not FIsRecording then
@@ -319,7 +357,6 @@ end;
 
 procedure TPlatformSpeechRecognition.RequestAuthorization;
 begin
-  TOSLog.d('TPlatformSpeechRecognition.RequestAuthorization');
   TSFSpeechRecognizer.OCClass.requestAuthorization(RequestAuthorizationHandler);
 end;
 
@@ -327,33 +364,24 @@ procedure TPlatformSpeechRecognition.RequestAuthorizationHandler(status: SFSpeec
 var
   LStatus: TAuthorizationStatus;
 begin
-  TOSLog.d('TPlatformSpeechRecognition.RequestAuthorizationHandler');
-  case status of
-    SFSpeechRecognizerAuthorizationStatusAuthorized:
-      LStatus := TAuthorizationStatus.Authorized;
-    SFSpeechRecognizerAuthorizationStatusDenied:
-      LStatus := TAuthorizationStatus.Denied;
-    SFSpeechRecognizerAuthorizationStatusRestricted:
-      LStatus := TAuthorizationStatus.Restricted;
-    SFSpeechRecognizerAuthorizationStatusNotDetermined:
-      LStatus := TAuthorizationStatus.NotDetermined;
-  else
-    LStatus := TAuthorizationStatus.NotDetermined;
-  end;
+  LStatus := GetSpeechAuthorizationStatus(status);
   QueueAuthorizationStatus(LStatus);
-  if LStatus = TAuthorizationStatus.Authorized then
-    Activate;
+  if (LStatus = TAuthorizationStatus.Authorized) and FIsRecordingPending then
+    DoStartRecording;
+end;
+
+procedure TPlatformSpeechRecognition.RequestPermission;
+begin
+  RequestRecordAudio;
 end;
 
 procedure TPlatformSpeechRecognition.RequestRecordAudio;
 begin
-  TOSLog.d('TPlatformSpeechRecognition.RequestRecordAudio');
   TAVCaptureDevice.OCClass.requestAccessForMediaType(AVMediaTypeAudio, RequestRecordAudioHandler);
 end;
 
 procedure TPlatformSpeechRecognition.RequestRecordAudioHandler(granted: Boolean);
 begin
-  TOSLog.d('TPlatformSpeechRecognition.RequestRecordAudioHandler');
   if granted then
     RequestAuthorization
   else
