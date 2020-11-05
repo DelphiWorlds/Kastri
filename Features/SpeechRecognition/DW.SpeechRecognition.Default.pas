@@ -4,7 +4,10 @@ unit DW.SpeechRecognition.Default;
 {                                                       }
 {                      Kastri                           }
 {                                                       }
-{          DelphiWorlds Cross-Platform Library          }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{    Copyright 2020 Dave Nottage under MIT license      }
+{  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
@@ -18,11 +21,11 @@ uses
 type
   TPlatformSpeechRecognition = class(TCustomPlatformSpeechRecognition)
   protected
-    class function IsSupported: Boolean; override;
-  protected
     function IsRecording: Boolean; override;
     procedure StartRecording; override;
     procedure StopRecording; override;
+  public
+    class function IsSupported: Boolean;
   end;
 
 implementation
