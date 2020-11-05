@@ -1,0 +1,129 @@
+object MainView: TMainView
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 607
+  ClientWidth = 519
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object TabControl: TTabControl
+    Align = Client
+    Size.Width = 519.000000000000000000
+    Size.Height = 607.000000000000000000
+    Size.PlatformDefault = False
+    TabIndex = 0
+    TabOrder = 0
+    TabPosition = None
+    Sizes = (
+      519s
+      607s
+      519s
+      607s)
+    object StartTab: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'StartTab'
+      ExplicitSize.cx = 8.000000000000000000
+      ExplicitSize.cy = 8.000000000000000000
+      object StartLayout: TLayout
+        Align = Client
+        Margins.Bottom = 12.000000000000000000
+        Size.Width = 519.000000000000000000
+        Size.Height = 595.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object StartImage: TImage
+          MultiResBitmap = <
+            item
+            end>
+          Align = Client
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Size.Width = 511.000000000000000000
+          Size.Height = 497.000000000000000000
+          Size.PlatformDefault = False
+        end
+        object StartButton: TButton
+          Align = Bottom
+          Margins.Left = 4.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 4.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Position.X = 4.000000000000000000
+          Position.Y = 544.000000000000000000
+          Size.Width = 511.000000000000000000
+          Size.Height = 47.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Text = 'Start'
+          OnClick = StartButtonClick
+        end
+        object SwitchLayout: TLayout
+          Align = Bottom
+          Padding.Left = 2.000000000000000000
+          Padding.Top = 2.000000000000000000
+          Padding.Right = 2.000000000000000000
+          Padding.Bottom = 2.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Position.Y = 501.000000000000000000
+          Size.Width = 519.000000000000000000
+          Size.Height = 35.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          object IncludeLocationSwitch: TSwitch
+            Align = Right
+            IsChecked = False
+            Position.X = 420.000000000000000000
+            Position.Y = 2.000000000000000000
+            Size.Width = 97.000000000000000000
+            Size.Height = 31.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            OnSwitch = IncludeLocationSwitchSwitch
+          end
+          object IncludeLocationLabel: TLabel
+            Align = Client
+            Margins.Right = 8.000000000000000000
+            Size.Width = 410.000000000000000000
+            Size.Height = 31.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.HorzAlign = Trailing
+            Text = 'Include Location'
+            TabOrder = 1
+          end
+        end
+      end
+    end
+    object CameraTab: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'CameraTab'
+      ExplicitSize.cx = 8.000000000000000000
+      ExplicitSize.cy = 8.000000000000000000
+    end
+  end
+  object LocationSensor: TLocationSensor
+    ActivityType = Other
+    UsageAuthorization = WhenInUse
+    OnLocationChanged = LocationSensorLocationChanged
+    Left = 80
+    Top = 92
+  end
+end

@@ -1,0 +1,5 @@
+CancelPlainRed64 RCDATA "Images\CancelPlainRed64.png"
+AcceptPlainGreen64 RCDATA "Images\AcceptPlainGreen64.png"
+CameraPlainBlue64 RCDATA "Images\CameraSolidBluePurple64.png"
+CameraSwapPlainPurple64 RCDATA "Images\CameraSwapPlainBlue64.png"
+
