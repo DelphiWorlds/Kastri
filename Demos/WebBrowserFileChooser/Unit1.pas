@@ -33,7 +33,10 @@ constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
   FManager := TWebChromeClientManager.Create(WebBrowser);
-  WebBrowser.Navigate('https://ps.uci.edu/~franklin/doc/file_upload.html'); // http://lacliniccaonline.com.br/resultados2020/mobile
+  // https://ps.uci.edu/~franklin/doc/file_upload.html // <---- This URL and the one just below are for demoing the file chooser fix
+  // http://lacliniccaonline.com.br/resultados2020/mobile
+  // https://www.youtube.com/watch?v=QkBvmv8kt4U // <----- This URL is for demo-ing YouTube in full screen mode
+  WebBrowser.Navigate('https://www.youtube.com/watch?v=QkBvmv8kt4U');
 end;
 
 end.

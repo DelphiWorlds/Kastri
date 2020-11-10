@@ -85,7 +85,7 @@ begin
   if Supports(AOwner, JWebView, LWebView) then
   begin
     FDelegate := TWebChromeClientDelegate.Create(Self);
-    FWebChromeClient := TJDWWebChromeClient.JavaClass.init(FDelegate);
+    FWebChromeClient := TJDWWebChromeClient.JavaClass.init(FDelegate, TAndroidHelper.Activity);
     LWebView.setWebChromeClient(FWebChromeClient);
   end;
 end;
