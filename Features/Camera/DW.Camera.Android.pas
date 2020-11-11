@@ -536,6 +536,7 @@ begin
   LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LONGITUDE_REF, StringToJString(cRefLongitude[LLocation.Longitude < 0]));
   LEXIF.saveAttributes;
   AStream.LoadFromFile(LFileName);
+  TFile.Delete(LFileName);
 end;
 
 procedure TCameraCaptureSession.ImageAvailable(reader: JImageReader);
