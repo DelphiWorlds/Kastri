@@ -25,7 +25,7 @@ Also be aware that the Android support **requires Android 6.0 or greater**, and 
 
 When using Delphi 10.3.3 to compile, attempting to start the camera causes a crash. [This issue is being investigated.](https://github.com/DelphiWorlds/Kastri/issues/20)
 
-When loading the main view in the demo using Delphi 10.3.3, you will receive warnings about missing properties in TLocationSensor. You can safely ignore these as they apply only to Delphi 10.4.4.
+When loading the main view in the demo using Delphi 10.3.3, you will receive warnings about missing properties in TLocationSensor. You can safely ignore these as they apply only to Delphi 10.4.1.
 
 ## Demo
 
