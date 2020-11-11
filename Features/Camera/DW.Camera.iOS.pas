@@ -100,6 +100,10 @@ uses
   Macapi.Helpers, Macapi.ObjCRuntime, Macapi.CoreFoundation,
   // iOS
   iOSapi.CoreGraphics, iOSapi.Helpers, iOSapi.CocoaTypes,
+  // DW
+  {$IF CompilerVersion < 34}
+  DW.iOSapi.AVFoundation,
+  {$ENDIF}
   // FMX
   FMX.Forms, FMX.Platform.iOS, FMX.Media, FMX.Helpers.iOS, FMX.Types, FMX.Graphics.iOS;
 

@@ -170,7 +170,7 @@ end;
 procedure TCameraView.CameraImageCapturedHandler(Sender: TObject; const AImageStream: TStream);
 begin
   FImageStream.Clear;
-  FImageStream.CopyFrom(AImageStream);
+  FImageStream.CopyFrom(AImageStream, AImageStream.Size);
   FCaptureImage.LoadFromStream(FImageStream);
   TabControl.ActiveTab := CaptureTab;
   EnableButtons(True);
