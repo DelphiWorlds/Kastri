@@ -22,7 +22,7 @@ uses
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreLocation, iOSapi.CoreGraphics, iOSapi.UIKit, iOSapi.CoreMedia, iOSapi.CoreVideo,
   iOSapi.AVFoundation,
   // DW
-  DW.Macapi.Simd, DW.iOSapi.SceneKit, DW.iOSapi.SpriteKitBase, DW.iOSapi.Metal, DW.iOSapi.AVFoundation;
+  DW.Macapi.Simd, DW.iOSapi.SceneKit, DW.iOSapi.SpriteKit, DW.iOSapi.Metal, DW.iOSapi.AVFoundation;
 
 const
   ARTrackingStateNotAvailable = 0;
@@ -721,6 +721,9 @@ type
 
   ARSCNFaceGeometryClass = interface(SCNGeometryClass)
     ['{1F40A8C2-6211-4E93-B9EC-1AAA805CBE26}']
+    {class} function faceGeometryWithDevice(device: Pointer; fillMesh: Boolean): Pointer; overload; cdecl;
+    {class} function faceGeometryWithDevice(device: Pointer): Pointer; overload; cdecl;
+    {class} function new: Pointer; cdecl;
   end;
 
   ARSCNFaceGeometry = interface(SCNGeometry)
@@ -1142,6 +1145,7 @@ type
 
   ARSCNPlaneGeometryClass = interface(SCNGeometryClass)
     ['{3A2A83D2-47E9-406C-AA33-DD6386E209BF}']
+    {class} function planeGeometryWithDevice(device: Pointer): Pointer; cdecl;
   end;
 
   ARSCNPlaneGeometry = interface(SCNGeometry)
@@ -1175,54 +1179,6 @@ type
     function unprojectPoint(point: CGPoint; ontoPlaneWithTransform: simd_float4x4): simd_float3; cdecl;
   end;
   TARSCNView = class(TOCGenericImport<ARSCNViewClass, ARSCNView>) end;
-
-(*
-
-OCTOID Fails
-
-{class} function planeGeometryWithDevice(device: Pointer): Pointer; cdecl;
-end;
-
-procedure updateFromPlaneGeometry(planeGeometry: ARPlaneGeometry); cdecl;
-end;
-TARSCNPlaneGeometry = class(TOCGenericImport<ARSCNPlaneGeometryClass, ARSCNPlaneGeometry>) end;
-
-
-end;
-
-function anchorForNode(node: Pointer): ARAnchor; cdecl;
-function automaticallyUpdatesLighting: Boolean; cdecl;
-function delegate: Pointer; cdecl;
-function hitTest(point: CGPoint; types: ARHitTestResultType): NSArray; cdecl; // API_DEPRECATED("Use [ARSCNView raycastQueryFromPoint:allowingTarget:alignment]", ios(11.0, 14.0))
-function nodeForAnchor(anchor: ARAnchor): Pointer; cdecl;
-function raycastQueryFromPoint(point: CGPoint; allowingTarget: ARRaycastTarget; alignment: ARRaycastTargetAlignment): ARRaycastQuery; cdecl;
-function rendersCameraGrain: Boolean; cdecl;
-function rendersMotionBlur: Boolean; cdecl;
-function scene: PInteger; cdecl;
-function session: ARSession; cdecl;
-procedure setAutomaticallyUpdatesLighting(automaticallyUpdatesLighting: Boolean); cdecl;
-procedure setDelegate(delegate: Pointer); cdecl;
-procedure setRendersCameraGrain(rendersCameraGrain: Boolean); cdecl;
-procedure setRendersMotionBlur(rendersMotionBlur: Boolean); cdecl;
-procedure setScene(scene: PInteger); cdecl;
-procedure setSession(session: ARSession); cdecl;
-function unprojectPoint(point: CGPoint; ontoPlaneWithTransform: simd_float4x4): simd_float3; cdecl;
-end;
-TARSCNView = class(TOCGenericImport<ARSCNViewClass, ARSCNView>) end;
-
-
-end;
-
-function anchorForNode(node: Pointer): ARAnchor; cdecl;
-function delegate: NSObject; cdecl;
-function hitTest(point: CGPoint; types: ARHitTestResultType): NSArray; cdecl; // API_DEPRECATED("Use raycasting", ios(11.0, 14.0))
-function nodeForAnchor(anchor: ARAnchor): Pointer; cdecl;
-function session: ARSession; cdecl;
-procedure setDelegate(delegate: NSObject); cdecl;
-procedure setSession(session: ARSession); cdecl;
-end;
-TARSKView = class(TOCGenericImport<ARSKViewClass, ARSKView>) end;
-*)
 
   ARSKViewClass = interface(SKViewClass)
     ['{C0747212-E877-41E8-8053-9DE68851CC68}']
