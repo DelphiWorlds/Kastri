@@ -17,7 +17,7 @@ interface
 
 uses
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.WebKit, Androidapi.JNI.GraphicsContentViewText;
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.WebKit, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App;
 
 type
   JDWWebChromeClient = interface;
@@ -25,7 +25,8 @@ type
 
   JDWWebChromeClientClass = interface(JWebChromeClientClass)
     ['{937DE965-7D1B-439E-8C83-134CC8C3E082}']
-    {class} function init(delegate: JDWWebChromeClientDelegate): JDWWebChromeClient; cdecl;
+    {class} function init(delegate: JDWWebChromeClientDelegate): JDWWebChromeClient; cdecl; overload;
+    {class} function init(delegate: JDWWebChromeClientDelegate; activity: JActivity): JDWWebChromeClient; cdecl; overload;
   end;
 
   [JavaSignature('com/delphiworlds/kastri/DWWebChromeClient')]
