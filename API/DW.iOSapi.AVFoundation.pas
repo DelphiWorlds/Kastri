@@ -17,9 +17,11 @@ interface
 
 uses
   // macOS
-  Macapi.CoreFoundation, Macapi.ObjCRuntime, Macapi.ObjectiveC,
+  Macapi.CoreFoundation, Macapi.ObjCRuntime, Macapi.ObjectiveC, Macapi.Dispatch,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.AVFoundation;
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.AVFoundation, iOSapi.CoreMedia, iOSapi.CoreGraphics, iOSapi.CoreVideo,
+  // DW
+  DW.Macapi.Simd;
 
 const
   AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation = 1;
@@ -35,6 +37,43 @@ const
   AVAudioSessionRouteChangeReasonWakeFromSleep = 6;
   AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory = 7;
   AVAudioSessionRouteChangeReasonRouteConfigurationChange = 8;
+  AVAudioEnvironmentDistanceAttenuationModelExponential = 1;
+  AVAudioEnvironmentDistanceAttenuationModelInverse = 2;
+  AVAudioEnvironmentDistanceAttenuationModelLinear = 3;
+  AVAudioEnvironmentOutputTypeAuto = 0;
+  AVAudioEnvironmentOutputTypeHeadphones = 1;
+  AVAudioEnvironmentOutputTypeBuiltInSpeakers = 2;
+  AVAudioEnvironmentOutputTypeExternalSpeakers = 3;
+  AVAudioUnitEQFilterTypeParametric = 0;
+  AVAudioUnitEQFilterTypeLowPass = 1;
+  AVAudioUnitEQFilterTypeHighPass = 2;
+  AVAudioUnitEQFilterTypeResonantLowPass = 3;
+  AVAudioUnitEQFilterTypeResonantHighPass = 4;
+  AVAudioUnitEQFilterTypeBandPass = 5;
+  AVAudioUnitEQFilterTypeBandStop = 6;
+  AVAudioUnitEQFilterTypeLowShelf = 7;
+  AVAudioUnitEQFilterTypeHighShelf = 8;
+  AVAudioUnitEQFilterTypeResonantLowShelf = 9;
+  AVAudioUnitEQFilterTypeResonantHighShelf = 10;
+  AVAudioUnitReverbPresetSmallRoom = 0;
+  AVAudioUnitReverbPresetMediumRoom = 1;
+  AVAudioUnitReverbPresetLargeRoom = 2;
+  AVAudioUnitReverbPresetMediumHall = 3;
+  AVAudioUnitReverbPresetLargeHall = 4;
+  AVAudioUnitReverbPresetPlate = 5;
+  AVAudioUnitReverbPresetMediumChamber = 6;
+  AVAudioUnitReverbPresetLargeChamber = 7;
+  AVAudioUnitReverbPresetCathedral = 8;
+  AVAudioUnitReverbPresetLargeRoom2 = 9;
+  AVAudioUnitReverbPresetMediumHall2 = 10;
+  AVAudioUnitReverbPresetMediumHall3 = 11;
+  AVAudioUnitReverbPresetLargeHall2 = 12;
+  AVPlayerHDRModeHLG = 1;
+  AVPlayerHDRModeHDR10 = 2;
+  AVPlayerHDRModeDolbyVision = 4;
+  AVPlayerTimeControlStatusPaused = 0;
+  AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate = 1;
+  AVPlayerTimeControlStatusPlaying = 2;
 
 type
   AVAudioBuffer = interface;
@@ -53,6 +92,10 @@ type
   AVAudioSessionPortDescription = interface;
   AVAudioSessionRouteDescription = interface;
   AVAudioTime = interface;
+  AVAudioEnvironmentNode = interface;
+  AVAudioEnvironmentDistanceAttenuationParameters = interface;
+  AVAudioUnitEQFilterParameters = interface;
+  AVAudioEnvironmentReverbParameters = interface;
 
   PInt32 = ^Int32;
   AVAuthorizationStatus = NSInteger;
@@ -69,9 +112,45 @@ type
   AVAudioSessionRouteChangeReason = NSInteger;
   CMFormatDescriptionRef = Pointer;
   CMAudioFormatDescriptionRef = CMFormatDescriptionRef;
+  AVAudioEnvironmentDistanceAttenuationModel = NSInteger;
+  AVAudioEnvironmentOutputType = NSInteger;
+  AVAudioUnitEQFilterType = NSInteger;
+  AVAudioUnitReverbPreset = NSInteger;
+  AVPlayerHDRMode = NSInteger;
+  AVLayerVideoGravity = NSString;
+  AVMediaCharacteristic = NSString;
+  AVPlayerWaitingReason = NSString;
+  AVPlayerTimeControlStatus = NSInteger;
+  AVDepthDataAccuracy = NSInteger;
+  AVDepthDataQuality = NSInteger;
+
+  CGImagePropertyOrientation = NSUInteger;
+
+  AVAudio3DAngularOrientation = record
+    yaw: Single;
+    pitch: Single;
+    roll: Single;
+  end;
+
+  AVAudio3DPoint = record
+    x: Single;
+    y: Single;
+    z: Single;
+  end;
+
+  AVAudio3DVector = AVAudio3DPoint;
+
+  AVAudio3DVectorOrientation = record
+    forward: AVAudio3DVector;
+    up: AVAudio3DVector;
+  end;
 
   AVAudioNodeTapBlock = procedure(buffer: AVAudioPCMBuffer; when: AVAudioTime) of object;
   PermissionBlock = procedure(granted: Boolean) of object;
+
+  TAVPlayerBlockMethod1 = procedure(finished: Boolean) of object;
+  TAVPlayerBlockMethod2 = procedure(time: CMTime) of object;
+  TAVPlayerBlockMethod3 = procedure of object;
 
   AVAudioSessionRouteDescriptionClass = interface(NSObjectClass)
     ['{A7524349-5447-431C-A1A9-D09F2C1F6588}']
@@ -423,8 +502,207 @@ type
   end;
   TAVCaptureDevice = class(TOCGenericImport<AVCaptureDeviceClass, AVCaptureDevice>) end;
 
-  function AVAudioSessionCategoryRecord: NSString;
-  function AVAudioSessionModeMeasurement: NSString;
+  AVAudioEnvironmentDistanceAttenuationParametersClass = interface(NSObjectClass)
+    ['{D889B82A-CF52-4EB4-8A56-23BCB07E61BF}']
+  end;
+
+  AVAudioEnvironmentDistanceAttenuationParameters = interface(NSObject)
+    ['{B2F3F993-FA7B-4360-A2B0-6AAFEEA4D021}']
+    function distanceAttenuationModel: AVAudioEnvironmentDistanceAttenuationModel; cdecl;
+    function maximumDistance: Single; cdecl;
+    function referenceDistance: Single; cdecl;
+    function rolloffFactor: Single; cdecl;
+    procedure setDistanceAttenuationModel(distanceAttenuationModel: AVAudioEnvironmentDistanceAttenuationModel); cdecl;
+    procedure setMaximumDistance(maximumDistance: Single); cdecl;
+    procedure setReferenceDistance(referenceDistance: Single); cdecl;
+    procedure setRolloffFactor(rolloffFactor: Single); cdecl;
+  end;
+  TAVAudioEnvironmentDistanceAttenuationParameters = class(TOCGenericImport<AVAudioEnvironmentDistanceAttenuationParametersClass,
+    AVAudioEnvironmentDistanceAttenuationParameters>) end;
+
+  AVAudioUnitEQFilterParametersClass = interface(NSObjectClass)
+    ['{AC93CB36-1660-4A47-8EBE-327F2A0E443A}']
+  end;
+
+  AVAudioUnitEQFilterParameters = interface(NSObject)
+    ['{78DBAF70-C134-40E3-8BC4-27462A36264E}']
+    function bandwidth: Single; cdecl;
+    function bypass: Boolean; cdecl;
+    function filterType: AVAudioUnitEQFilterType; cdecl;
+    function frequency: Single; cdecl;
+    function gain: Single; cdecl;
+    procedure setBandwidth(bandwidth: Single); cdecl;
+    procedure setBypass(bypass: Boolean); cdecl;
+    procedure setFilterType(filterType: AVAudioUnitEQFilterType); cdecl;
+    procedure setFrequency(frequency: Single); cdecl;
+    procedure setGain(gain: Single); cdecl;
+  end;
+  TAVAudioUnitEQFilterParameters = class(TOCGenericImport<AVAudioUnitEQFilterParametersClass, AVAudioUnitEQFilterParameters>) end;
+
+  AVAudioEnvironmentReverbParametersClass = interface(NSObjectClass)
+    ['{3441D228-B4B1-4CEE-BC66-FCC20213A63A}']
+  end;
+
+  AVAudioEnvironmentReverbParameters = interface(NSObject)
+    ['{84781FC7-2997-4D8D-AC81-937E36070959}']
+    function enable: Boolean; cdecl;
+    function filterParameters: AVAudioUnitEQFilterParameters; cdecl;
+    function level: Single; cdecl;
+    procedure loadFactoryReverbPreset(preset: AVAudioUnitReverbPreset); cdecl;
+    procedure setEnable(enable: Boolean); cdecl;
+    procedure setLevel(level: Single); cdecl;
+  end;
+  TAVAudioEnvironmentReverbParameters = class(TOCGenericImport<AVAudioEnvironmentReverbParametersClass, AVAudioEnvironmentReverbParameters>) end;
+
+  AVAudioEnvironmentNodeClass = interface(AVAudioNodeClass)
+    ['{DB31D7ED-0CD4-44DB-B378-AD391410A687}']
+  end;
+
+  AVAudioEnvironmentNode = interface(AVAudioNode)
+    ['{F69CD57E-A3CD-44D4-A51B-E0048575A350}']
+    function applicableRenderingAlgorithms: NSArray; cdecl;
+    function distanceAttenuationParameters: AVAudioEnvironmentDistanceAttenuationParameters; cdecl;
+    function listenerAngularOrientation: AVAudio3DAngularOrientation; cdecl;
+    function listenerPosition: AVAudio3DPoint; cdecl;
+    function listenerVectorOrientation: AVAudio3DVectorOrientation; cdecl;
+    function nextAvailableInputBus: AVAudioNodeBus; cdecl;
+    function outputType: AVAudioEnvironmentOutputType; cdecl;
+    function outputVolume: Single; cdecl;
+    function reverbParameters: AVAudioEnvironmentReverbParameters; cdecl;
+    procedure setListenerAngularOrientation(listenerAngularOrientation: AVAudio3DAngularOrientation); cdecl;
+    procedure setListenerPosition(listenerPosition: AVAudio3DPoint); cdecl;
+    procedure setListenerVectorOrientation(listenerVectorOrientation: AVAudio3DVectorOrientation); cdecl;
+    procedure setOutputType(outputType: AVAudioEnvironmentOutputType); cdecl;
+    procedure setOutputVolume(outputVolume: Single); cdecl;
+  end;
+  TAVAudioEnvironmentNode = class(TOCGenericImport<AVAudioEnvironmentNodeClass, AVAudioEnvironmentNode>) end;
+
+  AVCameraCalibrationDataClass = interface(NSObjectClass)
+    ['{03A8465E-E5BC-4333-B290-0D8450CA6AE1}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  AVCameraCalibrationData = interface(NSObject)
+    ['{376535E1-EFF2-4542-81B1-B38AB46FEC94}']
+    function extrinsicMatrix: matrix_float4x3; cdecl;
+    function intrinsicMatrix: matrix_float3x3; cdecl;
+    function intrinsicMatrixReferenceDimensions: CGSize; cdecl;
+    function inverseLensDistortionLookupTable: NSData; cdecl;
+    function lensDistortionCenter: CGPoint; cdecl;
+    function lensDistortionLookupTable: NSData; cdecl;
+    function pixelSize: Single; cdecl;
+  end;
+  TAVCameraCalibrationData = class(TOCGenericImport<AVCameraCalibrationDataClass, AVCameraCalibrationData>) end;
+
+  AVDepthDataClass = interface(NSObjectClass)
+    ['{532EB378-577E-425C-95A9-22507AC64804}']
+    [MethodName('depthDataFromDictionaryRepresentation:error:')]
+    {class} function depthDataFromDictionaryRepresentation(imageSourceAuxDataInfoDictionary: NSDictionary; outError: PNSError): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
+  end;
+
+  AVDepthData = interface(NSObject)
+    ['{3049DEC1-E604-4510-B028-51407F54AC61}']
+    function availableDepthDataTypes: NSArray; cdecl;
+    function cameraCalibrationData: AVCameraCalibrationData; cdecl;
+    function depthDataAccuracy: AVDepthDataAccuracy; cdecl;
+    function depthDataByApplyingExifOrientation(exifOrientation: CGImagePropertyOrientation): Pointer; cdecl;
+    function depthDataByConvertingToDepthDataType(depthDataType: OSType): Pointer; cdecl;
+    [MethodName('depthDataByReplacingDepthDataMapWithPixelBuffer:error:')]
+    function depthDataByReplacingDepthDataMapWithPixelBuffer(pixelBuffer: CVPixelBufferRef; outError: PNSError): Pointer; cdecl;
+    function depthDataMap: CVPixelBufferRef; cdecl;
+    function depthDataQuality: AVDepthDataQuality; cdecl;
+    function depthDataType: OSType; cdecl;
+    function dictionaryRepresentationForAuxiliaryDataType(outAuxDataType: PNSString): NSDictionary; cdecl;
+    function isDepthDataFiltered: Boolean; cdecl;
+  end;
+  TAVDepthData = class(TOCGenericImport<AVDepthDataClass, AVDepthData>) end;
+
+  AVPlayerClass = interface(NSObjectClass)
+    ['{8B1775DB-D230-4202-9D43-8ED8BACF1D48}']
+    {class} function availableHDRModes: AVPlayerHDRMode; cdecl;
+    {class} function eligibleForHDRPlayback: Boolean; cdecl;
+    {class} function playerWithPlayerItem(item: AVPlayerItem): Pointer; cdecl;
+    {class} function playerWithURL(URL: NSURL): Pointer; cdecl;
+  end;
+
+  AVPlayer = interface(NSObject)
+    ['{ECF23C67-9F21-4166-8328-66F0B5413F74}']
+    function actionAtItemEnd: AVPlayerActionAtItemEnd; cdecl;
+    [MethodName('addBoundaryTimeObserverForTimes:queue:usingBlock:')]
+    function addBoundaryTimeObserverForTimes(times: NSArray; queue: dispatch_queue_t; block: TAVPlayerBlockMethod3): Pointer; cdecl;
+    [MethodName('addPeriodicTimeObserverForInterval:queue:usingBlock:')]
+    function addPeriodicTimeObserverForInterval(interval: CMTime; queue: dispatch_queue_t; block: TAVPlayerBlockMethod2): Pointer; cdecl;
+    function allowsAirPlayVideo: Boolean; cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
+    function allowsExternalPlayback: Boolean; cdecl;
+    function appliesMediaSelectionCriteriaAutomatically: Boolean; cdecl;
+    function audioOutputDeviceUniqueID: NSString; cdecl;
+    function automaticallyWaitsToMinimizeStalling: Boolean; cdecl;
+    procedure cancelPendingPrerolls; cdecl;
+    function currentItem: AVPlayerItem; cdecl;
+    function currentTime: CMTime; cdecl;
+    function error: NSError; cdecl;
+    function externalPlaybackVideoGravity: AVLayerVideoGravity; cdecl;
+    function initWithPlayerItem(item: AVPlayerItem): Pointer; cdecl;
+    function initWithURL(URL: NSURL): Pointer; cdecl;
+    function isAirPlayVideoActive: Boolean; cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
+    function isClosedCaptionDisplayEnabled: Boolean; cdecl; // API_DEPRECATED("Allow AVPlayer to enable closed captions automatically according to user preferences by ensuring that the value of appliesMediaSelectionCriteriaAutomatically is YES.", macos(10.7, 10.13), ios(4.0, 11.0), tvos(9.0, 11.0))
+    function isExternalPlaybackActive: Boolean; cdecl;
+    function isMuted: Boolean; cdecl;
+    function masterClock: CMClockRef; cdecl;
+    function mediaSelectionCriteriaForMediaCharacteristic(mediaCharacteristic: AVMediaCharacteristic): AVPlayerMediaSelectionCriteria; cdecl;
+    function outputObscuredDueToInsufficientExternalProtection: Boolean; cdecl;
+    procedure pause; cdecl;
+    procedure play; cdecl;
+    procedure playImmediatelyAtRate(rate: Single); cdecl;
+    function preferredVideoDecoderGPURegistryID: UInt64; cdecl;
+    [MethodName('prerollAtRate:completionHandler:')]
+    procedure prerollAtRate(rate: Single; completionHandler: TAVPlayerBlockMethod1); cdecl;
+    function preventsDisplaySleepDuringVideoPlayback: Boolean; cdecl;
+    function rate: Single; cdecl;
+    function reasonForWaitingToPlay: AVPlayerWaitingReason; cdecl;
+    procedure removeTimeObserver(observer: Pointer); cdecl;
+    procedure replaceCurrentItemWithPlayerItem(item: AVPlayerItem); cdecl;
+    [MethodName('seekToDate:completionHandler:')]
+    procedure seekToDate(date: NSDate; completionHandler: TAVPlayerBlockMethod1); overload; cdecl;
+    procedure seekToDate(date: NSDate); overload; cdecl;
+    [MethodName('seekToTime:completionHandler:')]
+    procedure seekToTime(time: CMTime; completionHandler: TAVPlayerBlockMethod1); overload; cdecl;
+    [MethodName('seekToTime:toleranceBefore:toleranceAfter:completionHandler:')]
+    procedure seekToTime(time: CMTime; toleranceBefore: CMTime; toleranceAfter: CMTime; completionHandler: TAVPlayerBlockMethod1); overload; cdecl;
+    [MethodName('seekToTime:toleranceBefore:toleranceAfter:')]
+    procedure seekToTime(time: CMTime; toleranceBefore: CMTime; toleranceAfter: CMTime); overload; cdecl;
+    procedure seekToTime(time: CMTime); overload; cdecl;
+    procedure setActionAtItemEnd(actionAtItemEnd: AVPlayerActionAtItemEnd); cdecl;
+    procedure setAllowsAirPlayVideo(allowsAirPlayVideo: Boolean); cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
+    procedure setAllowsExternalPlayback(allowsExternalPlayback: Boolean); cdecl;
+    procedure setAppliesMediaSelectionCriteriaAutomatically(appliesMediaSelectionCriteriaAutomatically: Boolean); cdecl;
+    procedure setAudioOutputDeviceUniqueID(audioOutputDeviceUniqueID: NSString); cdecl;
+    procedure setAutomaticallyWaitsToMinimizeStalling(automaticallyWaitsToMinimizeStalling: Boolean); cdecl;
+    procedure setClosedCaptionDisplayEnabled(closedCaptionDisplayEnabled: Boolean); cdecl; // API_DEPRECATED("Allow AVPlayer to enable closed captions automatically according to user preferences by ensuring that the value of appliesMediaSelectionCriteriaAutomatically is YES.", macos(10.7, 10.13), ios(4.0, 11.0), tvos(9.0, 11.0))
+    procedure setExternalPlaybackVideoGravity(externalPlaybackVideoGravity: AVLayerVideoGravity); cdecl;
+    procedure setMasterClock(masterClock: CMClockRef); cdecl;
+    [MethodName('setMediaSelectionCriteria:forMediaCharacteristic:')]
+    procedure setMediaSelectionCriteria(criteria: AVPlayerMediaSelectionCriteria; mediaCharacteristic: AVMediaCharacteristic); cdecl;
+    procedure setMuted(muted: Boolean); cdecl;
+    procedure setPreferredVideoDecoderGPURegistryID(preferredVideoDecoderGPURegistryID: UInt64); cdecl;
+    procedure setPreventsDisplaySleepDuringVideoPlayback(preventsDisplaySleepDuringVideoPlayback: Boolean); cdecl;
+    procedure setRate(rate: Single); overload; cdecl;
+    [MethodName('setRate:time:atHostTime:')]
+    procedure setRate(rate: Single; itemTime: CMTime; hostClockTime: CMTime); overload; cdecl;
+    procedure setUsesAirPlayVideoWhileAirPlayScreenIsActive(usesAirPlayVideoWhileAirPlayScreenIsActive: Boolean); cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
+    procedure setUsesExternalPlaybackWhileExternalScreenIsActive(usesExternalPlaybackWhileExternalScreenIsActive: Boolean); cdecl;
+    procedure setVolume(volume: Single); cdecl;
+    function status: AVPlayerStatus; cdecl;
+    function timeControlStatus: AVPlayerTimeControlStatus; cdecl;
+    function usesAirPlayVideoWhileAirPlayScreenIsActive: Boolean; cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
+    function usesExternalPlaybackWhileExternalScreenIsActive: Boolean; cdecl;
+    function volume: Single; cdecl;
+  end;
+  TAVPlayer = class(TOCGenericImport<AVPlayerClass, AVPlayer>) end;
+
+function AVAudioSessionCategoryRecord: NSString;
+function AVAudioSessionModeMeasurement: NSString;
 
 implementation
 

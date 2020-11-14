@@ -40,6 +40,7 @@ type
   NSUserActivity = interface;
 
   NSErrorDomain = NSString;
+  NSErrorUserInfoKey = NSString;
   NSLocaleKey = NSString;
   NSNotificationName = NSString;
   NSLocaleLanguageDirection = NSInteger;
