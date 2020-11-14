@@ -27,6 +27,7 @@ type
   dispatch_block_t = Pointer; // dispatch_work_t;
   dispatch_source_t = Pointer;
   dispatch_function_t = procedure(context: Pointer); cdecl;
+  dispatch_data_t = Pointer;
 
   TGrandCentral = record
   private
