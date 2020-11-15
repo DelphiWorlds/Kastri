@@ -1224,7 +1224,10 @@ type
   TMTLSharedTextureHandle = class(TOCGenericImport<MTLSharedTextureHandleClass, MTLSharedTextureHandle>) end;
 
   MTLTextureDescriptorClass = interface(NSObjectClass)
-    ['{63A93653-848A-418E-B14D-A135E5394E21}']
+    ['{3DDEB54E-3F13-4E03-B56F-713EC572ED10}']
+    {class} function texture2DDescriptorWithPixelFormat(pixelFormat: MTLPixelFormat; width: NSUInteger; height: NSUInteger; mipmapped: Boolean): MTLTextureDescriptor; cdecl;
+    {class} function textureBufferDescriptorWithPixelFormat(pixelFormat: MTLPixelFormat; width: NSUInteger; resourceOptions: MTLResourceOptions; usage: MTLTextureUsage): MTLTextureDescriptor; cdecl;
+    {class} function textureCubeDescriptorWithPixelFormat(pixelFormat: MTLPixelFormat; size: NSUInteger; mipmapped: Boolean): MTLTextureDescriptor; cdecl;
   end;
 
   MTLTextureDescriptor = interface(NSObject)
@@ -1427,7 +1430,8 @@ type
   TMTLFunctionConstantValues = class(TOCGenericImport<MTLFunctionConstantValuesClass, MTLFunctionConstantValues>) end;
 
   MTLFunctionDescriptorClass = interface(NSObjectClass)
-    ['{997EDB23-C6D5-4338-BFFE-2A49CF24C8C7}']
+    ['{1DD54ABD-16F7-45C6-BF8C-3196205EAAE6}']
+    {class} function functionDescriptor: MTLFunctionDescriptor; cdecl;
   end;
 
   MTLFunctionDescriptor = interface(NSObject)
@@ -1597,7 +1601,8 @@ type
   end;
 
   MTLArgumentDescriptorClass = interface(NSObjectClass)
-    ['{6BF8ADA2-4658-4D13-8CA8-BF780758256C}']
+    ['{24179177-3AE0-4289-9F01-159CED016C33}']
+    {class} function argumentDescriptor: MTLArgumentDescriptor; cdecl;
   end;
 
   MTLArgumentDescriptor = interface(NSObject)
@@ -1758,7 +1763,8 @@ type
     MTLResourceStatePassSampleBufferAttachmentDescriptorArray>) end;
 
   MTLResourceStatePassDescriptorClass = interface(NSObjectClass)
-    ['{A00582BA-79E2-48C3-A196-22BA5DD5C9BD}']
+    ['{59F187B4-58F5-4A18-B74B-98693045FB76}']
+    {class} function resourceStatePassDescriptor: MTLResourceStatePassDescriptor; cdecl;
   end;
 
   MTLResourceStatePassDescriptor = interface(NSObject)
@@ -1895,7 +1901,8 @@ type
     MTLRenderPassSampleBufferAttachmentDescriptorArray>) end;
 
   MTLRenderPassDescriptorClass = interface(NSObjectClass)
-    ['{21F34C60-20AB-427C-A8AC-E4772462BF9E}']
+    ['{A5FD125E-54C4-45BB-AE68-6591316ACB54}']
+    {class} function renderPassDescriptor: MTLRenderPassDescriptor; cdecl;
   end;
 
   MTLRenderPassDescriptor = interface(NSObject)
@@ -1960,7 +1967,8 @@ type
     MTLBlitPassSampleBufferAttachmentDescriptorArray>) end;
 
   MTLBlitPassDescriptorClass = interface(NSObjectClass)
-    ['{B499CECA-2C98-47A5-90E3-66BF6D5FDEA7}']
+    ['{980E06E1-0553-4EEB-A1B7-F100FB89AA76}']
+    {class} function blitPassDescriptor: MTLBlitPassDescriptor; cdecl;
   end;
 
   MTLBlitPassDescriptor = interface(NSObject)
@@ -2104,7 +2112,8 @@ type
     MTLComputePassSampleBufferAttachmentDescriptorArray>) end;
 
   MTLComputePassDescriptorClass = interface(NSObjectClass)
-    ['{B70F9435-B5E5-454C-8435-33C69E65FCF5}']
+    ['{50F209BA-866E-4B15-8EFE-143FA9C719B4}']
+    {class} function computePassDescriptor: MTLComputePassDescriptor; cdecl;
   end;
 
   MTLComputePassDescriptor = interface(NSObject)
@@ -2277,7 +2286,8 @@ type
   TMTLAttributeDescriptorArray = class(TOCGenericImport<MTLAttributeDescriptorArrayClass, MTLAttributeDescriptorArray>) end;
 
   MTLStageInputOutputDescriptorClass = interface(NSObjectClass)
-    ['{542C0217-9D29-4B29-9BE8-99FBE273A120}']
+    ['{FB1C54BE-B68A-4E22-9746-8C89F6C53516}']
+    {class} function stageInputOutputDescriptor: MTLStageInputOutputDescriptor; cdecl;
   end;
 
   MTLStageInputOutputDescriptor = interface(NSObject)
@@ -2315,7 +2325,8 @@ type
   TMTLPipelineBufferDescriptorArray = class(TOCGenericImport<MTLPipelineBufferDescriptorArrayClass, MTLPipelineBufferDescriptorArray>) end;
 
   MTLLinkedFunctionsClass = interface(NSObjectClass)
-    ['{2C06BE84-8A7B-41ED-AC95-F963CA387A3F}']
+    ['{7CD663A1-D1B3-4B3D-87E6-D2FC4C2961DC}']
+    {class} function linkedFunctions: MTLLinkedFunctions; cdecl;
   end;
 
   MTLLinkedFunctions = interface(NSObject)
@@ -2715,7 +2726,8 @@ type
   TMTLVertexAttributeDescriptorArray = class(TOCGenericImport<MTLVertexAttributeDescriptorArrayClass, MTLVertexAttributeDescriptorArray>) end;
 
   MTLVertexDescriptorClass = interface(NSObjectClass)
-    ['{CAFEB6DB-D0F0-4330-86EB-592B283F46D9}']
+    ['{D941707F-CAF7-42EC-B2AE-3D99CDFA1839}']
+    {class} function vertexDescriptor: MTLVertexDescriptor; cdecl;
   end;
 
   MTLVertexDescriptor = interface(NSObject)
@@ -2876,7 +2888,8 @@ type
   TMTLCaptureDescriptor = class(TOCGenericImport<MTLCaptureDescriptorClass, MTLCaptureDescriptor>) end;
 
   MTLCaptureManagerClass = interface(NSObjectClass)
-    ['{3FC5DC06-C521-411A-9488-8868F272CFE8}']
+    ['{CDAA0736-A36D-49F2-BD86-AA995EADE9AF}']
+    {class} function sharedCaptureManager: MTLCaptureManager; cdecl;
   end;
 
   MTLCaptureManager = interface(NSObject)
@@ -3056,7 +3069,8 @@ type
     MTLAccelerationStructureGeometryDescriptor>) end;
 
   MTLPrimitiveAccelerationStructureDescriptorClass = interface(MTLAccelerationStructureDescriptorClass)
-    ['{B8CA13A0-017D-44C8-8286-753EABD0CAC4}']
+    ['{F92CB14B-2F52-4B1D-BF5D-3901206D3DB7}']
+    {class} function descriptor: Pointer; cdecl;
   end;
 
   MTLPrimitiveAccelerationStructureDescriptor = interface(MTLAccelerationStructureDescriptor)
@@ -3068,7 +3082,8 @@ type
     MTLPrimitiveAccelerationStructureDescriptor>) end;
 
   MTLAccelerationStructureTriangleGeometryDescriptorClass = interface(MTLAccelerationStructureGeometryDescriptorClass)
-    ['{34C32ADF-9096-4981-85E8-E60E16609996}']
+    ['{87B8A76E-3BED-41F3-8248-38B0CCF5C2E0}']
+    {class} function descriptor: Pointer; cdecl;
   end;
 
   MTLAccelerationStructureTriangleGeometryDescriptor = interface(MTLAccelerationStructureGeometryDescriptor)
@@ -3092,7 +3107,8 @@ type
     MTLAccelerationStructureTriangleGeometryDescriptor>) end;
 
   MTLAccelerationStructureBoundingBoxGeometryDescriptorClass = interface(MTLAccelerationStructureGeometryDescriptorClass)
-    ['{DF4CF6BD-5B01-493F-952C-49B5E6E59DC3}']
+    ['{B36ED013-72A7-4E45-B0EB-1DBC2900C06E}']
+    {class} function descriptor: Pointer; cdecl;
   end;
 
   MTLAccelerationStructureBoundingBoxGeometryDescriptor = interface(MTLAccelerationStructureGeometryDescriptor)
@@ -3110,7 +3126,8 @@ type
     MTLAccelerationStructureBoundingBoxGeometryDescriptor>) end;
 
   MTLInstanceAccelerationStructureDescriptorClass = interface(MTLAccelerationStructureDescriptorClass)
-    ['{E1F69D9C-1F4D-422E-9CC2-BB357846B032}']
+    ['{207EB5D5-98A7-4FC5-AE81-95A30E354121}']
+    {class} function descriptor: Pointer; cdecl;
   end;
 
   MTLInstanceAccelerationStructureDescriptor = interface(MTLAccelerationStructureDescriptor)
@@ -3178,6 +3195,7 @@ type
     function verticalSampleStorage: PSingle; cdecl;
   end;
   TMTLRasterizationRateLayerDescriptor = class(TOCGenericImport<MTLRasterizationRateLayerDescriptorClass, MTLRasterizationRateLayerDescriptor>) end;
+  PMTLRasterizationRateLayerDescriptor = ^MTLRasterizationRateLayerDescriptor;
 
   MTLRasterizationRateLayerArrayClass = interface(NSObjectClass)
     ['{A750C5BD-4062-4D91-8525-024FA3DBC48B}']
@@ -3191,7 +3209,12 @@ type
   TMTLRasterizationRateLayerArray = class(TOCGenericImport<MTLRasterizationRateLayerArrayClass, MTLRasterizationRateLayerArray>) end;
 
   MTLRasterizationRateMapDescriptorClass = interface(NSObjectClass)
-    ['{202FAB9A-A5A5-42BF-B2B3-A1E45EB49CEA}']
+    ['{02A1CB5E-CB6B-4520-863A-F408562222D1}']
+    {class} function rasterizationRateMapDescriptorWithScreenSize(screenSize: MTLSize; layerCount: NSUInteger; layers:
+      PMTLRasterizationRateLayerDescriptor): MTLRasterizationRateMapDescriptor; overload; cdecl;
+    {class} function rasterizationRateMapDescriptorWithScreenSize(screenSize: MTLSize;
+      layer: MTLRasterizationRateLayerDescriptor): MTLRasterizationRateMapDescriptor; overload; cdecl;
+    {class} function rasterizationRateMapDescriptorWithScreenSize(screenSize: MTLSize): MTLRasterizationRateMapDescriptor; overload; cdecl;
   end;
 
   MTLRasterizationRateMapDescriptor = interface(NSObject)
@@ -3241,7 +3264,8 @@ type
   end;
 
   MTLVisibleFunctionTableDescriptorClass = interface(NSObjectClass)
-    ['{011CFF09-0B94-45E0-982A-BD60E1066DAC}']
+    ['{3186E0A8-5C81-4CE7-B6B3-0339491D57B9}']
+    {class} function visibleFunctionTableDescriptor: MTLVisibleFunctionTableDescriptor; cdecl;
   end;
 
   MTLVisibleFunctionTableDescriptor = interface(NSObject)
@@ -3281,7 +3305,8 @@ type
   end;
 
   MTLIntersectionFunctionTableDescriptorClass = interface(NSObjectClass)
-    ['{9C9A7025-EF34-4907-A53B-57E019400E84}']
+    ['{0D1DFD03-EB2D-4557-BB0A-B59D8E80362D}']
+    {class} function intersectionFunctionTableDescriptor: MTLIntersectionFunctionTableDescriptor; cdecl;
   end;
 
   MTLIntersectionFunctionTableDescriptor = interface(NSObject)

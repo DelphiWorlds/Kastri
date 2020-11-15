@@ -162,6 +162,11 @@ type
 
   JSContextClass = interface(NSObjectClass)
     ['{691FD580-14D3-4E89-B904-60958F301D44}']
+    {class} function contextWithJSGlobalContextRef(jsGlobalContextRef: JSGlobalContextRef): JSContext; cdecl;
+    {class} function currentArguments: NSArray; cdecl;
+    {class} function currentCallee: JSValue; cdecl;
+    {class} function currentContext: JSContext; cdecl;
+    {class} function currentThis: JSValue; cdecl;
   end;
 
   JSContext = interface(NSObject)
@@ -185,6 +190,26 @@ type
 
   JSValueClass = interface(NSObjectClass)
     ['{3F79EE8A-2B07-4D49-9E6E-8D5A6A6E1FD0}']
+    {class} function valueWithBool(value: Boolean; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithDouble(value: Double; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithInt32(value: Int32; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithJSValueRef(value: JSValueRef; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithNewArrayInContext(context: JSContext): JSValue; cdecl;
+    {class} function valueWithNewErrorFromMessage(message: NSString; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithNewObjectInContext(context: JSContext): JSValue; cdecl;
+    {class} function valueWithNewPromiseInContext(context: JSContext; fromExecutor: TJSValueBlockMethod1): JSValue; cdecl;
+    {class} function valueWithNewPromiseRejectedWithReason(reason: Pointer; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithNewPromiseResolvedWithResult(result: Pointer; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithNewRegularExpressionFromPattern(pattern: NSString; flags: NSString; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithNewSymbolFromDescription(description: NSString; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithNullInContext(context: JSContext): JSValue; cdecl;
+    {class} function valueWithObject(value: Pointer; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithPoint(point: CGPoint; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithRange(range: NSRange; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithRect(rect: CGRect; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithSize(size: CGSize; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithUInt32(value: UInt32; inContext: JSContext): JSValue; cdecl;
+    {class} function valueWithUndefinedInContext(context: JSContext): JSValue; cdecl;
   end;
 
   JSValue = interface(NSObject)
@@ -237,6 +262,8 @@ type
 
   JSManagedValueClass = interface(NSObjectClass)
     ['{7BFF2469-40D7-4298-A4B6-ACF815E4419A}']
+    {class} function managedValueWithValue(value: JSValue): JSManagedValue; overload; cdecl;
+    {class} function managedValueWithValue(value: JSValue; andOwner: Pointer): JSManagedValue; overload; cdecl;
   end;
 
   JSManagedValue = interface(NSObject)

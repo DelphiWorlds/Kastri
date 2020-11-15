@@ -17,7 +17,7 @@ interface
 
 uses
   // macOS
-  Macapi.ObjectiveC, Macapi.CoreFoundation,
+  Macapi.ObjectiveC, Macapi.CoreFoundation, Macapi.Dispatch,
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.QuartzCore, iOSapi.CoreGraphics, iOSapi.AVFoundation, iOSapi.OpenGLES, iOSapi.GLKit,
   // DW
@@ -27,41 +27,6 @@ const
   SCN_ENABLE_METAL = 1;
   SCN_ENABLE_OPENGL = 1;
   SCNColor = UIColor;
-{
-  SCNSceneSourceLoadingOptionCreateNormalsIfAbsent = SCNSceneSourceCreateNormalsIfAbsentKey;
-  SCNSceneSourceLoadingOptionCheckConsistency = SCNSceneSourceCheckConsistencyKey;
-  SCNSceneSourceLoadingOptionFlattenScene = SCNSceneSourceFlattenSceneKey;
-  SCNSceneSourceLoadingOptionUseSafeMode = SCNSceneSourceUseSafeModeKey;
-  SCNSceneSourceLoadingOptionAssetDirectoryURLs = SCNSceneSourceAssetDirectoryURLsKey;
-  SCNSceneSourceLoadingOptionOverrideAssetURLs = SCNSceneSourceOverrideAssetURLsKey;
-  SCNSceneSourceLoadingOptionStrictConformance = SCNSceneSourceStrictConformanceKey;
-  SCNSceneSourceLoadingOptionConvertUnitsToMeters = SCNSceneSourceConvertUnitsToMetersKey;
-  SCNSceneSourceLoadingOptionConvertToYUp = SCNSceneSourceConvertToYUpKey;
-  SCNSceneSourceLoadingOptionAnimationImportPolicy = SCNSceneSourceAnimationImportPolicyKey;
-  SCNSceneAttributeStartTime = SCNSceneStartTimeAttributeKey;
-  SCNSceneAttributeEndTime = SCNSceneEndTimeAttributeKey;
-  SCNSceneAttributeFrameRate = SCNSceneFrameRateAttributeKey;
-  SCNSceneAttributeUpAxis = SCNSceneUpAxisAttributeKey;
-  SCNCullBack = SCNCullModeBack;
-  SCNCullFront = SCNCullModeFront;
-  SCNHitTestOptionFirstFoundOnly = SCNHitTestFirstFoundOnlyKey;
-  SCNHitTestOptionSortResults = SCNHitTestSortResultsKey;
-  SCNHitTestOptionClipToZRange = SCNHitTestClipToZRangeKey;
-  SCNHitTestOptionBackFaceCulling = SCNHitTestBackFaceCullingKey;
-  SCNHitTestOptionBoundingBoxOnly = SCNHitTestBoundingBoxOnlyKey;
-  SCNHitTestOptionIgnoreChildNodes = SCNHitTestIgnoreChildNodesKey;
-  SCNHitTestOptionRootNode = SCNHitTestRootNodeKey;
-  SCNHitTestOptionIgnoreHiddenNodes = SCNHitTestIgnoreHiddenNodesKey;
-  SCNViewOptionPreferredRenderingAPI = SCNPreferredRenderingAPIKey;
-  SCNViewOptionPreferredDevice = SCNPreferredDeviceKey;
-  SCNViewOptionPreferLowPowerDevice = SCNPreferLowPowerDeviceKey;
-  SCNPhysicsShapeOptionType = SCNPhysicsShapeTypeKey;
-  SCNPhysicsShapeOptionKeepAsCompound = SCNPhysicsShapeKeepAsCompoundKey;
-  SCNPhysicsShapeOptionScale = SCNPhysicsShapeScaleKey;
-  SCNPhysicsTestOptionCollisionBitMask = SCNPhysicsTestCollisionBitMaskKey;
-  SCNPhysicsTestOptionSearchMode = SCNPhysicsTestSearchModeKey;
-  SCNPhysicsTestOptionBackfaceCulling = SCNPhysicsTestBackfaceCullingKey;
-}
   SCNActionTimingModeLinear = 0;
   SCNActionTimingModeEaseIn = 1;
   SCNActionTimingModeEaseOut = 2;
@@ -122,6 +87,8 @@ const
   SCNFillModeLines = 1;
   SCNCullModeBack = 0;
   SCNCullModeFront = 1;
+  SCNCullBack = SCNCullModeBack;
+  SCNCullFront = SCNCullModeFront;
   SCNTransparencyModeAOne = 0;
   SCNTransparencyModeRGBZero = 1;
   SCNTransparencyModeSingleLayer = 2;
@@ -429,12 +396,10 @@ type
   TSCNAudioPlayerBlockMethod1 = procedure of object;
   TSCNAudioPlayerBlockMethod2 = procedure of object;
 
-//  SCNAnimation = interface(IObjectiveC)
-//    ['{30304E87-EFE3-4036-8A93-CAD8C3AA964E}']
-//  end;
-
   SCNTimingFunctionClass = interface(NSObjectClass)
-    ['{B3C2A1E8-8BBE-423D-9E28-C2991908087E}']
+    ['{23DB5DA0-97B7-4796-B431-21EB102F3118}']
+    {class} function functionWithCAMediaTimingFunction(caTimingFunction: CAMediaTimingFunction): SCNTimingFunction; cdecl;
+    {class} function functionWithTimingMode(timingMode: SCNActionTimingMode): SCNTimingFunction; cdecl;
   end;
 
   SCNTimingFunction = interface(NSObject)
@@ -462,7 +427,10 @@ type
   end;
 
   SCNAnimationClass = interface(NSObjectClass)
-    ['{E03C0D85-FB8E-4527-BE2B-0CDDD811218A}']
+    ['{46E08FD3-012C-4961-94BE-6CB9D13E9BF3}']
+    {class} function animationNamed(animationName: NSString): SCNAnimation; cdecl;
+    {class} function animationWithCAAnimation(caAnimation: CAAnimation): SCNAnimation; cdecl;
+    {class} function animationWithContentsOfURL(animationUrl: NSURL): SCNAnimation; cdecl;
   end;
 
   SCNAnimation = interface(NSObject)
@@ -509,7 +477,8 @@ type
   TSCNAnimation = class(TOCGenericImport<SCNAnimationClass, SCNAnimation>) end;
 
   SCNAnimationPlayerClass = interface(NSObjectClass)
-    ['{5C0A9492-CDF7-4C5B-B5AA-0035737C2E56}']
+    ['{4533D55B-1FE7-4B88-8DFD-1D93526D654A}']
+    {class} function animationPlayerWithAnimation(animation: SCNAnimation): SCNAnimationPlayer; cdecl;
   end;
 
   SCNAnimationPlayer = interface(NSObject)
@@ -528,7 +497,8 @@ type
   TSCNAnimationPlayer = class(TOCGenericImport<SCNAnimationPlayerClass, SCNAnimationPlayer>) end;
 
   SCNAnimationEventClass = interface(NSObjectClass)
-    ['{C07696AB-BB1E-4C7D-88F1-88ACDBD51083}']
+    ['{CD925E34-6E51-42D5-AF9F-7795146123F7}']
+    {class} function animationEventWithKeyTime(time: CGFloat; block: SCNAnimationEventBlock): Pointer; cdecl;
   end;
 
   SCNAnimationEvent = interface(NSObject)
@@ -557,7 +527,36 @@ type
   end;
 
   SCNActionClass = interface(NSObjectClass)
-    ['{B0212E6E-F145-442A-9925-40F0B3B3BE14}']
+    ['{1DA5FE6B-B08F-48F0-BF39-61A67502B9D7}']
+    {class} function customActionWithDuration(seconds: NSTimeInterval; actionBlock: TSCNActionBlockMethod2): SCNAction; cdecl;
+    {class} function fadeInWithDuration(sec: NSTimeInterval): SCNAction; cdecl;
+    {class} function fadeOpacityBy(factor: CGFloat; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function fadeOpacityTo(opacity: CGFloat; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function fadeOutWithDuration(sec: NSTimeInterval): SCNAction; cdecl;
+    {class} function group(actions: NSArray): SCNAction; cdecl;
+    {class} function hide: SCNAction; cdecl;
+    {class} function javaScriptActionWithScript(script: NSString; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function moveBy(delta: SCNVector3; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function moveByX(deltaX: CGFloat; y: CGFloat; z: CGFloat; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function moveTo(location: SCNVector3; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function playAudioSource(source: SCNAudioSource; waitForCompletion: Boolean): SCNAction; cdecl;
+    {class} function removeFromParentNode: SCNAction; cdecl;
+    {class} function repeatAction(action: SCNAction; count: NSUInteger): SCNAction; cdecl;
+    {class} function repeatActionForever(action: SCNAction): SCNAction; cdecl;
+    {class} function rotateByAngle(angle: CGFloat; aroundAxis: SCNVector3; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function rotateByX(xAngle: CGFloat; y: CGFloat; z: CGFloat; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function rotateToAxisAngle(axisAngle: SCNVector4; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function rotateToX(xAngle: CGFloat; y: CGFloat; z: CGFloat; duration: NSTimeInterval): SCNAction; overload; cdecl;
+    {class} function rotateToX(xAngle: CGFloat; y: CGFloat; z: CGFloat; duration: NSTimeInterval;
+      shortestUnitArc: Boolean): SCNAction; overload; cdecl;
+    {class} function runBlock(block: TSCNActionBlockMethod1; queue: dispatch_queue_t): SCNAction; overload; cdecl;
+    {class} function runBlock(block: TSCNActionBlockMethod1): SCNAction; overload; cdecl;
+    {class} function scaleBy(scale: CGFloat; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function scaleTo(scale: CGFloat; duration: NSTimeInterval): SCNAction; cdecl;
+    {class} function sequence(actions: NSArray): SCNAction; cdecl;
+    {class} function unhide: SCNAction; cdecl;
+    {class} function waitForDuration(sec: NSTimeInterval; withRange: NSTimeInterval): SCNAction; overload; cdecl;
+    {class} function waitForDuration(sec: NSTimeInterval): SCNAction; overload; cdecl;
   end;
 
   SCNAction = interface(NSObject)
@@ -575,7 +574,16 @@ type
   TSCNAction = class(TOCGenericImport<SCNActionClass, SCNAction>) end;
 
   SCNNodeClass = interface(NSObjectClass)
-    ['{0BB8B424-CBBA-4ADC-9D24-2822ED78C267}']
+    ['{B15C1158-20BA-476A-BC7A-D2FC78D5161A}']
+    {class} function localFront: SCNVector3; cdecl;
+    {class} function localRight: SCNVector3; cdecl;
+    {class} function localUp: SCNVector3; cdecl;
+    {class} function node: Pointer; cdecl;
+    {class} function nodeWithGeometry(geometry: SCNGeometry): SCNNode; cdecl;
+    {class} function nodeWithMDLObject(mdlObject: Pointer): Pointer; cdecl;
+    {class} function simdLocalFront: simd_float3; cdecl;
+    {class} function simdLocalRight: simd_float3; cdecl;
+    {class} function simdLocalUp: simd_float3; cdecl;
   end;
 
   SCNNode = interface(NSObject)
@@ -729,7 +737,9 @@ type
   end;
 
   SCNSceneSourceClass = interface(NSObjectClass)
-    ['{B55D9178-F40F-4A07-9B14-3E9FAFC7B6A3}']
+    ['{E4371980-5E30-413B-9974-5D91BD41D058}']
+    {class} function sceneSourceWithData(data: NSData; options: NSDictionary): Pointer; cdecl;
+    {class} function sceneSourceWithURL(url: NSURL; options: NSDictionary): Pointer; cdecl;
   end;
 
   SCNSceneSource = interface(NSObject)
@@ -748,7 +758,8 @@ type
   TSCNSceneSource = class(TOCGenericImport<SCNSceneSourceClass, SCNSceneSource>) end;
 
   SCNMaterialPropertyClass = interface(NSObjectClass)
-    ['{0C80F5E1-C5F8-4494-B309-7F1DE1914D75}']
+    ['{C7EDDEF2-308A-4732-91ED-0D10F4998D92}']
+    {class} function materialPropertyWithContents(contents: Pointer): Pointer; cdecl;
   end;
 
   SCNMaterialProperty = interface(NSObject)
@@ -781,7 +792,12 @@ type
   TSCNMaterialProperty = class(TOCGenericImport<SCNMaterialPropertyClass, SCNMaterialProperty>) end;
 
   SCNSceneClass = interface(NSObjectClass)
-    ['{30FF7D40-72C4-4045-886D-0EC91E3A959F}']
+    ['{C8DFA78E-8317-4AF1-8C50-43FC91319946}']
+    {class} function scene: Pointer; cdecl;
+    {class} function sceneNamed(name: NSString; inDirectory: NSString; options: NSDictionary): Pointer; overload; cdecl;
+    {class} function sceneNamed(name: NSString): Pointer; overload; cdecl;
+    {class} function sceneWithMDLAsset(mdlAsset: Pointer): Pointer; cdecl;
+    {class} function sceneWithURL(url: NSURL; options: NSDictionary; error: PPointer): Pointer; cdecl;
   end;
 
   SCNScene = interface(NSObject)
@@ -840,7 +856,9 @@ type
   end;
 
   SCNProgramClass = interface(NSObjectClass)
-    ['{065F7876-E359-46E6-92A1-5DFF2DFBB113}']
+    ['{36CC69E5-5D9E-4235-8331-CBEB3F10F5E6}']
+    [MethodName('program')]
+    {class} function &program: Pointer; cdecl;
   end;
 
   SCNProgram = interface(NSObject)
@@ -874,7 +892,9 @@ type
   end;
 
   SCNTechniqueClass = interface(NSObjectClass)
-    ['{D3303E51-71AC-4B69-B994-2BD652649055}']
+    ['{C00D8B31-A7B0-4EF4-9092-5934ACB8C5A4}']
+    {class} function techniqueBySequencingTechniques(techniques: NSArray): SCNTechnique; cdecl;
+    {class} function techniqueWithDictionary(dictionary: NSDictionary): SCNTechnique; cdecl;
   end;
 
   SCNTechnique = interface(NSObject)
@@ -896,7 +916,9 @@ type
   end;
 
   SCNLightClass = interface(NSObjectClass)
-    ['{440DE872-F719-4A26-86A1-55BD2FEDF58F}']
+    ['{A43E8DA8-484F-4F21-81F8-E07B930B6753}']
+    {class} function light: Pointer; cdecl;
+    {class} function lightWithMDLLight(mdlLight: Pointer): Pointer; cdecl;
   end;
 
   SCNLight = interface(NSObject)
@@ -989,7 +1011,9 @@ type
   TSCNLight = class(TOCGenericImport<SCNLightClass, SCNLight>) end;
 
   SCNCameraClass = interface(NSObjectClass)
-    ['{011217BF-298B-4A76-B215-4E3A4D36E8BE}']
+    ['{C48E02A7-5A71-46CD-9553-F5203F88C4A6}']
+    {class} function camera: Pointer; cdecl;
+    {class} function cameraWithMDLCamera(mdlCamera: Pointer): Pointer; cdecl;
   end;
 
   SCNCamera = interface(NSObject)
@@ -1108,7 +1132,10 @@ type
   TSCNCamera = class(TOCGenericImport<SCNCameraClass, SCNCamera>) end;
 
   SCNGeometryClass = interface(NSObjectClass)
-    ['{D67E9BF0-E013-423A-810B-DD0316DD9328}']
+    ['{55D9D544-B480-453B-AE35-390F40BB05D1}']
+    {class} function geometry: Pointer; cdecl;
+    {class} function geometryWithMDLMesh(mdlMesh: Pointer): Pointer; cdecl;
+    {class} function geometryWithSources(sources: NSArray; elements: NSArray): Pointer; cdecl;
   end;
 
   SCNGeometry = interface(NSObject)
@@ -1144,7 +1171,12 @@ type
   TSCNGeometry = class(TOCGenericImport<SCNGeometryClass, SCNGeometry>) end;
 
   SCNGeometrySourceClass = interface(NSObjectClass)
-    ['{3D0C5215-DD19-4195-B683-3842D6C1A1BB}']
+    ['{45E59684-5399-43CF-946B-D1443EC86940}']
+    {class} function geometrySourceWithBuffer(buffer: Pointer; vertexFormat: MTLVertexFormat; semantic: SCNGeometrySourceSemantic; vertexCount: NSInteger; dataOffset: NSInteger; dataStride: NSInteger): Pointer; cdecl;
+    {class} function geometrySourceWithData(data: NSData; semantic: SCNGeometrySourceSemantic; vectorCount: NSInteger; floatComponents: Boolean; componentsPerVector: NSInteger; bytesPerComponent: NSInteger; dataOffset: NSInteger; dataStride: NSInteger): Pointer; cdecl;
+    {class} function geometrySourceWithNormals(normals: PSCNVector3; count: NSInteger): Pointer; cdecl;
+    {class} function geometrySourceWithTextureCoordinates(texcoord: PCGPoint; count: NSInteger): Pointer; cdecl;
+    {class} function geometrySourceWithVertices(vertices: PSCNVector3; count: NSInteger): Pointer; cdecl;
   end;
 
   SCNGeometrySource = interface(NSObject)
@@ -1161,7 +1193,10 @@ type
   TSCNGeometrySource = class(TOCGenericImport<SCNGeometrySourceClass, SCNGeometrySource>) end;
 
   SCNGeometryElementClass = interface(NSObjectClass)
-    ['{FDEF8A27-5307-4317-8C26-DF0CA24F1642}']
+    ['{C5D987AD-2947-400F-98A4-63516FA01F7D}']
+    {class} function geometryElementWithBuffer(buffer: Pointer; primitiveType: SCNGeometryPrimitiveType; primitiveCount: NSInteger; bytesPerIndex: NSInteger): Pointer; cdecl;
+    {class} function geometryElementWithData(data: NSData; primitiveType: SCNGeometryPrimitiveType; primitiveCount: NSInteger; bytesPerIndex: NSInteger): Pointer; cdecl;
+    {class} function geometryElementWithMDLSubmesh(mdlSubMesh: Pointer): Pointer; cdecl;
   end;
 
   SCNGeometryElement = interface(NSObject)
@@ -1207,7 +1242,9 @@ type
   TSCNGeometryTessellator = class(TOCGenericImport<SCNGeometryTessellatorClass, SCNGeometryTessellator>) end;
 
   SCNMaterialClass = interface(NSObjectClass)
-    ['{0CD3A010-F36A-4002-9467-7D242F01F505}']
+    ['{4DE542BF-9B92-4F93-A1DC-4ED9D75944FB}']
+    {class} function material: Pointer; cdecl;
+    {class} function materialWithMDLMaterial(mdlMaterial: Pointer): Pointer; cdecl;
   end;
 
   SCNMaterial = interface(NSObject)
@@ -1398,7 +1435,9 @@ type
   TSCNView = class(TOCGenericImport<SCNViewClass, SCNView>) end;
 
   SCNRendererClass = interface(NSObjectClass)
-    ['{A9F40693-75E9-410C-A909-F8D4032AE27E}']
+    ['{D92DC396-4903-4955-8760-F0B451468563}']
+    {class} function rendererWithContext(context: EAGLContext; options: NSDictionary): Pointer; cdecl;
+    {class} function rendererWithDevice(device: Pointer; options: NSDictionary): Pointer; cdecl;
   end;
 
   SCNRenderer = interface(NSObject)
@@ -1417,7 +1456,8 @@ type
   TSCNRenderer = class(TOCGenericImport<SCNRendererClass, SCNRenderer>) end;
 
   SCNPlaneClass = interface(SCNGeometryClass)
-    ['{89D03834-C0BD-4D3E-B6B2-E9346F4DCE90}']
+    ['{2E521332-F7AB-4AFC-B61F-BE215B7DEE14}']
+    {class} function planeWithWidth(width: CGFloat; height: CGFloat): Pointer; cdecl;
   end;
 
   SCNPlane = interface(SCNGeometry)
@@ -1438,7 +1478,8 @@ type
   TSCNPlane = class(TOCGenericImport<SCNPlaneClass, SCNPlane>) end;
 
   SCNBoxClass = interface(SCNGeometryClass)
-    ['{F40D067D-46D6-42D8-B5E1-805374C8486C}']
+    ['{3670C651-386A-4D76-BD90-F478AAADBB29}']
+    {class} function boxWithWidth(width: CGFloat; height: CGFloat; length: CGFloat; chamferRadius: CGFloat): Pointer; cdecl;
   end;
 
   SCNBox = interface(SCNGeometry)
@@ -1463,7 +1504,8 @@ type
   TSCNBox = class(TOCGenericImport<SCNBoxClass, SCNBox>) end;
 
   SCNPyramidClass = interface(SCNGeometryClass)
-    ['{FE0691ED-A1AA-45B5-A8F5-EC5DABE92D24}']
+    ['{B0205370-360A-4ED5-90E9-3C1A6E6CAE21}']
+    {class} function pyramidWithWidth(width: CGFloat; height: CGFloat; length: CGFloat): Pointer; cdecl;
   end;
 
   SCNPyramid = interface(SCNGeometry)
@@ -1484,7 +1526,8 @@ type
   TSCNPyramid = class(TOCGenericImport<SCNPyramidClass, SCNPyramid>) end;
 
   SCNSphereClass = interface(SCNGeometryClass)
-    ['{C253849E-B3C2-4E45-8F02-30C50C35CAFE}']
+    ['{C37E91BF-CE8A-4A61-A1B8-B01B765F02C3}']
+    {class} function sphereWithRadius(radius: CGFloat): Pointer; cdecl;
   end;
 
   SCNSphere = interface(SCNGeometry)
@@ -1499,7 +1542,8 @@ type
   TSCNSphere = class(TOCGenericImport<SCNSphereClass, SCNSphere>) end;
 
   SCNCylinderClass = interface(SCNGeometryClass)
-    ['{586C1B56-CA9C-4E80-86E1-329210B7BAC0}']
+    ['{91D94D8B-2644-432B-9ECB-0795630FB37E}']
+    {class} function cylinderWithRadius(radius: CGFloat; height: CGFloat): Pointer; cdecl;
   end;
 
   SCNCylinder = interface(SCNGeometry)
@@ -1516,7 +1560,8 @@ type
   TSCNCylinder = class(TOCGenericImport<SCNCylinderClass, SCNCylinder>) end;
 
   SCNConeClass = interface(SCNGeometryClass)
-    ['{72498606-329C-4214-920F-E86E902CE789}']
+    ['{B6AB4F59-F862-4754-B195-90FF3FBE807A}']
+    {class} function coneWithTopRadius(topRadius: CGFloat; bottomRadius: CGFloat; height: CGFloat): Pointer; cdecl;
   end;
 
   SCNCone = interface(SCNGeometry)
@@ -1535,7 +1580,8 @@ type
   TSCNCone = class(TOCGenericImport<SCNConeClass, SCNCone>) end;
 
   SCNTubeClass = interface(SCNGeometryClass)
-    ['{B4D1C3EF-EA5D-4D5D-B231-D4C639C03477}']
+    ['{339818A6-CA90-48CF-B38F-DEA03B1EA760}']
+    {class} function tubeWithInnerRadius(innerRadius: CGFloat; outerRadius: CGFloat; height: CGFloat): Pointer; cdecl;
   end;
 
   SCNTube = interface(SCNGeometry)
@@ -1554,7 +1600,8 @@ type
   TSCNTube = class(TOCGenericImport<SCNTubeClass, SCNTube>) end;
 
   SCNCapsuleClass = interface(SCNGeometryClass)
-    ['{966AFCF5-4F35-430D-84F8-8ED69F8DFD66}']
+    ['{391A57D8-6DC0-453B-B011-2EFE6A2B53DE}']
+    {class} function capsuleWithCapRadius(capRadius: CGFloat; height: CGFloat): Pointer; cdecl;
   end;
 
   SCNCapsule = interface(SCNGeometry)
@@ -1573,7 +1620,8 @@ type
   TSCNCapsule = class(TOCGenericImport<SCNCapsuleClass, SCNCapsule>) end;
 
   SCNTorusClass = interface(SCNGeometryClass)
-    ['{B81DD38C-2FE6-4DEE-8FB5-C5C372FAAB29}']
+    ['{6E0B2D61-6D51-49F9-BF6B-8E3CFBF3E071}']
+    {class} function torusWithRingRadius(ringRadius: CGFloat; pipeRadius: CGFloat): Pointer; cdecl;
   end;
 
   SCNTorus = interface(SCNGeometry)
@@ -1590,7 +1638,8 @@ type
   TSCNTorus = class(TOCGenericImport<SCNTorusClass, SCNTorus>) end;
 
   SCNFloorClass = interface(SCNGeometryClass)
-    ['{92889415-0A34-4432-AB8A-800B51B61587}']
+    ['{4A570092-2FC9-43D9-8C9E-92EDF4017C5A}']
+    {class} function floor: Pointer; cdecl;
   end;
 
   SCNFloor = interface(SCNGeometry)
@@ -1613,7 +1662,8 @@ type
   TSCNFloor = class(TOCGenericImport<SCNFloorClass, SCNFloor>) end;
 
   SCNTextClass = interface(SCNGeometryClass)
-    ['{B59E0750-9546-4065-B8B2-EF5E369BB7A6}']
+    ['{02275452-5705-4363-A9E4-24E885E12EC3}']
+    {class} function textWithString(&string: Pointer; extrusionDepth: CGFloat): Pointer; cdecl;
   end;
 
   SCNText = interface(SCNGeometry)
@@ -1643,7 +1693,8 @@ type
   TSCNText = class(TOCGenericImport<SCNTextClass, SCNText>) end;
 
   SCNShapeClass = interface(SCNGeometryClass)
-    ['{70EE1BD0-E67A-4A83-B301-1D5E2F013BF3}']
+    ['{CA39FD1E-9AE1-4B49-A793-B031C33E8583}']
+    {class} function shapeWithPath(path: UIBezierPath; extrusionDepth: CGFloat): Pointer; cdecl;
   end;
 
   SCNShape = interface(SCNGeometry)
@@ -1662,7 +1713,23 @@ type
   TSCNShape = class(TOCGenericImport<SCNShapeClass, SCNShape>) end;
 
   SCNTransactionClass = interface(NSObjectClass)
-    ['{8D106C1D-8EB9-439E-9A13-E510FF8C5898}']
+    ['{1CDE1472-36B3-46BD-B2D9-3D9F1C0C225C}']
+    [MethodName('begin')]
+    {class} procedure &begin; cdecl;
+    {class} function animationDuration: CFTimeInterval; cdecl;
+    {class} function animationTimingFunction: CAMediaTimingFunction; cdecl;
+    {class} procedure commit; cdecl;
+    {class} function completionBlock: TSCNTransactionBlockMethod1; cdecl;
+    {class} function disableActions: Boolean; cdecl;
+    {class} procedure flush; cdecl;
+    {class} procedure lock; cdecl;
+    {class} procedure setAnimationDuration(animationDuration: CFTimeInterval); cdecl;
+    {class} procedure setAnimationTimingFunction(animationTimingFunction: CAMediaTimingFunction); cdecl;
+    {class} procedure setCompletionBlock(completionBlock: TSCNTransactionBlockMethod1); cdecl;
+    {class} procedure setDisableActions(disableActions: Boolean); cdecl;
+    {class} procedure setValue(value: Pointer; forKey: NSString); cdecl;
+    {class} procedure unlock; cdecl;
+    {class} function valueForKey(key: NSString): Pointer; cdecl;
   end;
 
   SCNTransaction = interface(NSObject)
@@ -1692,7 +1759,8 @@ type
   TSCNMorpher = class(TOCGenericImport<SCNMorpherClass, SCNMorpher>) end;
 
   SCNSkinnerClass = interface(NSObjectClass)
-    ['{6D069CD0-A11E-4D3B-A411-EF6A908BE006}']
+    ['{FAC5ADC1-4FC6-42A4-AE0B-51EDFA6B4C10}']
+    {class} function skinnerWithBaseGeometry(baseGeometry: SCNGeometry; bones: NSArray; boneInverseBindTransforms: NSArray; boneWeights: SCNGeometrySource; boneIndices: SCNGeometrySource): Pointer; cdecl;
   end;
 
   SCNSkinner = interface(NSObject)
@@ -1726,7 +1794,8 @@ type
   TSCNConstraint = class(TOCGenericImport<SCNConstraintClass, SCNConstraint>) end;
 
   SCNLookAtConstraintClass = interface(SCNConstraintClass)
-    ['{3A2A00B6-3357-45F5-9AC3-49BAC937874E}']
+    ['{C81ACEB8-EDFC-43AF-B536-9DEA7199E894}']
+    {class} function lookAtConstraintWithTarget(target: SCNNode): Pointer; cdecl;
   end;
 
   SCNLookAtConstraint = interface(SCNConstraint)
@@ -1745,7 +1814,8 @@ type
   TSCNLookAtConstraint = class(TOCGenericImport<SCNLookAtConstraintClass, SCNLookAtConstraint>) end;
 
   SCNBillboardConstraintClass = interface(SCNConstraintClass)
-    ['{FD78CFE3-69C7-41E8-81F1-0CFD071343E8}']
+    ['{16374279-592A-4616-8A39-A3F0CAC2645E}']
+    {class} function billboardConstraint: Pointer; cdecl;
   end;
 
   SCNBillboardConstraint = interface(SCNConstraint)
@@ -1756,7 +1826,10 @@ type
   TSCNBillboardConstraint = class(TOCGenericImport<SCNBillboardConstraintClass, SCNBillboardConstraint>) end;
 
   SCNTransformConstraintClass = interface(SCNConstraintClass)
-    ['{DB9FB6DF-6964-4489-A2D2-692E8E4DB2C7}']
+    ['{7EBF642B-029E-450B-90E9-C2FF89109890}']
+    {class} function orientationConstraintInWorldSpace(world: Boolean; withBlock: TSCNTransformConstraintBlockMethod3): Pointer; cdecl;
+    {class} function positionConstraintInWorldSpace(world: Boolean; withBlock: TSCNTransformConstraintBlockMethod2): Pointer; cdecl;
+    {class} function transformConstraintInWorldSpace(world: Boolean; withBlock: TSCNTransformConstraintBlockMethod1): Pointer; cdecl;
   end;
 
   SCNTransformConstraint = interface(SCNConstraint)
@@ -1765,7 +1838,8 @@ type
   TSCNTransformConstraint = class(TOCGenericImport<SCNTransformConstraintClass, SCNTransformConstraint>) end;
 
   SCNIKConstraintClass = interface(SCNConstraintClass)
-    ['{0E82AAB8-C553-424D-9D0C-16349D504BC0}']
+    ['{EFF6DDB3-C9EB-4782-83FB-F7A486B94672}']
+    {class} function inverseKinematicsConstraintWithChainRootNode(chainRootNode: SCNNode): Pointer; cdecl;
   end;
 
   SCNIKConstraint = interface(SCNConstraint)
@@ -1780,7 +1854,8 @@ type
   TSCNIKConstraint = class(TOCGenericImport<SCNIKConstraintClass, SCNIKConstraint>) end;
 
   SCNDistanceConstraintClass = interface(SCNConstraintClass)
-    ['{B3D50A9A-8EAC-4FC3-887E-FDAFF15B96E6}']
+    ['{60D54B52-F4CF-47F0-A4EC-B268459D3ECA}']
+    {class} function distanceConstraintWithTarget(target: SCNNode): Pointer; cdecl;
   end;
 
   SCNDistanceConstraint = interface(SCNConstraint)
@@ -1795,7 +1870,8 @@ type
   TSCNDistanceConstraint = class(TOCGenericImport<SCNDistanceConstraintClass, SCNDistanceConstraint>) end;
 
   SCNReplicatorConstraintClass = interface(SCNConstraintClass)
-    ['{86838DD6-201A-493A-815A-61D04985881E}']
+    ['{239A5B4B-E957-4AB4-9477-3F668429A536}']
+    {class} function replicatorConstraintWithTarget(target: SCNNode): Pointer; cdecl;
   end;
 
   SCNReplicatorConstraint = interface(SCNConstraint)
@@ -1818,7 +1894,8 @@ type
   TSCNReplicatorConstraint = class(TOCGenericImport<SCNReplicatorConstraintClass, SCNReplicatorConstraint>) end;
 
   SCNAccelerationConstraintClass = interface(SCNConstraintClass)
-    ['{A00090E9-1581-4143-A05E-9EC287B6D1E5}']
+    ['{3876BA66-D8DD-498D-8554-D07A2AE78F38}']
+    {class} function accelerationConstraint: Pointer; cdecl;
   end;
 
   SCNAccelerationConstraint = interface(SCNConstraint)
@@ -1835,7 +1912,8 @@ type
   TSCNAccelerationConstraint = class(TOCGenericImport<SCNAccelerationConstraintClass, SCNAccelerationConstraint>) end;
 
   SCNSliderConstraintClass = interface(SCNConstraintClass)
-    ['{EFE0D55C-29FC-4540-A116-5CEC18B96F34}']
+    ['{4750E3B9-D9B7-4283-BF7D-2B355D0049B7}']
+    {class} function sliderConstraint: Pointer; cdecl;
   end;
 
   SCNSliderConstraint = interface(SCNConstraint)
@@ -1858,7 +1936,8 @@ type
   end;
 
   SCNAvoidOccluderConstraintClass = interface(SCNConstraintClass)
-    ['{8621A97D-494E-4F20-A217-760DBC0188A3}']
+    ['{F9AED7BA-57DF-4DE3-ADD3-47BDE2C511E9}']
+    {class} function avoidOccluderConstraintWithTarget(target: SCNNode): Pointer; cdecl;
   end;
 
   SCNAvoidOccluderConstraint = interface(SCNConstraint)
@@ -1875,7 +1954,11 @@ type
   TSCNAvoidOccluderConstraint = class(TOCGenericImport<SCNAvoidOccluderConstraintClass, SCNAvoidOccluderConstraint>) end;
 
   SCNLevelOfDetailClass = interface(NSObjectClass)
-    ['{923AB5A0-C793-41F8-8EA4-6DB56D842F50}']
+    ['{9B4F2886-7639-4084-91F5-D622F9A11A39}']
+    [MethodName('levelOfDetailWithGeometry:screenSpaceRadius:')]
+    {class} function levelOfDetailWithGeometryScreenSpaceRadius(geometry: SCNGeometry; screenSpaceRadius: CGFloat): Pointer; cdecl;
+    [MethodName('levelOfDetailWithGeometry:worldSpaceDistance:')]
+    {class} function levelOfDetailWithGeometryWorldSpaceDistance(geometry: SCNGeometry; worldSpaceDistance: CGFloat): Pointer; cdecl;
   end;
 
   SCNLevelOfDetail = interface(NSObject)
@@ -1887,7 +1970,8 @@ type
   TSCNLevelOfDetail = class(TOCGenericImport<SCNLevelOfDetailClass, SCNLevelOfDetail>) end;
 
   SCNParticlePropertyControllerClass = interface(NSObjectClass)
-    ['{3AA9B1E4-7DDB-4873-967F-15C219B29B2B}']
+    ['{1877ADD3-0DCC-4EC2-9EE4-227B4C77ED81}']
+    {class} function controllerWithAnimation(animation: CAAnimation): Pointer; cdecl;
   end;
 
   SCNParticlePropertyController = interface(NSObject)
@@ -1908,7 +1992,9 @@ type
   TSCNParticlePropertyController = class(TOCGenericImport<SCNParticlePropertyControllerClass, SCNParticlePropertyController>) end;
 
   SCNParticleSystemClass = interface(NSObjectClass)
-    ['{002FC7C2-835E-414F-80E6-F44E4974F367}']
+    ['{B3E0F180-D560-49FE-9F9E-B9E9E68ABA27}']
+    {class} function particleSystem: Pointer; cdecl;
+    {class} function particleSystemNamed(name: NSString; inDirectory: NSString): Pointer; cdecl;
   end;
 
   SCNParticleSystem = interface(NSObject)
@@ -2048,7 +2134,11 @@ type
   TSCNParticleSystem = class(TOCGenericImport<SCNParticleSystemClass, SCNParticleSystem>) end;
 
   SCNPhysicsBodyClass = interface(NSObjectClass)
-    ['{1B4A1065-EBA4-4DFE-B0A4-35FAA565CBFB}']
+    ['{AFDB91DB-736F-4F8A-8222-B55D539F7220}']
+    {class} function bodyWithType(&type: SCNPhysicsBodyType; shape: SCNPhysicsShape): Pointer; cdecl;
+    {class} function dynamicBody: Pointer; cdecl;
+    {class} function kinematicBody: Pointer; cdecl;
+    {class} function staticBody: Pointer; cdecl;
   end;
 
   SCNPhysicsBody = interface(NSObject)
@@ -2113,7 +2203,17 @@ type
   TSCNPhysicsBody = class(TOCGenericImport<SCNPhysicsBodyClass, SCNPhysicsBody>) end;
 
   SCNPhysicsFieldClass = interface(NSObjectClass)
-    ['{87FA867D-616B-4C50-8319-977130B9DA06}']
+    ['{083BE30C-3B6F-47F7-8327-0617C0BC3D05}']
+    {class} function customFieldWithEvaluationBlock(block: SCNFieldForceEvaluator): SCNPhysicsField; cdecl;
+    {class} function dragField: SCNPhysicsField; cdecl;
+    {class} function electricField: SCNPhysicsField; cdecl;
+    {class} function linearGravityField: SCNPhysicsField; cdecl;
+    {class} function magneticField: SCNPhysicsField; cdecl;
+    {class} function noiseFieldWithSmoothness(smoothness: CGFloat; animationSpeed: CGFloat): SCNPhysicsField; cdecl;
+    {class} function radialGravityField: SCNPhysicsField; cdecl;
+    {class} function springField: SCNPhysicsField; cdecl;
+    {class} function turbulenceFieldWithSmoothness(smoothness: CGFloat; animationSpeed: CGFloat): SCNPhysicsField; cdecl;
+    {class} function vortexField: SCNPhysicsField; cdecl;
   end;
 
   SCNPhysicsField = interface(NSObject)
@@ -2144,7 +2244,10 @@ type
   TSCNPhysicsField = class(TOCGenericImport<SCNPhysicsFieldClass, SCNPhysicsField>) end;
 
   SCNPhysicsShapeClass = interface(NSObjectClass)
-    ['{F97F48A6-EA68-45F9-9AE2-F86CA68F447F}']
+    ['{2DED5592-094C-46F5-B0DB-DB1350609B02}']
+    {class} function shapeWithGeometry(geometry: SCNGeometry; options: NSDictionary): Pointer; cdecl;
+    {class} function shapeWithNode(node: SCNNode; options: NSDictionary): Pointer; cdecl;
+    {class} function shapeWithShapes(shapes: NSArray; transforms: NSArray): Pointer; cdecl;
   end;
 
   SCNPhysicsShape = interface(NSObject)
@@ -2217,7 +2320,9 @@ type
   TSCNPhysicsBehavior = class(TOCGenericImport<SCNPhysicsBehaviorClass, SCNPhysicsBehavior>) end;
 
   SCNPhysicsHingeJointClass = interface(SCNPhysicsBehaviorClass)
-    ['{A565AD96-BD91-4638-A6D6-A2C2A854AB79}']
+    ['{50DCF88B-59EE-4DBB-A7D2-3DED6E072571}']
+    {class} function jointWithBody(body: SCNPhysicsBody; axis: SCNVector3; anchor: SCNVector3): Pointer; cdecl;
+    {class} function jointWithBodyA(bodyA: SCNPhysicsBody; axisA: SCNVector3; anchorA: SCNVector3; bodyB: SCNPhysicsBody; axisB: SCNVector3; anchorB: SCNVector3): Pointer; cdecl;
   end;
 
   SCNPhysicsHingeJoint = interface(SCNPhysicsBehavior)
@@ -2236,7 +2341,9 @@ type
   TSCNPhysicsHingeJoint = class(TOCGenericImport<SCNPhysicsHingeJointClass, SCNPhysicsHingeJoint>) end;
 
   SCNPhysicsBallSocketJointClass = interface(SCNPhysicsBehaviorClass)
-    ['{E5A8A068-91ED-493A-9094-EE9EDB2DFB27}']
+    ['{1DB3EDFA-9BF4-44BE-A240-88AA679527AA}']
+    {class} function jointWithBody(body: SCNPhysicsBody; anchor: SCNVector3): Pointer; cdecl;
+    {class} function jointWithBodyA(bodyA: SCNPhysicsBody; anchorA: SCNVector3; bodyB: SCNPhysicsBody; anchorB: SCNVector3): Pointer; cdecl;
   end;
 
   SCNPhysicsBallSocketJoint = interface(SCNPhysicsBehavior)
@@ -2251,7 +2358,9 @@ type
   TSCNPhysicsBallSocketJoint = class(TOCGenericImport<SCNPhysicsBallSocketJointClass, SCNPhysicsBallSocketJoint>) end;
 
   SCNPhysicsSliderJointClass = interface(SCNPhysicsBehaviorClass)
-    ['{A321F149-1634-49B4-8E3B-32E7B1BD2D99}']
+    ['{95B4A047-F3E3-4694-A595-7E58BA8A7FB2}']
+    {class} function jointWithBody(body: SCNPhysicsBody; axis: SCNVector3; anchor: SCNVector3): Pointer; cdecl;
+    {class} function jointWithBodyA(bodyA: SCNPhysicsBody; axisA: SCNVector3; anchorA: SCNVector3; bodyB: SCNPhysicsBody; axisB: SCNVector3; anchorB: SCNVector3): Pointer; cdecl;
   end;
 
   SCNPhysicsSliderJoint = interface(SCNPhysicsBehavior)
@@ -2286,7 +2395,9 @@ type
   TSCNPhysicsSliderJoint = class(TOCGenericImport<SCNPhysicsSliderJointClass, SCNPhysicsSliderJoint>) end;
 
   SCNPhysicsConeTwistJointClass = interface(SCNPhysicsBehaviorClass)
-    ['{BEE403D7-4966-43D6-A09D-8453606A4DAA}']
+    ['{989DA3A9-C3CB-4F6B-9CD1-5CA8736EE107}']
+    {class} function jointWithBody(body: SCNPhysicsBody; frame: SCNMatrix4): Pointer; cdecl;
+    {class} function jointWithBodyA(bodyA: SCNPhysicsBody; frameA: SCNMatrix4; bodyB: SCNPhysicsBody; frameB: SCNMatrix4): Pointer; cdecl;
   end;
 
   SCNPhysicsConeTwistJoint = interface(SCNPhysicsBehavior)
@@ -2307,7 +2418,8 @@ type
   TSCNPhysicsConeTwistJoint = class(TOCGenericImport<SCNPhysicsConeTwistJointClass, SCNPhysicsConeTwistJoint>) end;
 
   SCNPhysicsVehicleWheelClass = interface(NSObjectClass)
-    ['{16A9C904-5801-4E7E-9490-E38A15694E4C}']
+    ['{74F6CA13-1554-4A7B-86CF-A91EC207C7DD}']
+    {class} function wheelWithNode(node: SCNNode): Pointer; cdecl;
   end;
 
   SCNPhysicsVehicleWheel = interface(NSObject)
@@ -2339,7 +2451,8 @@ type
   TSCNPhysicsVehicleWheel = class(TOCGenericImport<SCNPhysicsVehicleWheelClass, SCNPhysicsVehicleWheel>) end;
 
   SCNPhysicsVehicleClass = interface(SCNPhysicsBehaviorClass)
-    ['{09FCAB41-8286-4788-A153-642728886F32}']
+    ['{B7A3AA7D-19FD-4791-AE59-C5C9189E0C20}']
+    {class} function vehicleWithChassisBody(chassisBody: SCNPhysicsBody; wheels: NSArray): Pointer; cdecl;
   end;
 
   SCNPhysicsVehicle = interface(SCNPhysicsBehavior)
@@ -2354,7 +2467,8 @@ type
   TSCNPhysicsVehicle = class(TOCGenericImport<SCNPhysicsVehicleClass, SCNPhysicsVehicle>) end;
 
   SCNReferenceNodeClass = interface(SCNNodeClass)
-    ['{83E1F77A-5467-4D90-B8CE-4032EDAD67B5}']
+    ['{594821D4-1B75-4646-B029-B760FE47AFF5}']
+    {class} function referenceNodeWithURL(referenceURL: NSURL): Pointer; cdecl;
   end;
 
   SCNReferenceNode = interface(SCNNode)
@@ -2372,7 +2486,8 @@ type
   TSCNReferenceNode = class(TOCGenericImport<SCNReferenceNodeClass, SCNReferenceNode>) end;
 
   SCNAudioSourceClass = interface(NSObjectClass)
-    ['{2A520329-A175-47C7-89CF-AAFB45492982}']
+    ['{8EF70C6F-9C68-425E-99F8-603D52AD030F}']
+    {class} function audioSourceNamed(fileName: NSString): Pointer; cdecl;
   end;
 
   SCNAudioSource = interface(NSObject)
@@ -2396,7 +2511,9 @@ type
   TSCNAudioSource = class(TOCGenericImport<SCNAudioSourceClass, SCNAudioSource>) end;
 
   SCNAudioPlayerClass = interface(NSObjectClass)
-    ['{AC05D13E-2808-41B9-A714-7D56BEB08B62}']
+    ['{A760ECB9-664C-47EB-B321-25ADBAFCB3A1}']
+    {class} function audioPlayerWithAVAudioNode(audioNode: AVAudioNode): Pointer; cdecl;
+    {class} function audioPlayerWithSource(source: SCNAudioSource): Pointer; cdecl;
   end;
 
   SCNAudioPlayer = interface(NSObject)
@@ -2464,9 +2581,6 @@ type
   end;
   TSCNCameraController = class(TOCGenericImport<SCNCameraControllerClass, SCNCameraController>) end;
 
-// Exported const SCNVector3Zero has an unsupported type: const SCNVector3
-// Exported const SCNVector4Zero has an unsupported type: const SCNVector4
-// Exported const SCNMatrix4Identity has an unsupported type: const SCNMatrix4
 function SCNErrorDomain: NSString;
 function SCNModelTransform: NSString;
 function SCNViewTransform: NSString;
@@ -2483,16 +2597,16 @@ function SCNSceneSourceAssetAuthoringToolKey: NSString;
 function SCNSceneSourceAssetAuthorKey: NSString;
 function SCNSceneSourceAssetUnitNameKey: NSString;
 function SCNSceneSourceAssetUnitMeterKey: NSString;
-function SCNSceneSourceCreateNormalsIfAbsentKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceCheckConsistencyKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceFlattenSceneKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceUseSafeModeKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceAssetDirectoryURLsKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceOverrideAssetURLsKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceStrictConformanceKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceConvertUnitsToMetersKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceConvertToYUpKey: SCNSceneSourceLoadingOption;
-function SCNSceneSourceAnimationImportPolicyKey: SCNSceneSourceLoadingOption;
+function SCNSceneSourceCreateNormalsIfAbsentKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionCreateNormalsIfAbsent
+function SCNSceneSourceCheckConsistencyKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionCheckConsistency
+function SCNSceneSourceFlattenSceneKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionFlattenScene
+function SCNSceneSourceUseSafeModeKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionUseSafeMode
+function SCNSceneSourceAssetDirectoryURLsKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionAssetDirectoryURLs
+function SCNSceneSourceOverrideAssetURLsKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionOverrideAssetURLs
+function SCNSceneSourceStrictConformanceKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionStrictConformance
+function SCNSceneSourceConvertUnitsToMetersKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionConvertUnitsToMeters
+function SCNSceneSourceConvertToYUpKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionConvertToYUp
+function SCNSceneSourceAnimationImportPolicyKey: SCNSceneSourceLoadingOption; // SCNSceneSourceLoadingOptionAnimationImportPolicy
 function SCNSceneSourceLoadingOptionPreserveOriginalTopology: SCNSceneSourceLoadingOption;
 function SCNSceneSourceAnimationImportPolicyPlay: SCNSceneSourceAnimationImportPolicy;
 function SCNSceneSourceAnimationImportPolicyPlayRepeatedly: SCNSceneSourceAnimationImportPolicy;
@@ -2503,10 +2617,10 @@ function SCNConsistencyElementIDErrorKey: NSString;
 function SCNConsistencyElementTypeErrorKey: NSString;
 function SCNConsistencyLineNumberErrorKey: NSString;
 function SCNSceneExportDestinationURL: NSString;
-function SCNSceneStartTimeAttributeKey: SCNSceneAttribute;
-function SCNSceneEndTimeAttributeKey: SCNSceneAttribute;
-function SCNSceneFrameRateAttributeKey: SCNSceneAttribute;
-function SCNSceneUpAxisAttributeKey: SCNSceneAttribute;
+function SCNSceneStartTimeAttributeKey: SCNSceneAttribute; // SCNSceneAttributeStartTime
+function SCNSceneEndTimeAttributeKey: SCNSceneAttribute; // SCNSceneAttributeEndTime
+function SCNSceneFrameRateAttributeKey: SCNSceneAttribute; // SCNSceneAttributeFrameRate
+function SCNSceneUpAxisAttributeKey: SCNSceneAttribute; // SCNSceneUpAxisAttribute
 function SCNProgramMappingChannelKey: NSString;
 function SCNShaderModifierEntryPointGeometry: SCNShaderModifierEntryPoint;
 function SCNShaderModifierEntryPointSurface: SCNShaderModifierEntryPoint;
@@ -2534,20 +2648,20 @@ function SCNLightingModelLambert: SCNLightingModel;
 function SCNLightingModelConstant: SCNLightingModel;
 function SCNLightingModelPhysicallyBased: SCNLightingModel;
 function SCNLightingModelShadowOnly: SCNLightingModel;
-function SCNHitTestClipToZRangeKey: SCNHitTestOption;
-function SCNHitTestBackFaceCullingKey: SCNHitTestOption;
-function SCNHitTestBoundingBoxOnlyKey: SCNHitTestOption;
-function SCNHitTestIgnoreChildNodesKey: SCNHitTestOption;
-function SCNHitTestRootNodeKey: SCNHitTestOption;
-function SCNHitTestIgnoreHiddenNodesKey: SCNHitTestOption;
+function SCNHitTestClipToZRangeKey: SCNHitTestOption; // SCNHitTestOptionClipToZRange
+function SCNHitTestBackFaceCullingKey: SCNHitTestOption; // SCNHitTestOptionBackFaceCulling
+function SCNHitTestBoundingBoxOnlyKey: SCNHitTestOption; // SCNHitTestOptionBoundingBoxOnly
+function SCNHitTestIgnoreChildNodesKey: SCNHitTestOption; // SCNHitTestOptionIgnoreChildNodes
+function SCNHitTestRootNodeKey: SCNHitTestOption; // SCNHitTestOptionRootNode
+function SCNHitTestIgnoreHiddenNodesKey: SCNHitTestOption; // SCNHitTestOptionIgnoreHiddenNodes
 function SCNHitTestOptionCategoryBitMask: SCNHitTestOption;
 function SCNHitTestOptionSearchMode: SCNHitTestOption;
 function SCNHitTestOptionIgnoreLightArea: SCNHitTestOption;
-function SCNHitTestFirstFoundOnlyKey: SCNHitTestOption;
-function SCNHitTestSortResultsKey: SCNHitTestOption;
-function SCNPreferredRenderingAPIKey: SCNViewOption;
-function SCNPreferredDeviceKey: SCNViewOption;
-function SCNPreferLowPowerDeviceKey: SCNViewOption;
+function SCNHitTestFirstFoundOnlyKey: SCNHitTestOption; // SCNHitTestOptionFirstFoundOnly
+function SCNHitTestSortResultsKey: SCNHitTestOption; // SCNHitTestOptionSortResults
+function SCNPreferredRenderingAPIKey: SCNViewOption; // SCNViewOptionPreferredRenderingAPI
+function SCNPreferredDeviceKey: SCNViewOption; // SCNViewOptionPreferredDevice
+function SCNPreferLowPowerDeviceKey: SCNViewOption; // SCNViewOptionPreferLowPowerDevice
 function SCNParticlePropertyPosition: SCNParticleProperty;
 function SCNParticlePropertyAngle: SCNParticleProperty;
 function SCNParticlePropertyRotationAxis: SCNParticleProperty;
@@ -2564,16 +2678,16 @@ function SCNParticlePropertyCharge: SCNParticleProperty;
 function SCNParticlePropertyFriction: SCNParticleProperty;
 function SCNParticlePropertyContactPoint: SCNParticleProperty;
 function SCNParticlePropertyContactNormal: SCNParticleProperty;
-function SCNPhysicsShapeTypeKey: SCNPhysicsShapeOption;
-function SCNPhysicsShapeKeepAsCompoundKey: SCNPhysicsShapeOption;
-function SCNPhysicsShapeScaleKey: SCNPhysicsShapeOption;
+function SCNPhysicsShapeTypeKey: SCNPhysicsShapeOption; // SCNPhysicsShapeOptionType
+function SCNPhysicsShapeKeepAsCompoundKey: SCNPhysicsShapeOption; // SCNPhysicsShapeOptionKeepAsCompound
+function SCNPhysicsShapeScaleKey: SCNPhysicsShapeOption; // SCNPhysicsShapeOptionScale
 function SCNPhysicsShapeOptionCollisionMargin: SCNPhysicsShapeOption;
 function SCNPhysicsShapeTypeBoundingBox: SCNPhysicsShapeType;
 function SCNPhysicsShapeTypeConvexHull: SCNPhysicsShapeType;
 function SCNPhysicsShapeTypeConcavePolyhedron: SCNPhysicsShapeType;
-function SCNPhysicsTestCollisionBitMaskKey: SCNPhysicsTestOption;
-function SCNPhysicsTestSearchModeKey: SCNPhysicsTestOption;
-function SCNPhysicsTestBackfaceCullingKey: SCNPhysicsTestOption;
+function SCNPhysicsTestCollisionBitMaskKey: SCNPhysicsTestOption; // SCNPhysicsTestOptionCollisionBitMask
+function SCNPhysicsTestSearchModeKey: SCNPhysicsTestOption; // SCNPhysicsTestOptionSearchMode
+function SCNPhysicsTestBackfaceCullingKey: SCNPhysicsTestOption; // SCNPhysicsTestOptionBackfaceCulling
 function SCNPhysicsTestSearchModeAny: SCNPhysicsTestSearchMode;
 function SCNPhysicsTestSearchModeClosest: SCNPhysicsTestSearchMode;
 function SCNPhysicsTestSearchModeAll: SCNPhysicsTestSearchMode;

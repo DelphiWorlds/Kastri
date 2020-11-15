@@ -27,6 +27,7 @@ uses
 type
   SK3DNodeClass = interface(SKNodeClass)
     ['{48EE0436-32C0-4864-9F65-33554ACC33C2}']
+    {class} function nodeWithViewportSize(viewportSize: CGSize): Pointer; cdecl;
   end;
 
   SK3DNode = interface(SKNode)
