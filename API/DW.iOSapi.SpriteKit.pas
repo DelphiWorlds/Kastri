@@ -17,17 +17,14 @@ interface
 
 uses
   // macOS
-  Macapi.ObjectiveC, Macapi.CoreFoundation,
+  Macapi.ObjectiveC, Macapi.CoreFoundation, Macapi.ObjCRuntime, Macapi.Dispatch,
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics, iOSapi.CoreImage, iOSapi.GLKit,
   // DW
-  DW.Macapi.Simd, DW.iOSapi.AVFoundation, DW.iOSapi.Metal;
+  DW.Macapi.Simd, DW.Macapi.Dispatch, DW.iOSapi.AVFoundation, DW.iOSapi.Metal;
 
 const
   SKColor = UIColor;
-  SKNodeFocusBehaviorNone = 0;
-  SKNodeFocusBehaviorOccluding = 1;
-  SKNodeFocusBehaviorFocusable = 2;
   SKBlendModeAlpha = 0;
   SKBlendModeAdd = 1;
   SKBlendModeSubtract = 2;
@@ -36,25 +33,13 @@ const
   SKBlendModeScreen = 5;
   SKBlendModeReplace = 6;
   SKBlendModeMultiplyAlpha = 7;
+  SKNodeFocusBehaviorNone = 0;
+  SKNodeFocusBehaviorOccluding = 1;
+  SKNodeFocusBehaviorFocusable = 2;
   SKActionTimingLinear = 0;
   SKActionTimingEaseIn = 1;
   SKActionTimingEaseOut = 2;
   SKActionTimingEaseInEaseOut = 3;
-  SKUniformTypeNone = 0;
-  SKUniformTypeFloat = 1;
-  SKUniformTypeFloatVector2 = 2;
-  SKUniformTypeFloatVector3 = 3;
-  SKUniformTypeFloatVector4 = 4;
-  SKUniformTypeFloatMatrix2 = 5;
-  SKUniformTypeFloatMatrix3 = 6;
-  SKUniformTypeFloatMatrix4 = 7;
-  SKUniformTypeTexture = 8;
-  SKSceneScaleModeFill = 0;
-  SKSceneScaleModeAspectFill = 1;
-  SKSceneScaleModeAspectFit = 2;
-  SKSceneScaleModeResizeFill = 3;
-  SKTextureFilteringNearest = 0;
-  SKTextureFilteringLinear = 1;
   SKAttributeTypeNone = 0;
   SKAttributeTypeFloat = 1;
   SKAttributeTypeVectorFloat2 = 2;
@@ -64,6 +49,10 @@ const
   SKAttributeTypeVectorHalfFloat2 = 6;
   SKAttributeTypeVectorHalfFloat3 = 7;
   SKAttributeTypeVectorHalfFloat4 = 8;
+  SKSceneScaleModeFill = 0;
+  SKSceneScaleModeAspectFill = 1;
+  SKSceneScaleModeAspectFit = 2;
+  SKSceneScaleModeResizeFill = 3;
   SKInterpolationModeLinear = 1;
   SKInterpolationModeSpline = 2;
   SKInterpolationModeStep = 3;
@@ -83,6 +72,17 @@ const
   SKTransitionDirectionDown = 1;
   SKTransitionDirectionRight = 2;
   SKTransitionDirectionLeft = 3;
+  SKTextureFilteringNearest = 0;
+  SKTextureFilteringLinear = 1;
+  SKUniformTypeNone = 0;
+  SKUniformTypeFloat = 1;
+  SKUniformTypeFloatVector2 = 2;
+  SKUniformTypeFloatVector3 = 3;
+  SKUniformTypeFloatVector4 = 4;
+  SKUniformTypeFloatMatrix2 = 5;
+  SKUniformTypeFloatMatrix3 = 6;
+  SKUniformTypeFloatMatrix4 = 7;
+  SKUniformTypeTexture = 8;
   SKTileDefinitionRotation0 = 0;
   SKTileDefinitionRotation90 = 1;
   SKTileDefinitionRotation180 = 2;
@@ -128,11 +128,19 @@ const
   SKTileAdjacencyUpperLeftCorner = 247;
 
 type
+  SKNode = interface;
+  SKShader = interface;
+  SKAction = interface;
   SKWarpable = interface;
   SKWarpGeometry = interface;
   SKWarpGeometryGrid = interface;
   SKSpriteNode = interface;
   SKAttribute = interface;
+  SKAttributeValue = interface;
+  SKCameraNode = interface;
+  SKEffectNode = interface;
+  SKSceneDelegate = interface;
+  SKScene = interface;
   SKKeyframeSequence = interface;
   SKEmitterNode = interface;
   SKShapeNode = interface;
@@ -144,6 +152,11 @@ type
   SKReferenceNode = interface;
   SKTransformNode = interface;
   SKRegion = interface;
+  SKView = interface;
+  SKViewDelegate = interface;
+  SKTransition = interface;
+  SKTexture = interface;
+  SKUniform = interface;
   SKRenderer = interface;
   SKTileDefinition = interface;
   SKTileSet = interface;
@@ -154,22 +167,8 @@ type
   SKTextureAtlas = interface;
   SKRange = interface;
   SKConstraint = interface;
-  SKAudioNode = interface;
-  SKTexture = interface;
-  SKUniform = interface;
-  SKNode = interface;
-  SKShader = interface;
-  SKAction = interface;
-  SKPhysicsBody = interface;
   SKReachConstraints = interface;
-  SKAttributeValue = interface;
-  SKEffectNode = interface;
-  SKScene = interface;
-  SKSceneDelegate = interface;
-  SKCameraNode = interface;
-  SKView = interface;
-  SKViewDelegate = interface;
-  SKPhysicsWorld = interface;
+  SKPhysicsBody = interface;
   SKPhysicsJoint = interface;
   SKPhysicsJointPin = interface;
   SKPhysicsJointSpring = interface;
@@ -178,14 +177,22 @@ type
   SKPhysicsJointLimit = interface;
   SKPhysicsContact = interface;
   SKPhysicsContactDelegate = interface;
-  SKTransition = interface;
+  SKPhysicsWorld = interface;
+  SKAudioNode = interface;
 
-  SKActionTimingFunction = function(time: Single): Single of object;
-  SKFieldForceEvaluator = function(position: vector_float3; velocity: vector_float3; mass: Single; charge: Single;
-    deltaTime: NSTimeInterval): vector_float3 of object;
   SKBlendMode = NSInteger;
   SKNodeFocusBehavior = NSInteger;
   SKActionTimingMode = NSInteger;
+
+  SKActionTimingFunction = function(time: Single): Single of object;
+  SKAttributeType = NSInteger;
+  SKSceneScaleMode = NSInteger;
+  SKInterpolationMode = NSInteger;
+  SKRepeatMode = NSInteger;
+  SKParticleRenderOrder = NSInteger;
+
+  SKFieldForceEvaluator = function(position: vector_float3; velocity: vector_float3; mass: Single; charge: Single;
+    deltaTime: NSTimeInterval): vector_float3 of object;
   SKLabelVerticalAlignmentMode = NSInteger;
   SKLabelHorizontalAlignmentMode = NSInteger;
   SKTransitionDirection = NSInteger;
@@ -194,12 +201,6 @@ type
   SKTileDefinitionRotation = NSInteger;
   SKTileSetType = NSInteger;
   SKTileAdjacencyMask = NSInteger;
-  SKSceneScaleMode = NSInteger;
-  SKAttributeType = NSInteger;
-  SKInterpolationMode = NSInteger;
-  SKRepeatMode = NSInteger;
-  SKParticleRenderOrder = NSInteger;
-
   TSKNodeBlockMethod1 = procedure(node: SKNode; stop: PBoolean) of object;
   TSKNodeBlockMethod2 = procedure of object;
   TSKActionBlockMethod1 = procedure(node: SKNode; elapsedTime: CGFloat) of object;
@@ -210,86 +211,15 @@ type
   TSKPhysicsWorldBlockMethod1 = procedure(body: SKPhysicsBody; stop: PBoolean) of object;
   TSKPhysicsWorldBlockMethod2 = procedure(body: SKPhysicsBody; point: CGPoint; normal: CGVector; stop: PBoolean) of object;
 
-  SKWarpable = interface(IObjectiveC)
-    ['{842EE0D1-F9A1-4A10-9D3A-223CC4A642B0}']
-    procedure setSubdivisionLevels(subdivisionLevels: NSInteger); cdecl;
-    procedure setWarpGeometry(warpGeometry: SKWarpGeometry); cdecl;
-    function subdivisionLevels: NSInteger; cdecl;
-    function warpGeometry: SKWarpGeometry; cdecl;
-  end;
-
-  SKWarpGeometryClass = interface(NSObjectClass)
-    ['{898960AD-E1B3-448A-AF9F-28D44E656E62}']
-  end;
-
-  SKWarpGeometry = interface(NSObject)
-    ['{4E6A8AA0-1124-4A3F-9B15-D81EA6B03E4D}']
-  end;
-  TSKWarpGeometry = class(TOCGenericImport<SKWarpGeometryClass, SKWarpGeometry>) end;
-
-  SKWarpGeometryGridClass = interface(SKWarpGeometryClass)
-    ['{3235C17F-3B22-45A9-8536-CADF02B6F8C7}']
-  end;
-
-  SKWarpGeometryGrid = interface(SKWarpGeometry)
-    ['{32AF6DF0-C14A-45C2-A28D-3DE38F6C9B53}']
-    function destPositionAtIndex(index: NSInteger): vector_float2; cdecl;
-    function gridByReplacingDestPositions(destPositions: Pvector_float2): Pointer; cdecl;
-    function gridByReplacingSourcePositions(sourcePositions: Pvector_float2): Pointer; cdecl;
-    function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
-    function initWithColumns(cols: NSInteger; rows: NSInteger; sourcePositions: Pvector_float2; destPositions: Pvector_float2): Pointer; cdecl;
-    function numberOfColumns: NSInteger; cdecl;
-    function numberOfRows: NSInteger; cdecl;
-    function sourcePositionAtIndex(index: NSInteger): vector_float2; cdecl;
-    function vertexCount: NSInteger; cdecl;
-  end;
-  TSKWarpGeometryGrid = class(TOCGenericImport<SKWarpGeometryGridClass, SKWarpGeometryGrid>) end;
-
-  SKAttributeClass = interface(NSObjectClass)
-    ['{B5510BB5-4F6D-4B8A-B84C-C5D872E4E42F}']
-  end;
-
-  SKAttribute = interface(NSObject)
-    ['{DB2798C1-A173-4297-B8E5-8E38859D1FF5}']
-    [MethodName('type')]
-    function &type: SKAttributeType; cdecl;
-    function initWithName(name: NSString; &type: SKAttributeType): Pointer; cdecl;
-    function name: NSString; cdecl;
-  end;
-  TSKAttribute = class(TOCGenericImport<SKAttributeClass, SKAttribute>) end;
-
-  SKKeyframeSequenceClass = interface(NSObjectClass)
-    ['{1010975B-1FEA-43EC-AC73-582AE6207839}']
-  end;
-
-  SKKeyframeSequence = interface(NSObject)
-    ['{341A8327-BB2E-48DC-88BD-40CCC871E191}']
-    procedure addKeyframeValue(value: Pointer; time: CGFloat); cdecl;
-    function count: NSUInteger; cdecl;
-    function getKeyframeTimeForIndex(index: NSUInteger): CGFloat; cdecl;
-    function getKeyframeValueForIndex(index: NSUInteger): Pointer; cdecl;
-    function initWithCapacity(numItems: NSUInteger): Pointer; cdecl;
-    function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
-    function initWithKeyframeValues(values: NSArray; times: NSArray): Pointer; cdecl;
-    function interpolationMode: SKInterpolationMode; cdecl;
-    procedure removeKeyframeAtIndex(index: NSUInteger); cdecl;
-    procedure removeLastKeyframe; cdecl;
-    function repeatMode: SKRepeatMode; cdecl;
-    function sampleAtTime(time: CGFloat): Pointer; cdecl;
-    procedure setInterpolationMode(interpolationMode: SKInterpolationMode); cdecl;
-    procedure setKeyframeTime(time: CGFloat; forIndex: NSUInteger); cdecl;
-    procedure setKeyframeValue(value: Pointer; forIndex: NSUInteger); overload; cdecl;
-    procedure setKeyframeValue(value: Pointer; time: CGFloat; forIndex: NSUInteger); overload; cdecl;
-    procedure setRepeatMode(repeatMode: SKRepeatMode); cdecl;
-  end;
-  TSKKeyframeSequence = class(TOCGenericImport<SKKeyframeSequenceClass, SKKeyframeSequence>) end;
-
   SKNodeClass = interface(UIResponderClass)
-    ['{9D603E2C-BAFC-4BC5-B9F9-86B62863DEA1}']
+    ['{6AE7015B-53B1-4F10-B425-570D51701B77}']
+    {class} function node: Pointer; cdecl;
+    {class} function nodeWithFileNamed(filename: NSString; securelyWithClasses: NSSet; andError: PPointer): Pointer; overload; cdecl;
+    {class} function nodeWithFileNamed(filename: NSString): Pointer; overload; cdecl;
   end;
 
   SKNode = interface(UIResponder)
-    ['{372CC44D-56A0-4B4D-9C4A-2CD51D83CFC0}']
+    ['{A218481C-C23B-4E18-BBFC-73767A9751D5}']
     function actionForKey(key: NSString): SKAction; cdecl;
     procedure addChild(node: SKNode); cdecl;
     function alpha: CGFloat; cdecl;
@@ -362,12 +292,200 @@ type
   end;
   TSKNode = class(TOCGenericImport<SKNodeClass, SKNode>) end;
 
+  SKShaderClass = interface(NSObjectClass)
+    ['{9A5BBCFE-82DE-418A-995B-A27234433A83}']
+    {class} function shader: Pointer; cdecl;
+    {class} function shaderWithFileNamed(name: NSString): Pointer; cdecl;
+    {class} function shaderWithSource(source: NSString; uniforms: NSArray): Pointer; overload; cdecl;
+    {class} function shaderWithSource(source: NSString): Pointer; overload; cdecl;
+  end;
+
+  SKShader = interface(NSObject)
+    ['{1895FB3E-3226-4A93-B59B-4EBDDC77BA66}']
+    procedure addUniform(uniform: SKUniform); cdecl;
+    function attributes: NSArray; cdecl;
+    function initWithSource(source: NSString): Pointer; overload; cdecl;
+    function initWithSource(source: NSString; uniforms: NSArray): Pointer; overload; cdecl;
+    procedure removeUniformNamed(name: NSString); cdecl;
+    procedure setAttributes(attributes: NSArray); cdecl;
+    procedure setSource(source: NSString); cdecl;
+    procedure setUniforms(uniforms: NSArray); cdecl;
+    function source: NSString; cdecl;
+    function uniformNamed(name: NSString): SKUniform; cdecl;
+    function uniforms: NSArray; cdecl;
+  end;
+  TSKShader = class(TOCGenericImport<SKShaderClass, SKShader>) end;
+
+  SKActionClass = interface(NSObjectClass)
+    ['{E5059A74-9144-41D2-9405-33BCC0A31E5F}']
+    {class} function actionNamed(name: NSString; fromURL: NSURL; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function actionNamed(name: NSString; fromURL: NSURL): SKAction; overload; cdecl;
+    {class} function actionNamed(name: NSString; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function actionNamed(name: NSString): SKAction; overload; cdecl;
+    {class} function animateWithNormalTextures(textures: NSArray; timePerFrame: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function animateWithNormalTextures(textures: NSArray; timePerFrame: NSTimeInterval; resize: Boolean;
+      restore: Boolean): SKAction; overload; cdecl;
+    {class} function animateWithTextures(textures: NSArray; timePerFrame: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function animateWithTextures(textures: NSArray; timePerFrame: NSTimeInterval; resize: Boolean;
+      restore: Boolean): SKAction; overload; cdecl;
+    {class} function animateWithWarps(warps: NSArray; times: NSArray; restore: Boolean): SKAction; overload; cdecl;
+    {class} function animateWithWarps(warps: NSArray; times: NSArray): SKAction; overload; cdecl;
+    {class} function applyAngularImpulse(impulse: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function applyForce(force: CGVector; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function applyForce(force: CGVector; atPoint: CGPoint; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function applyImpulse(impulse: CGVector; atPoint: CGPoint; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function applyImpulse(impulse: CGVector; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function applyTorque(torque: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeChargeBy(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeChargeTo(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeMassBy(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeMassTo(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeObstructionBy(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeObstructionTo(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeOcclusionBy(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeOcclusionTo(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changePlaybackRateBy(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changePlaybackRateTo(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeReverbBy(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeReverbTo(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeVolumeBy(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function changeVolumeTo(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function colorizeWithColor(color: UIColor; colorBlendFactor: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function colorizeWithColorBlendFactor(colorBlendFactor: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function customActionWithDuration(duration: NSTimeInterval; actionBlock: TSKActionBlockMethod1): SKAction; cdecl;
+    {class} function fadeAlphaBy(factor: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function fadeAlphaTo(alpha: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function fadeInWithDuration(duration: NSTimeInterval): SKAction; cdecl;
+    {class} function fadeOutWithDuration(duration: NSTimeInterval): SKAction; cdecl;
+    {class} function falloffBy(falloff: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function falloffTo(falloff: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function followPath(path: CGPathRef; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function followPath(path: CGPathRef; asOffset: Boolean; orientToPath: Boolean; duration: NSTimeInterval): SKAction; overload; cdecl;
+    [MethodName('followPath:speed:')]
+    {class} function followPathSpeed(path: CGPathRef; speed: CGFloat): SKAction; overload; cdecl;
+    [MethodName('followPath:asOffset:orientToPath:speed')]
+    {class} function followPathAsOffsetOrientToPathSpeed(path: CGPathRef; asOffset: Boolean; orientToPath: Boolean;
+      speed: CGFloat): SKAction; overload; cdecl;
+    {class} function group(actions: NSArray): SKAction; cdecl;
+    {class} function hide: SKAction; cdecl;
+    {class} function moveBy(delta: CGVector; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function moveByX(deltaX: CGFloat; y: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function moveTo(location: CGPoint; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function moveToX(x: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function moveToY(y: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function pause: SKAction; cdecl;
+    {class} function performSelector(selector: SEL; onTarget: Pointer): SKAction; cdecl;
+    {class} function play: SKAction; cdecl;
+    {class} function playSoundFileNamed(soundFile: NSString; waitForCompletion: Boolean): SKAction; cdecl;
+    {class} function reachTo(position: CGPoint; rootNode: SKNode; duration: NSTimeInterval): SKAction; overload; cdecl;
+    [MethodName('reachTo:rootNode:velocity')]
+    {class} function reachToRootNodeVelocity(position: CGPoint; rootNode: SKNode; velocity: CGFloat): SKAction; overload; cdecl;
+    {class} function reachToNode(node: SKNode; rootNode: SKNode; velocity: CGFloat): SKAction; overload; cdecl;
+    [MethodName('reachTo:rootNode:duration')]
+    {class} function reachToNodeRootNodeDuration(node: SKNode; rootNode: SKNode; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function removeFromParent: SKAction; cdecl;
+    {class} function repeatAction(action: SKAction; count: NSUInteger): SKAction; cdecl;
+    {class} function repeatActionForever(action: SKAction): SKAction; cdecl;
+    {class} function resizeByWidth(width: CGFloat; height: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function resizeToHeight(height: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function resizeToWidth(width: CGFloat; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function resizeToWidth(width: CGFloat; height: CGFloat; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function rotateByAngle(radians: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function rotateToAngle(radians: CGFloat; duration: NSTimeInterval; shortestUnitArc: Boolean): SKAction; overload; cdecl;
+    {class} function rotateToAngle(radians: CGFloat; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function runAction(action: SKAction; onChildWithName: NSString): SKAction; cdecl;
+    {class} function runBlock(block: dispatch_block_t): SKAction; overload; cdecl;
+    {class} function runBlock(block: dispatch_block_t; queue: dispatch_queue_t): SKAction; overload; cdecl;
+    {class} function scaleBy(scale: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function scaleTo(scale: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function scaleToSize(size: CGSize; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function scaleXBy(xScale: CGFloat; y: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function scaleXTo(xScale: CGFloat; y: CGFloat; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function scaleXTo(scale: CGFloat; duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function scaleYTo(scale: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function sequence(actions: NSArray): SKAction; cdecl;
+    {class} function setNormalTexture(texture: SKTexture; resize: Boolean): SKAction; overload; cdecl;
+    {class} function setNormalTexture(texture: SKTexture): SKAction; overload; cdecl;
+    {class} function setTexture(texture: SKTexture; resize: Boolean): SKAction; overload; cdecl;
+    {class} function setTexture(texture: SKTexture): SKAction; overload; cdecl;
+    {class} function speedBy(speed: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function speedTo(speed: CGFloat; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function stereoPanBy(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function stereoPanTo(v: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function stop: SKAction; cdecl;
+    {class} function strengthBy(strength: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function strengthTo(strength: Single; duration: NSTimeInterval): SKAction; cdecl;
+    {class} function unhide: SKAction; cdecl;
+    {class} function waitForDuration(duration: NSTimeInterval; withRange: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function waitForDuration(duration: NSTimeInterval): SKAction; overload; cdecl;
+    {class} function warpTo(warp: SKWarpGeometry; duration: NSTimeInterval): SKAction; cdecl;
+  end;
+
+  SKAction = interface(NSObject)
+    ['{53ED2CD4-E999-4E72-A2CD-DF45D53E4943}']
+    function duration: NSTimeInterval; cdecl;
+    function reversedAction: SKAction; cdecl;
+    procedure setDuration(duration: NSTimeInterval); cdecl;
+    procedure setSpeed(speed: CGFloat); cdecl;
+    procedure setTimingFunction(timingFunction: SKActionTimingFunction); cdecl;
+    procedure setTimingMode(timingMode: SKActionTimingMode); cdecl;
+    function speed: CGFloat; cdecl;
+    function timingFunction: SKActionTimingFunction; cdecl;
+    function timingMode: SKActionTimingMode; cdecl;
+  end;
+  TSKAction = class(TOCGenericImport<SKActionClass, SKAction>) end;
+
+  SKWarpable = interface(IObjectiveC)
+    ['{F4436EDC-5F3F-485A-8DF3-3E9BD1DF3E93}']
+    procedure setSubdivisionLevels(subdivisionLevels: NSInteger); cdecl;
+    procedure setWarpGeometry(warpGeometry: SKWarpGeometry); cdecl;
+    function subdivisionLevels: NSInteger; cdecl;
+    function warpGeometry: SKWarpGeometry; cdecl;
+  end;
+
+  SKWarpGeometryClass = interface(NSObjectClass)
+    ['{910EA810-40FB-475C-ABDF-3EC6A4CCC920}']
+  end;
+
+  SKWarpGeometry = interface(NSObject)
+    ['{0901B5E1-CF4E-4360-B1B5-86F7C348755A}']
+  end;
+  TSKWarpGeometry = class(TOCGenericImport<SKWarpGeometryClass, SKWarpGeometry>) end;
+
+  SKWarpGeometryGridClass = interface(SKWarpGeometryClass)
+    ['{40E83BD6-6C42-4916-98C4-506BE780E95E}']
+    {class} function grid: Pointer; cdecl;
+    {class} function gridWithColumns(cols: NSInteger; rows: NSInteger; sourcePositions: Pvector_float2;
+      destPositions: Pvector_float2): Pointer; overload; cdecl;
+    {class} function gridWithColumns(cols: NSInteger; rows: NSInteger): Pointer; overload; cdecl;
+  end;
+
+  SKWarpGeometryGrid = interface(SKWarpGeometry)
+    ['{D26B19A0-4F83-4A88-9C96-D66A739F6911}']
+    function destPositionAtIndex(index: NSInteger): vector_float2; cdecl;
+    function gridByReplacingDestPositions(destPositions: Pvector_float2): Pointer; cdecl;
+    function gridByReplacingSourcePositions(sourcePositions: Pvector_float2): Pointer; cdecl;
+    function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
+    function initWithColumns(cols: NSInteger; rows: NSInteger; sourcePositions: Pvector_float2; destPositions: Pvector_float2): Pointer; cdecl;
+    function numberOfColumns: NSInteger; cdecl;
+    function numberOfRows: NSInteger; cdecl;
+    function sourcePositionAtIndex(index: NSInteger): vector_float2; cdecl;
+    function vertexCount: NSInteger; cdecl;
+  end;
+  TSKWarpGeometryGrid = class(TOCGenericImport<SKWarpGeometryGridClass, SKWarpGeometryGrid>) end;
+
   SKSpriteNodeClass = interface(SKNodeClass)
-    ['{9127CAA7-B996-4A7C-926E-C160F4161DC8}']
+    ['{CBF51D71-FA73-46D8-8BF2-DC04E5E855D3}']
+    {class} function spriteNodeWithColor(color: UIColor; size: CGSize): Pointer; cdecl;
+    {class} function spriteNodeWithImageNamed(name: NSString): Pointer; overload; cdecl;
+    {class} function spriteNodeWithImageNamed(name: NSString; normalMapped: Boolean): Pointer; overload; cdecl;
+    {class} function spriteNodeWithTexture(texture: SKTexture; size: CGSize): Pointer; overload; cdecl;
+    {class} function spriteNodeWithTexture(texture: SKTexture): Pointer; overload; cdecl;
+    {class} function spriteNodeWithTexture(texture: SKTexture; normalMap: SKTexture): Pointer; overload; cdecl;
   end;
 
   SKSpriteNode = interface(SKNode)
-    ['{0021C25A-3A03-4509-9FDF-51597BC70ABA}']
+    ['{EA3F6B2C-94DA-4E72-ACAF-A84C56BC47BB}']
     function anchorPoint: CGPoint; cdecl;
     function attributeValues: NSDictionary; cdecl;
     function blendMode: SKBlendMode; cdecl;
@@ -405,12 +523,157 @@ type
   end;
   TSKSpriteNode = class(TOCGenericImport<SKSpriteNodeClass, SKSpriteNode>) end;
 
+  SKAttributeClass = interface(NSObjectClass)
+    ['{619B5E94-99C6-4563-B3C7-DAA7E2A450F1}']
+    {class} function attributeWithName(name: NSString; &type: SKAttributeType): Pointer; cdecl;
+  end;
+
+  SKAttribute = interface(NSObject)
+    ['{8AAB3C34-21BD-4C3C-8C24-CCA6B5FF7B25}']
+    [MethodName('type')]
+    function &type: SKAttributeType; cdecl;
+    function initWithName(name: NSString; &type: SKAttributeType): Pointer; cdecl;
+    function name: NSString; cdecl;
+  end;
+  TSKAttribute = class(TOCGenericImport<SKAttributeClass, SKAttribute>) end;
+
+  SKAttributeValueClass = interface(NSObjectClass)
+    ['{4EFEBDD2-F4C1-4E3D-91F2-B62A26B953BA}']
+    {class} function valueWithFloat(value: Single): Pointer; cdecl;
+    {class} function valueWithVectorFloat2(value: vector_float2): Pointer; cdecl;
+    {class} function valueWithVectorFloat3(value: vector_float3): Pointer; cdecl;
+    {class} function valueWithVectorFloat4(value: vector_float4): Pointer; cdecl;
+  end;
+
+  SKAttributeValue = interface(NSObject)
+    ['{D88E5DBC-BFA9-436F-A155-684DAD669896}']
+    function floatValue: Single; cdecl;
+    procedure setFloatValue(floatValue: Single); cdecl;
+    procedure setVectorFloat2Value(vectorFloat2Value: vector_float2); cdecl;
+    procedure setVectorFloat3Value(vectorFloat3Value: vector_float3); cdecl;
+    procedure setVectorFloat4Value(vectorFloat4Value: vector_float4); cdecl;
+    function vectorFloat2Value: vector_float2; cdecl;
+    function vectorFloat3Value: vector_float3; cdecl;
+    function vectorFloat4Value: vector_float4; cdecl;
+  end;
+  TSKAttributeValue = class(TOCGenericImport<SKAttributeValueClass, SKAttributeValue>) end;
+
+  SKCameraNodeClass = interface(SKNodeClass)
+    ['{9502BA7B-E23C-4261-AD78-EFC3F53EF9D4}']
+  end;
+
+  SKCameraNode = interface(SKNode)
+    ['{73087342-57FD-42BE-9596-91902B2C44BE}']
+    function containedNodeSet: NSSet; cdecl;
+    function containsNode(node: SKNode): Boolean; cdecl;
+  end;
+  TSKCameraNode = class(TOCGenericImport<SKCameraNodeClass, SKCameraNode>) end;
+
+  SKEffectNodeClass = interface(SKNodeClass)
+    ['{FDBB97B8-531D-4F8F-A5EC-EA05B40CB450}']
+  end;
+
+  SKEffectNode = interface(SKNode)
+    ['{47FC88DC-8B7E-414A-9B36-6BD815CF3A0A}']
+    function attributeValues: NSDictionary; cdecl;
+    function blendMode: SKBlendMode; cdecl;
+    function filter: CIFilter; cdecl;
+    procedure setAttributeValues(attributeValues: NSDictionary); cdecl;
+    procedure setBlendMode(blendMode: SKBlendMode); cdecl;
+    procedure setFilter(filter: CIFilter); cdecl;
+    procedure setShader(shader: SKShader); cdecl;
+    procedure setShouldCenterFilter(shouldCenterFilter: Boolean); cdecl;
+    procedure setShouldEnableEffects(shouldEnableEffects: Boolean); cdecl;
+    procedure setShouldRasterize(shouldRasterize: Boolean); cdecl;
+    procedure setValue(value: SKAttributeValue; forAttributeNamed: NSString); cdecl;
+    function shader: SKShader; cdecl;
+    function shouldCenterFilter: Boolean; cdecl;
+    function shouldEnableEffects: Boolean; cdecl;
+    function shouldRasterize: Boolean; cdecl;
+    function valueForAttributeNamed(key: NSString): SKAttributeValue; cdecl;
+  end;
+  TSKEffectNode = class(TOCGenericImport<SKEffectNodeClass, SKEffectNode>) end;
+
+  SKSceneDelegate = interface(IObjectiveC)
+    ['{9A4EC22B-1F03-4F34-8526-2444E795B7C4}']
+    procedure didApplyConstraintsForScene(scene: SKScene); cdecl;
+    procedure didEvaluateActionsForScene(scene: SKScene); cdecl;
+    procedure didFinishUpdateForScene(scene: SKScene); cdecl;
+    procedure didSimulatePhysicsForScene(scene: SKScene); cdecl;
+    procedure update(currentTime: NSTimeInterval; forScene: SKScene); cdecl;
+  end;
+
+  SKSceneClass = interface(SKEffectNodeClass)
+    ['{6D102EB7-E2C7-407B-8998-0CE6B0401BCF}']
+    {class} function sceneWithSize(size: CGSize): Pointer; cdecl;
+  end;
+
+  SKScene = interface(SKEffectNode)
+    ['{78A36B89-FA21-4537-99EC-87271A1873D1}']
+    function anchorPoint: CGPoint; cdecl;
+    function audioEngine: AVAudioEngine; cdecl;
+    function backgroundColor: UIColor; cdecl;
+    function camera: SKCameraNode; cdecl;
+    function convertPointFromView(point: CGPoint): CGPoint; cdecl;
+    function convertPointToView(point: CGPoint): CGPoint; cdecl;
+    function delegate: Pointer; cdecl;
+    procedure didApplyConstraints; cdecl;
+    procedure didChangeSize(oldSize: CGSize); cdecl;
+    procedure didEvaluateActions; cdecl;
+    procedure didFinishUpdate; cdecl;
+    procedure didMoveToView(view: SKView); cdecl;
+    procedure didSimulatePhysics; cdecl;
+    function initWithSize(size: CGSize): Pointer; cdecl;
+    function listener: SKNode; cdecl;
+    function physicsWorld: SKPhysicsWorld; cdecl;
+    function scaleMode: SKSceneScaleMode; cdecl;
+    procedure sceneDidLoad; cdecl;
+    procedure setAnchorPoint(anchorPoint: CGPoint); cdecl;
+    procedure setBackgroundColor(backgroundColor: UIColor); cdecl;
+    procedure setCamera(camera: SKCameraNode); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setListener(listener: SKNode); cdecl;
+    procedure setScaleMode(scaleMode: SKSceneScaleMode); cdecl;
+    procedure setSize(size: CGSize); cdecl;
+    function size: CGSize; cdecl;
+    procedure update(currentTime: NSTimeInterval); cdecl;
+    function view: SKView; cdecl;
+    procedure willMoveFromView(view: SKView); cdecl;
+  end;
+  TSKScene = class(TOCGenericImport<SKSceneClass, SKScene>) end;
+
+  SKKeyframeSequenceClass = interface(NSObjectClass)
+    ['{26A904F7-0D26-4601-88AD-9667D4090B37}']
+  end;
+
+  SKKeyframeSequence = interface(NSObject)
+    ['{99C92AA1-4DA0-4F95-BF89-A52C33B8CFA6}']
+    procedure addKeyframeValue(value: Pointer; time: CGFloat); cdecl;
+    function count: NSUInteger; cdecl;
+    function getKeyframeTimeForIndex(index: NSUInteger): CGFloat; cdecl;
+    function getKeyframeValueForIndex(index: NSUInteger): Pointer; cdecl;
+    function initWithCapacity(numItems: NSUInteger): Pointer; cdecl;
+    function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
+    function initWithKeyframeValues(values: NSArray; times: NSArray): Pointer; cdecl;
+    function interpolationMode: SKInterpolationMode; cdecl;
+    procedure removeKeyframeAtIndex(index: NSUInteger); cdecl;
+    procedure removeLastKeyframe; cdecl;
+    function repeatMode: SKRepeatMode; cdecl;
+    function sampleAtTime(time: CGFloat): Pointer; cdecl;
+    procedure setInterpolationMode(interpolationMode: SKInterpolationMode); cdecl;
+    procedure setKeyframeTime(time: CGFloat; forIndex: NSUInteger); cdecl;
+    procedure setKeyframeValue(value: Pointer; forIndex: NSUInteger); overload; cdecl;
+    procedure setKeyframeValue(value: Pointer; time: CGFloat; forIndex: NSUInteger); overload; cdecl;
+    procedure setRepeatMode(repeatMode: SKRepeatMode); cdecl;
+  end;
+  TSKKeyframeSequence = class(TOCGenericImport<SKKeyframeSequenceClass, SKKeyframeSequence>) end;
+
   SKEmitterNodeClass = interface(SKNodeClass)
-    ['{03593D93-7EA9-442E-BF94-8C6BDF46429F}']
+    ['{DE35BC2C-51D9-4637-A319-2167D7BEC429}']
   end;
 
   SKEmitterNode = interface(SKNode)
-    ['{35D19936-CD28-4F7C-B9C2-B177AE7BB68A}']
+    ['{4F177C36-6C64-41EC-B998-F5B9B5F7A244}']
     procedure advanceSimulationTime(sec: NSTimeInterval); cdecl;
     function attributeValues: NSDictionary; cdecl;
     function emissionAngle: CGFloat; cdecl;
@@ -517,11 +780,22 @@ type
   TSKEmitterNode = class(TOCGenericImport<SKEmitterNodeClass, SKEmitterNode>) end;
 
   SKShapeNodeClass = interface(SKNodeClass)
-    ['{3258D6D7-0BD6-4AED-B44E-C9151E4A468F}']
+    ['{767B8471-1ACE-432F-B17C-6DBE9BDA5736}']
+    {class} function shapeNodeWithCircleOfRadius(radius: CGFloat): Pointer; cdecl;
+    {class} function shapeNodeWithEllipseInRect(rect: CGRect): Pointer; cdecl;
+    {class} function shapeNodeWithEllipseOfSize(size: CGSize): Pointer; cdecl;
+    {class} function shapeNodeWithPath(path: CGPathRef): Pointer; overload; cdecl;
+    {class} function shapeNodeWithPath(path: CGPathRef; centered: Boolean): Pointer; overload; cdecl;
+    {class} function shapeNodeWithPoints(points: PCGPoint; count: NativeUInt): Pointer; cdecl;
+    {class} function shapeNodeWithRect(rect: CGRect; cornerRadius: CGFloat): Pointer; overload; cdecl;
+    {class} function shapeNodeWithRect(rect: CGRect): Pointer; overload; cdecl;
+    {class} function shapeNodeWithRectOfSize(size: CGSize): Pointer; overload; cdecl;
+    {class} function shapeNodeWithRectOfSize(size: CGSize; cornerRadius: CGFloat): Pointer; overload; cdecl;
+    {class} function shapeNodeWithSplinePoints(points: PCGPoint; count: NativeUInt): Pointer; cdecl;
   end;
 
   SKShapeNode = interface(SKNode)
-    ['{183DED81-C955-42A6-893F-93CA93A3C3A0}']
+    ['{D650A472-AAC7-4CD8-BD8B-006D2B129662}']
     function attributeValues: NSDictionary; cdecl;
     function blendMode: SKBlendMode; cdecl;
     function fillColor: UIColor; cdecl;
@@ -559,11 +833,23 @@ type
   TSKShapeNode = class(TOCGenericImport<SKShapeNodeClass, SKShapeNode>) end;
 
   SKFieldNodeClass = interface(SKNodeClass)
-    ['{CEDA47FB-A117-4932-976E-A59A98ECF90E}']
+    ['{E0ADC139-5560-47BD-92B3-4A017309D43E}']
+    {class} function customFieldWithEvaluationBlock(block: SKFieldForceEvaluator): SKFieldNode; cdecl;
+    {class} function dragField: SKFieldNode; cdecl;
+    {class} function electricField: SKFieldNode; cdecl;
+    {class} function linearGravityFieldWithVector(direction: vector_float3): SKFieldNode; cdecl;
+    {class} function magneticField: SKFieldNode; cdecl;
+    {class} function noiseFieldWithSmoothness(smoothness: CGFloat; animationSpeed: CGFloat): SKFieldNode; cdecl;
+    {class} function radialGravityField: SKFieldNode; cdecl;
+    {class} function springField: SKFieldNode; cdecl;
+    {class} function turbulenceFieldWithSmoothness(smoothness: CGFloat; animationSpeed: CGFloat): SKFieldNode; cdecl;
+    {class} function velocityFieldWithTexture(velocityTexture: SKTexture): SKFieldNode; cdecl;
+    {class} function velocityFieldWithVector(direction: vector_float3): SKFieldNode; cdecl;
+    {class} function vortexField: SKFieldNode; cdecl;
   end;
 
   SKFieldNode = interface(SKNode)
-    ['{CB266392-7C80-4CC9-B727-4ADA42FE8CEC}']
+    ['{4B72FA5C-C898-4787-AE41-68DE81A1389B}']
     function animationSpeed: Single; cdecl;
     function categoryBitMask: UInt32; cdecl;
     function direction: vector_float3; cdecl;
@@ -590,11 +876,14 @@ type
   TSKFieldNode = class(TOCGenericImport<SKFieldNodeClass, SKFieldNode>) end;
 
   SKLabelNodeClass = interface(SKNodeClass)
-    ['{65D552BF-5609-4282-B567-27E4CC9ED79D}']
+    ['{D5F21F22-9D9A-4522-A9E4-601BBF28D403}']
+    {class} function labelNodeWithAttributedText(attributedText: NSAttributedString): Pointer; cdecl;
+    {class} function labelNodeWithFontNamed(fontName: NSString): Pointer; cdecl;
+    {class} function labelNodeWithText(text: NSString): Pointer; cdecl;
   end;
 
   SKLabelNode = interface(SKNode)
-    ['{DB475DC6-CA7E-4102-B02C-BF5CAFE9060C}']
+    ['{D4726AC1-537E-4FFB-9266-EDC34A899AE4}']
     function attributedText: NSAttributedString; cdecl;
     function blendMode: SKBlendMode; cdecl;
     function color: UIColor; cdecl;
@@ -626,11 +915,16 @@ type
   TSKLabelNode = class(TOCGenericImport<SKLabelNodeClass, SKLabelNode>) end;
 
   SKVideoNodeClass = interface(SKNodeClass)
-    ['{30C56BC6-372F-4818-895F-9FF1FD7EE115}']
+    ['{61A5E18F-43A9-40EC-B888-890451892D3F}']
+    {class} function videoNodeWithAVPlayer(player: AVPlayer): SKVideoNode; cdecl;
+    {class} function videoNodeWithFileNamed(videoFile: NSString): SKVideoNode; cdecl;
+    {class} function videoNodeWithURL(videoURL: NSURL): SKVideoNode; cdecl;
+    {class} function videoNodeWithVideoFileNamed(videoFile: NSString): SKVideoNode; cdecl;
+    {class} function videoNodeWithVideoURL(videoURL: NSURL): SKVideoNode; cdecl;
   end;
 
   SKVideoNode = interface(SKNode)
-    ['{09EC550C-3890-4C59-99ED-B57169EFCD85}']
+    ['{C4B30FD7-8CC3-4B8F-A8C1-52C257CDE95C}']
     function anchorPoint: CGPoint; cdecl;
     function initWithAVPlayer(player: AVPlayer): Pointer; cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
@@ -647,22 +941,22 @@ type
   TSKVideoNode = class(TOCGenericImport<SKVideoNodeClass, SKVideoNode>) end;
 
   SKCropNodeClass = interface(SKNodeClass)
-    ['{D2024C49-E7F9-46F3-872D-3C2AD6029D96}']
+    ['{089ED339-7159-4283-86C2-143933E8A7E6}']
   end;
 
   SKCropNode = interface(SKNode)
-    ['{7BA1BEE4-26E4-4278-B66F-104D866FA1E3}']
+    ['{EDC480D7-8A05-47A4-8359-D8F8C2E0977B}']
     function maskNode: SKNode; cdecl;
     procedure setMaskNode(maskNode: SKNode); cdecl;
   end;
   TSKCropNode = class(TOCGenericImport<SKCropNodeClass, SKCropNode>) end;
 
   SKLightNodeClass = interface(SKNodeClass)
-    ['{3180353E-FBEC-43EA-975E-C0C01E4B975B}']
+    ['{8A4CD65B-7412-45B6-8794-6FC5EC92B3D7}']
   end;
 
   SKLightNode = interface(SKNode)
-    ['{68ACE791-982F-4C24-AF84-87F7118A80AB}']
+    ['{8FBB54E9-E40E-4B4B-BA99-896C7BEC8584}']
     function ambientColor: UIColor; cdecl;
     function categoryBitMask: UInt32; cdecl;
     function falloff: CGFloat; cdecl;
@@ -679,11 +973,13 @@ type
   TSKLightNode = class(TOCGenericImport<SKLightNodeClass, SKLightNode>) end;
 
   SKReferenceNodeClass = interface(SKNodeClass)
-    ['{5D48ACE5-9E4F-4FFA-9ED9-60DC61CD731B}']
+    ['{B12C894D-5A37-4645-8A4D-6929CC36626A}']
+    {class} function referenceNodeWithFileNamed(fileName: NSString): Pointer; cdecl;
+    {class} function referenceNodeWithURL(referenceURL: NSURL): Pointer; cdecl;
   end;
 
   SKReferenceNode = interface(SKNode)
-    ['{C9F9D2C6-01C6-40FF-B60E-6F6DF8686547}']
+    ['{9D71EC4C-1496-4983-A3DD-CAB41A7252A5}']
     procedure didLoadReferenceNode(node: SKNode); cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
     function initWithFileNamed(fileName: NSString): Pointer; cdecl;
@@ -693,11 +989,11 @@ type
   TSKReferenceNode = class(TOCGenericImport<SKReferenceNodeClass, SKReferenceNode>) end;
 
   SKTransformNodeClass = interface(SKNodeClass)
-    ['{022F36BA-BCE2-42F4-BE11-9672BF9F5764}']
+    ['{5D6422D5-049D-42D1-AC1D-5013D9685640}']
   end;
 
   SKTransformNode = interface(SKNode)
-    ['{277828A1-4216-4D2D-A528-C9001EB0AE2C}']
+    ['{E513109F-0558-47F3-9D4D-A7A2A59E560B}']
     function eulerAngles: vector_float3; cdecl;
     function quaternion: simd_quatf; cdecl;
     function rotationMatrix: matrix_float3x3; cdecl;
@@ -712,11 +1008,12 @@ type
   TSKTransformNode = class(TOCGenericImport<SKTransformNodeClass, SKTransformNode>) end;
 
   SKRegionClass = interface(NSObjectClass)
-    ['{48D3EB55-1E46-42A2-A425-3DA26A498944}']
+    ['{EDFAA987-FCDC-4FED-B429-5CF47071D77A}']
+    {class} function infiniteRegion: Pointer; cdecl;
   end;
 
   SKRegion = interface(NSObject)
-    ['{2F9E3727-2C1E-4BD7-90C2-462CCADD0F5D}']
+    ['{AA3DB7AE-9FD3-42B1-AEF0-E1021C2089ED}']
     function containsPoint(point: CGPoint): Boolean; cdecl;
     function initWithPath(path: CGPathRef): Pointer; cdecl;
     function initWithRadius(radius: Single): Pointer; cdecl;
@@ -729,176 +1026,104 @@ type
   end;
   TSKRegion = class(TOCGenericImport<SKRegionClass, SKRegion>) end;
 
-  SKRendererClass = interface(NSObjectClass)
-    ['{5ECF2BA6-283E-4699-AC37-3F4376A4A3BA}']
+  SKViewClass = interface(UIViewClass)
+    ['{BFD5E7DE-1F08-4FF9-B7CF-70933F1B7B90}']
   end;
 
-  SKRenderer = interface(NSObject)
-    ['{FDCB213E-7197-45CD-BDD5-DAFFAA9BEA75}']
+  SKView = interface(UIView)
+    ['{380F19FF-1CCB-4720-913C-1314ED1918C2}']
+    function allowsTransparency: Boolean; cdecl;
+    [MethodName('convertPoint:fromScene:')]
+    function convertPointFromScene(point: CGPoint; fromScene: SKScene): CGPoint; cdecl;
+    [MethodName('convertPoint:toScene:')]
+    function convertPointToScene(point: CGPoint; toScene: SKScene): CGPoint; cdecl;
+    function delegate: NSObject; cdecl;
+    function disableDepthStencilBuffer: Boolean; cdecl;
+    function frameInterval: NSInteger; cdecl;
     function ignoresSiblingOrder: Boolean; cdecl;
-    procedure renderWithViewport(viewport: CGRect; renderCommandEncoder: Pointer; renderPassDescriptor: MTLRenderPassDescriptor;
-      commandQueue: Pointer); overload; cdecl;
-    procedure renderWithViewport(viewport: CGRect; commandBuffer: Pointer; renderPassDescriptor: MTLRenderPassDescriptor); overload; cdecl;
+    function isAsynchronous: Boolean; cdecl;
+    function isPaused: Boolean; cdecl;
+    function preferredFrameRate: Single; cdecl;
+    function preferredFramesPerSecond: NSInteger; cdecl;
+    procedure presentScene(scene: SKScene; transition: SKTransition); overload; cdecl;
+    procedure presentScene(scene: SKScene); overload; cdecl;
     function scene: SKScene; cdecl;
+    procedure setAllowsTransparency(allowsTransparency: Boolean); cdecl;
+    procedure setAsynchronous(asynchronous: Boolean); cdecl;
+    procedure setDelegate(delegate: NSObject); cdecl;
+    procedure setDisableDepthStencilBuffer(disableDepthStencilBuffer: Boolean); cdecl;
+    procedure setFrameInterval(frameInterval: NSInteger); cdecl;
     procedure setIgnoresSiblingOrder(ignoresSiblingOrder: Boolean); cdecl;
-    procedure setScene(scene: SKScene); cdecl;
+    procedure setPaused(paused: Boolean); cdecl;
+    procedure setPreferredFrameRate(preferredFrameRate: Single); cdecl;
+    procedure setPreferredFramesPerSecond(preferredFramesPerSecond: NSInteger); cdecl;
     procedure setShouldCullNonVisibleNodes(shouldCullNonVisibleNodes: Boolean); cdecl;
     procedure setShowsDrawCount(showsDrawCount: Boolean); cdecl;
     procedure setShowsFields(showsFields: Boolean); cdecl;
+    procedure setShowsFPS(showsFPS: Boolean); cdecl;
     procedure setShowsNodeCount(showsNodeCount: Boolean); cdecl;
     procedure setShowsPhysics(showsPhysics: Boolean); cdecl;
     procedure setShowsQuadCount(showsQuadCount: Boolean); cdecl;
     function shouldCullNonVisibleNodes: Boolean; cdecl;
     function showsDrawCount: Boolean; cdecl;
     function showsFields: Boolean; cdecl;
+    function showsFPS: Boolean; cdecl;
     function showsNodeCount: Boolean; cdecl;
     function showsPhysics: Boolean; cdecl;
     function showsQuadCount: Boolean; cdecl;
-    procedure updateAtTime(currentTime: NSTimeInterval); cdecl;
+    function textureFromNode(node: SKNode): SKTexture; overload; cdecl;
+    function textureFromNode(node: SKNode; crop: CGRect): SKTexture; overload; cdecl;
   end;
-  TSKRenderer = class(TOCGenericImport<SKRendererClass, SKRenderer>) end;
+  TSKView = class(TOCGenericImport<SKViewClass, SKView>) end;
 
-  SKTileDefinitionClass = interface(NSObjectClass)
-    ['{1AAB87F3-125D-4673-9570-AC0393E26498}']
-  end;
-
-  SKTileDefinition = interface(NSObject)
-    ['{95ACAF39-65D6-46A9-95A8-3DADA7416540}']
-    function flipHorizontally: Boolean; cdecl;
-    function flipVertically: Boolean; cdecl;
-    function initWithTexture(texture: SKTexture): Pointer; overload; cdecl;
-    function initWithTexture(texture: SKTexture; normalTexture: SKTexture; size: CGSize): Pointer; overload; cdecl;
-    function initWithTexture(texture: SKTexture; size: CGSize): Pointer; overload; cdecl;
-    function initWithTextures(textures: NSArray; normalTextures: NSArray; size: CGSize; timePerFrame: CGFloat): Pointer; overload; cdecl;
-    function initWithTextures(textures: NSArray; size: CGSize; timePerFrame: CGFloat): Pointer; overload; cdecl;
-    function name: NSString; cdecl;
-    function normalTextures: NSArray; cdecl;
-    function placementWeight: NSUInteger; cdecl;
-    function rotation: SKTileDefinitionRotation; cdecl;
-    procedure setFlipHorizontally(flipHorizontally: Boolean); cdecl;
-    procedure setFlipVertically(flipVertically: Boolean); cdecl;
-    procedure setName(name: NSString); cdecl;
-    procedure setNormalTextures(normalTextures: NSArray); cdecl;
-    procedure setPlacementWeight(placementWeight: NSUInteger); cdecl;
-    procedure setRotation(rotation: SKTileDefinitionRotation); cdecl;
-    procedure setSize(size: CGSize); cdecl;
-    procedure setTextures(textures: NSArray); cdecl;
-    procedure setTimePerFrame(timePerFrame: CGFloat); cdecl;
-    procedure setUserData(userData: NSMutableDictionary); cdecl;
-    function size: CGSize; cdecl;
-    function textures: NSArray; cdecl;
-    function timePerFrame: CGFloat; cdecl;
-    function userData: NSMutableDictionary; cdecl;
-  end;
-  TSKTileDefinition = class(TOCGenericImport<SKTileDefinitionClass, SKTileDefinition>) end;
-
-  SKTileSetClass = interface(NSObjectClass)
-    ['{D67B9B73-64FF-4C8A-AE1E-FE0556ECF745}']
+  SKViewDelegate = interface(IObjectiveC)
+    ['{B81B7EDD-CC2C-4374-9D40-9EF2ED79C718}']
+    function view(view: SKView; shouldRenderAtTime: NSTimeInterval): Boolean; cdecl;
   end;
 
-  SKTileSet = interface(NSObject)
-    ['{8AEA3BD5-694D-4F70-9D67-42A4FBEC9656}']
-    function &type: SKTileSetType; cdecl;
-    function defaultTileGroup: SKTileGroup; cdecl;
-    function defaultTileSize: CGSize; cdecl;
-    function initWithTileGroups(tileGroups: NSArray): Pointer; overload; cdecl;
-    function initWithTileGroups(tileGroups: NSArray; tileSetType: SKTileSetType): Pointer; overload; cdecl;
-    function name: NSString; cdecl;
-    procedure setDefaultTileGroup(defaultTileGroup: SKTileGroup); cdecl;
-    procedure setDefaultTileSize(defaultTileSize: CGSize); cdecl;
-    procedure setName(name: NSString); cdecl;
-    procedure setTileGroups(tileGroups: NSArray); cdecl;
-    procedure setType(&type: SKTileSetType); cdecl;
-    function tileGroups: NSArray; cdecl;
-  end;
-  TSKTileSet = class(TOCGenericImport<SKTileSetClass, SKTileSet>) end;
-
-  SKTileGroupClass = interface(NSObjectClass)
-    ['{F219D977-96C8-45E8-9E2C-062F0F89A096}']
+  SKTransitionClass = interface(NSObjectClass)
+    ['{D718E0A8-F280-4D6F-A911-20608E14AD94}']
+    {class} function crossFadeWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function doorsCloseHorizontalWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function doorsCloseVerticalWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function doorsOpenHorizontalWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function doorsOpenVerticalWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function doorwayWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function fadeWithColor(color: UIColor; duration: NSTimeInterval): SKTransition; cdecl;
+    {class} function fadeWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function flipHorizontalWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function flipVerticalWithDuration(sec: NSTimeInterval): SKTransition; cdecl;
+    {class} function moveInWithDirection(direction: SKTransitionDirection; duration: NSTimeInterval): SKTransition; cdecl;
+    {class} function pushWithDirection(direction: SKTransitionDirection; duration: NSTimeInterval): SKTransition; cdecl;
+    {class} function revealWithDirection(direction: SKTransitionDirection; duration: NSTimeInterval): SKTransition; cdecl;
+    {class} function transitionWithCIFilter(filter: CIFilter; duration: NSTimeInterval): SKTransition; cdecl;
   end;
 
-  SKTileGroup = interface(NSObject)
-    ['{7969A58C-095E-4FE2-B4D4-E8924EB1B4ED}']
-    function initWithRules(rules: NSArray): Pointer; cdecl;
-    function initWithTileDefinition(tileDefinition: SKTileDefinition): Pointer; cdecl;
-    function name: NSString; cdecl;
-    function rules: NSArray; cdecl;
-    procedure setName(name: NSString); cdecl;
-    procedure setRules(rules: NSArray); cdecl;
+  SKTransition = interface(NSObject)
+    ['{B5662C10-E7D9-4071-8547-63FC832F4508}']
+    function pausesIncomingScene: Boolean; cdecl;
+    function pausesOutgoingScene: Boolean; cdecl;
+    procedure setPausesIncomingScene(pausesIncomingScene: Boolean); cdecl;
+    procedure setPausesOutgoingScene(pausesOutgoingScene: Boolean); cdecl;
   end;
-  TSKTileGroup = class(TOCGenericImport<SKTileGroupClass, SKTileGroup>) end;
-
-  SKTileGroupRuleClass = interface(NSObjectClass)
-    ['{F5A7055F-102B-4C21-A7D0-904112FF89BC}']
-  end;
-
-  SKTileGroupRule = interface(NSObject)
-    ['{4391AD36-3238-4EBC-8ABD-0D8B8A799FDD}']
-    function adjacency: SKTileAdjacencyMask; cdecl;
-    function initWithAdjacency(adjacency: SKTileAdjacencyMask; tileDefinitions: NSArray): Pointer; cdecl;
-    function name: NSString; cdecl;
-    procedure setAdjacency(adjacency: SKTileAdjacencyMask); cdecl;
-    procedure setName(name: NSString); cdecl;
-    procedure setTileDefinitions(tileDefinitions: NSArray); cdecl;
-    function tileDefinitions: NSArray; cdecl;
-  end;
-  TSKTileGroupRule = class(TOCGenericImport<SKTileGroupRuleClass, SKTileGroupRule>) end;
-
-  SKTileMapNodeClass = interface(SKNodeClass)
-    ['{2B51B0A9-7F28-46A5-8376-BFBB9C82D3CD}']
-  end;
-
-  SKTileMapNode = interface(SKNode)
-    ['{A6345253-E514-4E27-9AE7-9C38C7F97429}']
-    function anchorPoint: CGPoint; cdecl;
-    function attributeValues: NSDictionary; cdecl;
-    function blendMode: SKBlendMode; cdecl;
-    function centerOfTileAtColumn(column: NSUInteger; row: NSUInteger): CGPoint; cdecl;
-    function color: UIColor; cdecl;
-    function colorBlendFactor: CGFloat; cdecl;
-    function enableAutomapping: Boolean; cdecl;
-    procedure fillWithTileGroup(tileGroup: SKTileGroup); cdecl;
-    function initWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize;
-      fillWithTileGroup: SKTileGroup): Pointer; overload; cdecl;
-    function initWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize): Pointer; overload; cdecl;
-    function initWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize;
-      tileGroupLayout: NSArray): Pointer; overload; cdecl;
-    function lightingBitMask: UInt32; cdecl;
-    function mapSize: CGSize; cdecl;
-    function numberOfColumns: NSUInteger; cdecl;
-    function numberOfRows: NSUInteger; cdecl;
-    procedure setAnchorPoint(anchorPoint: CGPoint); cdecl;
-    procedure setAttributeValues(attributeValues: NSDictionary); cdecl;
-    procedure setBlendMode(blendMode: SKBlendMode); cdecl;
-    procedure setColor(color: UIColor); cdecl;
-    procedure setColorBlendFactor(colorBlendFactor: CGFloat); cdecl;
-    procedure setEnableAutomapping(enableAutomapping: Boolean); cdecl;
-    procedure setLightingBitMask(lightingBitMask: UInt32); cdecl;
-    procedure setNumberOfColumns(numberOfColumns: NSUInteger); cdecl;
-    procedure setNumberOfRows(numberOfRows: NSUInteger); cdecl;
-    procedure setShader(shader: SKShader); cdecl;
-    procedure setTileGroup(tileGroup: SKTileGroup; forColumn: NSUInteger; row: NSUInteger); overload; cdecl;
-    procedure setTileGroup(tileGroup: SKTileGroup; andTileDefinition: SKTileDefinition; forColumn: NSUInteger; row: NSUInteger); overload; cdecl;
-    procedure setTileSet(tileSet: SKTileSet); cdecl;
-    procedure setTileSize(tileSize: CGSize); cdecl;
-    procedure setValue(value: SKAttributeValue; forAttributeNamed: NSString); cdecl;
-    function shader: SKShader; cdecl;
-    function tileColumnIndexFromPosition(position: CGPoint): NSUInteger; cdecl;
-    function tileDefinitionAtColumn(column: NSUInteger; row: NSUInteger): SKTileDefinition; cdecl;
-    function tileGroupAtColumn(column: NSUInteger; row: NSUInteger): SKTileGroup; cdecl;
-    function tileRowIndexFromPosition(position: CGPoint): NSUInteger; cdecl;
-    function tileSet: SKTileSet; cdecl;
-    function tileSize: CGSize; cdecl;
-    function valueForAttributeNamed(key: NSString): SKAttributeValue; cdecl;
-  end;
-  TSKTileMapNode = class(TOCGenericImport<SKTileMapNodeClass, SKTileMapNode>) end;
+  TSKTransition = class(TOCGenericImport<SKTransitionClass, SKTransition>) end;
 
   SKTextureClass = interface(NSObjectClass)
-    ['{F765593F-2149-455F-8931-7AA460C8AB93}']
+    ['{14ADFB10-1289-46CA-8CD5-B626907D9627}']
+    {class} procedure preloadTextures(textures: NSArray; withCompletionHandler: TSKTextureBlockMethod1); cdecl;
+    {class} function textureNoiseWithSmoothness(smoothness: CGFloat; size: CGSize; grayscale: Boolean): Pointer; cdecl;
+    {class} function textureVectorNoiseWithSmoothness(smoothness: CGFloat; size: CGSize): Pointer; cdecl;
+    {class} function textureWithCGImage(image: CGImageRef): Pointer; cdecl;
+    {class} function textureWithData(pixelData: NSData; size: CGSize; rowLength: Cardinal; alignment: Cardinal): Pointer; overload; cdecl;
+    {class} function textureWithData(pixelData: NSData; size: CGSize; flipped: Boolean): Pointer; overload; cdecl;
+    {class} function textureWithData(pixelData: NSData; size: CGSize): Pointer; overload; cdecl;
+    {class} function textureWithImage(image: UIImage): Pointer; cdecl;
+    {class} function textureWithImageNamed(name: NSString): Pointer; cdecl;
+    {class} function textureWithRect(rect: CGRect; inTexture: SKTexture): Pointer; cdecl;
   end;
 
   SKTexture = interface(NSObject)
-    ['{28D927EF-8E2E-4047-AFAD-96DF39AF5F2F}']
+    ['{5916853B-DD3D-4E4C-AD07-F544D38D04E6}']
     function CGImage: CGImageRef; cdecl;
     function filteringMode: SKTextureFilteringMode; cdecl;
     procedure preloadWithCompletionHandler(completionHandler: TSKTextureBlockMethod1); cdecl;
@@ -913,82 +1138,27 @@ type
   end;
   TSKTexture = class(TOCGenericImport<SKTextureClass, SKTexture>) end;
 
-  SKMutableTextureClass = interface(SKTextureClass)
-    ['{CFA38BDF-4DD2-41DB-B839-473ABA68503A}']
-  end;
-
-  SKMutableTexture = interface(SKTexture)
-    ['{7B9323CA-1715-41E2-9FE0-455001F55248}']
-    function initWithSize(size: CGSize; pixelFormat: Integer): Pointer; overload; cdecl;
-    function initWithSize(size: CGSize): Pointer; overload; cdecl;
-    procedure modifyPixelDataWithBlock(block: TSKMutableTextureBlockMethod1); cdecl;
-  end;
-  TSKMutableTexture = class(TOCGenericImport<SKMutableTextureClass, SKMutableTexture>) end;
-
-  SKTextureAtlasClass = interface(NSObjectClass)
-    ['{FC49A719-58C6-4F42-9F2E-8743010A0238}']
-  end;
-
-  SKTextureAtlas = interface(NSObject)
-    ['{3070B324-E13F-4864-9819-E577C0ED734A}']
-    procedure preloadWithCompletionHandler(completionHandler: TSKTextureAtlasBlockMethod1); cdecl;
-    function textureNamed(name: NSString): SKTexture; cdecl;
-    function textureNames: NSArray; cdecl;
-  end;
-  TSKTextureAtlas = class(TOCGenericImport<SKTextureAtlasClass, SKTextureAtlas>) end;
-
-  SKRangeClass = interface(NSObjectClass)
-    ['{0152A0AA-7FBA-4614-AE22-3D0A6439670B}']
-  end;
-
-  SKRange = interface(NSObject)
-    ['{640E921B-3D9F-4FB8-BB47-A28D1F8A7F2A}']
-    function initWithLowerLimit(lower: CGFloat; upperLimit: CGFloat): Pointer; cdecl;
-    function lowerLimit: CGFloat; cdecl;
-    procedure setLowerLimit(lowerLimit: CGFloat); cdecl;
-    procedure setUpperLimit(upperLimit: CGFloat); cdecl;
-    function upperLimit: CGFloat; cdecl;
-  end;
-  TSKRange = class(TOCGenericImport<SKRangeClass, SKRange>) end;
-
-  SKConstraintClass = interface(NSObjectClass)
-    ['{7E840F51-32CE-4406-91F9-6F5C970DB018}']
-  end;
-
-  SKConstraint = interface(NSObject)
-    ['{58A0FBC8-E3A5-4C92-A583-57692958B8D4}']
-    function enabled: Boolean; cdecl;
-    function referenceNode: SKNode; cdecl;
-    procedure setEnabled(enabled: Boolean); cdecl;
-    procedure setReferenceNode(referenceNode: SKNode); cdecl;
-  end;
-  TSKConstraint = class(TOCGenericImport<SKConstraintClass, SKConstraint>) end;
-
-  SKAudioNodeClass = interface(SKNodeClass)
-    ['{E04041B1-2CD9-48CE-823E-E76D4A333461}']
-  end;
-
-  SKAudioNode = interface(SKNode)
-    ['{499D1383-D0F3-4710-9AF1-3107874BA340}']
-    function autoplayLooped: Boolean; cdecl;
-    function avAudioNode: AVAudioNode; cdecl;
-    function initWithAVAudioNode(node: AVAudioNode): Pointer; cdecl;
-    function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
-    function initWithFileNamed(name: NSString): Pointer; cdecl;
-    function initWithURL(url: NSURL): Pointer; cdecl;
-    function isPositional: Boolean; cdecl;
-    procedure setAutoplayLooped(autoplayLooped: Boolean); cdecl;
-    procedure setAvAudioNode(avAudioNode: AVAudioNode); cdecl;
-    procedure setPositional(positional: Boolean); cdecl;
-  end;
-  TSKAudioNode = class(TOCGenericImport<SKAudioNodeClass, SKAudioNode>) end;
-
   SKUniformClass = interface(NSObjectClass)
-    ['{86D7F0CF-D824-4AAF-9A5A-711E338DAC98}']
+    ['{1137027D-7058-45B5-9759-30F4787F13D1}']
+    {class} function uniformWithName(name: NSString; floatVector3: GLKVector3): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; floatVector2: GLKVector2): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; matrixFloat4x4: matrix_float4x4): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; floatVector4: GLKVector4): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; floatMatrix4: GLKMatrix4): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; floatMatrix3: GLKMatrix3): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; floatMatrix2: GLKMatrix2): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; matrixFloat3x3: matrix_float3x3): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; float: Single): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; texture: SKTexture): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; vectorFloat2: vector_float2): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; matrixFloat2x2: matrix_float2x2): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; vectorFloat4: vector_float4): Pointer; overload; cdecl;
+    {class} function uniformWithName(name: NSString; vectorFloat3: vector_float3): Pointer; overload; cdecl;
   end;
 
   SKUniform = interface(NSObject)
-    ['{AC8778CB-D1C0-428B-806D-76842D672B0D}']
+    ['{3B1F4B4B-6909-4FC3-84B4-C30EA04A243A}']
     function floatMatrix2Value: GLKMatrix2; cdecl;
     function floatMatrix3Value: GLKMatrix3; cdecl;
     function floatMatrix4Value: GLKMatrix4; cdecl;
@@ -1037,50 +1207,295 @@ type
   end;
   TSKUniform = class(TOCGenericImport<SKUniformClass, SKUniform>) end;
 
-  SKShaderClass = interface(NSObjectClass)
-    ['{C1107AC8-0E12-4A54-B986-32563085C9CC}']
+  SKRendererClass = interface(NSObjectClass)
+    ['{77D8D036-AC9B-4AE0-B2C1-E68E7A0A0C40}']
+    {class} function rendererWithDevice(device: Pointer): SKRenderer; cdecl;
   end;
 
-  SKShader = interface(NSObject)
-    ['{A449193C-FA71-4254-8418-89B9CDF3406A}']
-    procedure addUniform(uniform: SKUniform); cdecl;
-    function attributes: NSArray; cdecl;
-    function initWithSource(source: NSString): Pointer; overload; cdecl;
-    function initWithSource(source: NSString; uniforms: NSArray): Pointer; overload; cdecl;
-    procedure removeUniformNamed(name: NSString); cdecl;
-    procedure setAttributes(attributes: NSArray); cdecl;
-    procedure setSource(source: NSString); cdecl;
-    procedure setUniforms(uniforms: NSArray); cdecl;
-    function source: NSString; cdecl;
-    function uniformNamed(name: NSString): SKUniform; cdecl;
-    function uniforms: NSArray; cdecl;
+  SKRenderer = interface(NSObject)
+    ['{15550D5B-662A-4066-AC92-98C74423650E}']
+    function ignoresSiblingOrder: Boolean; cdecl;
+    procedure renderWithViewport(viewport: CGRect; renderCommandEncoder: Pointer; renderPassDescriptor: MTLRenderPassDescriptor;
+      commandQueue: Pointer); overload; cdecl;
+    procedure renderWithViewport(viewport: CGRect; commandBuffer: Pointer; renderPassDescriptor: MTLRenderPassDescriptor); overload; cdecl;
+    function scene: SKScene; cdecl;
+    procedure setIgnoresSiblingOrder(ignoresSiblingOrder: Boolean); cdecl;
+    procedure setScene(scene: SKScene); cdecl;
+    procedure setShouldCullNonVisibleNodes(shouldCullNonVisibleNodes: Boolean); cdecl;
+    procedure setShowsDrawCount(showsDrawCount: Boolean); cdecl;
+    procedure setShowsFields(showsFields: Boolean); cdecl;
+    procedure setShowsNodeCount(showsNodeCount: Boolean); cdecl;
+    procedure setShowsPhysics(showsPhysics: Boolean); cdecl;
+    procedure setShowsQuadCount(showsQuadCount: Boolean); cdecl;
+    function shouldCullNonVisibleNodes: Boolean; cdecl;
+    function showsDrawCount: Boolean; cdecl;
+    function showsFields: Boolean; cdecl;
+    function showsNodeCount: Boolean; cdecl;
+    function showsPhysics: Boolean; cdecl;
+    function showsQuadCount: Boolean; cdecl;
+    procedure updateAtTime(currentTime: NSTimeInterval); cdecl;
   end;
-  TSKShader = class(TOCGenericImport<SKShaderClass, SKShader>) end;
+  TSKRenderer = class(TOCGenericImport<SKRendererClass, SKRenderer>) end;
 
-  SKActionClass = interface(NSObjectClass)
-    ['{B6E6AE35-0631-4C49-BCFD-AB7CA41747D0}']
+  SKTileDefinitionClass = interface(NSObjectClass)
+    ['{A99B0DAC-CFE5-4864-AF05-6C0550F4A4DF}']
+    {class} function tileDefinitionWithTexture(texture: SKTexture; normalTexture: SKTexture; size: CGSize): Pointer; overload; cdecl;
+    {class} function tileDefinitionWithTexture(texture: SKTexture; size: CGSize): Pointer; overload; cdecl;
+    {class} function tileDefinitionWithTexture(texture: SKTexture): Pointer; overload; cdecl;
+    {class} function tileDefinitionWithTextures(textures: NSArray; normalTextures: NSArray; size: CGSize;
+      timePerFrame: CGFloat): Pointer; overload; cdecl;
+    {class} function tileDefinitionWithTextures(textures: NSArray; size: CGSize; timePerFrame: CGFloat): Pointer; overload; cdecl;
   end;
 
-  SKAction = interface(NSObject)
-    ['{83B74D11-9E1D-461B-A127-FCDAA5223A5B}']
-    function duration: NSTimeInterval; cdecl;
-    function reversedAction: SKAction; cdecl;
-    procedure setDuration(duration: NSTimeInterval); cdecl;
-    procedure setSpeed(speed: CGFloat); cdecl;
-    procedure setTimingFunction(timingFunction: SKActionTimingFunction); cdecl;
-    procedure setTimingMode(timingMode: SKActionTimingMode); cdecl;
-    function speed: CGFloat; cdecl;
-    function timingFunction: SKActionTimingFunction; cdecl;
-    function timingMode: SKActionTimingMode; cdecl;
+  SKTileDefinition = interface(NSObject)
+    ['{2166D749-03D7-4336-8043-668535193F82}']
+    function flipHorizontally: Boolean; cdecl;
+    function flipVertically: Boolean; cdecl;
+    function initWithTexture(texture: SKTexture): Pointer; overload; cdecl;
+    function initWithTexture(texture: SKTexture; normalTexture: SKTexture; size: CGSize): Pointer; overload; cdecl;
+    function initWithTexture(texture: SKTexture; size: CGSize): Pointer; overload; cdecl;
+    function initWithTextures(textures: NSArray; normalTextures: NSArray; size: CGSize; timePerFrame: CGFloat): Pointer; overload; cdecl;
+    function initWithTextures(textures: NSArray; size: CGSize; timePerFrame: CGFloat): Pointer; overload; cdecl;
+    function name: NSString; cdecl;
+    function normalTextures: NSArray; cdecl;
+    function placementWeight: NSUInteger; cdecl;
+    function rotation: SKTileDefinitionRotation; cdecl;
+    procedure setFlipHorizontally(flipHorizontally: Boolean); cdecl;
+    procedure setFlipVertically(flipVertically: Boolean); cdecl;
+    procedure setName(name: NSString); cdecl;
+    procedure setNormalTextures(normalTextures: NSArray); cdecl;
+    procedure setPlacementWeight(placementWeight: NSUInteger); cdecl;
+    procedure setRotation(rotation: SKTileDefinitionRotation); cdecl;
+    procedure setSize(size: CGSize); cdecl;
+    procedure setTextures(textures: NSArray); cdecl;
+    procedure setTimePerFrame(timePerFrame: CGFloat); cdecl;
+    procedure setUserData(userData: NSMutableDictionary); cdecl;
+    function size: CGSize; cdecl;
+    function textures: NSArray; cdecl;
+    function timePerFrame: CGFloat; cdecl;
+    function userData: NSMutableDictionary; cdecl;
   end;
-  TSKAction = class(TOCGenericImport<SKActionClass, SKAction>) end;
+  TSKTileDefinition = class(TOCGenericImport<SKTileDefinitionClass, SKTileDefinition>) end;
 
-    SKPhysicsBodyClass = interface(NSObjectClass)
-    ['{0A15B7A4-9FCB-4B71-890D-9B6829D7FB69}']
+  SKTileSetClass = interface(NSObjectClass)
+    ['{3B430606-B4CC-43E3-80E7-4D5A6E206F6E}']
+    {class} function tileSetFromURL(url: NSURL): Pointer; cdecl;
+    {class} function tileSetNamed(name: NSString): Pointer; cdecl;
+    {class} function tileSetWithTileGroups(tileGroups: NSArray; tileSetType: SKTileSetType): Pointer; overload; cdecl;
+    {class} function tileSetWithTileGroups(tileGroups: NSArray): Pointer; overload; cdecl;
+  end;
+
+  SKTileSet = interface(NSObject)
+    ['{3172E37B-8B66-46C8-9654-05F07E82BCBC}']
+    [MethodName('type')]
+    function &type: SKTileSetType; cdecl;
+    function defaultTileGroup: SKTileGroup; cdecl;
+    function defaultTileSize: CGSize; cdecl;
+    function initWithTileGroups(tileGroups: NSArray): Pointer; overload; cdecl;
+    function initWithTileGroups(tileGroups: NSArray; tileSetType: SKTileSetType): Pointer; overload; cdecl;
+    function name: NSString; cdecl;
+    procedure setDefaultTileGroup(defaultTileGroup: SKTileGroup); cdecl;
+    procedure setDefaultTileSize(defaultTileSize: CGSize); cdecl;
+    procedure setName(name: NSString); cdecl;
+    procedure setTileGroups(tileGroups: NSArray); cdecl;
+    procedure setType(&type: SKTileSetType); cdecl;
+    function tileGroups: NSArray; cdecl;
+  end;
+  TSKTileSet = class(TOCGenericImport<SKTileSetClass, SKTileSet>) end;
+
+  SKTileGroupClass = interface(NSObjectClass)
+    ['{DA081793-FC34-44B1-96FF-1670D29F4438}']
+    {class} function emptyTileGroup: Pointer; cdecl;
+    {class} function tileGroupWithRules(rules: NSArray): Pointer; cdecl;
+    {class} function tileGroupWithTileDefinition(tileDefinition: SKTileDefinition): Pointer; cdecl;
+  end;
+
+  SKTileGroup = interface(NSObject)
+    ['{A3E5A66B-E8EC-4FF0-B4CB-84A49447674D}']
+    function initWithRules(rules: NSArray): Pointer; cdecl;
+    function initWithTileDefinition(tileDefinition: SKTileDefinition): Pointer; cdecl;
+    function name: NSString; cdecl;
+    function rules: NSArray; cdecl;
+    procedure setName(name: NSString); cdecl;
+    procedure setRules(rules: NSArray); cdecl;
+  end;
+  TSKTileGroup = class(TOCGenericImport<SKTileGroupClass, SKTileGroup>) end;
+
+  SKTileGroupRuleClass = interface(NSObjectClass)
+    ['{CD593B92-DB85-4B09-8324-56CCB9B449CC}']
+    {class} function tileGroupRuleWithAdjacency(adjacency: SKTileAdjacencyMask; tileDefinitions: NSArray): Pointer; cdecl;
+  end;
+
+  SKTileGroupRule = interface(NSObject)
+    ['{5DECABBA-8EB7-4A65-A58A-2B4BC08FF156}']
+    function adjacency: SKTileAdjacencyMask; cdecl;
+    function initWithAdjacency(adjacency: SKTileAdjacencyMask; tileDefinitions: NSArray): Pointer; cdecl;
+    function name: NSString; cdecl;
+    procedure setAdjacency(adjacency: SKTileAdjacencyMask); cdecl;
+    procedure setName(name: NSString); cdecl;
+    procedure setTileDefinitions(tileDefinitions: NSArray); cdecl;
+    function tileDefinitions: NSArray; cdecl;
+  end;
+  TSKTileGroupRule = class(TOCGenericImport<SKTileGroupRuleClass, SKTileGroupRule>) end;
+
+  SKTileMapNodeClass = interface(SKNodeClass)
+    ['{C41615E7-087C-439A-B21B-F42F0FD8C038}']
+    {class} function tileMapNodeWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize;
+      tileGroupLayout: NSArray): Pointer; overload; cdecl;
+    {class} function tileMapNodeWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize;
+      fillWithTileGroup: SKTileGroup): Pointer; overload; cdecl;
+    {class} function tileMapNodeWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize): Pointer; overload; cdecl;
+  end;
+
+  SKTileMapNode = interface(SKNode)
+    ['{EB92745E-7BC0-480B-8F17-CF061EA22181}']
+    function anchorPoint: CGPoint; cdecl;
+    function attributeValues: NSDictionary; cdecl;
+    function blendMode: SKBlendMode; cdecl;
+    function centerOfTileAtColumn(column: NSUInteger; row: NSUInteger): CGPoint; cdecl;
+    function color: UIColor; cdecl;
+    function colorBlendFactor: CGFloat; cdecl;
+    function enableAutomapping: Boolean; cdecl;
+    procedure fillWithTileGroup(tileGroup: SKTileGroup); cdecl;
+    function initWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize;
+      fillWithTileGroup: SKTileGroup): Pointer; overload; cdecl;
+    function initWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize): Pointer; overload; cdecl;
+    function initWithTileSet(tileSet: SKTileSet; columns: NSUInteger; rows: NSUInteger; tileSize: CGSize;
+      tileGroupLayout: NSArray): Pointer; overload; cdecl;
+    function lightingBitMask: UInt32; cdecl;
+    function mapSize: CGSize; cdecl;
+    function numberOfColumns: NSUInteger; cdecl;
+    function numberOfRows: NSUInteger; cdecl;
+    procedure setAnchorPoint(anchorPoint: CGPoint); cdecl;
+    procedure setAttributeValues(attributeValues: NSDictionary); cdecl;
+    procedure setBlendMode(blendMode: SKBlendMode); cdecl;
+    procedure setColor(color: UIColor); cdecl;
+    procedure setColorBlendFactor(colorBlendFactor: CGFloat); cdecl;
+    procedure setEnableAutomapping(enableAutomapping: Boolean); cdecl;
+    procedure setLightingBitMask(lightingBitMask: UInt32); cdecl;
+    procedure setNumberOfColumns(numberOfColumns: NSUInteger); cdecl;
+    procedure setNumberOfRows(numberOfRows: NSUInteger); cdecl;
+    procedure setShader(shader: SKShader); cdecl;
+    procedure setTileGroup(tileGroup: SKTileGroup; forColumn: NSUInteger; row: NSUInteger); overload; cdecl;
+    procedure setTileGroup(tileGroup: SKTileGroup; andTileDefinition: SKTileDefinition; forColumn: NSUInteger; row: NSUInteger); overload; cdecl;
+    procedure setTileSet(tileSet: SKTileSet); cdecl;
+    procedure setTileSize(tileSize: CGSize); cdecl;
+    procedure setValue(value: SKAttributeValue; forAttributeNamed: NSString); cdecl;
+    function shader: SKShader; cdecl;
+    function tileColumnIndexFromPosition(position: CGPoint): NSUInteger; cdecl;
+    function tileDefinitionAtColumn(column: NSUInteger; row: NSUInteger): SKTileDefinition; cdecl;
+    function tileGroupAtColumn(column: NSUInteger; row: NSUInteger): SKTileGroup; cdecl;
+    function tileRowIndexFromPosition(position: CGPoint): NSUInteger; cdecl;
+    function tileSet: SKTileSet; cdecl;
+    function tileSize: CGSize; cdecl;
+    function valueForAttributeNamed(key: NSString): SKAttributeValue; cdecl;
+  end;
+  TSKTileMapNode = class(TOCGenericImport<SKTileMapNodeClass, SKTileMapNode>) end;
+
+  SKMutableTextureClass = interface(SKTextureClass)
+    ['{CB59CF28-F944-4C70-832B-5A55AC39AA21}']
+    {class} function mutableTextureWithSize(size: CGSize): Pointer; cdecl;
+  end;
+
+  SKMutableTexture = interface(SKTexture)
+    ['{91EE1551-A329-473F-8DC7-561B42262399}']
+    function initWithSize(size: CGSize; pixelFormat: Integer): Pointer; overload; cdecl;
+    function initWithSize(size: CGSize): Pointer; overload; cdecl;
+    procedure modifyPixelDataWithBlock(block: TSKMutableTextureBlockMethod1); cdecl;
+  end;
+  TSKMutableTexture = class(TOCGenericImport<SKMutableTextureClass, SKMutableTexture>) end;
+
+  SKTextureAtlasClass = interface(NSObjectClass)
+    ['{B486B3FB-97A4-4F97-AEDE-AFD934C562B1}']
+    {class} function atlasNamed(name: NSString): Pointer; cdecl;
+    {class} function atlasWithDictionary(properties: NSDictionary): Pointer; cdecl;
+    {class} procedure preloadTextureAtlases(textureAtlases: NSArray; withCompletionHandler: TSKTextureAtlasBlockMethod1); cdecl;
+    {class} procedure preloadTextureAtlasesNamed(atlasNames: NSArray; withCompletionHandler: TSKTextureAtlasBlockMethod2); cdecl;
+  end;
+
+  SKTextureAtlas = interface(NSObject)
+    ['{F28FE0D7-0189-4B1D-8925-85FCF94393C5}']
+    procedure preloadWithCompletionHandler(completionHandler: TSKTextureAtlasBlockMethod1); cdecl;
+    function textureNamed(name: NSString): SKTexture; cdecl;
+    function textureNames: NSArray; cdecl;
+  end;
+  TSKTextureAtlas = class(TOCGenericImport<SKTextureAtlasClass, SKTextureAtlas>) end;
+
+  SKRangeClass = interface(NSObjectClass)
+    ['{462171B7-FFB6-4B70-9AD8-4242A64205BE}']
+    {class} function rangeWithConstantValue(value: CGFloat): Pointer; cdecl;
+    {class} function rangeWithLowerLimit(lower: CGFloat): Pointer; overload; cdecl;
+    {class} function rangeWithLowerLimit(lower: CGFloat; upperLimit: CGFloat): Pointer; overload; cdecl;
+    {class} function rangeWithNoLimits: Pointer; cdecl;
+    {class} function rangeWithUpperLimit(upper: CGFloat): Pointer; cdecl;
+    {class} function rangeWithValue(value: CGFloat; variance: CGFloat): Pointer; cdecl;
+  end;
+
+  SKRange = interface(NSObject)
+    ['{285B4873-1DF6-4D0F-AA44-CEE2516CA4FE}']
+    function initWithLowerLimit(lower: CGFloat; upperLimit: CGFloat): Pointer; cdecl;
+    function lowerLimit: CGFloat; cdecl;
+    procedure setLowerLimit(lowerLimit: CGFloat); cdecl;
+    procedure setUpperLimit(upperLimit: CGFloat); cdecl;
+    function upperLimit: CGFloat; cdecl;
+  end;
+  TSKRange = class(TOCGenericImport<SKRangeClass, SKRange>) end;
+
+  SKConstraintClass = interface(NSObjectClass)
+    ['{BCEF7660-C88C-40CC-AB7A-E6C39A7A8DB8}']
+    {class} function distance(range: SKRange; toNode: SKNode): Pointer; overload; cdecl;
+    {class} function distance(range: SKRange; toPoint: CGPoint): Pointer; overload; cdecl;
+    {class} function distance(range: SKRange; toPoint: CGPoint; inNode: SKNode): Pointer; overload; cdecl;
+    {class} function orientToNode(node: SKNode; offset: SKRange): Pointer; cdecl;
+    {class} function orientToPoint(point: CGPoint; offset: SKRange): Pointer; overload; cdecl;
+    {class} function orientToPoint(point: CGPoint; inNode: SKNode; offset: SKRange): Pointer; overload; cdecl;
+    {class} function positionX(range: SKRange): Pointer; overload; cdecl;
+    {class} function positionX(xRange: SKRange; Y: SKRange): Pointer; overload; cdecl;
+    {class} function positionY(range: SKRange): Pointer; cdecl;
+    {class} function zRotation(zRange: SKRange): Pointer; cdecl;
+  end;
+
+  SKConstraint = interface(NSObject)
+    ['{7CB160B9-8088-4524-A325-F7CE82254B63}']
+    function enabled: Boolean; cdecl;
+    function referenceNode: SKNode; cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+    procedure setReferenceNode(referenceNode: SKNode); cdecl;
+  end;
+  TSKConstraint = class(TOCGenericImport<SKConstraintClass, SKConstraint>) end;
+
+  SKReachConstraintsClass = interface(NSObjectClass)
+    ['{636B4E06-F8E9-48ED-9660-2842ADD3D36E}']
+  end;
+
+  SKReachConstraints = interface(NSObject)
+    ['{4701FD38-4121-441D-8CA8-4338361F81A8}']
+    function initWithLowerAngleLimit(lowerAngleLimit: CGFloat; upperAngleLimit: CGFloat): Pointer; cdecl;
+    function lowerAngleLimit: CGFloat; cdecl;
+    procedure setLowerAngleLimit(lowerAngleLimit: CGFloat); cdecl;
+    procedure setUpperAngleLimit(upperAngleLimit: CGFloat); cdecl;
+    function upperAngleLimit: CGFloat; cdecl;
+  end;
+  TSKReachConstraints = class(TOCGenericImport<SKReachConstraintsClass, SKReachConstraints>) end;
+
+  SKPhysicsBodyClass = interface(NSObjectClass)
+    ['{CEB4AB66-EC54-4126-ACD9-57587C5F480A}']
+    {class} function bodyWithBodies(bodies: NSArray): SKPhysicsBody; cdecl;
+    {class} function bodyWithCircleOfRadius(r: CGFloat): SKPhysicsBody; overload; cdecl;
+    {class} function bodyWithCircleOfRadius(r: CGFloat; center: CGPoint): SKPhysicsBody; overload; cdecl;
+    {class} function bodyWithEdgeChainFromPath(path: CGPathRef): SKPhysicsBody; cdecl;
+    {class} function bodyWithEdgeFromPoint(p1: CGPoint; toPoint: CGPoint): SKPhysicsBody; cdecl;
+    {class} function bodyWithEdgeLoopFromPath(path: CGPathRef): SKPhysicsBody; cdecl;
+    {class} function bodyWithEdgeLoopFromRect(rect: CGRect): SKPhysicsBody; cdecl;
+    {class} function bodyWithPolygonFromPath(path: CGPathRef): SKPhysicsBody; cdecl;
+    {class} function bodyWithRectangleOfSize(s: CGSize; center: CGPoint): SKPhysicsBody; overload; cdecl;
+    {class} function bodyWithRectangleOfSize(s: CGSize): SKPhysicsBody; overload; cdecl;
+    {class} function bodyWithTexture(texture: SKTexture; alphaThreshold: Single; size: CGSize): SKPhysicsBody; overload; cdecl;
+    {class} function bodyWithTexture(texture: SKTexture; size: CGSize): SKPhysicsBody; overload; cdecl;
   end;
 
   SKPhysicsBody = interface(NSObject)
-    ['{08C25679-E511-4780-8E37-402DA0F49CDD}']
+    ['{8E515A45-F62E-43F7-979B-C67FEBBD70F7}']
     function affectedByGravity: Boolean; cdecl;
     function allContactedBodies: NSArray; cdecl;
     function allowsRotation: Boolean; cdecl;
@@ -1133,11 +1548,11 @@ type
   TSKPhysicsBody = class(TOCGenericImport<SKPhysicsBodyClass, SKPhysicsBody>) end;
 
   SKPhysicsJointClass = interface(NSObjectClass)
-    ['{1CD3F80A-9025-41F5-A0CE-F631CF00F6CB}']
+    ['{AAFFF49E-190B-4909-B69A-7C6B3E2A03ED}']
   end;
 
   SKPhysicsJoint = interface(NSObject)
-    ['{7DCBF004-CF96-42CE-B855-5D23CFD276A9}']
+    ['{85ABF12C-A4D9-4FE9-B062-F99422ACC2F3}']
     function bodyA: SKPhysicsBody; cdecl;
     function bodyB: SKPhysicsBody; cdecl;
     function reactionForce: CGVector; cdecl;
@@ -1147,181 +1562,104 @@ type
   end;
   TSKPhysicsJoint = class(TOCGenericImport<SKPhysicsJointClass, SKPhysicsJoint>) end;
 
-  SKReachConstraintsClass = interface(NSObjectClass)
-    ['{3876F7C8-7835-4512-AA7F-DB1F123F4FBB}']
+  SKPhysicsJointPinClass = interface(SKPhysicsJointClass)
+    ['{3F86012A-EB2B-4ABE-A736-A48FA2BEAD95}']
+    {class} function jointWithBodyA(bodyA: SKPhysicsBody; bodyB: SKPhysicsBody; anchor: CGPoint): SKPhysicsJointPin; cdecl;
   end;
 
-  SKReachConstraints = interface(NSObject)
-    ['{FB326C25-B42D-483C-8E6B-E52DAE93E184}']
-    function initWithLowerAngleLimit(lowerAngleLimit: CGFloat; upperAngleLimit: CGFloat): Pointer; cdecl;
+  SKPhysicsJointPin = interface(SKPhysicsJoint)
+    ['{8DE96C29-AF85-4AEF-AA93-ECAFF936EC44}']
+    function frictionTorque: CGFloat; cdecl;
     function lowerAngleLimit: CGFloat; cdecl;
+    function rotationSpeed: CGFloat; cdecl;
+    procedure setFrictionTorque(frictionTorque: CGFloat); cdecl;
     procedure setLowerAngleLimit(lowerAngleLimit: CGFloat); cdecl;
+    procedure setRotationSpeed(rotationSpeed: CGFloat); cdecl;
+    procedure setShouldEnableLimits(shouldEnableLimits: Boolean); cdecl;
     procedure setUpperAngleLimit(upperAngleLimit: CGFloat); cdecl;
+    function shouldEnableLimits: Boolean; cdecl;
     function upperAngleLimit: CGFloat; cdecl;
   end;
-  TSKReachConstraints = class(TOCGenericImport<SKReachConstraintsClass, SKReachConstraints>) end;
+  TSKPhysicsJointPin = class(TOCGenericImport<SKPhysicsJointPinClass, SKPhysicsJointPin>) end;
 
-  SKAttributeValueClass = interface(NSObjectClass)
-    ['{EA545B33-8219-499E-B542-DBE258B71964}']
+  SKPhysicsJointSpringClass = interface(SKPhysicsJointClass)
+    ['{3BBD7813-928E-4A8E-9B26-E32402E7C903}']
+    {class} function jointWithBodyA(bodyA: SKPhysicsBody; bodyB: SKPhysicsBody; anchorA: CGPoint; anchorB: CGPoint): SKPhysicsJointSpring; cdecl;
   end;
 
-  SKAttributeValue = interface(NSObject)
-    ['{A6C6FCF3-5678-4E1C-878B-F9D7C7C68100}']
-    function floatValue: Single; cdecl;
-    procedure setFloatValue(floatValue: Single); cdecl;
-    procedure setVectorFloat2Value(vectorFloat2Value: vector_float2); cdecl;
-    procedure setVectorFloat3Value(vectorFloat3Value: vector_float3); cdecl;
-    procedure setVectorFloat4Value(vectorFloat4Value: vector_float4); cdecl;
-    function vectorFloat2Value: vector_float2; cdecl;
-    function vectorFloat3Value: vector_float3; cdecl;
-    function vectorFloat4Value: vector_float4; cdecl;
+  SKPhysicsJointSpring = interface(SKPhysicsJoint)
+    ['{91565458-C96A-498E-AEA7-8DE7209CAFAD}']
+    function damping: CGFloat; cdecl;
+    function frequency: CGFloat; cdecl;
+    procedure setDamping(damping: CGFloat); cdecl;
+    procedure setFrequency(frequency: CGFloat); cdecl;
   end;
-  TSKAttributeValue = class(TOCGenericImport<SKAttributeValueClass, SKAttributeValue>) end;
+  TSKPhysicsJointSpring = class(TOCGenericImport<SKPhysicsJointSpringClass, SKPhysicsJointSpring>) end;
 
-  SKEffectNodeClass = interface(SKNodeClass)
-    ['{2453D11B-BF35-4C12-93D0-70A028EEDACC}']
+  SKPhysicsJointFixedClass = interface(SKPhysicsJointClass)
+    ['{43C0BF62-A8A3-4066-B5C4-EE3A2B5F164D}']
+    {class} function jointWithBodyA(bodyA: SKPhysicsBody; bodyB: SKPhysicsBody; anchor: CGPoint): SKPhysicsJointFixed; cdecl;
   end;
 
-  SKEffectNode = interface(SKNode)
-    ['{5B9854DF-D939-4C11-B6C0-40216061A238}']
-    function attributeValues: NSDictionary; cdecl;
-    function blendMode: SKBlendMode; cdecl;
-    function filter: CIFilter; cdecl;
-    procedure setAttributeValues(attributeValues: NSDictionary); cdecl;
-    procedure setBlendMode(blendMode: SKBlendMode); cdecl;
-    procedure setFilter(filter: CIFilter); cdecl;
-    procedure setShader(shader: SKShader); cdecl;
-    procedure setShouldCenterFilter(shouldCenterFilter: Boolean); cdecl;
-    procedure setShouldEnableEffects(shouldEnableEffects: Boolean); cdecl;
-    procedure setShouldRasterize(shouldRasterize: Boolean); cdecl;
-    procedure setValue(value: SKAttributeValue; forAttributeNamed: NSString); cdecl;
-    function shader: SKShader; cdecl;
-    function shouldCenterFilter: Boolean; cdecl;
-    function shouldEnableEffects: Boolean; cdecl;
-    function shouldRasterize: Boolean; cdecl;
-    function valueForAttributeNamed(key: NSString): SKAttributeValue; cdecl;
+  SKPhysicsJointFixed = interface(SKPhysicsJoint)
+    ['{30D9932E-1DE4-4172-8E1B-53EC71112BA5}']
   end;
-  TSKEffectNode = class(TOCGenericImport<SKEffectNodeClass, SKEffectNode>) end;
+  TSKPhysicsJointFixed = class(TOCGenericImport<SKPhysicsJointFixedClass, SKPhysicsJointFixed>) end;
 
-  SKSceneDelegate = interface(IObjectiveC)
-    ['{7A39BA27-EC2D-4BCF-AAA0-268DECF9ED78}']
-    procedure didApplyConstraintsForScene(scene: SKScene); cdecl;
-    procedure didEvaluateActionsForScene(scene: SKScene); cdecl;
-    procedure didFinishUpdateForScene(scene: SKScene); cdecl;
-    procedure didSimulatePhysicsForScene(scene: SKScene); cdecl;
-    procedure update(currentTime: NSTimeInterval; forScene: SKScene); cdecl;
+  SKPhysicsJointSlidingClass = interface(SKPhysicsJointClass)
+    ['{72EA3C51-E145-4633-8F2D-5B398274297F}']
+    {class} function jointWithBodyA(bodyA: SKPhysicsBody; bodyB: SKPhysicsBody; anchor: CGPoint; axis: CGVector): SKPhysicsJointSliding; cdecl;
   end;
 
-  SKSceneClass = interface(SKEffectNodeClass)
-    ['{10138F18-0267-4473-BDC0-EFD7C0FEE1A6}']
+  SKPhysicsJointSliding = interface(SKPhysicsJoint)
+    ['{84636150-CAC6-49A0-9D1D-AAA0AEED4F79}']
+    function lowerDistanceLimit: CGFloat; cdecl;
+    procedure setLowerDistanceLimit(lowerDistanceLimit: CGFloat); cdecl;
+    procedure setShouldEnableLimits(shouldEnableLimits: Boolean); cdecl;
+    procedure setUpperDistanceLimit(upperDistanceLimit: CGFloat); cdecl;
+    function shouldEnableLimits: Boolean; cdecl;
+    function upperDistanceLimit: CGFloat; cdecl;
+  end;
+  TSKPhysicsJointSliding = class(TOCGenericImport<SKPhysicsJointSlidingClass, SKPhysicsJointSliding>) end;
+
+  SKPhysicsJointLimitClass = interface(SKPhysicsJointClass)
+    ['{BFD86759-1B49-4CC8-B62A-3323CA201899}']
+    {class} function jointWithBodyA(bodyA: SKPhysicsBody; bodyB: SKPhysicsBody; anchorA: CGPoint; anchorB: CGPoint): SKPhysicsJointLimit; cdecl;
   end;
 
-  SKScene = interface(SKEffectNode)
-    ['{81CED3FE-6D48-4A25-86AF-0D3F58699A5D}']
-    function anchorPoint: CGPoint; cdecl;
-    function audioEngine: AVAudioEngine; cdecl;
-    function backgroundColor: UIColor; cdecl;
-    function camera: SKCameraNode; cdecl;
-    function convertPointFromView(point: CGPoint): CGPoint; cdecl;
-    function convertPointToView(point: CGPoint): CGPoint; cdecl;
-    function delegate: Pointer; cdecl;
-    procedure didApplyConstraints; cdecl;
-    procedure didChangeSize(oldSize: CGSize); cdecl;
-    procedure didEvaluateActions; cdecl;
-    procedure didFinishUpdate; cdecl;
-    procedure didMoveToView(view: SKView); cdecl;
-    procedure didSimulatePhysics; cdecl;
-    function initWithSize(size: CGSize): Pointer; cdecl;
-    function listener: SKNode; cdecl;
-    function physicsWorld: SKPhysicsWorld; cdecl;
-    function scaleMode: SKSceneScaleMode; cdecl;
-    procedure sceneDidLoad; cdecl;
-    procedure setAnchorPoint(anchorPoint: CGPoint); cdecl;
-    procedure setBackgroundColor(backgroundColor: UIColor); cdecl;
-    procedure setCamera(camera: SKCameraNode); cdecl;
-    procedure setDelegate(delegate: Pointer); cdecl;
-    procedure setListener(listener: SKNode); cdecl;
-    procedure setScaleMode(scaleMode: SKSceneScaleMode); cdecl;
-    procedure setSize(size: CGSize); cdecl;
-    function size: CGSize; cdecl;
-    procedure update(currentTime: NSTimeInterval); cdecl;
-    function view: SKView; cdecl;
-    procedure willMoveFromView(view: SKView); cdecl;
+  SKPhysicsJointLimit = interface(SKPhysicsJoint)
+    ['{C57A0D4E-01BF-4116-8F05-F7DD4ABA9EBA}']
+    function maxLength: CGFloat; cdecl;
+    procedure setMaxLength(maxLength: CGFloat); cdecl;
   end;
-  TSKScene = class(TOCGenericImport<SKSceneClass, SKScene>) end;
+  TSKPhysicsJointLimit = class(TOCGenericImport<SKPhysicsJointLimitClass, SKPhysicsJointLimit>) end;
 
-  SKCameraNodeClass = interface(SKNodeClass)
-    ['{735FB7BB-4DD2-4ACA-A091-B0D86F2B00AC}']
+  SKPhysicsContactClass = interface(NSObjectClass)
+    ['{B73FA232-8D34-4E33-957E-4459F0005B40}']
   end;
 
-  SKCameraNode = interface(SKNode)
-    ['{BC965E50-661A-4A49-951F-88C0FC40EBC4}']
-    function containedNodeSet: NSSet; cdecl;
-    function containsNode(node: SKNode): Boolean; cdecl;
+  SKPhysicsContact = interface(NSObject)
+    ['{FD34A950-E1DC-4868-8584-621718671FF4}']
+    function bodyA: SKPhysicsBody; cdecl;
+    function bodyB: SKPhysicsBody; cdecl;
+    function collisionImpulse: CGFloat; cdecl;
+    function contactNormal: CGVector; cdecl;
+    function contactPoint: CGPoint; cdecl;
   end;
-  TSKCameraNode = class(TOCGenericImport<SKCameraNodeClass, SKCameraNode>) end;
+  TSKPhysicsContact = class(TOCGenericImport<SKPhysicsContactClass, SKPhysicsContact>) end;
 
-  SKViewDelegate = interface(IObjectiveC)
-    ['{733B368A-887A-46F3-919C-7B6C61C8CEE3}']
-    function view(view: SKView; shouldRenderAtTime: NSTimeInterval): Boolean; cdecl;
+  SKPhysicsContactDelegate = interface(IObjectiveC)
+    ['{E480A60D-6497-4131-8536-63A1A7C2F315}']
+    procedure didBeginContact(contact: SKPhysicsContact); cdecl;
+    procedure didEndContact(contact: SKPhysicsContact); cdecl;
   end;
-
-  SKViewClass = interface(UIViewClass)
-    ['{6F6C33A1-EF24-450E-866F-72C3AFBD195A}']
-  end;
-
-  SKView = interface(UIView)
-    ['{716AB9B5-9226-485F-BE0F-0978271E629E}']
-    function allowsTransparency: Boolean; cdecl;
-    [MethodName('convertPoint:fromScene:')]
-    function convertPointFromScene(point: CGPoint; fromScene: SKScene): CGPoint; cdecl;
-    [MethodName('convertPoint:toScene:')]
-    function convertPointToScene(point: CGPoint; toScene: SKScene): CGPoint; cdecl;
-    function delegate: NSObject; cdecl;
-    function disableDepthStencilBuffer: Boolean; cdecl;
-    function frameInterval: NSInteger; cdecl;
-    function ignoresSiblingOrder: Boolean; cdecl;
-    function isAsynchronous: Boolean; cdecl;
-    function isPaused: Boolean; cdecl;
-    function preferredFrameRate: Single; cdecl;
-    function preferredFramesPerSecond: NSInteger; cdecl;
-    procedure presentScene(scene: SKScene; transition: SKTransition); overload; cdecl;
-    procedure presentScene(scene: SKScene); overload; cdecl;
-    function scene: SKScene; cdecl;
-    procedure setAllowsTransparency(allowsTransparency: Boolean); cdecl;
-    procedure setAsynchronous(asynchronous: Boolean); cdecl;
-    procedure setDelegate(delegate: NSObject); cdecl;
-    procedure setDisableDepthStencilBuffer(disableDepthStencilBuffer: Boolean); cdecl;
-    procedure setFrameInterval(frameInterval: NSInteger); cdecl;
-    procedure setIgnoresSiblingOrder(ignoresSiblingOrder: Boolean); cdecl;
-    procedure setPaused(paused: Boolean); cdecl;
-    procedure setPreferredFrameRate(preferredFrameRate: Single); cdecl;
-    procedure setPreferredFramesPerSecond(preferredFramesPerSecond: NSInteger); cdecl;
-    procedure setShouldCullNonVisibleNodes(shouldCullNonVisibleNodes: Boolean); cdecl;
-    procedure setShowsDrawCount(showsDrawCount: Boolean); cdecl;
-    procedure setShowsFields(showsFields: Boolean); cdecl;
-    procedure setShowsFPS(showsFPS: Boolean); cdecl;
-    procedure setShowsNodeCount(showsNodeCount: Boolean); cdecl;
-    procedure setShowsPhysics(showsPhysics: Boolean); cdecl;
-    procedure setShowsQuadCount(showsQuadCount: Boolean); cdecl;
-    function shouldCullNonVisibleNodes: Boolean; cdecl;
-    function showsDrawCount: Boolean; cdecl;
-    function showsFields: Boolean; cdecl;
-    function showsFPS: Boolean; cdecl;
-    function showsNodeCount: Boolean; cdecl;
-    function showsPhysics: Boolean; cdecl;
-    function showsQuadCount: Boolean; cdecl;
-    function textureFromNode(node: SKNode): SKTexture; overload; cdecl;
-    function textureFromNode(node: SKNode; crop: CGRect): SKTexture; overload; cdecl;
-  end;
-  TSKView = class(TOCGenericImport<SKViewClass, SKView>) end;
 
   SKPhysicsWorldClass = interface(NSObjectClass)
-    ['{3B2F7C99-EF26-42F7-AFEA-EA036EBEF0A6}']
+    ['{149667C5-435E-4AEC-9F0F-23E45224128D}']
   end;
 
   SKPhysicsWorld = interface(NSObject)
-    ['{A19297C7-5B7F-43BB-8B8C-C41AE262E1DB}']
+    ['{28595B07-1C99-4B13-A2E3-2906DDC9B27F}']
     procedure addJoint(joint: SKPhysicsJoint); cdecl;
     function bodyAlongRayStart(start: CGPoint; &end: CGPoint): SKPhysicsBody; cdecl;
     function bodyAtPoint(point: CGPoint): SKPhysicsBody; cdecl;
@@ -1341,105 +1679,24 @@ type
   end;
   TSKPhysicsWorld = class(TOCGenericImport<SKPhysicsWorldClass, SKPhysicsWorld>) end;
 
-  SKPhysicsJointPinClass = interface(SKPhysicsJointClass)
-    ['{E0AE76C7-8067-4B93-91AD-8299A2BD1BE1}']
+  SKAudioNodeClass = interface(SKNodeClass)
+    ['{F5A72350-1F62-42AF-9408-302F18DF2FA3}']
   end;
 
-  SKPhysicsJointPin = interface(SKPhysicsJoint)
-    ['{664DEE43-B8C7-402C-9757-357B2E8B14C0}']
-    function frictionTorque: CGFloat; cdecl;
-    function lowerAngleLimit: CGFloat; cdecl;
-    function rotationSpeed: CGFloat; cdecl;
-    procedure setFrictionTorque(frictionTorque: CGFloat); cdecl;
-    procedure setLowerAngleLimit(lowerAngleLimit: CGFloat); cdecl;
-    procedure setRotationSpeed(rotationSpeed: CGFloat); cdecl;
-    procedure setShouldEnableLimits(shouldEnableLimits: Boolean); cdecl;
-    procedure setUpperAngleLimit(upperAngleLimit: CGFloat); cdecl;
-    function shouldEnableLimits: Boolean; cdecl;
-    function upperAngleLimit: CGFloat; cdecl;
+  SKAudioNode = interface(SKNode)
+    ['{D1E4C90C-3164-47C5-9DF6-C7D5564D4811}']
+    function autoplayLooped: Boolean; cdecl;
+    function avAudioNode: AVAudioNode; cdecl;
+    function initWithAVAudioNode(node: AVAudioNode): Pointer; cdecl;
+    function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
+    function initWithFileNamed(name: NSString): Pointer; cdecl;
+    function initWithURL(url: NSURL): Pointer; cdecl;
+    function isPositional: Boolean; cdecl;
+    procedure setAutoplayLooped(autoplayLooped: Boolean); cdecl;
+    procedure setAvAudioNode(avAudioNode: AVAudioNode); cdecl;
+    procedure setPositional(positional: Boolean); cdecl;
   end;
-  TSKPhysicsJointPin = class(TOCGenericImport<SKPhysicsJointPinClass, SKPhysicsJointPin>) end;
-
-  SKPhysicsJointSpringClass = interface(SKPhysicsJointClass)
-    ['{178E0271-2ED1-43CA-8EDC-996C42B4C21B}']
-  end;
-
-  SKPhysicsJointSpring = interface(SKPhysicsJoint)
-    ['{7E2C5B28-EF96-40BB-9CC1-DA199F3C76B7}']
-    function damping: CGFloat; cdecl;
-    function frequency: CGFloat; cdecl;
-    procedure setDamping(damping: CGFloat); cdecl;
-    procedure setFrequency(frequency: CGFloat); cdecl;
-  end;
-  TSKPhysicsJointSpring = class(TOCGenericImport<SKPhysicsJointSpringClass, SKPhysicsJointSpring>) end;
-
-  SKPhysicsJointFixedClass = interface(SKPhysicsJointClass)
-    ['{3C720B37-B7A3-42AD-8027-74974C1992A2}']
-  end;
-
-  SKPhysicsJointFixed = interface(SKPhysicsJoint)
-    ['{2D8E7072-F4E6-4CA6-B0A1-8BD131D64B23}']
-  end;
-  TSKPhysicsJointFixed = class(TOCGenericImport<SKPhysicsJointFixedClass, SKPhysicsJointFixed>) end;
-
-  SKPhysicsJointSlidingClass = interface(SKPhysicsJointClass)
-    ['{0B8F0C8D-9C32-4D04-88B3-5942A2DFD755}']
-  end;
-
-  SKPhysicsJointSliding = interface(SKPhysicsJoint)
-    ['{2DA08E1A-BDE3-4991-B511-4D66F1543295}']
-    function lowerDistanceLimit: CGFloat; cdecl;
-    procedure setLowerDistanceLimit(lowerDistanceLimit: CGFloat); cdecl;
-    procedure setShouldEnableLimits(shouldEnableLimits: Boolean); cdecl;
-    procedure setUpperDistanceLimit(upperDistanceLimit: CGFloat); cdecl;
-    function shouldEnableLimits: Boolean; cdecl;
-    function upperDistanceLimit: CGFloat; cdecl;
-  end;
-  TSKPhysicsJointSliding = class(TOCGenericImport<SKPhysicsJointSlidingClass, SKPhysicsJointSliding>) end;
-
-  SKPhysicsJointLimitClass = interface(SKPhysicsJointClass)
-    ['{E4BF27C9-5DD6-4768-BCA1-80D74A2F0681}']
-  end;
-
-  SKPhysicsJointLimit = interface(SKPhysicsJoint)
-    ['{1F6C2DD3-AD20-4ACB-A64E-F4EA69665244}']
-    function maxLength: CGFloat; cdecl;
-    procedure setMaxLength(maxLength: CGFloat); cdecl;
-  end;
-  TSKPhysicsJointLimit = class(TOCGenericImport<SKPhysicsJointLimitClass, SKPhysicsJointLimit>) end;
-
-  SKPhysicsContactClass = interface(NSObjectClass)
-    ['{5077AF6F-7A84-4DEA-B877-2873E463C879}']
-  end;
-
-  SKPhysicsContact = interface(NSObject)
-    ['{909E0ECA-5094-4F1A-AB8D-BBA0721E7739}']
-    function bodyA: SKPhysicsBody; cdecl;
-    function bodyB: SKPhysicsBody; cdecl;
-    function collisionImpulse: CGFloat; cdecl;
-    function contactNormal: CGVector; cdecl;
-    function contactPoint: CGPoint; cdecl;
-  end;
-  TSKPhysicsContact = class(TOCGenericImport<SKPhysicsContactClass, SKPhysicsContact>) end;
-
-  SKPhysicsContactDelegate = interface(IObjectiveC)
-    ['{6725ED28-6FFE-4C8F-A950-B70743795297}']
-    procedure didBeginContact(contact: SKPhysicsContact); cdecl;
-    procedure didEndContact(contact: SKPhysicsContact); cdecl;
-  end;
-
-  SKTransitionClass = interface(NSObjectClass)
-    ['{6D07EFB7-330B-4F25-8D8D-F30DE81C536F}']
-  end;
-
-  SKTransition = interface(NSObject)
-    ['{996E4E6D-9C90-4C77-98A3-067AAC5A57F6}']
-    function pausesIncomingScene: Boolean; cdecl;
-    function pausesOutgoingScene: Boolean; cdecl;
-    procedure setPausesIncomingScene(pausesIncomingScene: Boolean); cdecl;
-    procedure setPausesOutgoingScene(pausesOutgoingScene: Boolean); cdecl;
-  end;
-  TSKTransition = class(TOCGenericImport<SKTransitionClass, SKTransition>) end;
+  TSKAudioNode = class(TOCGenericImport<SKAudioNodeClass, SKAudioNode>) end;
 
 const
   libSpriteKit = '/System/Library/Frameworks/SpriteKit.framework/SpriteKit';
