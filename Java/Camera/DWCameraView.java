@@ -24,6 +24,8 @@ import java.lang.Math;
 
 public class DWCameraView extends TextureView implements TextureView.SurfaceTextureListener {
   
+  private static final String TAG = "DWCameraView";
+
   public interface StateDelegate {
     void onReady(DWCameraView view);
     void onDestroyed(DWCameraView view) throws Exception;
@@ -32,7 +34,6 @@ public class DWCameraView extends TextureView implements TextureView.SurfaceText
   private Size mPreviewSize;
   private StateDelegate mStateDelegate;
   private boolean mMirror = false;
-  private Size mViewSize = new Size(0, 0);
 
   public DWCameraView(Context context) {
     super(context, null);
@@ -108,25 +109,26 @@ public class DWCameraView extends TextureView implements TextureView.SurfaceText
 
   private void adjustViewRotation(int previewWidth, int previewHeight, int rotation) {
     Matrix txform = new Matrix();
-    int viewWidth = getWidth();
-    int viewHeight = getHeight();
+    // int viewWidth = getWidth();
+    // int viewHeight = getHeight();
+    // Log.d(TAG, "> View size: " + Integer.toString(viewWidth) + ", " + Integer.toString(viewHeight));
+    int viewWidth = previewWidth;
+    int viewHeight = previewHeight;
     RectF rectView = new RectF(0, 0, viewWidth, viewHeight);
     float viewCenterX = rectView.centerX();
     float viewCenterY = rectView.centerY();
     RectF rectPreview = new RectF(0, 0, previewHeight, previewWidth);
     float previewCenterX = rectPreview.centerX();
     float previewCenterY = rectPreview.centerY();
-
     if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-      rectPreview.offset(viewCenterX-previewCenterX, viewCenterY-previewCenterY);
+      rectPreview.offset(viewCenterX - previewCenterX, viewCenterY - previewCenterY);
       txform.setRectToRect(rectView, rectPreview, Matrix.ScaleToFit.FILL);
-      float scale = Math.max((float)viewHeight/previewHeight, (float)viewWidth/previewWidth);
+      float scale = Math.max((float)viewHeight / previewHeight, (float)viewWidth / previewWidth);
       txform.postScale(scale, scale, viewCenterX, viewCenterY);
-      txform.postRotate(90*(rotation-2), viewCenterX, viewCenterY);
-    } else {
-      if (Surface.ROTATION_180 == rotation) {
-        txform.postRotate(180, viewCenterX, viewCenterY);
-      }
+      txform.postRotate(90 * (rotation - 2), viewCenterX, viewCenterY);
+    } 
+    else if (Surface.ROTATION_180 == rotation) {
+      txform.postRotate(180, viewCenterX, viewCenterY);
     }
     if (mMirror) {
       txform.postScale(-1, 1, viewCenterX, viewCenterY);

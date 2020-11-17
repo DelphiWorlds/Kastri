@@ -64,7 +64,8 @@ type
     function GetOrientation(const ARotation: Integer): Integer;
     function GetPreviewControl: TControl;
     procedure InternalStartSession;
-    procedure PreviewOrientationChangeHandler(Sender: TObject);
+    procedure OrientationChangeHandler(Sender: TObject);
+    procedure SizeChangeHandler(Sender: TObject);
     procedure StartThread;
     procedure StopThread;
     procedure UpdateFlashMode;
@@ -138,7 +139,7 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI, Androidapi.JNI.App, Androidapi.JNI.JavaTypes,
   // FMX
-  FMX.Media,
+  FMX.Forms, FMX.Media,
   // DW
   DW.OSLog,
   DW.CameraPreview.Android, DW.Android.Helpers, DW.Consts.Android, DW.UIHelper, DW.Types;
@@ -348,7 +349,8 @@ begin
   FCaptureSessionStateCallback := TJDWCameraCaptureSessionStateCallback.JavaClass.init(FCaptureSessionStateCallbackDelegate);
   FPreview := TCameraPreview.Create(nil);
   FPreview.Align := TAlignLayout.Center;
-  FPreview.OnOrientationChange := PreviewOrientationChangeHandler;
+  FPreview.OnOrientationChange := OrientationChangeHandler;
+  FPreview.OnSizeChange := SizeChangeHandler;
   FSurfaceTextureListener := TSurfaceTextureListener.Create(Self);
   FCameraView := TAndroidCameraPreview(FPreview.Presentation).View;
   FCameraView.setSurfaceTextureListener(FSurfaceTextureListener);
@@ -399,6 +401,16 @@ begin
   FHandler := nil;
 end;
 
+procedure TCameraCaptureSession.CreatePreviewSurface;
+begin
+  FPreviewSurface := nil;
+  FSurfaceTexture.setDefaultBufferSize(PlatformCamera.ViewSize.getWidth, PlatformCamera.ViewSize.getHeight);
+  FPreviewSurface := TJSurface.JavaClass.init(FSurfaceTexture);
+  UpdatePreview;
+  if FIsStarting then
+    InternalStartSession;
+end;
+
 procedure TCameraCaptureSession.SurfaceTextureAvailable(surface: JSurfaceTexture; width, height: Integer);
 begin
   FSurfaceTexture := surface;
@@ -410,37 +422,37 @@ begin
   FSurfaceTexture := nil;
 end;
 
-procedure TCameraCaptureSession.CreatePreviewSurface;
+procedure TCameraCaptureSession.OrientationChangeHandler(Sender: TObject);
 begin
-  FPreviewSurface := nil;
-  FSurfaceTexture.setDefaultBufferSize(PlatformCamera.ViewSize.getWidth, PlatformCamera.ViewSize.getHeight);
-  FPreviewSurface := TJSurface.JavaClass.init(FSurfaceTexture);
-  UpdatePreview;
-  if FIsStarting then
-    InternalStartSession;
+  //
+end;
+
+procedure TCameraCaptureSession.SizeChangeHandler(Sender: TObject);
+begin
+  if FIsCapturing then
+    UpdatePreview;
 end;
 
 procedure TCameraCaptureSession.UpdatePreview;
 var
   LScale, LScreenScale: Single;
   LSize: TSizeF;
-  LViewSize: TSize;
+  LViewSize, LPreviewSize: TSize;
+  LIsPortrait: Boolean;
 begin
-  if TUIHelper.GetScreenOrientation in [TScreenOrientation.Portrait, TScreenOrientation.InvertedPortrait] then
+  LIsPortrait := Screen.Height > Screen.Width;
+  if LIsPortrait then
     LViewSize := TSize.Create(PlatformCamera.ViewSize.getWidth, PlatformCamera.ViewSize.getHeight)
   else
     LViewSize := TSize.Create(PlatformCamera.ViewSize.getHeight, PlatformCamera.ViewSize.getWidth);
-  LScale := Max(FPreview.ParentControl.Width / LViewSize.cx, FPreview.ParentControl.Height / LViewSize.cy);
-  LSize := TSizeF.Create(LViewSize.cx * LScale, LViewSize.cy * LScale);
+  if LIsPortrait then
+    LSize := TSizeF.Create(FPreview.ParentControl.Height * (LViewSize.cy / LViewSize.cx), FPreview.ParentControl.Height)
+  else
+    LSize := TSizeF.Create(FPreview.ParentControl.Width, FPreview.ParentControl.Width * (LViewSize.cx / LViewSize.cy));
   FPreview.Size.Size := LSize;
   LScreenScale := TAndroidCameraPreview(FPreview.Presentation).ScreenScale;
-  FCameraView.setPreviewSize(TJutil_Size.JavaClass.init(Round(LSize.cx * LScreenScale), Round(LSize.cy * LScreenScale)));
-end;
-
-procedure TCameraCaptureSession.PreviewOrientationChangeHandler(Sender: TObject);
-begin
-  if FPlatformCamera.IsActive then
-    UpdatePreview;
+  LPreviewSize := TSize.Create(Round(FPreview.Size.Size.cx * LScreenScale), Round(FPreview.Size.Size.cy * LScreenScale));
+  FCameraView.setPreviewSize(TJutil_Size.JavaClass.init(LPreviewSize.cx, LPreviewSize.cy));
 end;
 
 procedure TCameraCaptureSession.CreateStillReader;
@@ -840,11 +852,12 @@ begin
   for I := 0 to FAvailableViewSizes.Length - 1 do
   begin
     LSize := FAvailableViewSizes.Items[I];
+    // TOSLog.d('View size: %d x %d', [LSize.getWidth, LSize.getHeight]);
     if ((FViewSize = nil) or (GetSizeArea(LSize) > GetSizeArea(FViewSize))) then
       FViewSize := LSize;
   end;
   if (FViewSize <> nil) and ((FCameraOrientation mod 180) <> 0) then
-    FViewSize := TJutil_Size.JavaClass.init(FViewSize.getHeight, FViewSize.getWidth);
+    FViewSize := TJutil_Size.JavaClass.init(FViewSize.getWidth, FViewSize.getHeight);
 end;
 
 function TPlatformCamera.SizeFitsInPreview(const ASize: Jutil_Size): Boolean;
