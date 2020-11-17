@@ -45,7 +45,6 @@ type
     FView: JDWCameraView;
   protected
     function CreateView: JView; override;
-    procedure PMSetSize(var AMessage: TDispatchMessageWithValue<TSizeF>); message PM_SET_SIZE;
   public
     constructor Create; override;
     property View: JDWCameraView read FView;
@@ -94,11 +93,6 @@ begin
   FView := TJDWCameraView.JavaClass.init(TAndroidHelper.Activity);
   FView.setStateDelegate(FStateDelegate);
   Result := FView;
-end;
-
-procedure TAndroidCameraPreview.PMSetSize(var AMessage: TDispatchMessageWithValue<TSizeF>);
-begin
-  inherited PMSetSize(AMessage);
 end;
 
 initialization
