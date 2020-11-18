@@ -144,6 +144,40 @@ type
   TJNotificationChannelGroup = class(TJavaGenericImport<JNotificationChannelGroupClass, JNotificationChannelGroup>)
   end;
 
+  JNotificationManagerClass = interface(JObjectClass)
+    ['{66101C50-DAE9-4C81-8186-81A0A43A73BD}']
+    {class} function _GetACTION_INTERRUPTION_FILTER_CHANGED: JString; cdecl;
+    {class} function _GetACTION_NOTIFICATION_POLICY_ACCESS_GRANTED_CHANGED: JString; cdecl;
+    {class} function _GetACTION_NOTIFICATION_POLICY_CHANGED: JString; cdecl;
+    {class} function _GetIMPORTANCE_DEFAULT: Integer; cdecl;
+    {class} function _GetIMPORTANCE_HIGH: Integer; cdecl;
+    {class} function _GetIMPORTANCE_LOW: Integer; cdecl;
+    {class} function _GetIMPORTANCE_MAX: Integer; cdecl;
+    {class} function _GetIMPORTANCE_MIN: Integer; cdecl;
+    {class} function _GetIMPORTANCE_NONE: Integer; cdecl;
+    {class} function _GetIMPORTANCE_UNSPECIFIED: Integer; cdecl;
+    {class} function _GetINTERRUPTION_FILTER_ALARMS: Integer; cdecl;
+    {class} function _GetINTERRUPTION_FILTER_ALL: Integer; cdecl;
+    {class} function _GetINTERRUPTION_FILTER_NONE: Integer; cdecl;
+    {class} function _GetINTERRUPTION_FILTER_PRIORITY: Integer; cdecl;
+    {class} function _GetINTERRUPTION_FILTER_UNKNOWN: Integer; cdecl;
+    {class} property ACTION_INTERRUPTION_FILTER_CHANGED: JString read _GetACTION_INTERRUPTION_FILTER_CHANGED;
+    {class} property ACTION_NOTIFICATION_POLICY_ACCESS_GRANTED_CHANGED: JString read _GetACTION_NOTIFICATION_POLICY_ACCESS_GRANTED_CHANGED;
+    {class} property ACTION_NOTIFICATION_POLICY_CHANGED: JString read _GetACTION_NOTIFICATION_POLICY_CHANGED;
+    {class} property IMPORTANCE_DEFAULT: Integer read _GetIMPORTANCE_DEFAULT;
+    {class} property IMPORTANCE_HIGH: Integer read _GetIMPORTANCE_HIGH;
+    {class} property IMPORTANCE_LOW: Integer read _GetIMPORTANCE_LOW;
+    {class} property IMPORTANCE_MAX: Integer read _GetIMPORTANCE_MAX;
+    {class} property IMPORTANCE_MIN: Integer read _GetIMPORTANCE_MIN;
+    {class} property IMPORTANCE_NONE: Integer read _GetIMPORTANCE_NONE;
+    {class} property IMPORTANCE_UNSPECIFIED: Integer read _GetIMPORTANCE_UNSPECIFIED;
+    {class} property INTERRUPTION_FILTER_ALARMS: Integer read _GetINTERRUPTION_FILTER_ALARMS;
+    {class} property INTERRUPTION_FILTER_ALL: Integer read _GetINTERRUPTION_FILTER_ALL;
+    {class} property INTERRUPTION_FILTER_NONE: Integer read _GetINTERRUPTION_FILTER_NONE;
+    {class} property INTERRUPTION_FILTER_PRIORITY: Integer read _GetINTERRUPTION_FILTER_PRIORITY;
+    {class} property INTERRUPTION_FILTER_UNKNOWN: Integer read _GetINTERRUPTION_FILTER_UNKNOWN;
+  end;
+
   [JavaSignature('android/app/NotificationManager')]
   JNotificationManager = interface(Androidapi.JNI.App.JNotificationManager)
     ['{F2C96815-29C4-4A83-994A-4F49F30B8CF4}']
