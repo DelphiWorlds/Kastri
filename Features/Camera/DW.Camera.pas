@@ -309,6 +309,7 @@ end;
 
 procedure TCustomPlatformCamera.DoCapturedImage(const AImageStream: TStream);
 begin
+  AImageStream.Position := 0;
   FCamera.DoCapturedImage(AImageStream);
 end;
 
@@ -319,6 +320,7 @@ end;
 
 procedure TCustomPlatformCamera.DoDetectedFaces(const AImageStream: TStream; const AFaces: TFaces);
 begin
+  AImageStream.Position := 0;
   FCamera.DoDetectedFaces(AImageStream, AFaces);
 end;
 
