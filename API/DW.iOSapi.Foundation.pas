@@ -37,6 +37,7 @@ const
 type
   NSLocale = interface;
   NSPersonNameComponents = interface;
+  NSProgress = interface;
   NSUserActivity = interface;
 
   NSErrorDomain = NSString;
@@ -45,7 +46,19 @@ type
   NSNotificationName = NSString;
   NSLocaleLanguageDirection = NSInteger;
   NSUserActivityPersistentIdentifier = NSString;
+  NSProgressKind = NSString;
+  NSProgressUserInfoKey = NSString;
+  NSProgressFileOperationKind = NSString;
+  NSItemProviderRepresentationVisibility = NSInteger;
+  NSItemProviderFileOptions = NSInteger;
 
+  NSProgressUnpublishingHandler = procedure of object;
+  NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
+
+  TNSProgressBlockMethod1 = procedure of object;
+  TNSProgressBlockMethod2 = procedure of object;
+  TNSProgressBlockMethod3 = procedure of object;
+  TNSProgressBlockMethod4 = procedure of object;
   TNSUserActivityBlockMethod1 = procedure(inputStream: NSInputStream; outputStream: NSOutputStream; error: NSError) of object;
   TNSUserActivityBlockMethod2 = procedure of object;
 
@@ -182,6 +195,83 @@ type
     function webpageURL: NSURL; cdecl;
   end;
   TNSUserActivity = class(TOCGenericImport<NSUserActivityClass, NSUserActivity>) end;
+
+  NSProgressClass = interface(NSObjectClass)
+    ['{3C858ECE-7543-4485-90A3-EFAEB626797D}']
+    [MethodName('addSubscriberForFileURL:withPublishingHandler:')]
+    {class} function addSubscriberForFileURL(url: NSURL; publishingHandler: NSProgressPublishingHandler): Pointer; cdecl;
+    {class} function currentProgress: NSProgress; cdecl;
+    {class} function discreteProgressWithTotalUnitCount(unitCount: Int64): NSProgress; cdecl;
+    {class} function progressWithTotalUnitCount(unitCount: Int64): NSProgress; overload; cdecl;
+    [MethodName('progressWithTotalUnitCount:parent:pendingUnitCount:')]
+    {class} function progressWithTotalUnitCount(unitCount: Int64; parent: NSProgress; portionOfParentTotalUnitCount: Int64): NSProgress; overload; cdecl;
+    {class} procedure removeSubscriber(subscriber: Pointer); cdecl;
+  end;
+
+  NSProgress = interface(NSObject)
+    ['{5A99845A-FED5-419C-B87F-9F7A6A215A71}']
+    [MethodName('addChild:withPendingUnitCount:')]
+    procedure addChild(child: NSProgress; inUnitCount: Int64); cdecl;
+    procedure becomeCurrentWithPendingUnitCount(unitCount: Int64); cdecl;
+    procedure cancel; cdecl;
+    function cancellationHandler: TNSProgressBlockMethod1; cdecl;
+    function completedUnitCount: Int64; cdecl;
+    function estimatedTimeRemaining: NSNumber; cdecl;
+    function fileCompletedCount: NSNumber; cdecl;
+    function fileOperationKind: NSProgressFileOperationKind; cdecl;
+    function fileTotalCount: NSNumber; cdecl;
+    function fileURL: NSURL; cdecl;
+    function fractionCompleted: Double; cdecl;
+    [MethodName('initWithParent:userInfo:')]
+    function initWithParent(parentProgressOrNil: NSProgress; userInfoOrNil: NSDictionary): Pointer; cdecl;
+    function isCancellable: Boolean; cdecl;
+    function isCancelled: Boolean; cdecl;
+    function isFinished: Boolean; cdecl;
+    function isIndeterminate: Boolean; cdecl;
+    function isOld: Boolean; cdecl;
+    function isPausable: Boolean; cdecl;
+    function isPaused: Boolean; cdecl;
+    function kind: NSProgressKind; cdecl;
+    function localizedAdditionalDescription: NSString; cdecl;
+    function localizedDescription: NSString; cdecl;
+    procedure pause; cdecl;
+    function pausingHandler: TNSProgressBlockMethod1; cdecl;
+    [MethodName('performAsCurrentWithPendingUnitCount:usingBlock:')]
+    procedure performAsCurrentWithPendingUnitCount(unitCount: Int64; work: TNSProgressBlockMethod1); cdecl;
+    procedure publish; cdecl;
+    procedure resignCurrent; cdecl;
+    procedure resume; cdecl;
+    function resumingHandler: TNSProgressBlockMethod1; cdecl;
+    procedure setCancellable(cancellable: Boolean); cdecl;
+    procedure setCancellationHandler(cancellationHandler: TNSProgressBlockMethod1); cdecl;
+    procedure setCompletedUnitCount(completedUnitCount: Int64); cdecl;
+    procedure setEstimatedTimeRemaining(estimatedTimeRemaining: NSNumber); cdecl;
+    procedure setFileCompletedCount(fileCompletedCount: NSNumber); cdecl;
+    procedure setFileOperationKind(fileOperationKind: NSProgressFileOperationKind); cdecl;
+    procedure setFileTotalCount(fileTotalCount: NSNumber); cdecl;
+    procedure setFileURL(fileURL: NSURL); cdecl;
+    procedure setKind(kind: NSProgressKind); cdecl;
+    procedure setLocalizedAdditionalDescription(localizedAdditionalDescription: NSString); cdecl;
+    procedure setLocalizedDescription(localizedDescription: NSString); cdecl;
+    procedure setPausable(pausable: Boolean); cdecl;
+    procedure setPausingHandler(pausingHandler: TNSProgressBlockMethod1); cdecl;
+    procedure setResumingHandler(resumingHandler: TNSProgressBlockMethod1); cdecl;
+    procedure setThroughput(throughput: NSNumber); cdecl;
+    procedure setTotalUnitCount(totalUnitCount: Int64); cdecl;
+    [MethodName('setUserInfoObject:forKey:')]
+    procedure setUserInfoObject(objectOrNil: Pointer; key: NSProgressUserInfoKey); cdecl;
+    function throughput: NSNumber; cdecl;
+    function totalUnitCount: Int64; cdecl;
+    procedure unpublish; cdecl;
+    function userInfo: NSDictionary; cdecl;
+  end;
+  TNSProgress = class(TOCGenericImport<NSProgressClass, NSProgress>) end;
+
+  NSProgressReporting = interface(IObjectiveC)
+    ['{4C4F3C4A-B12D-42D9-B92C-936AE2122120}']
+    function progress: NSProgress; cdecl;
+  end;
+
 
 function NSUserActivityTypeBrowsingWeb: NSString;
 
