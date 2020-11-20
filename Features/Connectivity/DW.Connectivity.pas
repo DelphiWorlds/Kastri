@@ -22,6 +22,7 @@ type
   TConnectivity = class(TObject)
   private
     FPlatformConnectivity: TObject;
+    FSkipValidation: Boolean;
     FOnConnectivityChange: TConnectivityChangeEvent;
   protected
     procedure DoConnectivityChange(const IsConnected: Boolean);
@@ -31,6 +32,13 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    /// <summary>
+    ///   On Android, skips the validation check for the network capability
+    /// </summary>
+    /// <remarks>
+    ///   May need to set this property to True for some devices
+    /// </remarks>
+    property SkipValidation: Boolean read FSkipValidation write FSkipValidation;
     property OnConnectivityChange: TConnectivityChangeEvent read FOnConnectivityChange write FOnConnectivityChange;
   end;
 

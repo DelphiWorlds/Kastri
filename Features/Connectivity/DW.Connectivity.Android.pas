@@ -40,8 +40,8 @@ type
     function IndexOfNetwork(const ANetwork: JNetwork): Integer;
   protected
     class function ConnectivityManager: JConnectivityManager; static;
-    class function GetConnectedNetworkInfoFromNetwork(const ANetwork: JNetwork): JNetworkInfo; static;
-    class function GetConnectedNetworkInfo: JNetworkInfo; static;
+    class function GetConnectedNetworkInfoFromNetwork(const ANetwork: JNetwork; const ASkipValidation: Boolean): JNetworkInfo; static;
+    class function GetConnectedNetworkInfo(const ASkipValidation: Boolean): JNetworkInfo; static;
   public
     { JDWNetworkCallbackDelegate }
     procedure onAvailable(network: JNetwork); cdecl;
@@ -69,6 +69,7 @@ type
     FReceiver: TConnectivityReceiver;
   protected
     procedure ConnectivityChange(const AIsConnected: Boolean);
+    function SkipValidation: Boolean;
   public
     class function IsConnectedToInternet: Boolean; static;
     class function IsWifiInternetConnection: Boolean; static;
@@ -107,7 +108,7 @@ begin
   try
     for I := 0 to LNetworks.Length - 1 do
     begin
-      if GetConnectedNetworkInfoFromNetwork(LNetworks[I]) <> nil then
+      if GetConnectedNetworkInfoFromNetwork(LNetworks[I], FPlatformConnectivity.SkipValidation) <> nil then
       begin
         Result := True;
         Break;
@@ -163,7 +164,7 @@ begin
 end;
 
 // Based on: https://github.com/jamesmontemagno/ConnectivityPlugin/issues/56
-class function TNetworkCallbackDelegate.GetConnectedNetworkInfo: JNetworkInfo;
+class function TNetworkCallbackDelegate.GetConnectedNetworkInfo(const ASkipValidation: Boolean): JNetworkInfo;
 var
   LAllNetworks: TJavaObjectArray<JNetwork>;
   LAllNetworkInfo: TJavaObjectArray<JNetworkInfo>;
@@ -177,7 +178,7 @@ begin
     try
       for I := 0 to LAllNetworks.Length - 1 do
       begin
-        LInfo := GetConnectedNetworkInfoFromNetwork(LAllNetworks[I]);
+        LInfo := GetConnectedNetworkInfoFromNetwork(LAllNetworks[I], ASkipValidation);
         if LInfo <> nil then
         begin
           Result := LInfo;
@@ -207,7 +208,7 @@ begin
   end;
 end;
 
-class function TNetworkCallbackDelegate.GetConnectedNetworkInfoFromNetwork(const ANetwork: JNetwork): JNetworkInfo;
+class function TNetworkCallbackDelegate.GetConnectedNetworkInfoFromNetwork(const ANetwork: JNetwork; const ASkipValidation: Boolean): JNetworkInfo;
 var
   LCapabilities: JNetworkCapabilities;
   LInfo: JNetworkInfo;
@@ -218,7 +219,7 @@ begin
   if (LCapabilities <> nil) and LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_INTERNET) then
   begin
     // ..and is Validated or SDK < 23
-    if (TJBuild_VERSION.JavaClass.SDK_INT < 23) or LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_VALIDATED) then
+    if ASkipValidation or (TJBuild_VERSION.JavaClass.SDK_INT < 23) or LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_VALIDATED) then
     begin
       LInfo := ConnectivityManager.getNetworkInfo(ANetwork);
       if (LInfo <> nil) and LInfo.isAvailable and LInfo.isConnected then
@@ -247,7 +248,7 @@ begin
   if TJBuild_VERSION.JavaClass.SDK_INT < 21 then
   begin
     TOSLog.d('TConnectivityReceiver.Receive');
-    FPlatformConnectivity.ConnectivityChange(TNetworkCallbackDelegate.GetConnectedNetworkInfo <> nil);
+    FPlatformConnectivity.ConnectivityChange(TNetworkCallbackDelegate.GetConnectedNetworkInfo(FPlatformConnectivity.SkipValidation) <> nil);
   end;
 end;
 
@@ -273,15 +274,20 @@ end;
 
 class function TPlatformConnectivity.IsConnectedToInternet: Boolean;
 begin
-  Result := TNetworkCallbackDelegate.GetConnectedNetworkInfo <> nil;
+  Result := TNetworkCallbackDelegate.GetConnectedNetworkInfo(False) <> nil;
 end;
 
 class function TPlatformConnectivity.IsWifiInternetConnection: Boolean;
 var
   LInfo: JNetworkInfo;
 begin
-  LInfo := TNetworkCallbackDelegate.GetConnectedNetworkInfo;
+  LInfo := TNetworkCallbackDelegate.GetConnectedNetworkInfo(False);
   Result := (LInfo <> nil) and (LInfo.getType = TJConnectivityManager.JavaClass.TYPE_WIFI);
+end;
+
+function TPlatformConnectivity.SkipValidation: Boolean;
+begin
+  Result := FConnectivity.SkipValidation;
 end;
 
 procedure TPlatformConnectivity.ConnectivityChange(const AIsConnected: Boolean);
