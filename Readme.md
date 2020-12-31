@@ -8,6 +8,8 @@ Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www
 
 Development of Kastri can be helped along with [Github Sponsorship](https://github.com/sponsors/DelphiWorlds), so please consider sponsoring today!
 
+Please star this repo by clicking the Star box in the top right corner if you find it useful!
+
 ## Kastri
 
 * Is a cross-platform library which builds upon the existing RTL, FMX and VCL libraries in Delphi
@@ -33,11 +35,11 @@ If you encounter an issue, or want to request an enhancement, please [visit the 
 
 ### Slack Channel
 
-The Delphi Worlds Slack team has a channel (#kastri) devoted to discussing Kastri. There you will find Dave Nottage (when he is available) and other developers who are passionate about Kastri to discuss how to use Kastri, what is in it etc.
+The Delphi Worlds Slack workspace has a channel (#kastri) devoted to discussing Kastri. There you will find Dave Nottage (when he is available) and other developers who are passionate about Kastri to discuss how to use Kastri, what is in it etc.
 
 [Sponsors](https://github.com/sponsors/DelphiWorlds) of Kastri have access to the private #sponsors channel where they receive priority support.
 
-If you would like to join the Slack team, [please visit this self-invite link](https://slack.delphiworlds.com)
+If you would like to join the Delphi Worlds Slack workspace, [please visit this self-invite link](https://slack.delphiworlds.com)
 
 ## What Is In Kastri?
 
@@ -47,7 +49,7 @@ You'll find demo applications in the Demos folder, including those associated wi
 
 ### API imports
 
-In the API folder you will find imports for a number of iOS, Android and Linux APIs that are either not included with Delphi, serve to complete missing APIs, or are imports for Java code contained in Kastri
+In the API folder you will find imports for a number of iOS, Android and Linux APIs that are either not included with Delphi, serve to complete missing APIs, or are imports for Java code contained in Kastri. 
 Most of these are used in the Kastri Features and/or demos however some are included due to interest from developers.
 
 ### Core units
@@ -77,9 +79,17 @@ Features include:
 
 Android and iOS implementations of biometric functions, namely: Fingerprint recognition on Android, and Fingerprint and FaceID on iOS
 
+#### Camera
+
+Android and iOS implementations of native camera support
+
 #### Connectivity
 
-Android and iOS implementations of code for checking network connectivity of a device
+Android, iOS and Windows implementations of code for checking network connectivity of a device
+
+#### Files Selector
+
+Uses native APIs to allow users to select one or more files on the device, for Android and iOS
 
 #### Firebase
 
@@ -93,6 +103,10 @@ Near-Field Communication implementations for Android and iOS
 
 Framework that is alternative to TNotificationCenter (that ships with Delphi) for Notifications on Android and iOS
 
+#### Share Items
+
+A more feature-rich alternative for the Share Sheet implementation provided with Delphi, for Android and iOS
+
 #### Speech Recognition
 
 Android and iOS implementations for speech-to-text services. On Android, the actual speech API is used, rather than via Intents
@@ -101,17 +115,17 @@ Android and iOS implementations for speech-to-text services. On Android, the act
 
 In addition to the features listed above, several other features are [planned for Kastri](https://github.com/DelphiWorlds/Kastri/milestones), namely:
 
-#### Apple Sign-In
+#### Geofencing support on Android
 
-From April 30th of this year, iOS apps on the App Store that use **any** social media based login must also offer Apple Sign-In. This implementation will use native APIs and conform to Apple's requirements
-
-#### Camera
-
-Native camera implementation for Android and iOS. Performance that is leagues above that of TCameraComponent that ships with Delphi. Uses the latest native APIs
+This feature is currently in limbo, due to there being issues with making the functionality work. Please [contact me](https://github.com/DelphiWorlds/Kastri/issues/19) if you are interested in helping.
 
 #### Photos Library
 
 For accessing photos stored on the device via the albums on Android and iOS. Photos selector implementation with multiple-select capability (similar to Facebook's implementation)
+
+#### Simple backend framework for managing push tokens
+
+A simple REST backend for managing push tokens and sending messages that can be customised to your needs. Complements the existing Firebase Cloud Messaging support.
 
 #### Universal Links
 

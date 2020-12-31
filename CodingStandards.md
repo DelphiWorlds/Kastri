@@ -24,7 +24,7 @@ For _platform agnostic_ units: `<prefix>.<functionality>.pas`, e.g.: `DW.SuperWi
 
 For _platform specific_ units that consume a platform api: `<prefix>.<functionality>.<platform>.pas`, e.g.: `DW.SuperWidget.iOS.pas`
 
-_Project specific_ units are to use the codename for that project: `<projectprefix>.<unitname>.pas`,` e.g.: `MM.Types.pas`
+_Project specific_ units are to use the codename for that project: `<projectprefix>.<unitname>.pas`, e.g.: `MM.Types.pas`
 
 Form and frame units shall use the format `<prefix>.View.<viewname>`, e.g: `SDX.View.Main.pas`
 
@@ -114,7 +114,7 @@ Code inside a `finally` block is to execute resource deallocation or restoring o
 
 ### Checking For Assignment
 
-Use the Assigned method for event handlers **only**. All other checks for assignment shall be compared against nil.
+Use the Assigned method for event handlers **only**. All other checks for assignment shall be compared against `nil`.
 
 ## Global Variables
 
@@ -138,7 +138,7 @@ Identifiers must use the same case throughout the code, as they were declared
 
 ### Indentation
 
-* All declaration section headers(uses, type, const, procedure etc) must start in the first column
+* All declaration _section_ headers (`uses`, `type`, `const`, `procedure` etc) must start in the first column
 * All declarations within a declaration section must be indented by 2 spaces
 * Code blocks (eg inside a try..finally, within a begin..end, code that is executed by an if or for statement) must be indented 2 spaces
 
@@ -147,7 +147,7 @@ Identifiers must use the same case throughout the code, as they were declared
 Blank lines:
 
 * Always consider as being before a declaration (aside from unit name at beginning)
-* No blank lines within a declaration (i.e. record, class, method)
+* No blank lines within a declaration (i.e. `record`, `class`, `method`)
 * No multiple blank lines
 
 Spaces within lines:
@@ -167,7 +167,7 @@ All statements, where possible, must be terminated by a semicolon, even where th
 
 ### Code Blocks
 
-The begin in a begin..end code block must start on a new line.
+The `begin` in a `begin..end` code block must start on a new line.
 
 ### Structured Statements
 
