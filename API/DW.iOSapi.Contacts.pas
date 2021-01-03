@@ -1045,13 +1045,11 @@ const
 
 implementation
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 uses
   Posix.Dlfcn;
 
 var
   ContactsModule: THandle;
-{$ENDIF}
 
 function CNLabelHome: NSString;
 begin
@@ -2583,12 +2581,10 @@ begin
   Result := CocoaNSStringConst(libContacts, 'CNPostalAddressLocalizedPropertyNameAttribute');
 end;
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 initialization
   ContactsModule := dlopen(MarshaledAString(libContacts), RTLD_LAZY);
 
 finalization
   dlclose(ContactsModule)
-{$ENDIF}
 
 end.
