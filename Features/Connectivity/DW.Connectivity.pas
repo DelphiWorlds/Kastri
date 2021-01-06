@@ -47,9 +47,9 @@ implementation
 {$IF Defined(ANDROID)}
 uses
   DW.Connectivity.Android;
-{$ELSEIF Defined(IOS)}
+{$ELSEIF Defined(MACOS)}
 uses
-  DW.Connectivity.iOS;
+  DW.Connectivity.Mac;
 {$ELSEIF Defined(MSWINDOWS)}
 uses
   DW.Connectivity.Win;
