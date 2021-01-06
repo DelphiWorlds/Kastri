@@ -8,8 +8,8 @@ The demo should compile and work for at least versions 10.3.3 and 10.4.x
 
 ### Supported Platforms
 
-Currently supported platforms are Windows, iOS and Android
+Supported platforms are Windows, macOS, iOS and Android
 
-### Compiling for iOS
+### Compiling for macOS and/or iOS
 
-If compiling for iOS, you will need to add the SystemConfiguration framework to the iOS SDK. There are some instructions on [how to add a framework here](https://delphiworlds.com/2013/10/adding-other-ios-frameworks-to-the-sdk-manager) (needs updating, however it should still work)
+You will need to add the SystemConfiguration framework to the macOS and/or iOS SDK. There are some instructions on [how to add a framework here](https://delphiworlds.com/2013/10/adding-other-ios-frameworks-to-the-sdk-manager) (needs updating, however it should still work)
