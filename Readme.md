@@ -10,6 +10,8 @@ Development of Kastri can be helped along with [Github Sponsorship](https://gith
 
 Please star this repo by clicking the Star box in the top right corner if you find it useful!
 
+If you're looking to [learn Delphi, please visit this link](https://learndelphi.org)
+
 ## Kastri
 
 * Is a cross-platform library which builds upon the existing RTL, FMX and VCL libraries in Delphi
@@ -85,7 +87,7 @@ Android and iOS implementations of native camera support
 
 #### Connectivity
 
-Android, iOS and Windows implementations of code for checking network connectivity of a device
+Android, macOS, iOS and Windows implementations of code for checking network connectivity of a device
 
 #### Files Selector
 
