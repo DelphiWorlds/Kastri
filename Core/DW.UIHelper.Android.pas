@@ -46,7 +46,7 @@ uses
   // RTL
   System.SysUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App,
   // FMX
   FMX.Platform.UI.Android;
 
