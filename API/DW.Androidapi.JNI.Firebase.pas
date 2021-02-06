@@ -6,7 +6,7 @@ unit DW.Androidapi.JNI.Firebase;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -18,7 +18,7 @@ interface
 uses
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.JNI.App, Androidapi.JNI.Os,
-  Androidapi.JNI.Net;
+  Androidapi.JNI.Net, Androidapi.JNI.PlayServices.Tasks;
 
 type
   JFirebaseOptions = interface;
@@ -140,8 +140,8 @@ type
     function isAutoInitEnabled: Boolean; cdecl;
     procedure send(msg: JRemoteMessage); cdecl;
     procedure setAutoInitEnabled(enable: Boolean); cdecl;
-    procedure subscribeToTopic(topic: JString); cdecl;
-    procedure unsubscribeFromTopic(topic: JString); cdecl;
+    function subscribeToTopic(topic: JString): JTask; cdecl;
+    function unsubscribeFromTopic(topic: JString): JTask; cdecl;
   end;
   TJFirebaseMessaging = class(TJavaGenericImport<JFirebaseMessagingClass, JFirebaseMessaging>) end;
 
