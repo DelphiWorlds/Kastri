@@ -6,7 +6,7 @@ unit DW.FilesSelector.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -138,7 +138,7 @@ begin
   FSelector.FileTypes.Add('public.source-code');
   DestroyController;
   FController := TUIDocumentPickerViewController.Alloc;
-  FController := TUIDocumentPickerViewController.Wrap(FController.initWithDocumentTypes(StringsToNSArray(FSelector.FileTypes), UIDocumentPickerModeOpen));
+  FController := TUIDocumentPickerViewController.Wrap(FController.initWithDocumentTypes(StringsToNSArray(FSelector.FileTypes), UIDocumentPickerModeImport));
   FController.setDelegate(GetObjectID);
   FController.setTitle(StrToNSStr(FSelector.Title));
   TiOSHelper.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
@@ -153,9 +153,13 @@ end;
 procedure TUIDocumentPickerDelegate.documentPickerDidPickDocumentsAtURLs(controller: UIDocumentPickerViewController; urls: NSArray);
 var
   I: Integer;
+  LEscapedFileName: NSString;
 begin
   for I := 0 to urls.count - 1 do
-    FSelector.Files.Add(NSUrlToStr(TNSURL.Wrap(urls.objectAtIndex(I))));
+  begin
+    LEscapedFileName := TNSURL.Wrap(urls.objectAtIndex(I)).path.stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding);
+    FSelector.Files.Add(NSStrToStr(LEscapedFileName));
+  end;
   FSelector.DoComplete(True);
 end;
 

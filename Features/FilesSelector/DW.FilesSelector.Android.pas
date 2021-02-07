@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Messaging, System.Classes,
+  System.Messaging, System.Classes, System.SysUtils,
   // Android
   Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Net,
   // FMX
@@ -86,8 +86,6 @@ end;
 
 procedure TPlatformFilesSelector.HandleSelectorOK(const AData: JIntent);
 var
-  LURI: Jnet_Uri;
-  LFileName: string;
   I: Integer;
 begin
   if AData.getClipData <> nil then

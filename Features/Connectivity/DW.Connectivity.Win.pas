@@ -45,6 +45,7 @@ type
   private
     class var FCurrent: TNetwork;
     class constructor CreateClass;
+    class destructor DestroyClass;
   private
     FConnectivity: TConnectivity;
     FCookie: Longint;
@@ -210,6 +211,11 @@ begin
   FNetworkListManager := nil;
   CoUninitialize;
   inherited;
+end;
+
+class destructor TNetwork.DestroyClass;
+begin
+  FCurrent.Free;
 end;
 
 procedure TNetwork.SetConnectivity(const Value: TConnectivity);

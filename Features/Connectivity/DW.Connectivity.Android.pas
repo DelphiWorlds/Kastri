@@ -84,7 +84,7 @@ uses
   DW.OSLog,
   System.SysUtils,
   // Android
-  Androidapi.JNI.JavaTypes, Androidapi.Helpers, Androidapi.JNI.Os;
+  Androidapi.JNI.JavaTypes, Androidapi.Helpers, Androidapi.JNI.Os, Androidapi.JNI;
 
 type
   TOpenConnectivity = class(TConnectivity);
