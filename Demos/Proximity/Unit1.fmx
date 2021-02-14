@@ -1,0 +1,21 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 602
+  ClientWidth = 434
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Label1: TLabel
+    Align = Center
+    StyledSettings = [Family, Style, FontColor]
+    Size.Width = 268.000000000000000000
+    Size.Height = 86.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.Font.Size = 32.000000000000000000
+    Text = 'Blank When Near'
+    TabOrder = 1
+  end
+end
