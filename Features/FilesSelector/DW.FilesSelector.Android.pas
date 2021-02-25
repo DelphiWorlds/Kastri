@@ -47,8 +47,10 @@ type
 implementation
 
 uses
+  // RTL
+  System.IOUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNIBridge,
+  Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNIBridge, Androidapi.JNI.Provider,
   // FMX
   FMX.Platform.Android;
 
@@ -79,9 +81,27 @@ begin
 end;
 
 procedure TPlatformFilesSelector.AddFile(const AURI: Jnet_Uri);
+var
+  LSelectedFile: TSelectedFile;
+  LProjection: TJavaObjectArray<JString>;
+  LCursor: JCursor;
 begin
   if AURI <> nil then
-    Files.Add(JStringToString(AURI.toString));
+  begin
+    LSelectedFile.RawPath := JStringToString(AURI.toString);
+    LSelectedFile.DecodedPath := JStringToString(TJnet_Uri.JavaClass.decode(AURI.toString));
+    LProjection := TJavaObjectArray<JString>.Create(1);
+    try
+      LProjection[0] := TJMediaStore_MediaColumns.JavaClass.DISPLAY_NAME;
+      LCursor := TAndroidHelper.Context.getContentResolver.query(AURI, LProjection, nil, nil, nil);
+    finally
+      LProjection.Free;
+    end;
+    if (LCursor <> nil) and LCursor.moveToFirst then
+      LSelectedFile.DisplayName := JStringToString(LCursor.getString(0));
+    AddSelectedFile(LSelectedFile);
+    Files.Add(LSelectedFile.RawPath);
+  end;
 end;
 
 procedure TPlatformFilesSelector.HandleSelectorOK(const AData: JIntent);
