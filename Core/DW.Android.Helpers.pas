@@ -6,7 +6,7 @@ unit DW.Android.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Classes,
+  System.Classes, System.SysUtils,
   // Android
   Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App, Androidapi.JNI.Media,
   Androidapi.JNIBridge,
@@ -90,6 +90,10 @@ type
     /// </summary>
     class function GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo; static;
     /// <summary>
+    ///   Imports a file that can be accessed only via ContentResolver
+    /// </summary>
+    class function ImportFile(const AURI: string; const AImportPath: string): string; static;
+    /// <summary>
     ///   Returns whether the activity is running foreground
     /// </summary>
     /// <remarks>
@@ -153,10 +157,18 @@ type
   TJImageHelper = record
   private
     class function RotateBytes(const ABytes: TJavaArray<Byte>; const ARotation: Integer): TJavaArray<Byte>; static;
-    class function JImageToByteArray(const AImage: JImage): TJavaArray<Byte>; static;
+    class function JImageToByteArray(const AImage: JImage): TJavaArray<Byte>; overload; static;
+    class function JImageToByteArray(const AImage: JImage; const ARotation: Integer): TJavaArray<Byte>; overload; static;
     class function NV21ToJPEG(const ABytes: TJavaArray<Byte>; const AWidth, AHeight: Integer): TJavaArray<Byte>; static;
     class function YUV_420_888ToNV21(const AImage: JImage): TJavaArray<Byte>; static;
   public
+    /// <summary>
+    ///   Converts a JImage to a byte array, applying rotation (if any)
+    /// </summary>
+    /// <remarks>
+    ///   Used by the Camera support to orient the captured image
+    /// </remarks>
+    class function JImageToBytes(const AImage: JImage; const ARotation: Integer = 0): TBytes; static;
     /// <summary>
     ///   Converts a JImage to a JBitmap
     /// </summary>
@@ -165,7 +177,7 @@ type
     /// </remarks>
     class function JImageToJBitmap(const AImage: JImage): JBitmap; static;
     /// <summary>
-    ///   Converts a JImage to a JStream, applying rotation (if any)
+    ///   Converts a JImage to a TStream, applying rotation (if any)
     /// </summary>
     /// <remarks>
     ///   Used by the Camera support to orient the captured image
@@ -177,7 +189,7 @@ implementation
 
 uses
   // RTL
-  System.SysUtils, System.DateUtils,
+  System.DateUtils, System.IOUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI,
   // DW
@@ -267,6 +279,32 @@ begin
   Result := LApplicationInfo.targetSdkVersion;
 end;
 
+class function TAndroidHelperEx.ImportFile(const AURI, AImportPath: string): string;
+var
+  LInput: JInputStream;
+  LURI: Jnet_Uri;
+  LJavaBytes: TJavaArray<Byte>;
+  LBytes: TBytes;
+  LFileStream: TFileStream;
+begin
+  Result := '';
+  if TDirectory.Exists(AImportPath) then
+  begin
+    LURI := TJnet_Uri.JavaClass.parse(StringToJString(AURI));
+    LInput := TAndroidHelper.Context.getContentResolver.openInputStream(LURI);
+    LJavaBytes := TJavaArray<Byte>.Create(LInput.available);
+    try
+      LInput.read(LJavaBytes, 0, LJavaBytes.Length);
+      SetLength(LBytes, LJavaBytes.Length);
+      Move(LJavaBytes.Data^, LBytes[0], LJavaBytes.Length);
+    finally
+      LJavaBytes.Free;
+    end;
+    Result := TPath.Combine(AImportPath, TPath.GetFileName(AURI));
+    TFile.WriteAllBytes(Result, LBytes);
+  end;
+end;
+
 class function TAndroidHelperEx.IsIgnoringBatteryOptimizations: Boolean;
 begin
   Result := PowerManager.isIgnoringBatteryOptimizations(TAndroidHelper.Context.getPackageName);
@@ -292,28 +330,12 @@ end;
 
 class function TAndroidHelperEx.IsActivityForeground: Boolean;
 var
-  LService: JObject;
-  LRunningApps: JList;
   LAppInfo: JActivityManager_RunningAppProcessInfo;
-  I: Integer;
 begin
-  Result := False;
-  LService := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.ACTIVITY_SERVICE);
-  LRunningApps := TJActivityManager.Wrap(TAndroidHelper.JObjectToID(LService)).getRunningAppProcesses;
-  for I := 0 to LRunningApps.size - 1 do
-  begin
-    LAppInfo := TJActivityManager_RunningAppProcessInfo.Wrap(TAndroidHelper.JObjectToID(LRunningApps.get(I)));
-    if LAppInfo.importance = 100 then
-    begin
-      if LAppInfo.importanceReasonComponent <> nil then
-      begin
-        if LAppInfo.importanceReasonComponent.getPackageName.equals(TAndroidHelper.Context.getPackageName) then
-          Exit(True);
-      end
-      else if LRunningApps.size = 1 then
-        Exit(True);
-    end;
-  end;
+  LAppInfo := TJActivityManager_RunningAppProcessInfo.JavaClass.init;
+  TJActivityManager.JavaClass.getMyMemoryState(LAppInfo);
+  Result := (LAppInfo.importance = TJActivityManager_RunningAppProcessInfo.JavaClass.IMPORTANCE_FOREGROUND) or
+    (LAppInfo.importance = TJActivityManager_RunningAppProcessInfo.JavaClass.IMPORTANCE_VISIBLE);
 end;
 
 class function TAndroidHelperEx.IsServiceForeground(const AServiceName: string): Boolean;
@@ -434,6 +456,22 @@ begin
   end;
 end;
 
+class function TJImageHelper.JImageToByteArray(const AImage: JImage; const ARotation: Integer): TJavaArray<Byte>;
+var
+  LBytes: TJavaArray<Byte>;
+begin
+  Result := JImageToByteArray(AImage);
+  if ARotation > 0 then
+  begin
+    LBytes := Result;
+    try
+      Result := TJImageHelper.RotateBytes(LBytes, ARotation);
+    finally
+      LBytes.Free;
+    end;
+  end;
+end;
+
 class function TJImageHelper.JImageToByteArray(const AImage: JImage): TJavaArray<Byte>;
 var
   LBuffer: JByteBuffer;
@@ -454,18 +492,36 @@ var
   LBytes: TJavaArray<Byte>;
 begin
   LBytes := JImageToByteArray(AImage);
-  Result := TJBitmapFactory.JavaClass.decodeByteArray(LBytes, 0, LBytes.Length);
+  try
+    Result := TJBitmapFactory.JavaClass.decodeByteArray(LBytes, 0, LBytes.Length);
+  finally
+    LBytes.Free;
+  end;
 end;
 
 class function TJImageHelper.JImageToStream(const AImage: JImage; const ARotation: Integer = 0): TStream;
 var
   LBytes: TJavaArray<Byte>;
 begin
-  LBytes := JImageToByteArray(AImage);
-  if ARotation > 0 then
-    LBytes := RotateBytes(LBytes, ARotation);
   Result := TMemoryStream.Create;
-  Result.WriteBuffer(LBytes.Data^, LBytes.Length);
+  LBytes := JImageToByteArray(AImage, ARotation);
+  try
+    Result.WriteBuffer(LBytes.Data^, LBytes.Length);
+  finally
+    LBytes.Free;
+  end;
+end;
+
+class function TJImageHelper.JImageToBytes(const AImage: JImage; const ARotation: Integer = 0): TBytes;
+var
+  LBytes: TJavaArray<Byte>;
+begin
+  LBytes := JImageToByteArray(AImage, ARotation);
+  try
+    Result := TJavaArrayToTBytes(LBytes);
+  finally
+    LBytes.Free;
+  end;
 end;
 
 class function TJImageHelper.NV21ToJPEG(const ABytes: TJavaArray<Byte>; const AWidth, AHeight: Integer): TJavaArray<Byte>;
