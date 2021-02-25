@@ -2,38 +2,67 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 480
+  ClientHeight = 549
   ClientWidth = 340
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
-  object Button1: TButton
-    Align = Bottom
-    Margins.Left = 4.000000000000000000
-    Margins.Top = 4.000000000000000000
-    Margins.Right = 4.000000000000000000
-    Margins.Bottom = 4.000000000000000000
-    Position.X = 4.000000000000000000
-    Position.Y = 432.000000000000000000
-    Size.Width = 332.000000000000000000
-    Size.Height = 44.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 0
-    Text = 'Select'
-    OnClick = Button1Click
-  end
   object ListBox1: TListBox
     Align = Client
     Size.Width = 340.000000000000000000
-    Size.Height = 428.000000000000000000
+    Size.Height = 436.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 2
+    TabOrder = 1
     DisableFocusEffect = True
     DefaultItemStyles.ItemStyle = ''
     DefaultItemStyles.GroupHeaderStyle = ''
     DefaultItemStyles.GroupFooterStyle = ''
+    OnItemClick = ListBox1ItemClick
     Viewport.Width = 336.000000000000000000
-    Viewport.Height = 424.000000000000000000
+    Viewport.Height = 432.000000000000000000
+  end
+  object BottomLayout: TLayout
+    Align = Bottom
+    Padding.Left = 4.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 4.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Position.Y = 440.000000000000000000
+    Size.Width = 340.000000000000000000
+    Size.Height = 109.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object Button1: TButton
+      Align = Client
+      Size.Width = 332.000000000000000000
+      Size.Height = 48.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Select'
+      OnClick = Button1Click
+    end
+    object DisplayNameLabel: TLabel
+      Align = Top
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 332.000000000000000000
+      Size.Height = 21.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Display Name:'
+      TabOrder = 1
+    end
+    object DisplayNameValueLabel: TLabel
+      Align = Top
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 29.000000000000000000
+      Size.Width = 332.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+    end
   end
 end

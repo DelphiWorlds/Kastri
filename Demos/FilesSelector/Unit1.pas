@@ -11,7 +11,11 @@ type
   TForm1 = class(TForm)
     Button1: TButton;
     ListBox1: TListBox;
+    DisplayNameLabel: TLabel;
+    BottomLayout: TLayout;
+    DisplayNameValueLabel: TLabel;
     procedure Button1Click(Sender: TObject);
+    procedure ListBox1ItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
   private
     FSelector: TFilesSelector;
     procedure SelectorCompleteHandler(Sender: TObject; const AOK: Boolean);
@@ -69,10 +73,15 @@ begin
   inherited;
 end;
 
+procedure TForm1.ListBox1ItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
+begin
+  DisplayNameValueLabel.Text := FSelector.SelectedFiles[Item.Index].DisplayName;
+end;
+
 procedure TForm1.Resize;
 begin
   inherited;
-  Button1.Margins.Bottom := TUIHelper.GetOffsetRect.Bottom;
+  BottomLayout.Margins.Bottom := TUIHelper.GetOffsetRect.Bottom;
 end;
 
 procedure TForm1.SelectorCompleteHandler(Sender: TObject; const AOK: Boolean);
@@ -90,9 +99,9 @@ begin
   {$ENDIF}
   LMaxChars := Round((ListBox1.Width * LFudge) / MeasureTextWidth(ListBox1.ListItems[0].TextSettings.Font, 'W'));
   ListBox1.Clear;
-  for I := 0 to FSelector.Files.Count - 1 do
+  for I := 0 to Length(FSelector.SelectedFiles) - 1 do
   begin
-    LFileName := FSelector.Files[I];
+    LFileName := FSelector.SelectedFiles[I].DecodedPath; // **** NOTE: Use FSelector.SelectedFiles[I].RawPath for use in the file system!! ****
     if Length(LFileName) > LMaxChars then
     begin
       LDiff := (Length(LFileName) - LMaxChars) + 3;
@@ -100,7 +109,11 @@ begin
       LFileName := LFileName.Substring(0, LHalf - (LDiff div 2)) + '...' + LFileName.Substring(LHalf + (LDiff div 2));
     end;
     ListBox1.Items.Add(LFileName);
-    ListBox1.ListItems[I].TagString := FSelector.Files[I];
+  end;
+  if ListBox1.Items.Count > 0 then
+  begin
+    ListBox1.ItemIndex := 0;
+    ListBox1ItemClick(ListBox1, ListBox1.ListItems[0]);
   end;
   // NOTE: On Android, for some of the filenames returned you will need to access the files
   // via a ContentResolver, i.e. you will not be able to simply load the files using normal mechanisms in Delphi
