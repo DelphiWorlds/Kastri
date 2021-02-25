@@ -92,7 +92,7 @@ type
     /// <summary>
     ///   Imports a file that can be accessed only via ContentResolver
     /// </summary>
-    class function ImportFile(const AURI: string; const AImportPath: string): string; static;
+    class procedure ImportFile(const AURI: string; const AFileName: string); static;
     /// <summary>
     ///   Returns whether the activity is running foreground
     /// </summary>
@@ -279,7 +279,7 @@ begin
   Result := LApplicationInfo.targetSdkVersion;
 end;
 
-class function TAndroidHelperEx.ImportFile(const AURI, AImportPath: string): string;
+class procedure TAndroidHelperEx.ImportFile(const AURI: string; const AFileName: string);
 var
   LInput: JInputStream;
   LURI: Jnet_Uri;
@@ -287,22 +287,17 @@ var
   LBytes: TBytes;
   LFileStream: TFileStream;
 begin
-  Result := '';
-  if TDirectory.Exists(AImportPath) then
-  begin
-    LURI := TJnet_Uri.JavaClass.parse(StringToJString(AURI));
-    LInput := TAndroidHelper.Context.getContentResolver.openInputStream(LURI);
-    LJavaBytes := TJavaArray<Byte>.Create(LInput.available);
-    try
-      LInput.read(LJavaBytes, 0, LJavaBytes.Length);
-      SetLength(LBytes, LJavaBytes.Length);
-      Move(LJavaBytes.Data^, LBytes[0], LJavaBytes.Length);
-    finally
-      LJavaBytes.Free;
-    end;
-    Result := TPath.Combine(AImportPath, TPath.GetFileName(AURI));
-    TFile.WriteAllBytes(Result, LBytes);
+  LURI := TJnet_Uri.JavaClass.parse(StringToJString(AURI));
+  LInput := TAndroidHelper.Context.getContentResolver.openInputStream(LURI);
+  LJavaBytes := TJavaArray<Byte>.Create(LInput.available);
+  try
+    LInput.read(LJavaBytes, 0, LJavaBytes.Length);
+    SetLength(LBytes, LJavaBytes.Length);
+    Move(LJavaBytes.Data^, LBytes[0], LJavaBytes.Length);
+  finally
+    LJavaBytes.Free;
   end;
+  TFile.WriteAllBytes(AFileName, LBytes);
 end;
 
 class function TAndroidHelperEx.IsIgnoringBatteryOptimizations: Boolean;
