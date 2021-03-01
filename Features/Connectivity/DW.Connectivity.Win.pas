@@ -6,7 +6,7 @@ unit DW.Connectivity.Win;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -28,6 +28,7 @@ type
     class function IsWifiInternetConnection: Boolean;
   public
     constructor Create(const AConnectivity: TConnectivity);
+    destructor Destroy; override;
   end;
 
 implementation
@@ -47,12 +48,10 @@ type
     class constructor CreateClass;
     class destructor DestroyClass;
   private
-    FConnectivity: TConnectivity;
     FCookie: Longint;
     FNetworkListManager: INetworkListManager;
     FIsConnectedToInternet: Boolean;
     function GetWifiAdapterNames: TArray<string>;
-    procedure SetConnectivity(const Value: TConnectivity);
     procedure Start;
     procedure Stop;
   protected
@@ -69,7 +68,6 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    property Connectivity: TConnectivity read FConnectivity write SetConnectivity;
   end;
 
   TOpenConnectivity = class(TConnectivity);
@@ -78,13 +76,22 @@ const
   IID_IConnectionPointContainer: TGUID = (D1:$B196B284;D2:$BAB4;D3:$101A;D4:($B6,$9C,$00,$AA,$00,$34,$1D,$07));
   IF_TYPE_IEEE80211 = 71;
 
+var
+  Connectivity: TConnectivity;
+
 { TPlatformConnectivity }
 
 constructor TPlatformConnectivity.Create(const AConnectivity: TConnectivity);
 begin
   inherited Create;
   FConnectivity := AConnectivity;
-  TNetwork.Current.Connectivity := FConnectivity;
+  Connectivity := FConnectivity;
+end;
+
+destructor TPlatformConnectivity.Destroy;
+begin
+  Connectivity := nil;
+  inherited;
 end;
 
 class function TPlatformConnectivity.IsConnectedToInternet: Boolean;
@@ -102,6 +109,27 @@ end;
 class constructor TNetwork.CreateClass;
 begin
   FCurrent := TNetwork.Create;
+end;
+
+constructor TNetwork.Create;
+begin
+  inherited;
+  CoInitialize(nil);
+  FNetworkListManager := CoNetworkListManager.Create;
+  FIsConnectedToInternet := GetIsConnectedToInternet;
+end;
+
+destructor TNetwork.Destroy;
+begin
+  Stop;
+  FNetworkListManager := nil;
+  CoUninitialize;
+  inherited;
+end;
+
+class destructor TNetwork.DestroyClass;
+begin
+  FCurrent.Free;
 end;
 
 function TNetwork.GetWifiAdapterNames: TArray<string>;
@@ -175,13 +203,13 @@ function TNetwork.NetworkConnectivityChanged(networkId: TGUID; newConnectivity: 
 var
   LIsConnected: Boolean;
 begin
-  if FConnectivity <> nil then
+  if Connectivity <> nil then
   begin
     LIsConnected := GetIsConnectedToInternet;
     if LIsConnected <> FIsConnectedToInternet then
     begin
       FIsConnectedToInternet := LIsConnected;
-      TOpenConnectivity(FConnectivity).DoConnectivityChange(FIsConnectedToInternet);
+      TOpenConnectivity(Connectivity).DoConnectivityChange(FIsConnectedToInternet);
     end;
   end;
   Result := S_OK;
@@ -195,33 +223,6 @@ end;
 function TNetwork.NetworkPropertyChanged(networkId: TGUID; Flags: NLM_NETWORK_PROPERTY_CHANGE): HResult;
 begin
   Result := S_OK;
-end;
-
-constructor TNetwork.Create;
-begin
-  inherited;
-  CoInitialize(nil);
-  FNetworkListManager := CoNetworkListManager.Create;
-  FIsConnectedToInternet := GetIsConnectedToInternet;
-end;
-
-destructor TNetwork.Destroy;
-begin
-  Stop;
-  FNetworkListManager := nil;
-  CoUninitialize;
-  inherited;
-end;
-
-class destructor TNetwork.DestroyClass;
-begin
-  FCurrent.Free;
-end;
-
-procedure TNetwork.SetConnectivity(const Value: TConnectivity);
-begin
-  FConnectivity := Value;
-  Start;
 end;
 
 procedure TNetwork.Start;
