@@ -15,6 +15,7 @@ type
     procedure ConnectivityChangeHandler(Sender: TObject; const AIsConnected: Boolean);
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
 var
@@ -39,6 +40,12 @@ begin
     Memo1.Lines.Add('Device is NOT connected to the internet');
   FConnectivity := TConnectivity.Create;
   FConnectivity.OnConnectivityChange := ConnectivityChangeHandler;
+end;
+
+destructor TForm1.Destroy;
+begin
+  FConnectivity.Free;
+  inherited;
 end;
 
 procedure TForm1.ConnectivityChangeHandler(Sender: TObject; const AIsConnected: Boolean);
