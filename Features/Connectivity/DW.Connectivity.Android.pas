@@ -6,14 +6,14 @@ unit DW.Connectivity.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
 {$I DW.GlobalDefines.inc}
 
-// **** NOTE **** If the target device has API level 21 or greater, you need to add dw-kastri-bade.jar from the Lib folder to the Libraries node of the 
+// **** NOTE **** If the target device has API level 21 or greater, you need to add dw-kastri-base.jar from the Lib folder to the Libraries node of the 
 // Android platform of the project in Project Manager
 
 interface
