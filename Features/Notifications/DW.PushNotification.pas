@@ -6,7 +6,7 @@ unit DW.PushNotification;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -66,14 +66,17 @@ uses
   {$IF Defined(ANDROID)}
   FMX.PushNotification.Android,
   {$ENDIF}
-  // DW
-  DW.Consts.Android, DW.OSDevice,
   {$IF Defined(IOS)}
+  {$IF Declared(RTLVersion1042)} // i.e. Delphi 10.4.2 or later
+  FMX.PushNotification.FCM.iOS,
+  {$ELSE}
   DW.PushNotification.iOS;
   {$ENDIF}
-  {$IF Defined(ANDROID)}
-  DW.OSMetadata.Android;
   {$ENDIF}
+  {$IF Defined(ANDROID)}
+  DW.OSMetadata.Android,
+  {$ENDIF}
+  DW.Consts.Android, DW.OSDevice;
 
 { TPushNotifications }
 
@@ -152,7 +155,6 @@ end;
 {$ENDIF}
 
 procedure TPushNotifications.CheckStartupNotifications;
-{$IF Defined(ANDROID)}
 var
   LNotification: TPushServiceNotification;
 begin
@@ -160,15 +162,10 @@ begin
   for LNotification in FServiceConnection.Service.StartupNotifications do
     ReceiveNotificationHandler(FServiceConnection, LNotification);
 end;
-{$ELSE}
-begin
-  //
-end;
-{$ENDIF}
 
 function TPushNotifications.GetPushService: TPushService;
 begin
-  Result := TPushServiceManager.Instance.GetServiceByName(TPushService.TServiceNames.GCM);
+  Result := TPushServiceManager.Instance.GetServiceByName(TPushService.TServiceNames.FCM);
 end;
 
 procedure TPushNotifications.PresentLocalNotification(const AJSON: TJSONObject);
