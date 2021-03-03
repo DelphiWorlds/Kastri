@@ -1,0 +1,70 @@
+object MainView: TMainView
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 550
+  ClientWidth = 503
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object TabControl: TTabControl
+    Align = Client
+    Size.Width = 503.000000000000000000
+    Size.Height = 550.000000000000000000
+    Size.PlatformDefault = False
+    TabIndex = 0
+    TabOrder = 1
+    TabPosition = PlatformDefault
+    Sizes = (
+      503s
+      524s)
+    object LogTab: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 40.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Log'
+      ExplicitSize.cx = 40.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object LogMemo: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        DataDetectorTypes = []
+        TextSettings.WordWrap = True
+        Align = Client
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 495.000000000000000000
+        Size.Height = 460.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Viewport.Width = 491.000000000000000000
+        Viewport.Height = 456.000000000000000000
+      end
+      object LogBottomLayout: TLayout
+        Align = Bottom
+        Position.Y = 468.000000000000000000
+        Size.Width = 503.000000000000000000
+        Size.Height = 56.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object LogClearButton: TButton
+          Align = Center
+          Size.Width = 113.000000000000000000
+          Size.Height = 33.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Text = 'Clear'
+          OnClick = LogClearButtonClick
+        end
+      end
+    end
+  end
+end

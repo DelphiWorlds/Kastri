@@ -1,0 +1,1 @@
+Remember to put your GoogleService-Info.plist file in this folder!
