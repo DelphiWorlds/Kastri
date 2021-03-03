@@ -6,19 +6,13 @@ For iOS, Embarcadero has implemented FCM in Delphi 10.4.2 or later. For 10.4.1 o
 
 **NOTE: For Delphi 10.4.2 or later, you will need to patch the `iOSapi.FirebaseMessaging` unit in order to use Firebase iOS SDK 7.0 or later. See below for details**
 
-<br/>
-
 ### Supported Delphi versions
 
 The demo should compile and work for at least versions 10.3.3 and 10.4.x
 
-<br/>
-
 ### Supported Platforms
 
 Supported platforms are: Android and iOS
-
-<br/>
 
 ### Configuration
 
@@ -26,7 +20,7 @@ For iOS, please ensure that you put your `GoogleServices-info.plist` file (from 
 
 For Android, please follow the instructions as per the [Embarcadero documentation](http://docwiki.embarcadero.com/RADStudio/Sydney/en/Firebase_Android_Support)
 
-<br/>
+Please ensure that you change the values for `CFBundleIdentifier` (for iOS) and `Package` (for Android) in the Version Info of the Project Options to match the identifier you have created for your FCM app
 
 ### Firebase iOS SDK and Framework search path for the project
 
@@ -37,8 +31,6 @@ The `Framework search path` value in the Project Options is configured to use an
 You can set up an Environment Variable in Delphi - Tools|Options, IDE > Environment Variables, User System Overrides, name it `Firebase` and select the path to the SDK.
 
 For Firebase iOS SDK earlier than version 7.0, use the paths recommended by Embarcadero
-
-<br/>
 
 ### Using Firebase iOS SDK 7.0 or later requires patching the `iOSapi.FirebaseMessaging` unit
 
