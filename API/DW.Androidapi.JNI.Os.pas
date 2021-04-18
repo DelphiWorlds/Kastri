@@ -6,7 +6,7 @@ unit DW.Androidapi.JNI.Os;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -363,6 +363,8 @@ type
     ['{847171A2-7B65-4251-9BD3-E0BC89DE31FD}']
     {class} function _GetDIRECTORY_ALARMS: JString; cdecl;
     {class} procedure _SetDIRECTORY_ALARMS(Value: JString); cdecl;
+    {class} function _GetDIRECTORY_AUDIOBOOKS: JString; cdecl;
+    {class} procedure _SetDIRECTORY_AUDIOBOOKS(Value: JString); cdecl;
     {class} function _GetDIRECTORY_DCIM: JString; cdecl;
     {class} function _GetDIRECTORY_DOCUMENTS: JString; cdecl;
     {class} function _GetDIRECTORY_DOWNLOADS: JString; cdecl;
@@ -376,6 +378,8 @@ type
     {class} function _GetDIRECTORY_PODCASTS: JString; cdecl;
     {class} procedure _SetDIRECTORY_PODCASTS(Value: JString); cdecl;
     {class} function _GetDIRECTORY_RINGTONES: JString; cdecl;
+    {class} function _GetDIRECTORY_SCREENSHOTS: JString; cdecl;
+    {class} procedure _SetDIRECTORY_SCREENSHOTS(Value: JString); cdecl;
     {class} function _GetMEDIA_BAD_REMOVAL: JString; cdecl;
     {class} function _GetMEDIA_CHECKING: JString; cdecl;
     {class} function _GetMEDIA_EJECTING: JString; cdecl;
@@ -396,11 +400,17 @@ type
     {class} function getExternalStorageState(path: JFile): JString; cdecl; overload;
     {class} function getRootDirectory: JFile; cdecl;
     {class} function getStorageState(path: JFile): JString; cdecl;
+    {class} function getStorageDirectory: JFile; cdecl; // **** Android 11 ****
     {class} function isExternalStorageEmulated: Boolean; cdecl; overload;
     {class} function isExternalStorageEmulated(path: JFile): Boolean; cdecl; overload;
+    {class} function isExternalStorageLegacy: Boolean; cdecl; overload; // **** Android 10 ****
+    {class} function isExternalStorageLegacy(path: JFile): Boolean; cdecl; overload; // **** Android 10 ****
+    {class} function isExternalStorageManager: Boolean; cdecl; overload; // **** Android 11 ****
+    {class} function isExternalStorageManager(path: JFile): Boolean; cdecl; overload; // **** Android 11 ****
     {class} function isExternalStorageRemovable: Boolean; cdecl; overload;
     {class} function isExternalStorageRemovable(path: JFile): Boolean; cdecl; overload;
     {class} property DIRECTORY_ALARMS: JString read _GetDIRECTORY_ALARMS write _SetDIRECTORY_ALARMS;
+    {class} property DIRECTORY_AUDIOBOOKS: JString read _GetDIRECTORY_AUDIOBOOKS write _SetDIRECTORY_AUDIOBOOKS; // **** Android 10 ****
     {class} property DIRECTORY_DCIM: JString read _GetDIRECTORY_DCIM;
     {class} property DIRECTORY_DOCUMENTS: JString read _GetDIRECTORY_DOCUMENTS;
     {class} property DIRECTORY_DOWNLOADS: JString read _GetDIRECTORY_DOWNLOADS write _SetDIRECTORY_DOWNLOADS;
@@ -410,6 +420,7 @@ type
     {class} property DIRECTORY_PICTURES: JString read _GetDIRECTORY_PICTURES;
     {class} property DIRECTORY_PODCASTS: JString read _GetDIRECTORY_PODCASTS write _SetDIRECTORY_PODCASTS;
     {class} property DIRECTORY_RINGTONES: JString read _GetDIRECTORY_RINGTONES;
+    {class} property DIRECTORY_SCREENSHOTS: JString read _GetDIRECTORY_SCREENSHOTS write _SetDIRECTORY_SCREENSHOTS; // **** Android 10 ****
     {class} property MEDIA_BAD_REMOVAL: JString read _GetMEDIA_BAD_REMOVAL;
     {class} property MEDIA_CHECKING: JString read _GetMEDIA_CHECKING;
     {class} property MEDIA_EJECTING: JString read _GetMEDIA_EJECTING;
