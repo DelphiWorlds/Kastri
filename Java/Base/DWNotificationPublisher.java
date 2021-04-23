@@ -6,7 +6,7 @@ package com.delphiworlds.kastri;
  *                                                     *
  *        Delphi Worlds Cross-Platform Library         *
  *                                                     *
- *   Copyright 2020 Dave Nottage under MIT license     *
+ * Copyright 2020-2021 Dave Nottage under MIT license  *
  * which is located in the root folder of this library *
  *                                                     *
  *******************************************************/
@@ -35,7 +35,7 @@ public class DWNotificationPublisher {
   private static final String TAG = "DWNotificationPublisher";
   private static int mUniqueId = 0;
   private static int mDefaultPriority = -1; // Not present
-  private static int mDefaultSmallIcon = -1; // Not present
+  private static int mDefaultSmallIcon = 0;
   private static NotificationChannel mDefaultChannel;
   private static NotificationManager mNotificationManager = null;
   private static final String WAKE_ON_NOTIFICATION = "DWNotificationPublisher.WAKE_ON_NOTIFICATION";
@@ -62,6 +62,8 @@ public class DWNotificationPublisher {
         if (metaData.containsKey(FIREBASE_DEFAULT_SMALL_ICON))
           mDefaultSmallIcon = metaData.getInt(FIREBASE_DEFAULT_SMALL_ICON);
       }
+      if (mDefaultSmallIcon == 0)
+        mDefaultSmallIcon = DWNotificationPublisher.getNotificationIconId(context);
       mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
       if (Build.VERSION.SDK_INT < 26)
         return; 
@@ -77,6 +79,35 @@ public class DWNotificationPublisher {
       Log.w(TAG, "-initialize");
   }
 
+  private static boolean getIntentFlag(Intent intent, String key) {
+    return intent.hasExtra(key) && (Integer.parseInt(intent.getStringExtra(key)) == 1);
+  }
+
+  private static Bitmap getBitmap(URL url) throws IOException {
+    Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+    if (bitmap != null) {
+      int width;
+      if (bitmap.getWidth() < bitmap.getHeight()) { 
+        width = bitmap.getWidth(); }
+      else { 
+        width = bitmap.getHeight(); 
+      }
+      Bitmap bitmapCropped = Bitmap.createBitmap(bitmap, (bitmap.getWidth() - width) / 2, (bitmap.getHeight() - width) / 2, width, width, null, true);
+      if (!bitmap.sameAs(bitmapCropped)) 
+        bitmap.recycle();
+      return bitmapCropped;
+    }
+    return null;     
+  }
+
+  private static int getNotificationIconId(Context context) {
+    int id = context.getResources().getIdentifier("drawable/ic_notification", null, context.getPackageName());
+    if (id == 0)
+      id = context.getApplicationInfo().icon;
+    return id;
+  }
+
+  /*
   private static void getLargeIcon(URL url, NotificationCompat.Builder builder) throws IOException {
     Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
     if (bitmap != null) {
@@ -92,6 +123,7 @@ public class DWNotificationPublisher {
       builder = builder.setLargeIcon(bitmapCropped); 
     } 
   }
+  */
 
   public static void sendNotification(Context context, Intent intent, boolean pending) {
     Log.d(TAG, "+sendNotification");
@@ -119,7 +151,7 @@ public class DWNotificationPublisher {
       Log.d(TAG, "text is: " + text);
     }
     builder = builder.setContentText(text);
-    if (intent.hasExtra("big_text") && (Integer.parseInt(intent.getStringExtra("big_text")) == 1)) {
+    if (DWNotificationPublisher.getIntentFlag(intent, "big_text")) {
       Log.d(TAG, "Notification has big text flag");
       builder = builder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
     }
@@ -127,23 +159,16 @@ public class DWNotificationPublisher {
       Log.d(TAG, "title is: " + intent.getStringExtra("title"));
       builder = builder.setContentTitle(intent.getStringExtra("title"));
     }
-/*
-    String smallIconIdent = null;
-    if (intent.hasExtra("icon")) { 
-      smallIconIdent = intent.getStringExtra("icon");
-    }
-    int smallIcon = 0;
-    if (smallIconIdent != null)
-      smallIcon = context.getResources().getIdentifier(smallIconIdent, "drawable", context.getPackageName());
-    if (smallIcon == 0)
-      smallIcon = mDefaultSmallIcon;
-*/
-    mDefaultSmallIcon = context.getApplicationInfo().icon;
+    // Log.d(TAG, "Notification icon id: " + String.valueOf(mDefaultSmallIcon));
     builder.setSmallIcon(mDefaultSmallIcon);
     if (intent.hasExtra("image")) { 
       try {
-        URL url = new URL(intent.getStringExtra("image"));
-        DWNotificationPublisher.getLargeIcon(url, builder);    
+        Bitmap bitmap = DWNotificationPublisher.getBitmap(new URL(intent.getStringExtra("image")));
+        if (DWNotificationPublisher.getIntentFlag(intent, "big_image")) {
+          Log.d(TAG, "Notification has big image flag");
+          builder = builder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap));
+        }
+        builder = builder.setLargeIcon(bitmap);
       } catch(Throwable e) { 
         Log.e(TAG, "Exception", e); 
       }
