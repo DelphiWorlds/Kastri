@@ -6,7 +6,7 @@ unit DW.UIHelper;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -44,7 +44,6 @@ type
     class function GetTextColor(const ABackgroundColor: TAlphaColor): TAlphaColor; static;
     class function GetScreenOrientation: TScreenOrientation; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
-    class procedure OpenSettings; static;
     /// <summary>
     ///   Force a repaint of the form
     /// </summary>
@@ -115,15 +114,6 @@ begin
   Result := TPlatformUIHelper.GetUserInterfaceStyle;
   {$ELSE}
   Result := TUserInterfaceStyle.Light;
-  {$ENDIF}
-end;
-
-class procedure TUIHelper.OpenSettings;
-begin
-  {$IF Defined(IOS)} // or Defined(Android)}
-  TPlatformUIHelper.OpenSettings;
-  {$ELSE}
-  //
   {$ENDIF}
 end;
 
