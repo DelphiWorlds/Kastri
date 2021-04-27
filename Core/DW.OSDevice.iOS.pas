@@ -6,7 +6,7 @@ unit DW.OSDevice.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -16,11 +16,15 @@ unit DW.OSDevice.iOS;
 interface
 
 uses
+  // iOS
+  iOSapi.Foundation,
   // DW
   DW.OSDevice;
 
 type
   TPlatformOSDevice = record
+  private
+    class procedure OpenNSURL(const AURL: NSURL); static;
   public
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     class function GetDeviceModel: string; static;
@@ -30,6 +34,8 @@ type
     class function GetUniqueDeviceID: string; static;
     class function IsScreenLocked: Boolean; static;
     class function IsTouchDevice: Boolean; static;
+    class procedure OpenURL(const AURL: string); static;
+    class procedure OpenAppSettings; static;
   end;
 
 implementation
@@ -40,7 +46,7 @@ uses
   // macOS
   Macapi.Helpers,
   // iOS
-  iOSapi.Helpers,
+  iOSapi.Helpers, iOSapi.UIKit,
   // Posix
   Posix.SysUtsname,
   // DW
@@ -87,6 +93,21 @@ end;
 class function TPlatformOSDevice.IsTouchDevice: Boolean;
 begin
   Result := True;
+end;
+
+class procedure TPlatformOSDevice.OpenNSURL(const AURL: NSURL);
+begin
+  TiOSHelper.SharedApplication.openURL(AURL);
+end;
+
+class procedure TPlatformOSDevice.OpenAppSettings;
+begin
+  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(CocoaNSStringConst(libUIKit, 'UIApplicationOpenSettingsURLString'))));
+end;
+
+class procedure TPlatformOSDevice.OpenURL(const AURL: string);
+begin
+  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(StrToNSStr(AURL))));
 end;
 
 class function TPlatformOSDevice.GetPackageID: string;
