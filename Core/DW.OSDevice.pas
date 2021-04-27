@@ -6,7 +6,7 @@ unit DW.OSDevice;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.SysUtils, System.Types;
+  System.SysUtils, System.Types, System.Classes;
 
 type
   TOSPlatform = TOSVersion.TPlatform;
@@ -52,6 +52,10 @@ type
     ///   Returns a summary of information about the device/application, including Package ID, Version, Device Name and Device ID
     /// </summary>
     class function GetDeviceSummary: string; static;
+    /// <summary>
+    ///   Returns environment vars
+    /// </summary>
+    class procedure GetEnvironmentVars(const AVars: TStrings); static;
     /// <summary>
     ///   Returns build for the application package, if any exists
     /// </summary>
@@ -90,6 +94,11 @@ type
     /// </summary>
     class function IsPlatform(const APlatform: TOSPlatform): Boolean; static;
     /// <summary>
+    ///   Opens the default browser with the URL
+    /// </summary>
+    class procedure OpenURL(const AURL: string); static;
+    class procedure OpenAppSettings; static;
+    /// <summary>
     ///   Shows the folder that contains the nominated files
     /// </summary>
     class procedure ShowFilesInFolder(const AFileNames: array of string); static;
@@ -100,6 +109,9 @@ implementation
 uses
   // DW
   DW.OSLog,
+  {$IF Defined(POSIX)}
+  DW.OSDevice.Posix,
+  {$ENDIF}
   {$IF Defined(ANDROID)}
   DW.OSDevice.Android;
   {$ELSEIF Defined(IOS)}
@@ -107,6 +119,7 @@ uses
   {$ELSEIF Defined(MACOS)}
   DW.OSDevice.Mac;
   {$ELSEIF Defined(MSWINDOWS)}
+  DW.Winapi.Helpers,
   DW.OSDevice.Win;
   {$ELSEIF Defined(LINUX)}
   DW.OSDevice.Linux;
@@ -136,6 +149,15 @@ end;
 class function TOSDevice.GetDeviceSummary: string;
 begin
   Result := Format('%s Version: %s, Device: %s (%s)', [GetPackageID, GetPackageVersion, GetDeviceName, GetUniqueDeviceID]);
+end;
+
+class procedure TOSDevice.GetEnvironmentVars(const AVars: TStrings);
+begin
+  {$IF Defined(MSWINDOWS)}
+  TWinapiHelper.GetEnvironmentVars(AVars, True);
+  {$ELSEIF Defined(POSIX)}
+  TPosixOSDevice.GetEnvironmentVars(AVars);
+  {$ENDIF}
 end;
 
 class function TOSDevice.GetPackageBuild: string;
@@ -202,6 +224,20 @@ end;
 class function TOSDevice.IsTouchDevice: Boolean;
 begin
   Result := TPlatformOSDevice.IsTouchDevice;
+end;
+
+class procedure TOSDevice.OpenAppSettings;
+begin
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  TPlatformOSDevice.OpenAppSettings;
+  {$ENDIF}
+end;
+
+class procedure TOSDevice.OpenURL(const AURL: string);
+begin
+  {$IF Defined(IOS)}
+  TPlatformOSDevice.OpenURL(AURL);
+  {$ENDIF}
 end;
 
 class procedure TOSDevice.ShowFilesInFolder(const AFileNames: array of string);
