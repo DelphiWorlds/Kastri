@@ -6,7 +6,7 @@ unit DW.OSDevice.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -25,6 +25,7 @@ type
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     class function GetDeviceModel: string; static;
     class function GetDeviceName: string; static;
+    class function GetOSBuild: string; static;
     class function GetPackageID: string; static;
     class function GetPackageVersion: string; static;
     class function GetUniqueDeviceID: string; static;
@@ -41,7 +42,7 @@ uses
   // macOS
   Macapi.CoreFoundation, Macapi.Foundation, Macapi.Helpers, Macapi.IOKit, Macapi.AppKit,
   // Posix
-  Posix.SysUtsname,
+  Posix.SysUtsname, Posix.SysSysctl,
   // DW
   DW.Macapi.IOKit, DW.Macapi.Helpers, DW.Macapi.Foundation;
 
@@ -71,6 +72,17 @@ end;
 class function TPlatformOSDevice.GetDeviceName: string;
 begin
   Result := NSStrToStr(TNSHost.Wrap(TNSHost.OCClass.currentHost).localizedName);
+end;
+
+class function TPlatformOSDevice.GetOSBuild: string;
+var
+  LBuffer: TArray<Byte>;
+  LLength: LongWord;
+begin
+  sysctlbyname(MarshaledAString('kern.osversion'), nil, @LLength, nil, 0);
+  SetLength(LBuffer, LLength);
+  sysctlbyname(MarshaledAString('kern.osversion'), @LBuffer[0], @LLength, nil, 0);
+  Result := string(MarshaledAString(@LBuffer[0]));
 end;
 
 class function TPlatformOSDevice.GetUniqueDeviceID: string;
