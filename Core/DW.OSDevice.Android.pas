@@ -6,7 +6,7 @@ unit DW.OSDevice.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -33,6 +33,7 @@ type
     class function HasHardwareKeyboard: Boolean; static;
     class function IsScreenLocked: Boolean; static;
     class function IsTouchDevice: Boolean; static;
+    class procedure OpenAppSettings; static;
   end;
 
 implementation
@@ -42,6 +43,7 @@ uses
   System.SysUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.Provider, Androidapi.JNI.Os,  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.Net,
   // DW
   DW.Android.Helpers;
 
@@ -113,6 +115,16 @@ end;
 class function TPlatformOSDevice.IsTouchDevice: Boolean;
 begin
   Result := TAndroidHelper.Context.getPackageManager.hasSystemFeature(StringToJString('android.hardware.touchscreen'));
+end;
+
+class procedure TPlatformOSDevice.OpenAppSettings;
+var
+  LIntent: JIntent;
+begin
+  LIntent := TJIntent.Create;
+  LIntent.setAction(TJSettings.javaClass.ACTION_APPLICATION_DETAILS_SETTINGS);
+  LIntent.setData(TJnet_Uri.JavaClass.parse(StringToJString('package:' + JStringtoString(TAndroidHelper.Context.getPackageName()))));
+  TAndroidHelper.Context.startActivity(LIntent);
 end;
 
 end.
