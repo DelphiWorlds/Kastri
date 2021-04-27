@@ -35,7 +35,10 @@ type
   private
     FCallback: JDWNetworkCallback;
     FConnectedNetworks: TNetworks;
+    FIsPendingAvailable: Boolean;
     FPlatformConnectivity: TPlatformConnectivity;
+    procedure ConnectivityChange;
+    procedure CheckConnectivityChange;
     function IsConnectedToInternet: Boolean;
     function IndexOfNetwork(const ANetwork: JNetwork): Integer;
   protected
@@ -82,7 +85,8 @@ implementation
 
 uses
   DW.OSLog,
-  System.SysUtils,
+  // RTL
+  System.SysUtils, System.Classes,
   // Android
   Androidapi.JNI.JavaTypes, Androidapi.Helpers, Androidapi.JNI.Os, Androidapi.JNI;
 
@@ -134,6 +138,18 @@ begin
   end;
 end;
 
+procedure TNetworkCallbackDelegate.CheckConnectivityChange;
+begin
+  Sleep(250);
+  if FIsPendingAvailable then
+    TThread.Synchronize(nil, ConnectivityChange);
+end;
+
+procedure TNetworkCallbackDelegate.ConnectivityChange;
+begin
+  FPlatformConnectivity.ConnectivityChange(IsConnectedToInternet);
+end;
+
 class function TNetworkCallbackDelegate.ConnectivityManager: JConnectivityManager;
 var
   LService: JObject;
@@ -149,12 +165,14 @@ end;
 procedure TNetworkCallbackDelegate.onAvailable(network: JNetwork);
 begin
   TOSLog.d('TDWNetworkCallbackDelegate.onAvailable');
-  FPlatformConnectivity.ConnectivityChange(IsConnectedToInternet);
+  FIsPendingAvailable := True;
+  TThread.CreateAnonymousThread(CheckConnectivityChange).Start;
 end;
 
 procedure TNetworkCallbackDelegate.onLost(network: JNetwork);
 begin
   TOSLog.d('TDWNetworkCallbackDelegate.onLost');
+  FIsPendingAvailable := False;
   FPlatformConnectivity.ConnectivityChange(IsConnectedToInternet);
 end;
 
