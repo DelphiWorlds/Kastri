@@ -6,7 +6,7 @@ unit DW.Messaging;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -19,6 +19,7 @@ uses
   System.Messaging, System.Types;
 
 type
+  TComboBoxCancelMessage = class(TMessage);
   TOrientationDidChangeMessage = class(TMessage);
   TOrientationWillChangeMessage = class(TMessage);
   TVirtualKeyboardRectChangeMessage = class(TMessage<TRect>);
