@@ -14,6 +14,7 @@ type
     ContentLayout: TLayout;
     CancelButton: TButton;
     ResetButton: TButton;
+    KindLabel: TLabel;
     procedure BiometricImageClick(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
     procedure ResetButtonClick(Sender: TObject);
@@ -46,13 +47,23 @@ begin
   inherited;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   Listening(False);
-  if not TBiometric.IsSupported then
+  if TBiometric.IsSupported then
   begin
-    BiometricImage.Visible := False;
-    ShowMessage('Biometric not supported');
+    case TBiometric.Current.GetBiometryKind of
+      TBiometryKind.None:
+        KindLabel.Text := 'Biometry kind: None, or not implemented';
+      TBiometryKind.Face:
+        KindLabel.Text := 'Biometry kind: Face';
+      TBiometryKind.Touch:
+        KindLabel.Text := 'Biometry kind: Touch';
+    end;
+    TBiometric.Current.KeyName := ChangeFileExt(ExtractFileName(ParamStr(0)), '') + '.key';
   end
   else
-    TBiometric.Current.KeyName := ChangeFileExt(ExtractFileName(ParamStr(0)), '') + '.key';
+  begin
+    BiometricImage.Visible := False;
+    KindLabel.Text := 'Biometry kind: Not supported on this device';
+  end;
 end;
 
 destructor TfrmMain.Destroy;
@@ -119,7 +130,7 @@ begin
       ShowMessage('You cancelled');
     end;
     TBiometricFailResult.Denied:
-      ShowMessage(Format('Denied! Probably the wrong finger: %s', [AResultMessage]));
+      ShowMessage(Format('Denied! Probably the wrong face/finger: %s', [AResultMessage]));
     TBiometricFailResult.Error:
       ShowMessage(Format('Error: %s', [AResultMessage]));
     TBiometricFailResult.Fallback:
