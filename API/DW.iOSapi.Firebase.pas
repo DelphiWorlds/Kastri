@@ -6,7 +6,7 @@ unit DW.iOSapi.Firebase;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -71,6 +71,8 @@ const
   FIRMessasingAPNSTokenTypeProd = 2;
 
 type
+  FIRApp = interface;
+
   FIRInstanceIDAPNSTokenType = NSInteger;
   FIRMessagingAPNSTokenType = NSInteger;
   FIRInstanceIDError = NSUInteger;
@@ -80,6 +82,7 @@ type
   FIRAppClass = interface(NSObjectClass)
     ['{B8962096-555F-498E-B102-8EC66E871EF2}']
     {class} procedure configure; cdecl;
+    {class} function defaultApp: FIRApp; cdecl;
   end;
 
   FIRApp = interface(NSObject)
@@ -180,7 +183,7 @@ procedure FirebaseAnalyticsLoader; cdecl; external 'FirebaseAnalytics';
 procedure FirebaseCoreLoader; cdecl; external 'FirebaseCore';
 procedure FirebaseCoreDiagnosticsLoader; cdecl; external 'FirebaseCoreDiagnostics';
 procedure FirebaseInstanceIDLoader; cdecl; external 'FirebaseInstanceID';
-procedure FirebaseInstallations cdecl; external 'FirebaseInstallations';
+procedure FirebaseInstallationsLoader cdecl; external 'FirebaseInstallations';
 procedure FirebaseMessagingLoader; cdecl; external 'FirebaseMessaging';
 // procedure MeasurementNanoPBLoader; cdecl; external 'MeasurementNanoPB';
 procedure FoundationLoader; cdecl; external libFoundation;
