@@ -6,7 +6,7 @@ unit DW.Consts.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -20,6 +20,7 @@ const
   cPermissionAccessCoarseLocation = 'android.permission.ACCESS_COARSE_LOCATION';
   cPermissionAccessFineLocation = 'android.permission.ACCESS_FINE_LOCATION';
   cPermissionCamera = 'android.permission.CAMERA';
+  cPermissionReadCallLog = 'android.permission.READ_CALL_LOG';
   cPermissionReadContacts = 'android.permission.READ_CONTACTS';
   cPermissionReadExternalStorage = 'android.permission.READ_EXTERNAL_STORAGE';
   cPermissionReadPhoneState = 'android.permission.READ_PHONE_STATE';
@@ -43,6 +44,10 @@ const
   cLocationBroadcastAction = 'com.delphiworlds.kastri.LOCATION_BROADCAST_ACTION';
   cLocationBroadcastExtraLatitude = 'Latitude';
   cLocationBroadcastExtraLongitude = 'Longitude';
+  cLocationBroadcastExtraAltitude = 'Altitude';
+  cLocationBroadcastExtraBearing = 'Bearing';
+  cLocationBroadcastExtraFlags = 'Flags';
+  cLocationBroadcastExtraSpeed = 'Speed';
   cLocationBroadcastExtraAccuracy = 'Accuracy';
   cLocationBroadcastExtraSource = 'Source';
 
@@ -57,6 +62,7 @@ const
   cServiceCommandAppBecameActive = 1;
   cServiceCommandAppEnteredBackground = 2;
   cServiceCommandAppWillTerminate = 3;
+  cServiceCommandAppIsRequestingPermissions = 4;
 
   cEMBTJavaServicePrefix = 'com.embarcadero.services.';
 
