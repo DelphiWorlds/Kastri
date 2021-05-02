@@ -6,7 +6,7 @@ unit DW.Androidapi.JNI.View;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -139,10 +139,10 @@ type
   [JavaSignature('android/view/TextureView$SurfaceTextureListener')]
   JTextureView_SurfaceTextureListener = interface(IJavaInstance)
     ['{1E496A42-F10C-4473-BDE1-43960E671F09}']
-    procedure onSurfaceTextureAvailable(surface: JSurfaceTexture; width: Integer; height: Integer); cdecl;
-    function onSurfaceTextureDestroyed(surface: JSurfaceTexture): Boolean; cdecl;
-    procedure onSurfaceTextureUpdated(surface: JSurfaceTexture); cdecl;
-    procedure onSurfaceTextureSizeChanged(surface: JSurfaceTexture; width: Integer; height: Integer); cdecl;
+    procedure onSurfaceTextureAvailable(texture: JSurfaceTexture; width: Integer; height: Integer); cdecl;
+    function onSurfaceTextureDestroyed(texture: JSurfaceTexture): Boolean; cdecl;
+    procedure onSurfaceTextureUpdated(texture: JSurfaceTexture); cdecl;
+    procedure onSurfaceTextureSizeChanged(texture: JSurfaceTexture; width: Integer; height: Integer); cdecl;
   end;
   TJTextureView_SurfaceTextureListener = class(TJavaGenericImport<JTextureView_SurfaceTextureListenerClass, JTextureView_SurfaceTextureListener>) end;
 
