@@ -6,12 +6,16 @@ unit DW.Macapi.ObjCBlocks;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
 {$I DW.GlobalDefines.inc}
+
+// This unit is based on this article:
+//   https://sudonull.com/post/72033-Using-code-blocks-from-Objective-C-in-Delphi-on-macOS-how-we-built-bridges
+// If the link ever disappears, I have it "backed up"
 
 interface
 
