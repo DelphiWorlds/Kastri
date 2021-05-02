@@ -6,7 +6,7 @@ unit DW.Base64.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -31,6 +31,14 @@ type
     /// </summary>
     class function CompressEncode(const AStream: TStream): string; overload; static;
     /// <summary>
+    ///   Compresses and encodes a file to a Base64 string
+    /// </summary>
+    class function CompressEncodeFromFile(const AFileName: string): string; static;
+    /// <summary>
+    ///   Decodes a Base64 string to a stream
+    /// </summary>
+    class function Decode(const ASource: string; const AStream: TStream): string; static;
+    /// <summary>
     ///   Takes a string, Base64 decodes it, then decompresses it
     /// </summary>
     class function DecodeDecompress(const ASource: string): string; overload; static;
@@ -47,9 +55,13 @@ type
     /// </summary>
     class procedure DecodeToFile(const ASource, AFileName: string); static;
     /// <summary>
-    ///   Encodes a Base64 file to a string
+    ///   Encodes a stream to a Base64 string
     /// </summary>
-    class function CompressEncodeFromFile(const AFileName: string): string; static;
+    class function Encode(const AStream: TStream): string; static;
+    /// <summary>
+    ///   Encodes a file to a Base64 string
+    /// </summary>
+    class function EncodeFromFile(const AFileName: string): string; static;
   end;
 
 implementation
@@ -104,6 +116,18 @@ begin
     Result := LStringStream.DataString;
   finally
     LStringStream.Free;
+  end;
+end;
+
+class function TBase64Helper.Decode(const ASource: string; const AStream: TStream): string;
+var
+  LBase64Stream: TStream;
+begin
+  LBase64Stream := TStringStream.Create(ASource, TEncoding.ASCII);
+  try
+    TNetEncoding.Base64.Decode(LBase64Stream, AStream);
+  finally
+    LBase64Stream.Free;
   end;
 end;
 
@@ -164,6 +188,32 @@ begin
   try
     LStream.LoadFromFile(AFileName);
     Result := CompressEncode(LStream);
+  finally
+    LStream.Free;
+  end;
+end;
+
+class function TBase64Helper.Encode(const AStream: TStream): string;
+var
+  LBase64Stream: TStringStream;
+begin
+  LBase64Stream := TStringStream.Create;
+  try
+    TNetEncoding.Base64.Encode(AStream, LBase64Stream);
+    Result := LBase64Stream.DataString;
+  finally
+    LBase64Stream.Free;
+  end;
+end;
+
+class function TBase64Helper.EncodeFromFile(const AFileName: string): string;
+var
+  LStream: TMemoryStream;
+begin
+  LStream := TMemoryStream.Create;
+  try
+    LStream.LoadFromFile(AFileName);
+    Result := Encode(LStream);
   finally
     LStream.Free;
   end;
