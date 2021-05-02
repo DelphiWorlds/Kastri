@@ -6,7 +6,7 @@ unit DW.OSTimer;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Classes;
+  System.Classes, System.SysUtils;
 
 type
   TOSTimer = class;
@@ -35,7 +35,10 @@ type
     class function GetTimer(const ATimerID: Cardinal): TCustomPlatformOSTimer;
   protected
     FHandler: TNotifyEvent;
+    FProc: TProc;
+    procedure DoHandler;
     procedure DoInterval;
+    procedure DoProc;
     procedure StartTimer(const ARepeating: Boolean); virtual; abstract;
     procedure StopTimer; virtual; abstract;
     property Interval: Integer read FInterval write FInterval;
@@ -67,7 +70,8 @@ type
     /// <summary>
     ///   Creates a "one-shot" timer that fires at the desired interval, and is destroyed after it fires
     /// </summary>
-    class procedure FireOnce(const AInterval: Integer; const AHandler: TNotifyEvent);
+    class procedure FireOnce(const AInterval: Integer; const AHandler: TNotifyEvent); overload;
+    class procedure FireOnce(const AInterval: Integer; const AHandler: TProc); overload;
   public
     constructor Create;
     destructor Destroy; override;
@@ -124,8 +128,6 @@ begin
 end;
 
 procedure TCustomPlatformOSTimer.DoInterval;
-var
-  LHandler: TNotifyEvent;
 begin
   if FOSTimer <> nil then
   begin
@@ -133,13 +135,31 @@ begin
       FOSTimer.DoInterval;
   end
   else if Assigned(FHandler) then
-  begin
-    // Nil FHandler in case it takes > Interval
-    LHandler := FHandler;
-    FHandler := nil;
-    LHandler(Self);
-    TCustomPlatformOSTimer.FreeTimer(Self);
-  end;
+    DoHandler
+  else if Assigned(FProc) then
+    DoProc;
+end;
+
+procedure TCustomPlatformOSTimer.DoHandler;
+var
+  LHandler: TNotifyEvent;
+begin
+  // Nil FHandler in case it takes > Interval
+  LHandler := FHandler;
+  FHandler := nil;
+  LHandler(Self);
+  TCustomPlatformOSTimer.FreeTimer(Self);
+end;
+
+procedure TCustomPlatformOSTimer.DoProc;
+var
+  LProc: TProc;
+begin
+  // Nil FProc in case it takes > Interval
+  LProc := FProc;
+  FProc := nil;
+  LProc;
+  TCustomPlatformOSTimer.FreeTimer(Self);
 end;
 
 class procedure TCustomPlatformOSTimer.FreeTimer(const ATimer: TCustomPlatformOSTimer);
@@ -201,6 +221,16 @@ end;
 procedure TOSTimer.Fire;
 begin
   DoInterval;
+end;
+
+class procedure TOSTimer.FireOnce(const AInterval: Integer; const AHandler: TProc);
+var
+  LTimer: TPlatformOSTimer;
+begin
+  LTimer := TPlatformOSTimer.Create(nil);
+  LTimer.Interval := AInterval;
+  LTimer.FProc := AHandler;
+  LTimer.StartTimer(False);
 end;
 
 class procedure TOSTimer.FireOnce(const AInterval: Integer; const AHandler: TNotifyEvent);
