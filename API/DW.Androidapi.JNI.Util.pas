@@ -6,7 +6,7 @@ unit DW.Androidapi.JNI.Util;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -20,9 +20,40 @@ uses
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes;
 
 type
+  JBase64 = interface;
   JTimerTask = interface;
   JTimer = interface;
   Jutil_Log = interface;
+
+  JBase64Class = interface(JObjectClass)
+    ['{DA78E162-4CB0-455B-ACC0-BEDDE5484C85}']
+    function _GetCRLF: Integer; cdecl;
+    function _GetDEFAULT: Integer; cdecl;
+    function _GetNO_CLOSE: Integer; cdecl;
+    function _GetNO_PADDING: Integer; cdecl;
+    function _GetNO_WRAP: Integer; cdecl;
+    function _GetURL_SAFE: Integer; cdecl;
+    function decode(input: TJavaArray<Byte>; flags: Integer): TJavaArray<Byte>; cdecl; overload;
+    function decode(input: TJavaArray<Byte>; offset: Integer; len: Integer; flags: Integer): TJavaArray<Byte>; cdecl; overload;
+    function decode(str: JString; flags: Integer): TJavaArray<Byte>; cdecl; overload;
+    function encode(input: TJavaArray<Byte>; flags: Integer): TJavaArray<Byte>; cdecl; overload;
+    function encode(input: TJavaArray<Byte>; offset: Integer; len: Integer; flags: Integer): TJavaArray<Byte>; cdecl; overload;
+    function encodeToString(input: TJavaArray<Byte>; flags: Integer): JString; cdecl; overload;
+    function encodeToString(input: TJavaArray<Byte>; offset: Integer; len: Integer; flags: Integer): JString; cdecl; overload;
+    property &DEFAULT: Integer read _GetDEFAULT;
+    property CRLF: Integer read _GetCRLF;
+    property NO_CLOSE: Integer read _GetNO_CLOSE;
+    property NO_PADDING: Integer read _GetNO_PADDING;
+    property NO_WRAP: Integer read _GetNO_WRAP;
+    property URL_SAFE: Integer read _GetURL_SAFE;
+  end;
+
+  [JavaSignature('android/util/Base64')]
+  JBase64 = interface(JObject)
+    ['{AC976256-7237-4F07-87CD-B57F5F28BF6A}']
+  end;
+  TJBase64 = class(TJavaGenericImport<JBase64Class, JBase64>)
+  end;
 
   JTimerClass = interface(JObjectClass)
     ['{07C8270D-52FF-4B70-B364-A4E86A4F3411}']
@@ -99,6 +130,7 @@ type
     ['{6A5EC34E-CB76-4AB0-A11D-7CCB3B40C571}']
   end;
   TJutil_Log = class(TJavaGenericImport<Jutil_LogClass, Jutil_Log>) end;
+
 
 implementation
 
