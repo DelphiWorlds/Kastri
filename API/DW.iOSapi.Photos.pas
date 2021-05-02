@@ -6,7 +6,7 @@ unit DW.iOSapi.Photos;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -949,13 +949,11 @@ const
 
 implementation
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 uses
   Posix.Dlfcn;
 
 var
   PhotosModule: THandle;
-{$ENDIF}
 
 function PHContentEditingInputResultIsInCloudKey: NSString;
 begin
@@ -1032,12 +1030,10 @@ begin
   Result := CocoaNSStringConst(libPhotos, 'PHLivePhotoEditingErrorDomain');
 end;
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 initialization
   PhotosModule := dlopen(MarshaledAString(libPhotos), RTLD_LAZY);
 
 finalization
   dlclose(PhotosModule)
-{$ENDIF}
 
 end.
