@@ -6,7 +6,7 @@ unit DW.Vcl.ListBoxHelper;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -115,16 +115,17 @@ procedure TListBoxHelper.ToggleChecked(const AIndex: Integer = -1);
 var
   I, LCheckedCount: Integer;
 begin
-  if not (Self is TCheckListBox) then
-    Exit; // <======
-  if AIndex = -1 then
+  if Self is TCheckListBox then
   begin
-    LCheckedCount := CheckedCount;
-    for I := 0 to Count - 1 do
-      TCheckListBox(Self).Checked[I] := LCheckedCount < (Count div 2);
-  end
-  else if (AIndex > -1) and (AIndex < Items.Count) then
-    TCheckListBox(Self).Checked[AIndex] := not TCheckListBox(Self).Checked[AIndex];
+    if AIndex = -1 then
+    begin
+      LCheckedCount := CheckedCount;
+      for I := 0 to Count - 1 do
+        TCheckListBox(Self).Checked[I] := LCheckedCount < (Count div 2);
+    end
+    else if (AIndex > -1) and (AIndex < Items.Count) then
+      TCheckListBox(Self).Checked[AIndex] := not TCheckListBox(Self).Checked[AIndex];
+  end;
 end;
 
 end.
