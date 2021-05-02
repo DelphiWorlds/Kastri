@@ -6,7 +6,7 @@ unit DW.IOUtils.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -125,7 +125,8 @@ type
   end;
 
   TDirectoryHelper = record
-    /// <summary>
+    class function Copy(const ASrcDirectory, ADestDirectory: string): Boolean; static;
+     /// <summary>
     ///   Deletes files based on multiple search patterns
     /// </summary>
     class procedure DeleteFiles(const APath: string; const APatterns: TArray<string>); overload; static;
@@ -138,12 +139,16 @@ type
     /// </summary>
     class function Exists(const ADirectory: string): Boolean; static;
     class function GetDirectories(const APath: string; const APatterns: TArray<string>;
-  const ASearchOption: TSearchOption = TSearchOption.soTopDirectoryOnly): TArray<string>; static;
+      const ASearchOption: TSearchOption = TSearchOption.soTopDirectoryOnly): TArray<string>; static;
     /// <summary>
     ///   Retrieves files based on multiple search patterns
     /// </summary>
     class function GetFiles(const APath: string; const APatterns: TArray<string>;
       const ASearchOption: TSearchOption = TSearchOption.soTopDirectoryOnly): TArray<string>; overload; static;
+    /// <summary>
+    ///   Retrieves first sub-folder under APath
+    /// </summary>
+    class function GetFirstFolder(const APath: string): string; static;
     /// <summary>
     ///   Returns the size of the directory, in bytes
     /// </summary>
@@ -397,12 +402,26 @@ end;
 
 { TDirectoryHelper }
 
+class function TDirectoryHelper.Copy(const ASrcDirectory, ADestDirectory: string): Boolean;
+begin
+  Result := False;
+  if Exists(ASrcDirectory) then
+  begin
+    {$IF Defined(MACOS)}
+      Result := TPlatformDirectory.Copy(ASrcDirectory, ADestDirectory);
+    {$ELSE}
+      TDirectory.Copy(ASrcDirectory, ADestDirectory);
+      Result := True;
+    {$ENDIF}
+  end;
+end;
+
 class function TDirectoryHelper.Delete(const ADirectory: string): Boolean;
 begin
   Result := not Exists(ADirectory);
   if not Result then
   begin
-    {$IF Defined(MSWINDOWS)}
+    {$IF Defined(MSWINDOWS) or Defined(MACOS)}
       Result := TPlatformDirectory.Delete(ADirectory);
     {$ELSE}
       Result := False;
@@ -454,6 +473,31 @@ begin
   begin
     LResult := TDirectory.GetFiles(APath, LPattern, ASearchOption);
     Result := Concat(Result, LResult);
+  end;
+end;
+
+class function TDirectoryHelper.GetFirstFolder(const APath: string): string;
+var
+  LSearchRec: TSearchRec;
+  LStop: Boolean;
+  LName: string;
+begin
+  if FindFirst(TPath.Combine(APath, '*'), faAnyFile, LSearchRec) = 0 then
+  try
+    LStop := False;
+    repeat
+      if (LSearchRec.Attr and System.SysUtils.faDirectory) <> 0 then
+      begin
+        LName := LSearchRec.Name;
+        if not (LName.Equals('.') or LName.Equals('..')) then
+        begin
+          Result := TPath.Combine(APath, LName);
+          LStop := True;
+        end;
+      end;
+    until LStop or (FindNext(LSearchRec) <> 0);
+  finally
+    FindClose(LSearchRec);
   end;
 end;
 
