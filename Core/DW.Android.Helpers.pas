@@ -113,6 +113,10 @@ type
     /// </summary>
     class function IsServiceRunning(const AServiceName: string): Boolean; static;
     /// <summary>
+    ///   Encodes a file-based URI to Base64
+    /// </summary>
+    class function JURIToBase64(const AJURI: Jnet_Uri): string; static;
+    /// <summary>
     ///   Returns the keyguard manager
     /// </summary>
     class function KeyguardManager: JKeyguardManager; static;
@@ -193,7 +197,7 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI,
   // DW
-  DW.Androidapi.JNI.SupportV4;
+  DW.Androidapi.JNI.SupportV4, DW.Androidapi.JNI.Util;
 
 const
   cActionStartAlarm = cMultiBroadcastReceiverName + '.ACTION_START_ALARM';
@@ -245,7 +249,9 @@ end;
 
 class function TAndroidHelperEx.GetDefaultIconID: Integer;
 begin
-  Result := TAndroidHelper.Context.getApplicationInfo.icon;
+  Result := TAndroidHelper.GetResourceID('drawable/ic_notification');
+  if Result = 0 then
+    Result := TAndroidHelper.Context.getApplicationInfo.icon;
 end;
 
 class function TAndroidHelperEx.GetDefaultNotificationSound: Jnet_Uri;
@@ -285,7 +291,6 @@ var
   LURI: Jnet_Uri;
   LJavaBytes: TJavaArray<Byte>;
   LBytes: TBytes;
-  LFileStream: TFileStream;
 begin
   LURI := TJnet_Uri.JavaClass.parse(StringToJString(AURI));
   LInput := TAndroidHelper.Context.getContentResolver.openInputStream(LURI);
@@ -298,6 +303,21 @@ begin
     LJavaBytes.Free;
   end;
   TFile.WriteAllBytes(AFileName, LBytes);
+end;
+
+class function TAndroidHelperEx.JURIToBase64(const AJURI: Jnet_Uri): string;
+var
+  LInput: JInputStream;
+  LJavaBytes: TJavaArray<Byte>;
+begin
+  LInput := TAndroidHelper.Context.getContentResolver.openInputStream(AJURI);
+  LJavaBytes := TJavaArray<Byte>.Create(LInput.available);
+  try
+    LInput.read(LJavaBytes, 0, LJavaBytes.Length);
+    Result := JStringToString(TJBase64.JavaClass.encodeToString(LJavaBytes, TJBase64.JavaClass.NO_WRAP));
+  finally
+    LJavaBytes.Free;
+  end;
 end;
 
 class function TAndroidHelperEx.IsIgnoringBatteryOptimizations: Boolean;
