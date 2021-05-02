@@ -81,6 +81,8 @@ LaunchScreen.TemplateiOS
 Settings.bundle
 **/Android/Debug
 **/Android/Release
+**/Android64/Debug
+**/Android64/Release
 **/iOSDevice64/Debug/
 **/iOSDevice64/Release/
 **/OSX64/Debug/
