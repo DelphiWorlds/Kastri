@@ -6,7 +6,7 @@ unit DW.IOUtils.Helpers.Win;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -17,15 +17,19 @@ interface
 
 type
   TPlatformPath = record
+  public
+    class function CopyFiles(const AFiles: TArray<string>; const ADestination: string; const AConfirm: Boolean = True): Boolean; static;
     class function GetSharedDocumentsPath: string; static;
   end;
 
   TPlatformFile = record
+  public
     class function GetFileSize(const AFileName: string): Int64; static;
     class function IsInUse(const AFileName: string): Boolean; static;
   end;
 
   TPlatformDirectory = record
+  public
     class function Delete(const ADirectory: string): Boolean; static;
   end;
 
@@ -35,9 +39,40 @@ uses
   // RTL
   System.SysUtils, System.IOUtils,
   // Win
-  Winapi.Windows, Winapi.SHFolder, Winapi.ShellAPI;
+  Winapi.Windows, Winapi.SHFolder, Winapi.ShellAPI, Winapi.ActiveX, Winapi.ShlObj;
 
 { TPlatformPath }
+
+class function TPlatformPath.CopyFiles(const AFiles: TArray<string>; const ADestination: string; const AConfirm: Boolean = True): Boolean;
+var
+  LFileOp: IFileOperation;
+  LSrcFileItem: IShellItem;
+  LDestFolderItem: IShellItem;
+  LFileName: string;
+  LOpFlags: DWORD;
+begin
+  Result := False;
+  if Succeeded(CoInitializeEx(nil, COINIT_APARTMENTTHREADED or COINIT_DISABLE_OLE1DDE)) then
+  begin
+    LOpFlags := FOFX_NOMINIMIZEBOX;
+    if not AConfirm then
+      LOpFlags := LOpFlags or FOF_NOCONFIRMATION;
+    if Succeeded(CoCreateInstance(CLSID_FileOperation, nil, CLSCTX_ALL, IFileOperation, LFileOp)) and
+      Succeeded(LFileOp.SetOperationFlags(LOpFlags)) then
+    begin
+      if ForceDirectories(ADestination) and Succeeded(SHCreateItemFromParsingName(PChar(ADestination), nil, IShellItem, LDestFolderItem)) then
+      begin
+        for LFileName in AFiles do
+        begin
+          if Succeeded(SHCreateItemFromParsingName(PChar(LFileName), nil, IShellItem, LSrcFileItem)) then
+            LFileOp.CopyItem(LSrcFileItem, LDestFolderItem, PChar(TPath.GetFileName(LFileName)), nil);
+        end;
+        Result := Succeeded(LFileOp.PerformOperations);
+      end;
+    end;
+    CoUninitialize;
+  end;
+end;
 
 class function TPlatformPath.GetSharedDocumentsPath: string;
 var
