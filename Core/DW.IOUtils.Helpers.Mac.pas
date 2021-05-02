@@ -6,7 +6,7 @@ unit DW.IOUtils.Helpers.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -21,6 +21,12 @@ type
     class function GetResourcesPath(const AFolder: string): string; static;
   end;
 
+  TPlatformDirectory = record
+  public
+    class function Copy(const ASrcDirectory, ADestDirectory: string): Boolean; static;
+    class function Delete(const ADirectory: string): Boolean; static;
+  end;
+
 implementation
 
 uses
@@ -33,9 +39,25 @@ uses
   Macapi.Foundation,
   {$ENDIF}
   {$IF Defined(IOS)}
+  Macapi.ObjectiveC,
   iOSapi.Foundation,
   {$ENDIF}
   Macapi.Helpers;
+
+{$IF Defined(IOS)}
+type
+  NSFileManager = interface(iOSapi.Foundation.NSFileManager)
+    ['{238C346D-D21F-4CC7-9966-125C68F46259}']
+    function trashItemAtURL(url: NSURL; resultingItemURL: NSURL; error: PPointer = nil): Boolean; cdecl;
+  end;
+
+  TNSFileManager = class(TOCGenericImport<NSFileManagerClass, NSFileManager>)  end;
+{$ENDIF}
+
+function FileManager: NSFileManager;
+begin
+  Result := TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager);
+end;
 
 { TPlatformPath }
 
@@ -65,6 +87,31 @@ begin
     Result := TPathHelper.CombineAll([Result, 'Contents', 'Resources', AFolder])
   else
     Result := TPath.Combine(Result, AFolder);
+end;
+
+{ TPlatformDirectory }
+
+class function TPlatformDirectory.Copy(const ASrcDirectory, ADestDirectory: string): Boolean;
+var
+  LError: Pointer;
+  LMessage: string;
+begin
+  Result := False;
+  LError := nil;
+  FileManager.copyItemAtPath(StrToNSStr(ASrcDirectory).stringByResolvingSymlinksInPath, StrToNSStr(ADestDirectory), @LError);
+  Result := LError = nil;
+  if not Result then
+    LMessage := NSStrToStr(TNSError.Wrap(LError).localizedDescription);
+end;
+
+class function TPlatformDirectory.Delete(const ADirectory: string): Boolean;
+var
+  LError: Pointer;
+begin
+  // LError needs to be initialized to nil, because if trashItemAtURL succeeds, it does not touch the reference
+  LError := nil;
+  FileManager.trashItemAtURL(TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ADirectory), True)), nil, @LError);
+  Result := LError = nil;
 end;
 
 end.
