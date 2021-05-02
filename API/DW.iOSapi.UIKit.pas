@@ -6,7 +6,7 @@ unit DW.iOSapi.UIKit;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -1393,7 +1393,7 @@ type
   UIStoryboardViewControllerCreator = function(coder: NSCoder): UIViewController of object;
   UITextAttributesConversionHandler = function(param1: NSDictionary): NSDictionary of object; // CAUTION: Declaration needs verification
 
-  TUIAlertActionHandler = procedure(alertaction: Pointer) of object;
+  TUIAlertActionHandler = procedure(alertaction: UIAlertAction) of object;
   TUIAlertControllerConfigurationHandler = procedure(textfield: UITextField) of object;
   TNSLayoutManagerBlockMethod1 = procedure(rect: CGRect; usedRect: CGRect; textContainer: NSTextContainer; glyphRange: NSRange; stop: PBoolean) of object;
   TNSLayoutManagerBlockMethod2 = procedure(rect: CGRect; stop: PBoolean) of object;
