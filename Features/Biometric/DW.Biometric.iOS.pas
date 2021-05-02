@@ -6,12 +6,13 @@ unit DW.Biometric.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
 {$I DW.GlobalDefines.inc}
+
 interface
 
 uses
@@ -20,28 +21,84 @@ uses
   // macOS
   Macapi.ObjectiveC, Macapi.Helpers,
   // iOS
-  iOSapi.Foundation, iOSapi.CocoaTypes,
+  iOSapi.Foundation, iOSapi.CocoaTypes, iOSapi.Security,
   // DW
   DW.Biometric;
 
-type
-  LAPolicy = (notUsed = 0, DeviceOwnerAuthenticationWithBiometrics = 1, DeviceOwnerAuthentication = 2);
+const
+  LAPolicyDeviceOwnerAuthenticationWithBiometrics = 1;
+  LAPolicyDeviceOwnerAuthentication = 2;
+  LAPolicyDeviceOwnerAuthenticationWithWatch = 3;
+  LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch = 4;
+  LACredentialTypeApplicationPassword = 0;
+  LACredentialTypeSmartCardPIN = -3;
+  LAAccessControlOperationCreateItem = 0;
+  LAAccessControlOperationUseItem = 1;
+  LAAccessControlOperationCreateKey = 2;
+  LAAccessControlOperationUseKeySign = 3;
+  LAAccessControlOperationUseKeyDecrypt = 4;
+  LAAccessControlOperationUseKeyKeyExchange = 5;
+  LABiometryTypeNone = 0;
+  LABiometryTypeTouchID = 1;
+  LABiometryTypeFaceID = 2;
+  LAErrorAuthenticationFailed = -1;
+  LAErrorUserCancel = -2;
+  LAErrorUserFallback = -3;
+  LAErrorSystemCancel = -4;
+  LAErrorPasscodeNotSet = -5;
+  LAErrorTouchIDNotAvailable = -6;
+  LAErrorTouchIDNotEnrolled = -7;
+  LAErrorTouchIDLockout = -8;
+  LAErrorAppCancel = -9;
+  LAErrorInvalidContext = -10;
+  LAErrorBiometryNotAvailable = -6;
+  LAErrorBiometryNotEnrolled = -7;
+  LAErrorBiometryLockout = -8;
+  LAErrorNotInteractive = -1004;
+  LAErrorWatchNotAvailable = -11;
 
-  LAContextReply = procedure(success: Pointer; error: Pointer) of object;
+type
+  LAContext = interface;
+
+  LAPolicy = NSInteger;
+  LACredentialType = NSInteger;
+  LAAccessControlOperation = NSInteger;
+  LABiometryType = NSInteger;
+  LAError = NSInteger;
+  SecAccessControlRef = Pointer;
+
+  LAContextEvaluateAccessControlReplyHandler = procedure(success: Boolean; error: Pointer) of object;
+  LAContextEvaluatePolicyReplyHandler = procedure(success: Boolean; error: Pointer) of object;
 
   LAContextClass = interface(NSObjectClass)
-    ['{5ABCEDE7-FC9E-4F97-AACB-C992FA7AEA25}']
+    ['{CB05A3B4-0AA5-47FB-9591-4AE4B8955AD4}']
   end;
+
   LAContext = interface(NSObject)
-    ['{481C9FA2-FB24-4BE7-98BC-0337ACCC4C5F}']
+    ['{0FCAC33A-E0AD-4A03-BD42-C77A11D76641}']
+    function biometryType: LABiometryType; cdecl;
     function canEvaluatePolicy(policy: LAPolicy; error: PPointer): Boolean; cdecl;
-    procedure evaluatePolicy(policy: LAPolicy; localizedReason: NSString; reply: LAContextReply); cdecl;
+    procedure evaluateAccessControl(accessControl: SecAccessControlRef; operation: LAAccessControlOperation; localizedReason: NSString;
+      reply: LAContextEvaluateAccessControlReplyHandler); cdecl;
+    function evaluatedPolicyDomainState: NSData; cdecl;
+    procedure evaluatePolicy(policy: LAPolicy; localizedReason: NSString; reply: LAContextEvaluatePolicyReplyHandler); cdecl;
+    function interactionNotAllowed: Boolean; cdecl;
     procedure invalidate; cdecl;
+    function isCredentialSet(&type: LACredentialType): Boolean; cdecl;
+    function localizedCancelTitle: NSString; cdecl;
+    function localizedFallbackTitle: NSString; cdecl;
+    function localizedReason: NSString; cdecl;
+    function maxBiometryFailures: NSNumber; cdecl;
+    function setCredential(credential: NSData; &type: LACredentialType): Boolean; cdecl;
+    procedure setInteractionNotAllowed(interactionNotAllowed: Boolean); cdecl;
+    procedure setLocalizedCancelTitle(localizedCancelTitle: NSString); cdecl;
+    procedure setLocalizedFallbackTitle(localizedFallbackTitle: NSString); cdecl;
+    procedure setLocalizedReason(localizedReason: NSString); cdecl;
+    procedure setMaxBiometryFailures(maxBiometryFailures: NSNumber); cdecl;
     procedure setTouchIDAuthenticationAllowableReuseDuration(touchIDAuthenticationAllowableReuseDuration: NSTimeInterval); cdecl;
     function touchIDAuthenticationAllowableReuseDuration: NSTimeInterval; cdecl;
   end;
-  TLAContext = class(TOCGenericImport<LAContextClass, LAContext>)
-  end;
+  TLAContext = class(TOCGenericImport<LAContextClass, LAContext>) end;
 
   TPlatformBiometric = class(TCustomPlatformBiometric)
   private
@@ -59,8 +116,8 @@ type
     procedure DoRestoreBiometryFailResult(const AResult: TBiometricFailResult; const AResultMessage: string);
     procedure DoRestoreBiometrySuccessResult;
     procedure ProcessFailResult(error: Pointer; var AResult: TBiometricFailResult; var AMessage: string);
-    procedure RestoreBiometryReply(success: Pointer; error: Pointer);
-    procedure BiometricReply(success: Pointer; error: Pointer);
+    procedure RestoreBiometryReplyHandler(success: Boolean; error: Pointer);
+    procedure VerifyReplyHandler(success: Boolean; error: Pointer);
   protected
     procedure Cancel; override;
     function CanVerify: Boolean; override;
@@ -71,6 +128,7 @@ type
     procedure SetReuseTime(const AInterval: Double); override;
     procedure Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod); override;
   public
+    class function GetBiometryKind: TBiometryKind; override;
     class function IsSupported: Boolean; override;
   public
     constructor Create(const ABiometric: TBiometric); override;
@@ -87,24 +145,6 @@ uses
 
 const
   libLocalAuthentication = '/System/Library/Frameworks/LocalAuthentication.framework/LocalAuthentication';
-
-  LAPolicyDeviceOwnerAuthenticationWithBiometrics = 1;
-  LAPolicyDeviceOwnerAuthentication = 2;
-  LACredentialTypeApplicationPassword = 0;
-  LAAccessControlOperationCreateItem = 0;
-  LAAccessControlOperationUseItem = 1;
-  LAAccessControlOperationCreateKey = 2;
-  LAAccessControlOperationUseKeySign = 3;
-  LAErrorAuthenticationFailed = -1;
-  LAErrorUserCancel = -2;
-  LAErrorUserFallback = -3;
-  LAErrorSystemCancel = -4;
-  LAErrorPasscodeNotSet = -5;
-  LAErrorTouchIDNotAvailable = -6;
-  LAErrorTouchIDNotEnrolled = -7;
-  LAErrorTouchIDLockout = -8;
-  LAErrorAppCancel = -9;
-  LAErrorInvalidContext = -10;
 
 function LATouchIDAuthenticationMaximumAllowableReuseDuration: Double;
 begin
@@ -191,6 +231,21 @@ begin
   );
 end;
 
+class function TPlatformBiometric.GetBiometryKind: TBiometryKind;
+var
+  LContext: LAContext;
+begin
+  LContext := TLAContext.Create;
+  case LContext.biometryType of
+    LABiometryTypeFaceID:
+      Result := TBiometryKind.Face;
+    LABiometryTypeTouchID:
+      Result := TBiometryKind.Touch;
+  else
+    Result := TBiometryKind.None;
+  end;
+end;
+
 function TPlatformBiometric.HasUserInterface: Boolean;
 begin
   Result := True;
@@ -232,12 +287,12 @@ begin
   end;
 end;
 
-procedure TPlatformBiometric.BiometricReply(success, error: Pointer);
+procedure TPlatformBiometric.VerifyReplyHandler(success: Boolean; error: Pointer);
 var
   LResult: TBiometricFailResult;
   LMessage: string;
 begin
-  if success = nil then
+  if not success then
   begin
     ProcessFailResult(error, LResult, LMessage);
     DoVerifyFailResult(LResult, LMessage);
@@ -251,7 +306,7 @@ begin
   FVerifySuccessResultMethod := ASuccessResultMethod;
   FVerifyFailResultMethod := AFailResultMethod;
   if CanVerify then
-    FContext.evaluatePolicy(LAPolicy.DeviceOwnerAuthenticationWithBiometrics, StrToNSStr(AMessage), BiometricReply)
+    FContext.evaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, StrToNSStr(AMessage), VerifyReplyHandler)
   else
     DoVerifyFailResult(TBiometricFailResult.Error, SBiometricErrorCannotVerify);
 end;
@@ -264,7 +319,7 @@ end;
 
 function TPlatformBiometric.CanVerify: Boolean;
 begin
-  Result := FContext.canEvaluatePolicy(LAPolicy.DeviceOwnerAuthenticationWithBiometrics, nil);
+  Result := FContext.canEvaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, nil);
 end;
 
 function TPlatformBiometric.IsBiometryLockedOut: Boolean;
@@ -283,7 +338,7 @@ var
   LContext: LAContext;
 begin
   LContext := TLAContext.Create;
-  LContext.canEvaluatePolicy(LAPolicy.DeviceOwnerAuthenticationWithBiometrics, @LPointer);
+  LContext.canEvaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, @LPointer);
   Result := TNSError.Wrap(LPointer);
 end;
 
@@ -303,15 +358,15 @@ procedure TPlatformBiometric.RestoreBiometry(const ASuccessResultMethod: TProc; 
 begin
   FRestoreBiometryFailResultMethod := AFailResultMethod;
   FRestoreBiometrySuccessResultMethod := ASuccessResultMethod;
-  FContext.evaluatePolicy(LAPolicy.DeviceOwnerAuthentication, StrToNSStr(SBiometricEnterPINToRestore), RestoreBiometryReply);
+  FContext.evaluatePolicy(LAPolicyDeviceOwnerAuthentication, StrToNSStr(SBiometricEnterPINToRestore), RestoreBiometryReplyHandler);
 end;
 
-procedure TPlatformBiometric.RestoreBiometryReply(success, error: Pointer);
+procedure TPlatformBiometric.RestoreBiometryReplyHandler(success: Boolean; error: Pointer);
 var
   LResult: TBiometricFailResult;
   LMessage: string;
 begin
-  if success = nil then
+  if not success then
   begin
     ProcessFailResult(error, LResult, LMessage);
     DoRestoreBiometryFailResult(LResult, LMessage);

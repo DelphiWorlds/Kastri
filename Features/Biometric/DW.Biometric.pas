@@ -6,7 +6,7 @@ unit DW.Biometric;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -21,6 +21,8 @@ uses
 
 type
   TBiometricFailResult = (Unknown, Cancelled, Fallback, Denied, LockedOut, Error, Help);
+
+  TBiometryKind = (None, Face, Touch);
 
   TBiometricFailResultMethod = procedure (const FailResult: TBiometricFailResult; const ResultMessage: string) of object;
 
@@ -42,6 +44,7 @@ type
     procedure Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod); virtual;
     property Biometric: TBiometric read FBiometric;
   public
+    class function GetBiometryKind: TBiometryKind; virtual;
     class function IsSupported: Boolean; virtual;
   public
     constructor Create(const ABiometric: TBiometric); virtual;
@@ -54,8 +57,9 @@ type
   private
     FPlatformBiometric: TCustomPlatformBiometric;
   public
-    class destructor UnInitialise;
+    class destructor DestroyClass;
     class property Current: TBiometric read GetCurrent;
+    class function GetBiometryKind: TBiometryKind;
     class function IsSupported: Boolean;
   public
     constructor Create;
@@ -148,6 +152,11 @@ begin
   //
 end;
 
+class function TCustomPlatformBiometric.GetBiometryKind: TBiometryKind;
+begin
+  Result := TBiometryKind.None;
+end;
+
 function TCustomPlatformBiometric.GetKeyName: string;
 begin
   Result := '';
@@ -221,6 +230,11 @@ begin
   Result := FPlatformBiometric.CanVerify;
 end;
 
+class function TBiometric.GetBiometryKind: TBiometryKind;
+begin
+  Result := TPlatformBiometric.GetBiometryKind;
+end;
+
 class function TBiometric.GetCurrent: TBiometric;
 begin
   if FCurrent = nil then
@@ -268,7 +282,7 @@ begin
   FPlatformBiometric.SetReuseTime(AInterval);
 end;
 
-class destructor TBiometric.UnInitialise;
+class destructor TBiometric.DestroyClass;
 begin
   FCurrent.Free;
   FCurrent := nil;
