@@ -6,7 +6,7 @@ unit DW.iOSapi.QuickLook;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -143,21 +143,13 @@ uses
   // Posix
   Posix.Dlfcn;
 
-{$IF not Defined(CPUARM)}
 var
   QuickLookModule: Cardinal;
-{$ENDIF}
 
-{$IF Defined(CPUARM)}
-procedure QuickLookLoader; cdecl; external libQuickLook;
-{$ENDIF}
-
-{$IF not Defined(CPUARM)}
 initialization
   QuickLookModule := dlopen(MarshaledAString(libQuickLook), RTLD_LAZY);
 
 finalization
   dlclose(QuickLookModule);
-{$ENDIF}
 
 end.
