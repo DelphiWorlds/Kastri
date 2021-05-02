@@ -6,7 +6,7 @@ package com.delphiworlds.kastri;
  *                                                     *
  *        Delphi Worlds Cross-Platform Library         *
  *                                                     *
- *   Copyright 2020 Dave Nottage under MIT license     *
+ * Copyright 2020-2021 Dave Nottage under MIT license  *
  * which is located in the root folder of this library *
  *                                                     *
  *******************************************************/
@@ -51,6 +51,8 @@ package com.delphiworlds.kastri;
 */
 
 import android.app.AlarmManager;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -89,6 +91,16 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
   public static final String EXTRA_SERVICE_RESTART = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_RESTART";
   public static final String EXTRA_START_UNLOCK = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_START_UNLOCK";
 
+	private DWMultiBroadcastReceiverDelegate mDelegate;
+	
+	public DWMultiBroadcastReceiver() {
+    //
+  }
+
+	public DWMultiBroadcastReceiver(DWMultiBroadcastReceiverDelegate delegate) {
+		mDelegate = delegate;
+  }
+
   private boolean startApp(Context context) {
     context.startActivity(context.getPackageManager().getLaunchIntentForPackage(context.getPackageName()));
     return true;
@@ -111,6 +123,12 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
     } catch (PackageManager.NameNotFoundException exception) {
       return 0; // this should never happen :-)
     }
+  }
+
+  private boolean isAppForeground() {
+    RunningAppProcessInfo info = new ActivityManager.RunningAppProcessInfo();
+    ActivityManager.getMyMemoryState(info);
+    return (info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND || info.importance == RunningAppProcessInfo.IMPORTANCE_VISIBLE);
   }
 
   private boolean checkBuildAndTarget(Context context, int value) {
@@ -154,7 +172,7 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
         Log.d(TAG, "Attempting to start service from boot: " + serviceName);
         Intent serviceIntent = new Intent();
         serviceIntent.setClassName(context.getPackageName(), serviceName);
-        if (checkBuildAndTarget(context, 26)) 
+        if (checkBuildAndTarget(context, 26) && !isAppForeground()) 
           context.startForegroundService(serviceIntent); // Service MUST call startForeground when it starts
         else
           context.startService(serviceIntent);
@@ -166,12 +184,16 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
     if (intent.getAction().equals(ACTION_SERVICE_ALARM) || intent.getAction().equals(ACTION_SERVICE_RESTART)) {
       Log.d(TAG, "Attempting to restart service or start service from alarm");
       intent.setClassName(context.getPackageName(), intent.getStringExtra("ServiceName"));
+      // Some restart cases require the service not to be started in foreground mode
+      boolean startNormal = intent.getIntExtra("MustStartNormal", 0) == 1;
       if (intent.getAction().equals(ACTION_SERVICE_RESTART))
         intent.putExtra(EXTRA_SERVICE_RESTART, 1);
-      if (checkBuildAndTarget(context, 26)) 
-        context.startForegroundService(intent); // Service MUST call startForeground when it starts
+      if (!startNormal && checkBuildAndTarget(context, 26) && !isAppForeground()) 
+        context.startForegroundService(intent); // Service MUST call startForeground when it starts if the app is in the background or not running
+      else if (isAppForeground() || !checkBuildAndTarget(context, 26))
+        context.startService(intent); // Can only start the service "normally" if the app is in the foreground or lower than Android 8
       else
-        context.startService(intent);
+        Log.d(TAG, "Cannot start service in any mode");
       return true;
     }
 
@@ -258,29 +280,34 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 		  alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
   }
 
+  @Override
   public void onReceive(Context context, Intent intent) {
-    Log.d(TAG, "Received intent with action: " + intent.getAction());
-    if (ACTION_NOTIFICATION.equals(intent.getAction())) {
-      // Broadcast to the app to handle the notification if the app is running
-      LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-      Notification notification = intent.getParcelableExtra(EXTRA_NOTIFICATION);
-      NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-      DWWakeUp.checkWakeUp(context, WAKE_ON_NOTIFICATION, false);
-      // Dispatch the notification to the OS
-      int id = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
-      Log.d(TAG, "Notifying with id: " + id);
-      manager.notify(id, notification);
-      // Set alarm if repeating
-      long alarmTime = getAlarmTime(notification.extras.getInt(EXTRA_NOTIFICATION_REPEATINTERVAL, 0));
-      if (alarmTime != 0)
-        setRepeatAlarm(context, intent, alarmTime);
-		}
-    else if (intent.getAction().equals(ACTION_ALARM_TIMER)) {
-      Log.d(TAG, "Alarm timer");
-      LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    } else if (!checkStartupIntent(context, intent))
-      // Simply forward on the intent in a local broadcast
-      LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    if (mDelegate == null) {
+      Log.d(TAG, "Received intent with action: " + intent.getAction());
+      if (ACTION_NOTIFICATION.equals(intent.getAction())) {
+        // Broadcast to the app to handle the notification if the app is running
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        Notification notification = intent.getParcelableExtra(EXTRA_NOTIFICATION);
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        DWWakeUp.checkWakeUp(context, WAKE_ON_NOTIFICATION, false);
+        // Dispatch the notification to the OS
+        int id = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
+        Log.d(TAG, "Notifying with id: " + id);
+        manager.notify(id, notification);
+        // Set alarm if repeating
+        long alarmTime = getAlarmTime(notification.extras.getInt(EXTRA_NOTIFICATION_REPEATINTERVAL, 0));
+        if (alarmTime != 0)
+          setRepeatAlarm(context, intent, alarmTime);
+      }
+      else if (intent.getAction().equals(ACTION_ALARM_TIMER)) {
+        Log.d(TAG, "Alarm timer");
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+      } else if (!checkStartupIntent(context, intent))
+        // Simply forward on the intent in a local broadcast
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+    else
+      mDelegate.onReceive(context, intent);
   }
 
 }
