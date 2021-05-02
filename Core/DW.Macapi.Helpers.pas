@@ -6,7 +6,7 @@ unit DW.Macapi.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -52,11 +52,17 @@ type
     procedure SetValue(const AValue, AKey: string); overload;
   end;
 
+  TNSArrayHelper = record
+  public
+    class function FromNSObjects(const AArray: array of NSObject): NSArray; static;
+  end;
+
   TMacHelperEx = record
   public
     // class function GetLocationManagerAuthorization: TAuthorizationType; static;
     // class function NSDictionaryToJSON(const ADictionary: NSDictionary): string; static;
     class function GetBundleValue(const AKey: string): string; static;
+    class function GetBundleValueNS(const AKey: string): NSString; static;
     class function MainBundle: NSBundle; static;
     {$IF Defined(MACDEV)}
     class function SharedApplication: NSApplication; static;
@@ -261,16 +267,39 @@ begin
   Result := IncSecond(ADateTime, TNSTimeZone.Wrap(TNSTimeZone.OCClass.localTimeZone).secondsFromGMT);
 end;
 
+{ TNSArrayHelper }
+
+class function TNSArrayHelper.FromNSObjects(const AArray: array of NSObject): NSArray;
+var
+  LArray: array of Pointer;
+  I: Integer;
+begin
+  SetLength(LArray, Length(AArray));
+  for I := 0 to Length(AArray) - 1 do
+    LArray[I] := NSObjectToID(AArray[I]);
+  Result := TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@LArray[0], Length(LArray)));
+end;
+
 { TMacHelperEx }
 
 class function TMacHelperEx.GetBundleValue(const AKey: string): string;
 var
-  LValueObject: Pointer;
+  LValue: NSString;
 begin
   Result := '';
+  LValue := GetBundleValueNS(AKey);
+  if LValue <> nil then
+    Result := NSStrToStr(LValue);
+end;
+
+class function TMacHelperEx.GetBundleValueNS(const AKey: string): NSString;
+var
+  LValueObject: Pointer;
+begin
+  Result := nil;
   LValueObject := MainBundle.infoDictionary.objectForKey(StrToObjectID(AKey));
   if LValueObject <> nil then
-    Result := NSStrToStr(TNSString.Wrap(LValueObject));
+    Result := TNSString.Wrap(LValueObject);
 end;
 
 class function TMacHelperEx.MainBundle: NSBundle;
