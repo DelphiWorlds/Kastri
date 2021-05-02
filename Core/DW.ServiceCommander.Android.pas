@@ -6,7 +6,7 @@ unit DW.ServiceCommander.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -16,12 +16,14 @@ unit DW.ServiceCommander.Android;
 interface
 
 uses
+  // RTL
   System.Messaging;
 
 type
   TServiceCommander = class(TObject)
   private
     class var FCommander: TServiceCommander;
+    class var FIsRequestingPermissions: Boolean;
     class var FServiceName: string;
     class constructor CreateClass;
     class destructor DestroyClass;
@@ -30,6 +32,7 @@ type
   public
     class procedure SendCommand(const ACommand: Integer);
     class procedure StartService(AServiceName: string);
+    class property IsRequestingPermissions: Boolean read FIsRequestingPermissions write FIsRequestingPermissions;
   public
     constructor Create;
     destructor Destroy; override;
@@ -38,8 +41,9 @@ type
 implementation
 
 uses
+  DW.OSLog,
   // RTL
-  System.SysUtils, System.Android.Service,
+  System.SysUtils, System.Android.Service, System.IOUtils,
   // Android
   Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers, AndroidApi.JNI.JavaTypes,
   // FMX
@@ -78,7 +82,12 @@ begin
     TApplicationEvent.BecameActive:
       SendCommand(cServiceCommandAppBecameActive);
     TApplicationEvent.EnteredBackground:
-      SendCommand(cServiceCommandAppEnteredBackground);
+    begin
+      if FIsRequestingPermissions then
+        SendCommand(cServiceCommandAppIsRequestingPermissions)
+      else
+        SendCommand(cServiceCommandAppEnteredBackground);
+    end;
   end;
 end;
 
