@@ -4,7 +4,7 @@
 
 From [Delphi Worlds](http://www.delphiworlds.com)
 
-Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two point releases of major releases** (e.g. at present that includes 10.3.3 and 10.4.1) are "officially" supported. 
+Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two point releases of major releases** (e.g. at present that includes 10.3.3 and 10.4.2) are "officially" supported. 
 
 Development of Kastri can be helped along with [Github Sponsorship](https://github.com/sponsors/DelphiWorlds), so please consider sponsoring today!
 
@@ -51,7 +51,7 @@ You'll find demo applications in the Demos folder, including those associated wi
 
 ### API imports
 
-In the API folder you will find imports for a number of iOS, Android and Linux APIs that are either not included with Delphi, serve to complete missing APIs, or are imports for Java code contained in Kastri. 
+In the API folder you will find imports for a number of iOS, macOS, Android and Linux APIs that are either not included with Delphi, serve to complete missing APIs, or are imports for Java code contained in Kastri. 
 Most of these are used in the Kastri Features and/or demos however some are included due to interest from developers.
 
 ### Core units
@@ -105,6 +105,10 @@ Near-Field Communication implementations for Android and iOS
 
 Framework that is alternative to TNotificationCenter (that ships with Delphi) for Notifications on Android and iOS
 
+#### Proximity
+
+Support for the proximity sensor on Android and iOS, including switching the screen on/off e.g. when the user puts the device to their ear
+
 #### Share Items
 
 A more feature-rich alternative for the Share Sheet implementation provided with Delphi, for Android and iOS
@@ -123,7 +127,7 @@ This feature is currently in limbo, due to there being issues with making the fu
 
 #### Photos Library
 
-For accessing photos stored on the device via the albums on Android and iOS. Photos selector implementation with multiple-select capability (similar to Facebook's implementation)
+For accessing photos stored on the device via the albums on Android and iOS
 
 #### Simple backend framework for managing push tokens
 
