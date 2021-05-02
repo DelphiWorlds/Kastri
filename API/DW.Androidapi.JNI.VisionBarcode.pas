@@ -6,10 +6,12 @@ unit DW.Androidapi.JNI.VisionBarcode;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
+
+{$I DW.GlobalDefines.inc}
 
 // NOTE: Barcode (JBarcode) is NOT a complete import, as it omits the subclasses. These might be added later
 //
@@ -48,8 +50,6 @@ unit DW.Androidapi.JNI.VisionBarcode;
 //        LCode := JStringToString(LBarcode.displayValue); // <---- LCode now has the scanned code
 //      end;
 //    end;
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
