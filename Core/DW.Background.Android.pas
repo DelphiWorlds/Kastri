@@ -6,7 +6,7 @@ unit DW.Background.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -44,15 +44,18 @@ type
     FServiceName: string;
     FOnDozeChange: TBackgroundStateChangeEvent;
     FOnScreenLockChange: TBackgroundStateChangeEvent;
+    FIsActive: Boolean;
     function CreateDozeAlarm(const AAction: string; const AAlarm: Int64): Boolean;
     procedure DozeModeChange(const ADozed: Boolean);
     procedure ScreenLockChange(const ALocked: Boolean);
     function GetIsDozed: Boolean;
     function GetIsScreenLocked: Boolean;
+    procedure SetIsActive(const Value: Boolean);
   protected
     procedure ReceiverReceive(intent: JIntent);
   public
     constructor Create;
+    destructor Destroy; override;
     /// <summary>
     ///   Creates an alarm that is used to wake up the service
     /// </summary>
@@ -68,6 +71,10 @@ type
     ///   Determines the interval, in milliseconds, of the alarm when next set
     /// </summary>
     property DozeAlarmInterval: Integer read FDozeAlarmInterval write FDozeAlarmInterval;
+    /// <summary>
+    ///   Indicates whether or not background monitoring is active
+    /// </summary>
+    property IsActive: Boolean read FIsActive write SetIsActive;
     /// <summary>
     ///   Indicates whether or not the device is in doze mode
     /// </summary>
@@ -125,24 +132,51 @@ constructor TBackgroundMonitor.Create;
 begin
   inherited Create;
   FReceiver := TBackgroundMonitorReceiver.Create(Self);
+  FIsActive := True;
+end;
+
+destructor TBackgroundMonitor.Destroy;
+begin
+  FReceiver.Free;
+  inherited;
 end;
 
 procedure TBackgroundMonitor.ReceiverReceive(intent: JIntent);
 begin
-  if intent.getAction.equals(TJIntent.JavaClass.ACTION_USER_PRESENT) or intent.getAction.equals(TJIntent.JavaClass.ACTION_SCREEN_OFF)
-    or intent.getAction.equals(TJIntent.JavaClass.ACTION_SCREEN_ON) then
+  if FIsActive then
   begin
-    ScreenLockChange(IsScreenLocked);
-  end
-  // Otherwise, check for "doze" mode changes
-  else if TOSVersion.Check(6) and intent.getAction.equals(TJPowerManager.JavaClass.ACTION_DEVICE_IDLE_MODE_CHANGED) then
-    DozeModeChange(IsDozed);
+    if intent.getAction.equals(TJIntent.JavaClass.ACTION_USER_PRESENT) or intent.getAction.equals(TJIntent.JavaClass.ACTION_SCREEN_OFF)
+      or intent.getAction.equals(TJIntent.JavaClass.ACTION_SCREEN_ON) then
+    begin
+      ScreenLockChange(IsScreenLocked);
+    end
+    // Otherwise, check for "doze" mode changes
+    else if TOSVersion.Check(6) and intent.getAction.equals(TJPowerManager.JavaClass.ACTION_DEVICE_IDLE_MODE_CHANGED) then
+      DozeModeChange(IsDozed);
+  end;
 end;
 
 procedure TBackgroundMonitor.ScreenLockChange(const ALocked: Boolean);
 begin
   if Assigned(FOnScreenLockChange) then
     FOnScreenLockChange(Self, ALocked);
+end;
+
+procedure TBackgroundMonitor.SetIsActive(const Value: Boolean);
+begin
+  if Value <> FIsActive then
+  begin
+    FIsActive := Value;
+    if FIsActive then
+    begin
+      // Not really changing, but fire the event in case the screen was locked since the last time the monitor was active
+      ScreenLockChange(IsScreenLocked);
+      if IsDozed then
+        StartDozeAlarm;
+    end
+    else
+      StopDozeAlarm;
+  end;
 end;
 
 procedure TBackgroundMonitor.DozeModeChange(const ADozed: Boolean);
