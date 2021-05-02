@@ -6,7 +6,7 @@ unit DW.OSPower.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -69,35 +69,43 @@ begin
   FPowerInfo.BatteryStatus := TBatteryStatus.Unknown;
   FPowerInfo.DevicePowerStatus := TDevicePowerStatus.Unknown;
   LBlob := IOPSCopyPowerSourcesInfo;
-  LSources := IOPSCopyPowerSourcesList(LBlob);
-  LSourcesCount := CFArrayGetCount(LSources);
-  for I := 0 to LSourcesCount - 1 do
-  begin
-    LSource := IOPSGetPowerSourceDescription(LBlob, CFArrayGetValueAtIndex(LSources, I));
-    if LSource <> nil then
-    begin
-      UpdateDevicePowerStatus(CFDictionaryGetValue(LSource, kIOPSPowerSourceStateKey));
-      FPowerInfo.BatteryChargeTime := GetIntegerValue(CFDictionaryGetValue(LSource, kIOPSTimeToFullChargeKey));
-      FPowerInfo.BatteryLifeTime := GetIntegerValue(CFDictionaryGetValue(LSource, kIOPSTimeToEmptyKey));
-      LCurrentCapacity := GetIntegerValue(CFDictionaryGetValue(LSource, kIOPSCurrentCapacityKey));
-      LMaxCapacity := GetIntegerValue(CFDictionaryGetValue(LSource, kIOPSMaxCapacityKey));
-      if (LCurrentCapacity > -1) and (LMaxCapacity > 0) then
-        FPowerInfo.BatteryLevel := Round(LCurrentCapacity / LMaxCapacity * 100);
-      if FPowerInfo.BatteryLevel > -1 then
+  try
+    LSources := IOPSCopyPowerSourcesList(LBlob);
+    try
+      LSourcesCount := CFArrayGetCount(LSources);
+      for I := 0 to LSourcesCount - 1 do
       begin
-        if FPowerInfo.BatteryLevel > 66 then
-          FPowerInfo.BatteryStatus := TBatteryStatus.BatteryHealthy
-        else if FPowerInfo.BatteryLevel > 33 then
-          FPowerInfo.BatteryStatus := TBatteryStatus.BatteryNormal
-        else if FPowerInfo.BatteryLevel > 5 then
-          FPowerInfo.BatteryStatus := TBatteryStatus.BatteryLow
-        else
-          FPowerInfo.BatteryStatus := TBatteryStatus.BatteryCritical;
+        LSource := IOPSGetPowerSourceDescription(LBlob, CFArrayGetValueAtIndex(LSources, I));
+        if LSource <> nil then
+        try
+          UpdateDevicePowerStatus(CFDictionaryGetValue(LSource, kIOPSPowerSourceStateKey));
+          FPowerInfo.BatteryChargeTime := GetIntegerValue(CFDictionaryGetValue(LSource, kIOPSTimeToFullChargeKey));
+          FPowerInfo.BatteryLifeTime := GetIntegerValue(CFDictionaryGetValue(LSource, kIOPSTimeToEmptyKey));
+          LCurrentCapacity := GetIntegerValue(CFDictionaryGetValue(LSource, kIOPSCurrentCapacityKey));
+          LMaxCapacity := GetIntegerValue(CFDictionaryGetValue(LSource, kIOPSMaxCapacityKey));
+          if (LCurrentCapacity > -1) and (LMaxCapacity > 0) then
+            FPowerInfo.BatteryLevel := Round(LCurrentCapacity / LMaxCapacity * 100);
+          if FPowerInfo.BatteryLevel > -1 then
+          begin
+            if FPowerInfo.BatteryLevel > 66 then
+              FPowerInfo.BatteryStatus := TBatteryStatus.BatteryHealthy
+            else if FPowerInfo.BatteryLevel > 33 then
+              FPowerInfo.BatteryStatus := TBatteryStatus.BatteryNormal
+            else if FPowerInfo.BatteryLevel > 5 then
+              FPowerInfo.BatteryStatus := TBatteryStatus.BatteryLow
+            else
+              FPowerInfo.BatteryStatus := TBatteryStatus.BatteryCritical;
+          end;
+        finally
+          CFRelease(LSource);
+        end;
       end;
+    finally
+      CFRelease(LSources);
     end;
+  finally
+    CFRelease(LBlob);
   end;
-  CFRelease(LSources);
-  CFRelease(LBlob);
 end;
 
 class function TPlatformOSPower.GetIntegerValue(const AValue: Pointer; const ADefault: Integer = -1): Integer;
