@@ -5,7 +5,12 @@ interface
 uses
   System.SysUtils, System.Classes, System.Android.Service, System.Sensors,
   AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App,
-  DW.Location.Android, DW.Background.Android, DW.MultiReceiver.Android,
+  DW.Location, DW.Background.Android, DW.MultiReceiver.Android,
+  {$IF Defined(USE_FUSED_LOCATION)}
+  DW.Location.FusedLocation.Android,
+  {$ELSE}
+  DW.Location.Android,
+  {$ENDIF}
   CPL.LocationUpdater;
 
 type
@@ -29,6 +34,7 @@ type
     FLocalReceiver: TLocalReceiver;
     FLocation: TLocation;
     FNotificationChannel: JNotificationChannel;
+    FTerminatedFlagFileName: string;
     FUpdater: TLocationUpdater;
     procedure BackgroundMonitorDozeChange(Sender: TObject; const AIsDozed: Boolean);
     procedure BackgroundMonitorScreenLockChange(Sender: TObject; const AIsScreenLocked: Boolean);
@@ -37,11 +43,16 @@ type
     procedure CreateObjects;
     procedure DestroyObjects;
     procedure DoMessage(const AMsg: string);
+    function HasBackgroundPermission: Boolean;
     function IsForeground: Boolean;
-    procedure LocationChangeHandler(Sender: TObject; const ALocation: TLocationCoord2D; const ASource: TLocationSource);
+    {$IF Defined(USE_FUSED_LOCATION)}
+    procedure LocationChangeHandler(Sender: TObject; const AData: TLocationData);
+    {$ELSE}
+    procedure LocationChangeHandler(Sender: TObject; const AData: TLocationData; const ASource: TLocationSource);
+    {$ENDIF}
     procedure RestartService;
-    procedure StartForeground;
-    procedure StopForeground;
+    procedure StartForeground(const AMustStartForeground: Boolean);
+    procedure StopForeground(const AIsStarting: Boolean);
   protected
     procedure LocalReceiverReceive(intent: JIntent);
   public
@@ -113,8 +124,8 @@ end;
 constructor TServiceModule.Create(AOwner: TComponent);
 begin
   inherited;
-  ConnectToDatabase;
   CreateObjects;
+  ConnectToDatabase;
   if TAndroidHelperEx.IsServiceRunning(cServiceNameFull) then
     FLocation.Resume;
 end;
@@ -138,6 +149,8 @@ begin
   if FBackgroundMonitor = nil then
   begin
     FBackgroundMonitor := TBackgroundMonitor.Create;
+    // Set IsActive to false if the service does not appear to need background monitoring
+    FBackgroundMonitor.IsActive := False;
     FBackgroundMonitor.ServiceName := cServiceNameFull;
     FBackgroundMonitor.OnDozeChange := BackgroundMonitorDozeChange;
     FBackgroundMonitor.OnScreenLockChange := BackgroundMonitorScreenLockChange;
@@ -146,10 +159,13 @@ begin
   if FLocation = nil then
   begin
     FLocation := TLocation.Create;
-    FLocation.NeedsBackgroundAccess := True;
+    // *** Set this to True if the app cannot do without background access. Make sure the user is informed of this from within the app ***
+    FLocation.NeedsBackgroundAccess := False;
+    {$IF not Defined(USE_FUSED_LOCATION)}
     FLocation.MinimumChangeInterval := cMinimumChangeInterval;
-    FLocation.OnLocationChange := LocationChangeHandler;
     FLocation.TimerTask.Schedule(cLocationTimerInterval);
+    {$ENDIF}
+    FLocation.OnLocationChange := LocationChangeHandler;
   end;
   if FUpdater = nil then
   begin
@@ -160,12 +176,17 @@ end;
 
 procedure TServiceModule.DestroyObjects;
 begin
-  FLocalReceiver.DisposeOf;
+  FLocalReceiver.Free;
   FLocalReceiver := nil;
-  FBackgroundMonitor.DisposeOf;
+  FBackgroundMonitor.Free;
   FBackgroundMonitor := nil;
-  FLocation.DisposeOf;
+  FLocation.Free;
   FLocation := nil;
+end;
+
+function TServiceModule.HasBackgroundPermission: Boolean;
+begin
+  Result := PermissionsService.IsPermissionGranted(cPermissionAccessBackgroundLocation);
 end;
 
 procedure TServiceModule.DoMessage(const AMsg: string);
@@ -180,11 +201,14 @@ end;
 procedure TServiceModule.RestartService;
 var
   LIntent: JIntent;
+  LMustStartNormal: Integer;
 begin
   TOSLog.d('Sending restart intent');
+  LMustStartNormal := Ord(not HasBackgroundPermission);
   LIntent := TJIntent.JavaClass.init(StringToJString(cDWBroadcastReceiverActionServiceRestart));
   LIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cDWBroadcastReceiverName));
   LIntent.putExtra(StringToJString('ServiceName'), StringToJString(cServiceNameFull));
+  LIntent.putExtra(StringToJString('MustStartNormal'), LMustStartNormal);
   TAndroidHelper.Context.sendBroadcast(LIntent);
 end;
 
@@ -192,13 +216,13 @@ function TServiceModule.AndroidServiceStartCommand(const Sender: TObject; const 
 var
   LAlarm: Boolean;
 begin
+  CreateObjects;
   {$IF Defined(CLOUDLOGGING)}
   GrijjyLog.SetLogLevel(TgoLogLevel.Info);
   GrijjyLog.Connect(cCloudLoggingHost, cCloudLoggingName);
   {$ENDIF}
   if not TAndroidHelperEx.IsActivityForeground then
-    StartForeground;
-  CreateObjects;
+    StartForeground(False);
   // The broadcast receiver will send a start command when the doze alarm goes off, so there is a check here to see if that is why it was "started"
   LAlarm := (Intent <> nil) and JStringToString(Intent.getAction).Equals(cDWBroadcastReceiverActionServiceAlarm);
   if LAlarm and FBackgroundMonitor.IsDozed then
@@ -222,11 +246,12 @@ begin
     LCommand := intent.getIntExtra(StringToJString(cServiceBroadcastParamCommand), 0);
     TOSLog.d('LocalReceiverReceive received command: %d', [LCommand]);
     // Commands from the app
-    case intent.getIntExtra(StringToJString(cServiceBroadcastParamCommand), 0) of
+    case LCommand of
       cServiceCommandAppBecameActive:
-        StopForeground;
-      cServiceCommandAppEnteredBackground:
-        StartForeground;
+        StopForeground(False);
+      // If the app is requesting permissions, the service *must* be put into the foreground (if Android requires it)
+      cServiceCommandAppEnteredBackground, cServiceCommandAppIsRequestingPermissions:
+        StartForeground(LCommand = cServiceCommandAppIsRequestingPermissions);
       cServiceCommandStartLocationUpdates:
         FLocation.Resume;
       cServiceCommandStopLocationUpdates:
@@ -252,9 +277,9 @@ begin
   TOSLog.d('Screen Lock Change: %s', [BoolToStr(AIsScreenLocked, True)]);
   // If the screen is being locked, put the service into foreground mode so that it can still have network access
   if AIsScreenLocked then
-    StartForeground
+    StartForeground(False)
   else
-    StopForeground;
+    StopForeground(False);
 end;
 
 procedure TServiceModule.CreateNotificationChannel;
@@ -271,41 +296,52 @@ begin
   Result := TAndroidHelperEx.IsServiceForeground(cServiceNameFull);
 end;
 
-procedure TServiceModule.StartForeground;
+procedure TServiceModule.StartForeground(const AMustStartForeground: Boolean);
 var
   LBuilder: JNotificationCompat_Builder;
+  LIsForegroundMandatory: Boolean;
 begin
-  if not TOSVersion.Check(8) or IsForeground then
-    Exit; // <======
-  TOSLog.d('StartForeground');
-  if FNotificationChannel = nil then
-    CreateNotificationChannel;
-  JavaService.stopForeground(True);
-  LBuilder := TJNotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Context.getPackageName);
-  LBuilder.setAutoCancel(True);
-  LBuilder.setContentTitle(StrToJCharSequence(cServiceNotificationCaption));
-  LBuilder.setContentText(StrToJCharSequence(cServiceNotificationText));
-  LBuilder.setSmallIcon(TAndroidHelper.Context.getApplicationInfo.icon);
-  LBuilder.setTicker(StrToJCharSequence(cServiceNotificationCaption));
-  LBuilder.setPriority(TJNotification.JavaClass.PRIORITY_MIN);
-  JavaService.startForeground(cServiceForegroundId, LBuilder.build);
-  DoMessage('Service entered foreground mode');
+  LIsForegroundMandatory := not TAndroidHelperEx.IsActivityForeground and AMustStartForeground;
+  // Only allow the service to start in the foreground if it needs to. One case is where the Android permissions dialog is showing!
+  if not IsForeground and TOSVersion.Check(8) and (LIsForegroundMandatory or (not TOSVersion.Check(10) or HasBackgroundPermission)) then
+  begin
+    TOSLog.d('Starting foreground..');
+    if FNotificationChannel = nil then
+      CreateNotificationChannel;
+    JavaService.stopForeground(True);
+    LBuilder := TJNotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Context.getPackageName);
+    LBuilder.setAutoCancel(True);
+    LBuilder.setContentTitle(StrToJCharSequence(cServiceNotificationCaption));
+    LBuilder.setContentText(StrToJCharSequence(cServiceNotificationText));
+    LBuilder.setSmallIcon(TAndroidHelperEx.GetDefaultIconID);
+    LBuilder.setTicker(StrToJCharSequence(cServiceNotificationCaption));
+    LBuilder.setPriority(TJNotification.JavaClass.PRIORITY_MIN);
+    JavaService.startForeground(cServiceForegroundId, LBuilder.build);
+    DoMessage('Service entered foreground mode');
+  end;
 end;
 
-procedure TServiceModule.StopForeground;
+procedure TServiceModule.StopForeground(const AIsStarting: Boolean);
 begin
-  // Do not stop foreground service if the app is not in the foreground, or if the service is not foreground already
-  if not TOSVersion.Check(8) or not TAndroidHelperEx.IsActivityForeground or not IsForeground then
-    Exit; // <======
-  TOSLog.d('StopForeground');
-  JavaService.stopForeground(True);
-  DoMessage('Service exited foreground mode');
+  // Stop foreground service if the app is in the foreground, or if the service is foreground already
+  if TOSVersion.Check(8) and IsForeground then
+  begin
+    TOSLog.d('Stopping foreground..');
+    JavaService.stopForeground(True);
+    if not AIsStarting then
+      DoMessage('Service exited foreground mode');
+  end;
 end;
 
-procedure TServiceModule.LocationChangeHandler(Sender: TObject; const ALocation: TLocationCoord2D; const ASource: TLocationSource);
+{$IF Defined(USE_FUSED_LOCATION)}
+procedure TServiceModule.LocationChangeHandler(Sender: TObject; const AData: TLocationData);
+{$ELSE}
+procedure TServiceModule.LocationChangeHandler(Sender: TObject; const AData: TLocationData; const ASource: TLocationSource);
+{$ENDIF}
 var
   LStatus: Integer;
 begin
+  TOSLog.d('TServiceModule.LocationChangeHandler');
   // This is where to use the location data to update a server, or to a database when not connected to the internet and the data is to be sent later
   LStatus := 0;
   // Service in foreground means app is inactive
@@ -314,7 +350,7 @@ begin
   if FBackgroundMonitor.IsDozed then
     LStatus := 2;
 //  FUpdater.SendLocation(ALocation, LStatus);
-  LocationsDataModule.AddLocation(ALocation, LStatus);
+  LocationsDataModule.AddLocation(AData, LStatus);
 end;
 
 end.

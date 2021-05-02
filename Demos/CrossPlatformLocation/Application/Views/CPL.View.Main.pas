@@ -38,10 +38,13 @@ type
     {$IF Defined(ANDROID)}
     FReceiver: TLocalReceiver;
     {$ENDIF}
-    procedure LocationChangedHandler(Sender: TObject; const ALocation: TLocationCoord2D);
+    function GetBasePermissions: TArray<string>;
+    procedure LocationChangedHandler(Sender: TObject; const AData: TLocationData);
     procedure ReceiverMessageReceivedHandler(Sender: TObject; const AMsg: string);
-    procedure RequestLocationPermissions;
+    procedure RequestLocationPermissions(const APermissions: TArray<string>);
+    procedure RequestLocationPermissionsPrelude;
     procedure StartLocation;
+    procedure ShowRationale(const APostRationaleProc: TProc);
   protected
     procedure DoShow; override;
     procedure Resize; override;
@@ -59,38 +62,21 @@ implementation
 
 uses
   System.Permissions,
+  FMX.DialogService.Async,
   {$IF Defined(CLOUDLOGGING)}
   Grijjy.CloudLogging,
   {$ENDIF}
   DW.OSLog, DW.OSDevice,
   {$IF Defined(ANDROID)}
-  Androidapi.Helpers,
+  Androidapi.Helpers, Androidapi.JNI.JavaTypes,
   DW.ServiceCommander.Android,
   {$ENDIF}
   DW.Sensors, DW.Consts.Android, DW.UIHelper,
   CPL.Consts;
 
-type
-  TPermissionStatuses = TArray<TPermissionStatus>;
-
-  TPermissionStatusesHelper = record helper for TPermissionStatuses
-  public
-    function AreAllGranted: Boolean;
-  end;
-
-{ TPermissionStatusesHelper }
-
-function TPermissionStatusesHelper.AreAllGranted: Boolean;
-var
-  LStatus: TPermissionStatus;
-begin
-  for LStatus in Self do
-  begin
-    if LStatus <> TPermissionStatus.Granted then
-      Exit(False);
-  end;
-  Result := True;
-end;
+const
+  cBackgroundPermissionsMessage = 'This application requires access to location updates in the background'#13#10#13#10 +
+    'When prompted, please tap the "Allow in settings" option and select "Allow all the time"';
 
 {$IF Defined(ANDROID)}
 { TLocalReceiver }
@@ -146,7 +132,7 @@ procedure TMainView.DoShow;
 begin
   inherited;
   {$IF Defined(ANDROID)}
-  RequestLocationPermissions;
+  RequestLocationPermissionsPrelude;
   {$ELSE}
   StartLocation;
   {$ENDIF}
@@ -160,23 +146,71 @@ end;
 
 procedure TMainView.ReceiverMessageReceivedHandler(Sender: TObject; const AMsg: string);
 begin
-  Memo.Lines.Add('Message from service: ' + AMsg);
+  Memo.Lines.Add('Svc: ' + AMsg);
 end;
 
-procedure TMainView.RequestLocationPermissions;
+function TMainView.GetBasePermissions: TArray<string>;
+begin
+  Result := [cPermissionAccessCoarseLocation, cPermissionAccessFineLocation];
+end;
+
+procedure TMainView.ShowRationale(const APostRationaleProc: TProc);
+begin
+  if TOSVersion.Check(10) and not PermissionsService.IsPermissionGranted(cPermissionAccessBackgroundLocation) then
+  begin
+    TDialogServiceAsync.MessageDialog(cBackgroundPermissionsMessage, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], TMsgDlgBtn.mbOK, 0,
+      procedure(const AResult: TModalResult)
+      begin
+        APostRationaleProc;
+      end
+    );
+  end
+  else
+    APostRationaleProc;
+end;
+
+procedure TMainView.RequestLocationPermissions(const APermissions: TArray<string>);
+begin
+  {$IF Defined(ANDROID)}
+  TServiceCommander.IsRequestingPermissions := True;
+  {$ENDIF}
+  PermissionsService.RequestPermissions(APermissions,
+    procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
+    begin
+      if PermissionsService.IsEveryPermissionGranted(GetBasePermissions) then
+        StartLocation;
+      {$IF Defined(ANDROID)}
+      TServiceCommander.IsRequestingPermissions := False;
+      {$ENDIF}
+    end,
+    procedure(const APermissions: TArray<string>; const APostRationaleProc: TProc)
+    begin
+      ShowRationale(APostRationaleProc);
+    end
+  );
+end;
+
+procedure TMainView.RequestLocationPermissionsPrelude;
 var
   LPermissions: TArray<string>;
 begin
-  LPermissions := [cPermissionAccessCoarseLocation, cPermissionAccessFineLocation];
-  if TOSVersion.Check(10) then
-    LPermissions := LPermissions + [cPermissionAccessBackgroundLocation];
-  PermissionsService.RequestPermissions(LPermissions,
-    procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
-    begin
-      if AGrantResults.AreAllGranted then
-        StartLocation;
-    end
-  );
+  LPermissions := GetBasePermissions;
+  if not PermissionsService.IsEveryPermissionGranted(LPermissions) then
+  begin
+    // Calling ShowRationale here because the user needs to be aware that the background updates require the "Always" permission
+    ShowRationale(
+      procedure
+      begin
+        if TOSVersion.Check(10) then
+          LPermissions := LPermissions + [cPermissionAccessBackgroundLocation];
+        RequestLocationPermissions(LPermissions);
+      end
+    );
+  end
+  else if TOSVersion.Check(10) and not PermissionsService.IsPermissionGranted(cPermissionAccessBackgroundLocation) then
+    RequestLocationPermissions([cPermissionAccessBackgroundLocation])
+  else
+    StartLocation;
 end;
 
 procedure TMainView.StartLocation;
@@ -187,12 +221,13 @@ begin
   FLocation.IsActive := True;
 end;
 
-procedure TMainView.LocationChangedHandler(Sender: TObject; const ALocation: TLocationCoord2D);
+procedure TMainView.LocationChangedHandler(Sender: TObject; const AData: TLocationData);
 var
   LTimestamp: string;
 begin
-  LTimestamp := FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', Now);
-  Memo.Lines.Add(Format('%s - Location: %2.6f, %2.6f', [LTimestamp, ALocation.Latitude, ALocation.Longitude]));
+  LTimestamp := FormatDateTime('hh:nn:ss.zzz', Now);
+  Memo.Lines.Add(Format('%s - Location: %2.6f, %2.6f', [LTimestamp, AData.Location.Latitude, AData.Location.Longitude]));
+  Memo.Lines.Add(Format('%s - Speed: %.1f, Altitude: %.1f, Bearing: %.1f', [LTimestamp, AData.Speed, AData.Altitude, AData.Bearing]));
 end;
 
 procedure TMainView.ClearButtonClick(Sender: TObject);

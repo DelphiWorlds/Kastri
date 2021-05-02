@@ -6,7 +6,9 @@ uses
   System.SysUtils, System.Classes, System.Sensors,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
   FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs, FireDAC.ConsoleUI.Wait,
-  FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+  FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+  FireDAC.Phys.SQLiteWrapper.Stat,
+  DW.Location;
 
 type
   TLocationsDataModule = class(TDataModule)
@@ -20,7 +22,7 @@ type
     { Private declarations }
   public
     procedure Connect;
-    procedure AddLocation(const ALocation: TLocationCoord2D; const ADeviceState: Integer);
+    procedure AddLocation(const AData: TLocationData; const ADeviceState: Integer);
   end;
 
 var
@@ -56,13 +58,13 @@ begin
   end;
 end;
 
-procedure TLocationsDataModule.AddLocation(const ALocation: TLocationCoord2D; const ADeviceState: Integer);
+procedure TLocationsDataModule.AddLocation(const AData: TLocationData; const ADeviceState: Integer);
 begin
   if LocationsTable.Active then
   try
     LocationsTable.Append;
-    LocationsTableLatitude.Value := ALocation.Latitude;
-    LocationsTableLongitude.Value := ALocation.Longitude;
+    LocationsTableLatitude.Value := AData.Location.Latitude;
+    LocationsTableLongitude.Value := AData.Location.Longitude;
     LocationsTableDeviceState.Value := ADeviceState;
     LocationsTable.Post;
   except
