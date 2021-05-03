@@ -21,6 +21,8 @@ If you are creating a new project (i.e. other than the demo) you will need to ad
 
 On iOS, the demo is dependent on prebuilt libraries in the [`ThirdParty\iOS`](https://github.com/DelphiWorlds/Kastri/tree/master/ThirdParty/iOS) folder
 
+The MLKitBarcodeScanning framework is over 100MB, so it has been zipped (`MLKitBarcodeScanning.framework.zip`). **It will need to be unzipped in place, in order for the app to compile**
+
 If you are creating a new project (i.e. other than the demo) you will need to add the path to the 
 
 * Framework search path, and:
