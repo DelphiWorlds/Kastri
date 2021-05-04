@@ -27,7 +27,9 @@ If you're looking to [learn Delphi, please visit this link](https://learndelphi.
 
 ## How To Use Kastri
 
-With Kastri, there are no components to install. Simply clone the repo ([Fork](https://git-fork.com/) is a highly recommended Git client), or download/unzip and ensure that your Project (recommended) or IDE paths point to the folders of the units that you use.
+For the most part, with Kastri there are no components to install. Simply clone the repo ([Fork](https://git-fork.com/) is a highly recommended Git client), or download/unzip and ensure that your Project (recommended) or IDE paths point to the folders of the units that you use.
+
+The [Native Controls suite (Kastri FMX)](./Controls) is a set of components that can be [installed into Delphi](./Packages) and used at design-time
 
 ## Support
 
@@ -47,7 +49,7 @@ If you would like to join the Delphi Worlds Slack workspace, [please visit this 
 
 ### Demos
 
-You'll find demo applications in the Demos folder, including those associated with articles posted on the [Delphi Worlds blog](http://www.delphiworlds.com/blog)
+You'll find demo applications in the [Demos](./Demos) folder, including those associated with articles posted on the [Delphi Worlds blog](http://www.delphiworlds.com/blog)
 
 ### API imports
 
@@ -77,6 +79,10 @@ The Features folder contains more feature-rich cross-platform implementations of
 There are demos for each of the features in the Demos folder
 Features include:
 
+#### Barcode
+
+Based on [Google ML Vision APIs](https://developers.google.com/ml-kit/vision), it allows you to scan an image and detect barcodes within it
+
 #### Biometric
 
 Android and iOS implementations of biometric functions, namely: Fingerprint recognition on Android, and Fingerprint and FaceID on iOS
@@ -96,6 +102,10 @@ Uses native APIs to allow users to select one or more files on the device, for A
 #### Firebase
 
 Android and iOS implementations of Firebase Cloud Messaging using their native libraries
+
+#### Location
+
+Android and iOS framework made specifically for location updates when the application is in any state (e.g. even when it is not running)
 
 #### NFC
 
@@ -124,6 +134,10 @@ In addition to the features listed above, several other features are [planned fo
 #### Geofencing support on Android
 
 This feature is currently in limbo, due to there being issues with making the functionality work. Please [contact me](https://github.com/DelphiWorlds/Kastri/issues/19) if you are interested in helping.
+
+#### Google SignIn
+
+A (hopefully) simplified variation on [Grijjy's excellent Google SignIn](https://github.com/grijjy/DelphiGoogleSignIn) implementation, **with added support for iOS**
 
 #### Photos Library
 
