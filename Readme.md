@@ -147,10 +147,6 @@ For accessing photos stored on the device via the albums on Android and iOS
 
 A simple REST backend for managing push tokens and sending messages that can be customised to your needs. Complements the existing Firebase Cloud Messaging support.
 
-#### Universal Links
-
-Allows users to intelligently follow links to content inside your app from your website. Implemented natively on iOS
-
 The above features take time and resources to develop. Your help via [sponsorship](https://github.com/sponsors/DelphiWorlds) can help make them a reality!
 
 ## License
