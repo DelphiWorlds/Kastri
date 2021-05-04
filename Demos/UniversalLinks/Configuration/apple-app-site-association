@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "LDM7R2GDFK.com.delphiworlds.testuniversallinks",
+        "paths": [
+          "/linkstest/",
+          "/linkstest2/*"
+      }
+    ]
+  }
+}
