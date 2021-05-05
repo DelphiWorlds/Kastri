@@ -127,6 +127,10 @@ A more feature-rich alternative for the Share Sheet implementation provided with
 
 Android and iOS implementations for speech-to-text services. On Android, the actual speech API is used, rather than via Intents
 
+#### Universal Links (iOS only)
+
+Allows users to follow links to content inside your app from your website.
+
 ### Planned Features
 
 In addition to the features listed above, several other features are [planned for Kastri](https://github.com/DelphiWorlds/Kastri/milestones), namely:
