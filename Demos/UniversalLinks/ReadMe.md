@@ -102,7 +102,7 @@ Due to an [issue in Delphi](https://quality.embarcadero.com/browse/RSP-31487), y
 1. Compile the app
 2. In the Delphi menu, use Project|Deploy [your project name] (Shift-Ctrl-Alt-F9) to deploy the project files
 3. Copy the .entitlements (the file name will start with the same name as your project) file from the deployed files (e.g. in the iOSDevice64\Debug subfolder), and put it in another folder (e.g. the project root)
-4. In the copy of the .entitlments folder you will need to modify the line below: `<key>com.apple.developer.associated-domains</key>`
+4. In the copy of the .entitlments file you will need to modify the line below: `<key>com.apple.developer.associated-domains</key>`
 5. Replace `<string>*</string>` with:
    
 
