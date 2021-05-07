@@ -280,9 +280,6 @@ type
     function getSkuDetails: JSkuDetails; cdecl;
     function getSkuType: JString; cdecl;
     function getVrPurchaseFlow: Boolean; cdecl;
-    function zza: JArrayList; cdecl;
-    function zzb: JString; cdecl;
-    function zzd: JString; cdecl;
   end;
   TJBillingFlowParams = class(TJavaGenericImport<JBillingFlowParamsClass, JBillingFlowParams>) end;
 
@@ -559,9 +556,6 @@ type
     function getType: JString; cdecl;
     function hashCode: Integer; cdecl;
     function toString: JString; cdecl;
-    function zza: JString; cdecl;
-    function zzc: JString; cdecl;
-    function zzd: Integer; cdecl;
   end;
   TJSkuDetails = class(TJavaGenericImport<JSkuDetailsClass, JSkuDetails>) end;
 
