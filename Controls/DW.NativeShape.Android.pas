@@ -25,6 +25,7 @@ uses
   Androidapi.JNIBridge, Androidapi.JNI, Androidapi.JNI.Support,
   // FMX
   FMX.Presentation.Messages, FMX.Presentation.Android, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model,
+  FMX.Graphics,
   // DW
   DW.NativeShape;
 
@@ -127,8 +128,14 @@ begin
 end;
 
 procedure TAndroidNativeShape.StrokeChanged;
+var
+  LNativeColor: Integer;
 begin
-  FBackground.setStroke(Round(Model.Stroke.Thickness * ScreenScale), TAndroidHelper.AlphaColorToJColor(Model.Stroke.Color));
+  if (Model.Stroke.Color = TAlphaColors.Null) or (Model.Stroke.Kind = TBrushKind.None) then
+    LNativeColor := TJColor.JavaClass.TRANSPARENT
+  else
+    LNativeColor := TAndroidHelper.AlphaColorToJColor(Model.Stroke.Color);
+  FBackground.setStroke(Round(Model.Stroke.Thickness * ScreenScale), LNativeColor);
 end;
 
 function TAndroidNativeShape.GetModel: TCustomNativeShapeModel;
