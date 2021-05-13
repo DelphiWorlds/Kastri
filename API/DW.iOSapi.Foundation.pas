@@ -36,8 +36,10 @@ const
 
 type
   NSLocale = interface;
+  NSMeasurement = interface;
   NSPersonNameComponents = interface;
   NSProgress = interface;
+  NSUnit = interface;
   NSUserActivity = interface;
 
   NSErrorDomain = NSString;
@@ -272,6 +274,34 @@ type
     function progress: NSProgress; cdecl;
   end;
 
+  NSUnitClass = interface(NSObjectClass)
+    ['{E58B92C1-F0D4-496B-8C43-397E478C10AA}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  NSUnit = interface(NSObject)
+    ['{4FAA83A3-6D6B-4BF9-BFD6-9EE2C0F02382}']
+    function initWithSymbol(symbol: NSString): Pointer; cdecl;
+    function symbol: NSString; cdecl;
+  end;
+  TNSUnit = class(TOCGenericImport<NSUnitClass, NSUnit>) end;
+
+  NSMeasurementClass = interface(NSObjectClass)
+    ['{5992431E-64D1-4813-B918-D656927DC518}']
+  end;
+
+  NSMeasurement = interface(NSObject)
+    ['{AA2F9B58-7C87-4632-9A4B-8865D26F8B83}']
+    [MethodName('unit')]
+    function &unit: Pointer; cdecl;  // UnitType
+    function canBeConvertedToUnit(&unit: NSUnit): Boolean; cdecl;
+    function doubleValue: Double; cdecl;
+    function initWithDoubleValue(doubleValue: Double; &unit: Pointer): Pointer; cdecl; // &unit: UnitType
+    function measurementByAddingMeasurement(measurement: NSMeasurement): NSMeasurement; cdecl;
+    function measurementByConvertingToUnit(&unit: NSUnit): NSMeasurement; cdecl;
+    function measurementBySubtractingMeasurement(measurement: NSMeasurement): NSMeasurement; cdecl;
+  end;
+  TNSMeasurement = class(TOCGenericImport<NSMeasurementClass, NSMeasurement>) end;
 
 function NSUserActivityTypeBrowsingWeb: NSString;
 
