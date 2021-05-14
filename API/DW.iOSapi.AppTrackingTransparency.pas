@@ -50,13 +50,11 @@ const
 
 implementation
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 uses
   Posix.Dlfcn;
 
 var
   AppTrackingTransparencyModule: THandle;
-{$ENDIF}
 
 function CocoaDoubleConst(const Fwk: string; const ConstStr: string): Double;
 var
@@ -76,12 +74,10 @@ end;
 
 procedure AppTrackingTransparencyLoader; cdecl; external libAppTrackingTransparency;
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 initialization
   AppTrackingTransparencyModule := dlopen(MarshaledAString(libAppTrackingTransparency), RTLD_LAZY);
 
 finalization
-  dlclose(AppTrackingTransparencyModule)
-{$ENDIF}
+  dlclose(AppTrackingTransparencyModule);
 
 end.
