@@ -8,6 +8,14 @@ As many of you are probably aware, the existing camera support in Delphi is not 
 
 Camera support in Kastri builds on the original standalone camera project, and adds support for iOS. On both platforms, instead of using the built-in camera app on devices, native APIs are used. Native controls are also used for displaying the camera preview, so the result is an huge improvement over the existing support in Delphi.
 
+## Compiling for iOS
+
+The camera support in Kastri is tied to the Vision framework from the iOS SDK. If you compile without importing the framework, you may receive this error:
+
+`[DCC Error] E2597 ld: file not found: /System/Library/Frameworks/Vision.framework/Vision`
+
+This is because the framework is not normally imported, so it will need to be imported manually, as per the [instructions in this article](https://delphiworlds.com/2013/10/adding-other-ios-frameworks-to-the-sdk-manager/).
+
 ## Some caveats
 
 Please be aware that this is a “first release” of camera support. It provides basic turn on/off of the preview, capturing of a still image, and inclusion of location metadata. Other features will be added over time, including:
