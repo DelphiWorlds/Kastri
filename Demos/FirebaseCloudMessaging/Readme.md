@@ -64,10 +64,9 @@ PushItServer is a framework being developed to help create push servers that man
 
 * Please follow the steps as per the Using the demo section
 * In the Project Manager, under the Android target, right-click the Libraries node and add the dw-kastri-base.jar and dw-firebase-messaging.jar files from the Kastri\Lib folder
+* In the Project Options, ensure that you have a Post Build event for merging the manifest, as per the demo
 * In the Project Options, ensure that the search path for **all** platforms includes folders from the Kastri repo as per the demo
 * In the Project Options, ensure that the search path for iOS Device 64-bit includes the Firebase SDK paths as per the demo
-
-
 
 
 
