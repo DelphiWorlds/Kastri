@@ -26,6 +26,7 @@ type
   private
     class procedure OpenNSURL(const AURL: NSURL); static;
   public
+    class function EnableTorch(const AEnable: Boolean): Boolean; static;
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     class function GetDeviceModel: string; static;
     class function GetDeviceName: string; static;
@@ -46,13 +47,33 @@ uses
   // macOS
   Macapi.Helpers,
   // iOS
-  iOSapi.Helpers, iOSapi.UIKit,
+  iOSapi.Helpers, iOSapi.UIKit, iOSapi.AVFoundation,
   // Posix
   Posix.SysUtsname,
   // DW
   DW.Macapi.Helpers, DW.iOSapi.Foundation;
 
 { TPlatformOSDevice }
+
+class function TPlatformOSDevice.EnableTorch(const AEnable: Boolean): Boolean;
+var
+  LDevice: AVCaptureDevice;
+  LMode: AVCaptureTorchMode;
+begin
+  Result := False;
+  LDevice := TAVCaptureDevice.Wrap(TAVCaptureDevice.OCClass.defaultDeviceWithMediaType(AVMediaTypeVideo));
+  if (LDevice <> nil) and LDevice.hasTorch and LDevice.lockForConfiguration then
+  try
+    if AEnable then
+      LMode := AVCaptureTorchModeOn
+    else
+      LMode := AVCaptureTorchModeOff;
+    LDevice.setTorchMode(LMode);
+    Result := LDevice.torchMode = LMode;
+  finally
+    LDevice.unlockForConfiguration;
+  end;
+end;
 
 class function TPlatformOSDevice.GetCurrentLocaleInfo: TLocaleInfo;
 var

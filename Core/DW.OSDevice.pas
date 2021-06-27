@@ -39,6 +39,13 @@ type
   /// </remarks>
   TOSDevice = record
   public
+    /// <summary>
+    ///   Turns the torch on/off, if available
+    /// </summary>
+    class function EnableTorch(const AEnable: Boolean): Boolean; static;
+    /// <summary>
+    ///   Returns locale info
+    /// </summary>
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     /// <summary>
     ///   Returns the model of the device, if available
@@ -126,6 +133,15 @@ uses
   {$ENDIF}
 
 { TOSDevice }
+
+class function TOSDevice.EnableTorch(const AEnable: Boolean): Boolean;
+begin
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  Result := TPlatformOSDevice.EnableTorch(AEnable);
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
 
 class function TOSDevice.GetCurrentLocaleInfo: TLocaleInfo;
 begin

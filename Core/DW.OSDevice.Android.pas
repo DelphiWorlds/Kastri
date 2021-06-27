@@ -25,6 +25,7 @@ type
   /// </remarks>
   TPlatformOSDevice = record
   public
+    class function EnableTorch(const AEnable: Boolean): Boolean; static;
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     class function GetDeviceName: string; static;
     class function GetPackageID: string; static;
@@ -43,11 +44,30 @@ uses
   System.SysUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.Provider, Androidapi.JNI.Os,  Androidapi.JNI.GraphicsContentViewText,
-  Androidapi.JNI.Net,
+  Androidapi.JNI.Net, Androidapi.JNIBridge,
   // DW
-  DW.Android.Helpers;
+  DW.Androidapi.JNI.Hardware.Camera2, DW.Android.Helpers;
 
 { TPlatformOSDevice }
+
+class function TPlatformOSDevice.EnableTorch(const AEnable: Boolean): Boolean;
+var
+  LCameraManager: JCameraManager;
+  LIDList: TJavaObjectArray<JString>;
+begin
+  Result := False;
+  LCameraManager := TJCameraManager.Wrap(TAndroidHelper.Context.getSystemService(TJContext.JavaClass.CAMERA_SERVICE));
+  if LCameraManager <> nil then
+  begin
+    LIDList := LCameraManager.getCameraIdList;
+    try
+      LCameraManager.setTorchMode(LIDList.Items[0], AEnable);
+      Result := True;
+    finally
+      LIDList.Free;
+    end;
+  end;
+end;
 
 class function TPlatformOSDevice.GetCurrentLocaleInfo: TLocaleInfo;
 var
