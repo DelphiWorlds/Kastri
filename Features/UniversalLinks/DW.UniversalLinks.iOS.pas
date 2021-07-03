@@ -1,14 +1,32 @@
 unit DW.UniversalLinks.iOS;
 
+{*******************************************************}
+{                                                       }
+{                      Kastri                           }
+{                                                       }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  which is located in the root folder of this library  }
+{                                                       }
+{*******************************************************}
+
+{$I DW.GlobalDefines.inc}
+
 interface
 
 implementation
 
 uses
+  // RTL
   System.SysUtils, System.Messaging,
+  // macOS
   Macapi.Helpers,
+  // iOS
   iOSapi.Foundation, iOSapi.UIKit,
+  // FMX
   FMX.Platform,
+  // DW
   DW.Macapi.ObjCRuntime, DW.iOSapi.Foundation, DW.UniversalLinks;
 
 type
