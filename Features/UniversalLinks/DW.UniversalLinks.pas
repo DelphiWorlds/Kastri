@@ -1,5 +1,18 @@
 unit DW.UniversalLinks;
 
+{*******************************************************}
+{                                                       }
+{                      Kastri                           }
+{                                                       }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  which is located in the root folder of this library  }
+{                                                       }
+{*******************************************************}
+
+{$I DW.GlobalDefines.inc}
+
 interface
 
 type
@@ -16,6 +29,10 @@ implementation
 {$IF Defined(IOS)}
 uses
   DW.UniversalLinks.iOS;
+{$ENDIF}
+{$IF Defined(ANDROID)}
+uses
+  DW.UniversalLinks.Android;
 {$ENDIF}
 
 { TOpenApplicationContext }
