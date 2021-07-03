@@ -1,4 +1,4 @@
-# Universal Links demo (iOS only)
+# Universal Links demo (Android and iOS only)
 
 ## Description
 
@@ -8,15 +8,42 @@ In order to use this demo (and/or implement the feature in your own projects), y
 
 ## Set up your website
 
-**Please ensure that your website is capable of handling HTTPS**. This makes configuration far less painful. If you are unable to provide https support, please refer to the ["Signing the App-Site-Association File" section in this article](https://developerinsider.co/enable-universal-links-in-ios-app-and-setup-server-for-it/).
+**Please ensure that your website is capable of handling HTTPS**. This makes configuration far less painful. For iOS, if you are unable to provide https support, please refer to the ["Signing the App-Site-Association File" section in this article](https://developerinsider.co/enable-universal-links-in-ios-app-and-setup-server-for-it/).
 
-### apple-app-site-association file
+### Android: assetlinks.json file
 
-A file called `apple-app-site-association` needs to be added to your website. The file is in JSON format (though without the JSON extension - **having no extension is a requirement**), and needs to be accessible from the root of the domain, e.g. https://yourdomain.com/apple-app-site-association, or from the `.well-known` subdirectory, e.g: https://yourdomain.com/.well-known/apple-app-site-association
+For Android, a file called `assetlinks.json` needs to be added to your website, and needs to be accessible from the `.well-known` subdirectory, e.g: https://yourdomain.com/.well-known/assetlinks.json, as per [this documentation](https://developer.android.com/training/app-links/verify-site-associations#web-assoc).
+
+The file contains information about the package identifier for your app, and a SHA256 fingerprint that is used to associate and an [Android keystore file that you generate via Delphi](http://docwiki.embarcadero.com/RADStudio/Sydney/en/Creating_a_Keystore_File), with your application. As per the documentation mentioned above, you can generate the fingerprint using this command in a commandline window:
+
+```
+keytool -list -v -keystore my-release-key.keystore
+```
+
+Where `my-release-key.keystore` is the name of the keystore file generated, as explained above. Here's an example of an assetlinks.json file:
+
+```
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.delphiworlds.testuniversallinks",
+    "sha256_cert_fingerprints":
+    ["AA:BB:07:E3:FE:06:C8:CF:A6:1E:12:3E:7F:87:FF:B7:29:A6:9E:8A:8C:B5:E2:91:AB:CB:86:84:2F:72:AA:BB"]
+  }
+}]
+```
+
+You could use this as a template, replacing the values for `package_name` and `sha256_cert_fingerprints` with your own.
+
+### iOS: apple-app-site-association file
+
+For iOS, a file called `apple-app-site-association` needs to be added to your website. The file is in JSON format (though without the JSON extension - **having no extension is a requirement**), and needs to be accessible from the root of the domain, e.g. https://yourdomain.com/apple-app-site-association, or from the `.well-known` subdirectory, e.g: https://yourdomain.com/.well-known/apple-app-site-association
 
 It contains information about the domain and the supported routes. An [example of the file is here](./Configuration/apple-app-site-association). You will need to modify the file to suit your App ID and the links that will be supported. **Note that the AppID value in this file needs to include the Team ID**
 
 Here is additional [information about setting up a website for Universal Links support](https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/UniversalLinks.html)
+
 
 ### Adding links to your webpage
 
@@ -28,18 +55,20 @@ An example webpage with links (`TestLinks.html`) is located in the [Configuratio
     <title>Universal Links Test</title>
   </head>
   <body>
-    <a href="https://www.delphiworlds.com/linkstest">Links Test</a>
+    <a href="https://www.delphiworlds.com/linkstest"> iOS Links Test</a>
     <br/>
-    <a href="https://www.delphiworlds.com/linkstest2">Links Test 2</a>
+    <a href="https://www.delphiworlds.com/linkstest2">iOS Links Test 2</a>
     <br/>
-    <a href="https://www.delphiworlds.com/linkstest2/bloop">Links Test 2 Against "Wildcard"</a>
+    <a href="https://www.delphiworlds.com/linkstest2/bloop">iOS Links Test 2 Against "Wildcard"</a>
+    <br/>
+    <a href="https://www.delphiworlds.com/androidlinkstest">Android Links Test</a>
   </body>
 </html>
 ```
 
 If you use this file to test with, you will of course need to change the `href` values to suit your domain and configuration
 
-## Apple Developer tasks
+## iOS - Apple Developer tasks
 
 [Log in to the website](https://developer.apple.com/account/) with your Apple ID
 
@@ -90,12 +119,41 @@ The profile should now be on your Mac, in the `~/Library/MobileDevice/Provisioni
 
 1. In the Project Options, select Application > Version Info
 2. In the Target combo box, select the configuration to which the options should apply. Unless you have a different App ID for debug and release, select All configurations
-3. Enter the Bundle ID (from step 7 of the App ID instructions) (if this is the demo project, replace the existing value)
-4. Click Save, and save the project
+3. For iOS, enter the Bundle ID (from step 7 of the App ID instructions) (if this is the demo project, replace the existing value)
+4. For Android, enter the package name that applies
+5. Click Save, and save the project
 
     <img src="./Screenshots/ProjectOptionsBundleID.png" alt="Project Options Bundle ID" height="400">
 
-### Entitlements
+### Android manifest changes
+
+In order for Android to launch your app in response to the links being browsed to, you will need to add `intent-filter` entries in the `activity` node of the `AndroidManifest.template.xml` file in the project folder.
+
+Following the example from the section, this is what the `activity` node looks like with the `intent-filter` added:
+
+        <activity android:name="com.embarcadero.firemonkey.FMXNativeActivity"
+                android:label="%activityLabel%"
+                android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+                android:launchMode="singleTask">
+            <!-- Tell NativeActivity the name of our .so -->
+            <meta-data android:name="android.app.lib_name"
+                android:value="%libNameValue%" />
+            <intent-filter>  
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Universal links filters --> 
+            <intent-filter android:label="https filter">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                      android:host="www.delphiworlds.com"
+                      android:pathPrefix="/androidlinkstest" />
+            </intent-filter>
+        </activity>
+
+### iOS Entitlements
 
 Due to an [issue in Delphi](https://quality.embarcadero.com/browse/RSP-31487), you will need to:
 
@@ -127,6 +185,7 @@ Your app should be ready for deployment now, so build and deploy to the device, 
 
 ## Testing the links
 
-On your iOS device where the app has been deployed to, open Safari and navigate to the page with links as per the [`Set up your website`](#set-up-your-website) steps
+On your device where the app has been deployed to, for iOS open Safari, for Android open Chrome, and navigate to the page with links as per the [`Set up your website`](#set-up-your-website) steps
 
-When you tap the link in Safari, your app should open, and the URL passed to the app should match the URL in the link. If the app does not open, check that you have followed the [`Set up your website`](#set-up-your-website) and [`Apple Developer tasks`](#apple-developer-tasks) steps
+When you tap the link in the browser, your app should open, and the URL passed to the app should match the URL in the link. If the app does not open, check that you have followed the [`Set up your website`](#set-up-your-website) and if on iOS, [`Apple Developer tasks`](#apple-developer-tasks) steps
+
