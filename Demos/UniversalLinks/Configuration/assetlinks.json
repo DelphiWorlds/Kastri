@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.delphiworlds.testuniversallinks",
+    "sha256_cert_fingerprints":
+    ["AA:BB:07:E3:FE:06:C8:CF:A6:1E:12:3E:7F:87:FF:B7:29:A6:9E:8A:8C:B5:E2:91:AB:CB:86:84:2F:72:AA:BB"]
+  }
+}]
