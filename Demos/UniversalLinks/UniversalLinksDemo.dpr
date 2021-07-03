@@ -1,4 +1,4 @@
-program iOSUniversalLinksDemo;
+program UniversalLinksDemo;
 
 uses
   System.StartUpCopy,
