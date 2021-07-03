@@ -129,7 +129,7 @@ The profile should now be on your Mac, in the `~/Library/MobileDevice/Provisioni
 
 In order for Android to launch your app in response to the links being browsed to, you will need to add `intent-filter` entries in the `activity` node of the `AndroidManifest.template.xml` file in the project folder.
 
-Following the example from the section, this is what the `activity` node looks like with the `intent-filter` added:
+Following the example from the [`Adding links to your webpage`](#adding-links-to-your-webpage) section, this is what the `activity` node looks like with the `intent-filter` added:
 
         <activity android:name="com.embarcadero.firemonkey.FMXNativeActivity"
                 android:label="%activityLabel%"
