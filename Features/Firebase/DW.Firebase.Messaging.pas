@@ -57,6 +57,7 @@ type
   end;
 
   TAuthorizationResultEvent = procedure(Sender: TObject; const Granted: Boolean) of object;
+  TFailedToRegisterEvent = procedure(Sender: TObject; const ErrorMessage: string) of object;
 
   TFirebaseMessaging = class(TObject)
   private
@@ -64,6 +65,7 @@ type
     FPlatformFirebaseMessaging: TCustomPlatformFirebaseMessaging;
     FToken: string;
     FOnAuthorizationResult: TAuthorizationResultEvent;
+    FOnFailedToRegister: TFailedToRegisterEvent;
     FOnMessageReceived: TFirebaseMessageReceivedEvent;
     FOnTokenReceived: TFirebaseTokenReceivedEvent;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
@@ -75,6 +77,7 @@ type
     procedure SetShowBannerWhenForeground(const Value: Boolean);
   protected
     procedure DoAuthorizationResult(const AGranted: Boolean);
+    procedure DoFailedToRegister(const AErrorMessage: string);
     procedure DoMessageReceived(const APayload: TStrings);
     procedure DoTokenReceived(const AToken: string);
   public
@@ -91,6 +94,7 @@ type
     property ShowBannerWhenForeground: Boolean read GetShowBannerWhenForeground write SetShowBannerWhenForeground;
     property Token: string read FToken;
     property OnAuthorizationResult: TAuthorizationResultEvent read FOnAuthorizationResult write FOnAuthorizationResult;
+    property OnFailedToRegister: TFailedToRegisterEvent read FOnFailedToRegister write FOnFailedToRegister;
     property OnMessageReceived: TFirebaseMessageReceivedEvent read FOnMessageReceived write FOnMessageReceived;
     property OnTokenReceived: TFirebaseTokenReceivedEvent read FOnTokenReceived write FOnTokenReceived;
   end;
@@ -216,6 +220,12 @@ begin
     FOnAuthorizationResult(Self, AGranted);
 end;
 
+procedure TFirebaseMessaging.DoFailedToRegister(const AErrorMessage: string);
+begin
+  if Assigned(FOnFailedToRegister) then
+    FOnFailedToRegister(Self, AErrorMessage);
+end;
+
 procedure TFirebaseMessaging.DoMessageReceived(const APayload: TStrings);
 begin
   if Assigned(FOnMessageReceived) then
@@ -260,7 +270,7 @@ end;
 
 procedure TFirebaseMessaging.PushFailToRegisterMessageHandler(const Sender: TObject; const M: TMessage);
 begin
-
+  DoFailedToRegister(TPushFailToRegisterMessage(M).Value.ErrorMessage);
 end;
 
 procedure TFirebaseMessaging.PushRemoteNotificationMessageHandler(const Sender: TObject; const M: TMessage);
