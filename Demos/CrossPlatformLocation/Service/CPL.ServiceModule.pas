@@ -164,6 +164,9 @@ begin
     {$IF not Defined(USE_FUSED_LOCATION)}
     FLocation.MinimumChangeInterval := cMinimumChangeInterval;
     FLocation.TimerTask.Schedule(cLocationTimerInterval);
+    {$ELSE}
+    // Uncomment this line and use the desired value from DW.Consts.Android
+    // FLocation.Priority := cLocationPriorityBalancedPowerAccuracy;
     {$ENDIF}
     FLocation.OnLocationChange := LocationChangeHandler;
   end;
@@ -300,6 +303,7 @@ procedure TServiceModule.StartForeground(const AMustStartForeground: Boolean);
 var
   LBuilder: JNotificationCompat_Builder;
   LIsForegroundMandatory: Boolean;
+  LIntent: JIntent;
 begin
   LIsForegroundMandatory := not TAndroidHelperEx.IsActivityForeground and AMustStartForeground;
   // Only allow the service to start in the foreground if it needs to. One case is where the Android permissions dialog is showing!
@@ -309,6 +313,9 @@ begin
     if FNotificationChannel = nil then
       CreateNotificationChannel;
     JavaService.stopForeground(True);
+    // Create an intent for starting the app if the user taps the notification
+    LIntent := TJIntent.Create;
+    LIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString('com.embarcadero.firemonkey.FMXNativeActivity'));
     LBuilder := TJNotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Context.getPackageName);
     LBuilder.setAutoCancel(True);
     LBuilder.setContentTitle(StrToJCharSequence(cServiceNotificationCaption));
@@ -316,6 +323,7 @@ begin
     LBuilder.setSmallIcon(TAndroidHelperEx.GetDefaultIconID);
     LBuilder.setTicker(StrToJCharSequence(cServiceNotificationCaption));
     LBuilder.setPriority(TJNotification.JavaClass.PRIORITY_MIN);
+    LBuilder.setContentIntent(TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent, TJIntent.JavaClass.FLAG_ACTIVITY_NEW_TASK));
     JavaService.startForeground(cServiceForegroundId, LBuilder.build);
     DoMessage('Service entered foreground mode');
   end;
