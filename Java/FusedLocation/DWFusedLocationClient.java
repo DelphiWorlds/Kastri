@@ -46,12 +46,16 @@ public class DWFusedLocationClient {
 
   private Context mContext;
   private DWFusedLocationClientDelegate mDelegate;
+  private long mFastestInterval = 10000; // Milliseconds
+  private long mInterval = 10000; // Milliseconds
   private boolean mIsMockMode = false;
   private DWLocationCallback mLocationCallback;
   private FusedLocationProviderClient mLocationClient;
   private LocationRequest mLocationRequest;
+  private int mPriority = LocationRequest.PRIORITY_HIGH_ACCURACY;
   private SettingsClient mSettingsClient;
   private LocationSettingsRequest mSettingsRequest;
+  private float mSmallestDisplacement = 0; // Metres
 
 	public DWFusedLocationClient(Context context, DWFusedLocationClientDelegate delegate) {
     mContext = context;
@@ -59,27 +63,39 @@ public class DWFusedLocationClient {
     mLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
     mSettingsClient = LocationServices.getSettingsClient(mContext);
     mLocationCallback = new DWLocationCallback(mDelegate);
-    mLocationRequest = new LocationRequest();
   }
 
   private void createSettingsRequest() {
+    mLocationRequest = new LocationRequest();
+    mLocationRequest.setFastestInterval(mFastestInterval);
+    mLocationRequest.setInterval(mInterval);
+    mLocationRequest.setPriority(mPriority);
+    mLocationRequest.setSmallestDisplacement(mSmallestDisplacement);
     mSettingsRequest = new LocationSettingsRequest.Builder()
      .addLocationRequest(mLocationRequest)
      .build();
   }
 
   public long getFastestInterval() {
-    return mLocationRequest.getFastestInterval();
+    return mFastestInterval;
   }
 
   public void setFastestInterval(long interval) {
     // Sets the fastest rate for active location updates. This interval is exact, and your
     // application will never receive updates faster than this value.
-    mLocationRequest.setFastestInterval(interval);
+    mFastestInterval = interval;
+  }
+
+  public void setSmallestDisplacement(float value) {
+    mSmallestDisplacement = value;
+  }
+
+  public float getSmallestDisplacement() {
+    return mSmallestDisplacement;
   }
 
   public long getInterval() {
-    return mLocationRequest.getInterval();
+    return mInterval;
   }
 
   public void setInterval(long interval) {
@@ -87,7 +103,7 @@ public class DWFusedLocationClient {
     // inexact. You may not receive updates at all if no location sources are available, or
     // you may receive them slower than requested. You may also receive updates faster than
     // requested if other applications are requesting location at a faster interval.
-    mLocationRequest.setInterval(interval);
+    mInterval = interval;
   }
 
   public boolean getIsMockMode() {
@@ -95,11 +111,11 @@ public class DWFusedLocationClient {
   }
 
   public int getPriority() {
-      return mLocationRequest.getPriority();
+      return mPriority;
   }
 
   public void setPriority(int priority) {
-      mLocationRequest.setPriority(priority);
+      mPriority = priority;
   }
 
   public void requestLastKnownLocation() {
@@ -176,8 +192,7 @@ public class DWFusedLocationClient {
   }
 
   public void startLocationUpdates() {
-    if (mSettingsRequest == null)
-      createSettingsRequest();
+    createSettingsRequest();
     // Begin by checking if the device has the necessary location settings.
     Log.d(TAG, "checkLocationSettings");
     mSettingsClient.checkLocationSettings(mSettingsRequest)
@@ -219,16 +234,14 @@ public class DWFusedLocationClient {
   }
 
   public void stopLocationUpdates() {
-    // if (!mRequestingLocationUpdates) {
-    //   Log.d(TAG, "stopLocationUpdates: updates never requested, no-op.");
-    //   return;
-    // }
     mLocationClient.removeLocationUpdates(mLocationCallback)
       .addOnCompleteListener(new OnCompleteListener<Void>() {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
           // mRequestingLocationUpdates = false;
           Log.d(TAG, "removeLocationUpdates onComplete");
+          mLocationRequest = null;
+          mSettingsRequest = null;
           mDelegate.onLocationUpdatesChange(false); // i.e. stopped
         }
       });
