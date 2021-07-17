@@ -31,7 +31,13 @@ type
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
   public
     class procedure SendCommand(const ACommand: Integer);
-    class procedure StartService(AServiceName: string);
+    /// <summary>
+    ///   Attempts to start the service if it is not already running
+    /// </summary>
+    /// <remarks>
+    ///   NOTE: Result is True if the method attempts to start the service - it does not mean it succeeded in starting the service
+    /// </remarks>
+    class function StartService(AServiceName: string): Boolean;
     class property IsRequestingPermissions: Boolean read FIsRequestingPermissions write FIsRequestingPermissions;
   public
     constructor Create;
@@ -100,13 +106,17 @@ begin
   TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).sendBroadcast(LIntent);
 end;
 
-class procedure TServiceCommander.StartService(AServiceName: string);
+class function TServiceCommander.StartService(AServiceName: string): Boolean;
 begin
+  Result := False;
   FServiceName := AServiceName;
   if not AServiceName.StartsWith(cEMBTJavaServicePrefix) then
     AServiceName := cEMBTJavaServicePrefix + AServiceName;
   if not TAndroidHelperEx.IsServiceRunning(AServiceName) then
+  begin
     TLocalServiceConnection.StartService(AServiceName);
+    Result := True;
+  end;
 end;
 
 end.
