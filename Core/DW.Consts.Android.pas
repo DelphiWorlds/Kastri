@@ -58,11 +58,16 @@ const
   cDWBroadcastReceiverExtraServiceRestart = cDWBroadcastReceiverName + '.EXTRA_SERVICE_RESTART';
 
   cServiceCommandAction = 'com.delphiworlds.action.SERVICE_COMMAND';
+  cServiceMessageAction = 'com.delphiworlds.action.SERVICE_MESSAGE';
+  cServiceStateAction = 'com.delphiworlds.action.SERVICE_STATE';
   cServiceBroadcastParamCommand = 'COMMAND';
+  cServiceBroadcastParamMessage = 'MESSAGE';
+  cServiceBroadcastParamState = 'STATE';
   cServiceCommandAppBecameActive = 1;
   cServiceCommandAppEnteredBackground = 2;
   cServiceCommandAppWillTerminate = 3;
   cServiceCommandAppIsRequestingPermissions = 4;
+  cServiceCommandAppCheckState = 5;
 
   cEMBTJavaServicePrefix = 'com.embarcadero.services.';
 
