@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.Android.Service, System.Sensors,
   AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App,
-  DW.Location, DW.Background.Android, DW.MultiReceiver.Android,
+  DW.Location, DW.Background.Android, DW.MultiReceiver.Android, DW.JsonConfig,
   {$IF Defined(USE_FUSED_LOCATION)}
   DW.Location.FusedLocation.Android,
   {$ELSE}
@@ -26,6 +26,15 @@ type
     constructor Create(const AService: TServiceModule);
   end;
 
+  TServiceLocationSettings = class(TJsonConfig)
+  private
+    FIsPaused: Boolean;
+  public
+    class function GetConfigFileName: string; override;
+  public
+    property IsPaused: Boolean read FIsPaused write FIsPaused;
+  end;
+
   TServiceModule = class(TAndroidService)
     function AndroidServiceStartCommand(const Sender: TObject; const Intent: JIntent; Flags, StartId: Integer): Integer;
     procedure AndroidServiceDestroy(Sender: TObject);
@@ -33,24 +42,29 @@ type
     FBackgroundMonitor: TBackgroundMonitor;
     FLocalReceiver: TLocalReceiver;
     FLocation: TLocation;
+    FLocationSettings: TServiceLocationSettings;
     FNotificationChannel: JNotificationChannel;
     FTerminatedFlagFileName: string;
     FUpdater: TLocationUpdater;
     procedure BackgroundMonitorDozeChange(Sender: TObject; const AIsDozed: Boolean);
     procedure BackgroundMonitorScreenLockChange(Sender: TObject; const AIsScreenLocked: Boolean);
+    procedure ChangeUpdates(const APause: Boolean);
     procedure ConnectToDatabase;
     procedure CreateNotificationChannel;
     procedure CreateObjects;
     procedure DestroyObjects;
     procedure DoMessage(const AMsg: string);
+    procedure DoState(const AState: Integer);
     function HasBackgroundPermission: Boolean;
     function IsForeground: Boolean;
     {$IF Defined(USE_FUSED_LOCATION)}
     procedure LocationChangeHandler(Sender: TObject; const AData: TLocationData);
+    procedure LocationStateChangeHandler(Sender: TObject);
     {$ELSE}
     procedure LocationChangeHandler(Sender: TObject; const AData: TLocationData; const ASource: TLocationSource);
     {$ENDIF}
     procedure RestartService;
+    procedure SendState;
     procedure StartForeground(const AMustStartForeground: Boolean);
     procedure StopForeground(const AIsStarting: Boolean);
   protected
@@ -100,6 +114,13 @@ begin
   Result := FormatDateTime('mm-dd hh:nn:ss.zzz', Now);
 end;
 
+{ TServiceLocationSettings }
+
+class function TServiceLocationSettings.GetConfigFileName: string;
+begin
+  Result := TPath.Combine(TPath.GetDocumentsPath, 'locationsettings.json');
+end;
+
 { TLocalReceiver }
 
 constructor TLocalReceiver.Create(const AService: TServiceModule);
@@ -126,14 +147,27 @@ begin
   inherited;
   CreateObjects;
   ConnectToDatabase;
-  if TAndroidHelperEx.IsServiceRunning(cServiceNameFull) then
-    FLocation.Resume;
+  if not FLocationSettings.IsPaused and TAndroidHelperEx.IsServiceRunning(cServiceNameFull) then
+    ChangeUpdates(False);
 end;
 
 procedure TServiceModule.AndroidServiceDestroy(Sender: TObject);
 begin
   DestroyObjects;
   RestartService;
+end;
+
+procedure TServiceModule.ChangeUpdates(const APause: Boolean);
+begin
+  if APause then
+    FLocation.Pause
+  else
+    FLocation.Resume;
+  if FLocationSettings.IsPaused <> APause  then
+  begin
+    FLocationSettings.IsPaused := APause;
+    FLocationSettings.Save;
+  end;
 end;
 
 procedure TServiceModule.ConnectToDatabase;
@@ -144,6 +178,7 @@ end;
 
 procedure TServiceModule.CreateObjects;
 begin
+  TServiceLocationSettings.CreateFromFile(FLocationSettings);
   if FLocalReceiver = nil then
     FLocalReceiver := TLocalReceiver.Create(Self);
   if FBackgroundMonitor = nil then
@@ -165,6 +200,7 @@ begin
     FLocation.MinimumChangeInterval := cMinimumChangeInterval;
     FLocation.TimerTask.Schedule(cLocationTimerInterval);
     {$ELSE}
+    FLocation.OnStateChange := LocationStateChangeHandler;
     // Uncomment this line and use the desired value from DW.Consts.Android
     // FLocation.Priority := cLocationPriorityBalancedPowerAccuracy;
     {$ENDIF}
@@ -198,6 +234,16 @@ var
 begin
   LIntent := TJIntent.JavaClass.init(StringToJString(cServiceMessageAction));
   LIntent.putExtra(StringToJString(cServiceBroadcastParamMessage), StringToJString(GetLogTime + ': ' + AMsg));
+  TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).sendBroadcast(LIntent);
+end;
+
+procedure TServiceModule.DoState(const AState: Integer);
+var
+  LIntent: JIntent;
+begin
+  LIntent := TJIntent.JavaClass.init(StringToJString(cServiceStateAction));
+  LIntent.putExtra(StringToJString(cServiceBroadcastParamState), AState);
+  TOSLog.d('Sending state broadcast: %s', [JStringToString(LIntent.toURI)]);
   TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).sendBroadcast(LIntent);
 end;
 
@@ -236,7 +282,8 @@ begin
     FBackgroundMonitor.StartDozeAlarm;
   end
   else
-    FLocation.Resume;
+    ChangeUpdates(FLocationSettings.IsPaused);
+  SendState;
   Result := TJService.JavaClass.START_STICKY;
 end;
 
@@ -256,9 +303,11 @@ begin
       cServiceCommandAppEnteredBackground, cServiceCommandAppIsRequestingPermissions:
         StartForeground(LCommand = cServiceCommandAppIsRequestingPermissions);
       cServiceCommandStartLocationUpdates:
-        FLocation.Resume;
+        ChangeUpdates(False);
       cServiceCommandStopLocationUpdates:
-        FLocation.Pause;
+        ChangeUpdates(True);
+      cServiceCommandCheckState:
+        SendState;
     end;
   end;
 end;
@@ -339,6 +388,22 @@ begin
     if not AIsStarting then
       DoMessage('Service exited foreground mode');
   end;
+end;
+
+{$IF Defined(USE_FUSED_LOCATION)}
+procedure TServiceModule.LocationStateChangeHandler(Sender: TObject);
+begin
+  TOSLog.d('TServiceModule.LocationStateChangeHandler > FLocation.IsPaused: %s', [BoolToStr(FLocation.IsPaused, True)]);
+  SendState;
+end;
+{$ENDIF}
+
+procedure TServiceModule.SendState;
+begin
+  if FLocation.IsPaused then
+    DoState(cServiceStateLocationUpdatesPaused)
+  else
+    DoState(cServiceStateLocationUpdatesResumed);
 end;
 
 {$IF Defined(USE_FUSED_LOCATION)}
