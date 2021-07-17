@@ -19,7 +19,7 @@ interface
 
 uses
   // RTL
-  System.Sensors,
+  System.Sensors, System.Classes,
   // Android
   AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNIBridge, Androidapi.JNI.Location,
   // DW
@@ -54,7 +54,9 @@ type
     FOnLocationChange: TLocationChangeEvent;
     FOnSetMockLocationResult: TSetMockLocationResultEvent;
     FOnSetMockModeResult: TSetMockModeResultEvent;
+    FOnStateChange: TNotifyEvent;
     procedure BroadcastLocation(const AData: TLocationData);
+    procedure DoStateChange;
     function GetFastestInterval: Int64;
     function GetInterval: Int64;
     function GetIsMockMode: Boolean;
@@ -65,9 +67,10 @@ type
     procedure SetFastestInterval(const Value: Int64);
     procedure SetInterval(const Value: Int64);
     procedure SetPriority(const Value: Integer);
-   protected
+  protected
     procedure LocationChange(const ALocation: JLocation);
     procedure SetIsPaused(const AValue: Boolean);
+    procedure SettingsChange(const ASuccess: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -109,6 +112,7 @@ type
     /// </summary>
     property OnSetMockLocationResult: TSetMockLocationResultEvent read FOnSetMockLocationResult write FOnSetMockLocationResult;
     property OnSetMockModeResult: TSetMockModeResultEvent read FOnSetMockModeResult write FOnSetMockModeResult;
+    property OnStateChange: TNotifyEvent read FOnStateChange write FOnStateChange;
   end;
 
 implementation
@@ -141,7 +145,7 @@ end;
 
 procedure TFusedLocationClientDelegate.onLocationSettingsChange(success: Boolean);
 begin
-  //
+  FLocation.SettingsChange(success);
 end;
 
 procedure TFusedLocationClientDelegate.onLocationUpdatesChange(active: Boolean);
@@ -254,9 +258,18 @@ begin
     FClient.setPriority(Value);
 end;
 
+procedure TLocation.SettingsChange(const ASuccess: Boolean);
+begin
+  // This means it failed to create updates
+end;
+
 procedure TLocation.SetIsPaused(const AValue: Boolean);
 begin
-  FIsPaused := AValue;
+  if FIsPaused <> AValue then
+  begin
+    FIsPaused := AValue;
+    DoStateChange;
+  end;
 end;
 
 procedure TLocation.SetMockLocation(const ALocation: TLocationCoord2D);
@@ -267,6 +280,12 @@ end;
 procedure TLocation.SetMockMode(const AIsMockMode: Boolean);
 begin
   FClient.setMockMode(AIsMockMode);
+end;
+
+procedure TLocation.DoStateChange;
+begin
+  if Assigned(FOnStateChange) then
+    FOnStateChange(Self);
 end;
 
 function TLocation.GetLocationData(const ALocation: JLocation): TLocationData;
@@ -318,6 +337,7 @@ end;
 
 procedure TLocation.Resume;
 begin
+  FIsPaused := True;
   if HasPermissions then
     FClient.startLocationUpdates
   else
