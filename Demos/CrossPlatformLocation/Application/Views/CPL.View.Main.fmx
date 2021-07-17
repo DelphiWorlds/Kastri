@@ -2,8 +2,8 @@ object MainView: TMainView
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 480
-  ClientWidth = 458
+  ClientHeight = 606
+  ClientWidth = 544
   Padding.Left = 4.000000000000000000
   Padding.Top = 4.000000000000000000
   Padding.Right = 4.000000000000000000
@@ -14,31 +14,56 @@ object MainView: TMainView
   DesignerMasterStyle = 0
   object ContentLayout: TLayout
     Align = Contents
-    Size.Width = 458.000000000000000000
-    Size.Height = 480.000000000000000000
+    Size.Width = 544.000000000000000000
+    Size.Height = 606.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
     object Memo: TMemo
       Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
       DataDetectorTypes = []
       Align = Client
-      Size.Width = 458.000000000000000000
-      Size.Height = 436.000000000000000000
+      Size.Width = 544.000000000000000000
+      Size.Height = 560.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
-      Viewport.Width = 454.000000000000000000
-      Viewport.Height = 432.000000000000000000
+      Viewport.Width = 540.000000000000000000
+      Viewport.Height = 556.000000000000000000
     end
-    object ClearButton: TButton
+    object ButtonsLayout: TLayout
       Align = Bottom
-      Margins.Top = 4.000000000000000000
-      Position.Y = 440.000000000000000000
-      Size.Width = 458.000000000000000000
-      Size.Height = 40.000000000000000000
+      Padding.Left = 4.000000000000000000
+      Padding.Top = 4.000000000000000000
+      Padding.Right = 4.000000000000000000
+      Padding.Bottom = 4.000000000000000000
+      Position.Y = 560.000000000000000000
+      Size.Width = 544.000000000000000000
+      Size.Height = 46.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
-      Text = 'Clear'
-      OnClick = ClearButtonClick
+      object ClearButton: TButton
+        Align = Left
+        Margins.Left = 8.000000000000000000
+        Position.X = 137.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 136.000000000000000000
+        Size.Height = 38.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = 'Clear'
+        OnClick = ClearButtonClick
+      end
+      object ChangeStateButton: TButton
+        Align = Left
+        Enabled = False
+        Position.X = 4.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 125.000000000000000000
+        Size.Height = 38.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = 'Resume'
+        OnClick = ChangeStateButtonClick
+      end
     end
   end
 end

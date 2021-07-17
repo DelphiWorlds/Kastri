@@ -14,26 +14,36 @@ uses
 
 type
   TMessageReceivedEvent = procedure(Sender: TObject; const Msg: string) of object;
+  TStateEvent = procedure(Sender: TObject; const State: Integer) of object;
 
   {$IF Defined(ANDROID)}
   TLocalReceiver = class(TMultiReceiver)
   private
     FOnMessageReceived: TMessageReceivedEvent;
+    FOnState: TStateEvent;
     procedure DoMessageReceived(const AMsg: string);
+    procedure DoState(const AState: Integer);
   protected
     procedure Receive(context: JContext; intent: JIntent); override;
     procedure ConfigureActions; override;
   public
     property OnMessageReceived: TMessageReceivedEvent read FOnMessageReceived write FOnMessageReceived;
+    property OnState: TStateEvent read FOnState write FOnState;
   end;
   {$ENDIF}
+
+  TLocationState = (Unavailable, Resumed, Paused);
 
   TMainView = class(TForm)
     Memo: TMemo;
     ClearButton: TButton;
     ContentLayout: TLayout;
+    ButtonsLayout: TLayout;
+    ChangeStateButton: TButton;
     procedure ClearButtonClick(Sender: TObject);
+    procedure ChangeStateButtonClick(Sender: TObject);
   private
+    FLocationState: TLocationState;
     FLocation: TLocation;
     {$IF Defined(ANDROID)}
     FReceiver: TLocalReceiver;
@@ -41,6 +51,7 @@ type
     function GetBasePermissions: TArray<string>;
     procedure LocationChangedHandler(Sender: TObject; const AData: TLocationData);
     procedure ReceiverMessageReceivedHandler(Sender: TObject; const AMsg: string);
+    procedure ReceiverStateHandler(Sender: TObject; const AState: Integer);
     procedure RequestLocationPermissions(const APermissions: TArray<string>);
     procedure RequestLocationPermissionsPrelude;
     procedure StartLocation;
@@ -69,7 +80,7 @@ uses
   DW.OSLog, DW.OSDevice,
   {$IF Defined(ANDROID)}
   Androidapi.Helpers, Androidapi.JNI.JavaTypes,
-  DW.ServiceCommander.Android,
+  DW.ServiceCommander.Android, DW.Android.Helpers,
   {$ENDIF}
   DW.Sensors, DW.Consts.Android, DW.UIHelper,
   CPL.Consts;
@@ -84,6 +95,7 @@ const
 procedure TLocalReceiver.ConfigureActions;
 begin
   IntentFilter.addAction(StringToJString(cServiceMessageAction));
+  IntentFilter.addAction(StringToJString(cServiceStateAction));
 end;
 
 procedure TLocalReceiver.DoMessageReceived(const AMsg: string);
@@ -92,10 +104,18 @@ begin
     FOnMessageReceived(Self, AMsg);
 end;
 
+procedure TLocalReceiver.DoState(const AState: Integer);
+begin
+  if Assigned(FOnState) then
+    FOnState(Self, AState);
+end;
+
 procedure TLocalReceiver.Receive(context: JContext; intent: JIntent);
 begin
   if intent.getAction.equals(StringToJString(cServiceMessageAction)) then
-    DoMessageReceived(JStringToString(intent.getStringExtra(StringToJString(cServiceBroadcastParamMessage))));
+    DoMessageReceived(JStringToString(intent.getStringExtra(StringToJString(cServiceBroadcastParamMessage))))
+  else if intent.getAction.equals(StringToJString(cServiceStateAction)) then
+    DoState(intent.getIntExtra(StringToJString(cServiceBroadcastParamState), cServiceStateLocationUpdatesUnavailable));
 end;
 {$ENDIF}
 
@@ -111,6 +131,7 @@ begin
   {$IF Defined(ANDROID)}
   FReceiver := TLocalReceiver.Create(True);
   FReceiver.OnMessageReceived := ReceiverMessageReceivedHandler;
+  FReceiver.OnState := ReceiverStateHandler;
   {$ENDIF}
   FLocation := TLocation.Create;
   FLocation.Usage := TLocationUsage.Always;
@@ -147,6 +168,30 @@ end;
 procedure TMainView.ReceiverMessageReceivedHandler(Sender: TObject; const AMsg: string);
 begin
   Memo.Lines.Add('Svc: ' + AMsg);
+end;
+
+procedure TMainView.ReceiverStateHandler(Sender: TObject; const AState: Integer);
+begin
+  TOSLog.d('TMainView.ReceiverStateHandler > %d', [AState]);
+  case AState of
+    cServiceStateLocationUpdatesResumed:
+    begin
+      FLocationState := TLocationState.Resumed;
+      ChangeStateButton.Text := 'Pause';
+      ChangeStateButton.Enabled := True;
+    end;
+    cServiceStateLocationUpdatesPaused:
+    begin
+      FLocationState := TLocationState.Paused;
+      ChangeStateButton.Text := 'Resume';
+      ChangeStateButton.Enabled := True;
+    end;
+    cServiceStateLocationUpdatesUnavailable:
+    begin
+      FLocationState := TLocationState.Unavailable;
+      ChangeStateButton.Enabled := False;
+    end;
+  end;
 end;
 
 function TMainView.GetBasePermissions: TArray<string>;
@@ -207,6 +252,7 @@ begin
       end
     );
   end
+  // Just request background permission
   else if TOSVersion.Check(10) and not PermissionsService.IsPermissionGranted(cPermissionAccessBackgroundLocation) then
     RequestLocationPermissions([cPermissionAccessBackgroundLocation])
   else
@@ -216,7 +262,8 @@ end;
 procedure TMainView.StartLocation;
 begin
   {$IF Defined(ANDROID)}
-  TServiceCommander.StartService(cServiceName);
+  if not TServiceCommander.StartService(cServiceName) then
+    TServiceCommander.SendCommand(cServiceCommandCheckState);
   {$ENDIF}
   FLocation.IsActive := True;
 end;
@@ -228,6 +275,24 @@ begin
   LTimestamp := FormatDateTime('hh:nn:ss.zzz', Now);
   Memo.Lines.Add(Format('%s - Location: %2.6f, %2.6f', [LTimestamp, AData.Location.Latitude, AData.Location.Longitude]));
   Memo.Lines.Add(Format('%s - Speed: %.1f, Altitude: %.1f, Bearing: %.1f', [LTimestamp, AData.Speed, AData.Altitude, AData.Bearing]));
+end;
+
+procedure TMainView.ChangeStateButtonClick(Sender: TObject);
+begin
+  case FLocationState of
+    TLocationState.Resumed:
+    begin
+      {$IF Defined(ANDROID)}
+      TServiceCommander.SendCommand(cServiceCommandStopLocationUpdates);
+      {$ENDIF}
+    end;
+    TLocationState.Paused:
+    begin
+      {$IF Defined(ANDROID)}
+      TServiceCommander.SendCommand(cServiceCommandStartLocationUpdates);
+      {$ENDIF}
+    end;
+  end;
 end;
 
 procedure TMainView.ClearButtonClick(Sender: TObject);
