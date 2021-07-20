@@ -51,36 +51,53 @@ type
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
   end;
 
-  TElasticLayoutHelper = class helper for TControl
+  TGridPanelLayout = class(FMX.Layouts.TGridPanelLayout)
   private
-    function GetChildrenOnlyRect: TRectF;
+    FIsElastic: Boolean;
+    procedure SetIsElastic(const Value: Boolean);
   protected
-    procedure ElasticRealign;
+    procedure DoRealign; override;
+  public
+    property IsElastic: Boolean read FIsElastic write SetIsElastic;
+  end;
+
+  TElasticLayoutHelper = record
+  private
+    class function GetChildrenOnlyRect(const AControl: TControl): TRectF; static;
+  public
+    class procedure ElasticRealign(const ALayout: TGridPanelLayout); overload; static;
+    class procedure ElasticRealign(const AControl: TControl); overload; static;
   end;
 
 implementation
 
+type
+  TOpenControl = class(TControl);
+  TOpenCellItem = class(TGridPanelLayout.TCellItem);
+
 { TElasticLayoutHelper }
 
-function TElasticLayoutHelper.GetChildrenOnlyRect: TRectF;
+class function TElasticLayoutHelper.GetChildrenOnlyRect(const AControl: TControl): TRectF;
 var
   I: Integer;
-  Control: TControl;
+  LChildControl: TControl;
   LChildrenRect: TRectF;
+  LControl: TOpenControl;
 begin
   Result := TRectF.Empty;
-  if not ClipChildren and (Controls <> nil) then
+  LControl := TOpenControl(AControl);
+  if not AControl.ClipChildren and (AControl.Controls <> nil) then
   begin
-    for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
+    for I := LControl.GetFirstVisibleObjectIndex to LControl.GetLastVisibleObjectIndex - 1 do
     begin
-      Control := Controls[I];
-      if Control.Visible and not (Control.Align in [TAlignLayout.Contents, TAlignLayout.Client]) then
+      LChildControl := LControl.Controls[I];
+      if LChildControl.Visible and not (LChildControl.Align in [TAlignLayout.Contents, TAlignLayout.Client]) then
       begin
-        LChildrenRect := Control.ChildrenRect;
-        LChildrenRect.Top := LChildrenRect.Top - Control.Margins.Top;
-        LChildrenRect.Left := LChildrenRect.Left - Control.Margins.Left;
-        LChildrenRect.Bottom := LChildrenRect.Bottom + Control.Margins.Bottom;
-        LChildrenRect.Right := LChildrenRect.Right + Control.Margins.Right;
+        LChildrenRect := LChildControl.ChildrenRect;
+        LChildrenRect.Top := LChildrenRect.Top - LChildControl.Margins.Top;
+        LChildrenRect.Left := LChildrenRect.Left - LChildControl.Margins.Left;
+        LChildrenRect.Bottom := LChildrenRect.Bottom + LChildControl.Margins.Bottom;
+        LChildrenRect.Right := LChildrenRect.Right + LChildControl.Margins.Right;
         if Result.IsEmpty then
           Result := LChildrenRect
         else
@@ -90,20 +107,31 @@ begin
   end;
 end;
 
-procedure TElasticLayoutHelper.ElasticRealign;
+class procedure TElasticLayoutHelper.ElasticRealign(const ALayout: TGridPanelLayout);
+var
+  I: Integer;
+  LTotalHeight: Single;
+begin
+  LTotalHeight := 0;
+  for I := 0 to ALayout.RowCollection.Count - 1 do
+    LTotalHeight := LTotalHeight + TOpenCellItem(ALayout.RowCollection.Items[I]).Size;
+  ALayout.Height := LTotalHeight + ALayout.Margins.Rect.Height;
+end;
+
+class procedure TElasticLayoutHelper.ElasticRealign(const AControl: TControl);
 var
   LRect: TRectF;
 begin
-  LRect := GetChildrenOnlyRect;
-  LRect.Inflate(Padding.Left, Padding.Top, Padding.Right, Padding.Bottom);
-  FDisableAlign := True;
+  LRect := GetChildrenOnlyRect(AControl);
+  LRect.Inflate(AControl.Padding.Left, AControl.Padding.Top, AControl.Padding.Right, AControl.Padding.Bottom);
+  TOpenControl(AControl).FDisableAlign := True;
   try
-    if not (Align in [TAlignLayout.Top, TAlignLayout.MostTop, TAlignLayout.Bottom, TAlignLayout.MostBottom]) then
-      Width := LRect.Width;
-    if not (Align in [TAlignLayout.Left, TAlignLayout.MostLeft, TAlignLayout.Right, TAlignLayout.MostRight]) then
-      Height := LRect.Height;
+    if not (AControl.Align in [TAlignLayout.Top, TAlignLayout.MostTop, TAlignLayout.Bottom, TAlignLayout.MostBottom]) then
+      AControl.Width := LRect.Width;
+    if not (AControl.Align in [TAlignLayout.Left, TAlignLayout.MostLeft, TAlignLayout.Right, TAlignLayout.MostRight]) then
+      AControl.Height := LRect.Height;
   finally
-    FDisableAlign := False;
+    TOpenControl(AControl).FDisableAlign := False;
   end;
 end;
 
@@ -113,15 +141,16 @@ procedure TLayout.DoRealign;
 begin
   inherited;
   if FIsElastic then
-    ElasticRealign;
+    TElasticLayoutHelper.ElasticRealign(Self);
 end;
 
 procedure TLayout.SetIsElastic(const Value: Boolean);
 begin
-  if Value = FIsElastic then
-    Exit; // <======
-  FIsElastic := Value;
-  Realign;
+  if Value <> FIsElastic then
+  begin
+    FIsElastic := Value;
+    Realign;
+  end;
 end;
 
 { TFlowLayout }
@@ -130,15 +159,34 @@ procedure TFlowLayout.DoRealign;
 begin
   inherited;
   if FIsElastic then
-    ElasticRealign;
+    TElasticLayoutHelper.ElasticRealign(Self);
 end;
 
 procedure TFlowLayout.SetIsElastic(const Value: Boolean);
 begin
-  if Value = FIsElastic then
-    Exit; // <======
-  FIsElastic := Value;
-  Realign;
+  if Value <> FIsElastic then
+  begin
+    FIsElastic := Value;
+    Realign;
+  end;
+end;
+
+{ TGridPanelLayout }
+
+procedure TGridPanelLayout.DoRealign;
+begin
+  inherited;
+  if FIsElastic then
+    TElasticLayoutHelper.ElasticRealign(Self);
+end;
+
+procedure TGridPanelLayout.SetIsElastic(const Value: Boolean);
+begin
+  if Value <> FIsElastic then
+  begin
+    FIsElastic := Value;
+    Realign;
+  end;
 end;
 
 end.
