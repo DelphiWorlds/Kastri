@@ -37,6 +37,7 @@ type
     FView: JViewGroup;
     function GetImageControl: TCustomNativeImage;
     function GetModel: TCustomNativeImageModel;
+    procedure MMBackgroundColorChanged(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_BACKGROUNDCOLORCHANGED;
     procedure MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_LOADFROMFILE;
     procedure MMLoadFromStream(var AMessage: TDispatchMessageWithValue<TStream>); message MM_NATIVEIMAGE_LOADFROMSTREAM;
     procedure MMTextChanged(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_TEXTCHANGED;
@@ -142,6 +143,11 @@ begin
   Result := inherited GetModel<TCustomNativeImageModel>;
 end;
 
+procedure TAndroidNativeImage.MMBackgroundColorChanged(var AMessage: TDispatchMessageWithValue<string>);
+begin
+  View.setBackgroundColor(TAndroidHelper.AlphaColorToJColor(Model.BackgroundColor));
+end;
+
 procedure TAndroidNativeImage.MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>);
 begin
   FImageView.setImageURI(TAndroidHelper.JFileToJURI(TJFile.JavaClass.init(StringToJString(AMessage.Value))));
@@ -152,11 +158,16 @@ var
   LBytes: TBytes;
   LJBytes: TJavaArray<Byte>;
 begin
-  SetLength(LBytes, AMessage.Value.Size);
-  AMessage.Value.Position := 0;
-  AMessage.Value.Read(LBytes, 0, Length(LBytes));
-  LJBytes := TAndroidHelper.TBytesToTJavaArray(LBytes);
-  FImageView.setImageBitmap(TJBitmapFactory.JavaClass.decodeByteArray(LJBytes, 0, LJBytes.Length));
+  if AMessage.Value.Size > 0 then
+  begin
+    SetLength(LBytes, AMessage.Value.Size);
+    AMessage.Value.Position := 0;
+    AMessage.Value.Read(LBytes, 0, Length(LBytes));
+    LJBytes := TAndroidHelper.TBytesToTJavaArray(LBytes);
+    FImageView.setImageBitmap(TJBitmapFactory.JavaClass.decodeByteArray(LJBytes, 0, LJBytes.Length));
+  end
+  else
+    FImageView.setImageBitmap(nil);
 end;
 
 procedure TAndroidNativeImage.MMTextChanged(var AMessage: TDispatchMessageWithValue<string>);
