@@ -35,6 +35,7 @@ type
     FIsRunning: Boolean;
     FOutput: string;
     FProcess: TJvCreateProcess;
+    procedure ProcessMessage;
     procedure ProcessReadHandler(Sender: TObject; const S: string; const StartsOnNewLine: Boolean);
     procedure ProcessTerminateHandler(Sender: TObject; ExitCode: Cardinal);
   protected
@@ -70,7 +71,9 @@ implementation
 
 uses
   // RTL
-  System.SysUtils, System.IOUtils,
+  System.SysUtils, System.IOUtils, System.DateUtils,
+  // Windows
+  Winapi.Windows,
   // DW
   DW.OSLog;
 
@@ -100,6 +103,17 @@ begin
   inherited;
 end;
 
+procedure TCustomRunProcess.ProcessMessage;
+var
+  LMsg: TMsg;
+begin
+  if GetMessage(LMsg, 0, 0, 0) then
+  begin
+    TranslateMessage(LMsg);
+    DispatchMessage(LMsg);
+  end;
+end;
+
 procedure TCustomRunProcess.ProcessReadHandler(Sender: TObject; const S: string; const StartsOnNewLine: Boolean);
 begin
   if (FOutput <> '') and StartsOnNewLine then
@@ -116,15 +130,16 @@ end;
 
 function TCustomRunProcess.RunAndWait(const ATimeout: Integer): Boolean;
 var
-  LWaitTime: Integer;
+  LStart: TDateTime;
 begin
-  LWaitTime := 0;
-  while IsRunning and (LWaitTime < ATimeout) do
+  Result := False;
+  if InternalRun then
   begin
-    Sleep(WaitInterval);
-    Inc(LWaitTime, WaitInterval);
+    LStart := Now;
+    while IsRunning and (MilliSecondsBetween(Now, LStart) < ATimeout) do
+      ProcessMessage;
+    Result := not IsRunning;
   end;
-  Result := not IsRunning;
 end;
 
 procedure TCustomRunProcess.Terminate;
