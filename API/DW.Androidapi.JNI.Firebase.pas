@@ -137,6 +137,7 @@ type
   [JavaSignature('com/google/firebase/messaging/FirebaseMessaging')]
   JFirebaseMessaging = interface(JObject)
     ['{F33877E5-DAA2-4097-9527-CE1CDBD66A67}']
+    function getToken: JTask; cdecl;
     function isAutoInitEnabled: Boolean; cdecl;
     procedure send(msg: JRemoteMessage); cdecl;
     procedure setAutoInitEnabled(enable: Boolean); cdecl;
