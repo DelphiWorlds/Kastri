@@ -35,12 +35,14 @@ type
     function getInterval: Int64; cdecl;
     function getIsMockMode: Boolean; cdecl;
     function getPriority: Integer; cdecl;
+    function getSmallestDisplacement: Double; cdecl;
     procedure requestLastKnownLocation; cdecl;
     procedure setFastestInterval(interval: Int64); cdecl;
     procedure setInterval(interval: Int64); cdecl;
     procedure setMockLocation(latitude: Double; longitude: Double); cdecl;
     procedure setMockMode(isMockMode: Boolean); cdecl;
     procedure setPriority(interval: Integer); cdecl;
+    procedure setSmallestDisplacement(value: Double); cdecl;
     procedure startLocationUpdates; cdecl;
     procedure stopLocationUpdates; cdecl;
   end;
