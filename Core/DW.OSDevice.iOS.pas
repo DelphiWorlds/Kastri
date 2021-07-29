@@ -123,7 +123,7 @@ end;
 
 class procedure TPlatformOSDevice.OpenAppSettings;
 begin
-  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(CocoaNSStringConst(libUIKit, 'UIApplicationOpenSettingsURLString'))));
+  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(UIApplicationOpenSettingsURLString)));
 end;
 
 class procedure TPlatformOSDevice.OpenURL(const AURL: string);

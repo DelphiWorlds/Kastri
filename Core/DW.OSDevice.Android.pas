@@ -140,10 +140,11 @@ end;
 class procedure TPlatformOSDevice.OpenAppSettings;
 var
   LIntent: JIntent;
+  LUri: Jnet_Uri;
 begin
-  LIntent := TJIntent.Create;
-  LIntent.setAction(TJSettings.javaClass.ACTION_APPLICATION_DETAILS_SETTINGS);
-  LIntent.setData(TJnet_Uri.JavaClass.parse(StringToJString('package:' + JStringtoString(TAndroidHelper.Context.getPackageName()))));
+  LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
+  LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_APPLICATION_DETAILS_SETTINGS, LUri);
+  LIntent.addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_NEW_TASK);
   TAndroidHelper.Context.startActivity(LIntent);
 end;
 
