@@ -38,7 +38,6 @@ type
     class function GetOffsetRect(const AHandle: TWindowHandle): TRectF; overload; static;
     class function GetScreenOrientation: TScreenOrientation; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
-    class procedure OpenSettings; static;
   end;
 
 implementation
@@ -196,11 +195,6 @@ begin
         Result := TUserInterfaceStyle.Dark;
     end;
   end;
-end;
-
-class procedure TPlatformUIHelper.OpenSettings;
-begin
-  TiOSHelper.SharedApplication.openURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(UIApplicationOpenSettingsURLString)));
 end;
 
 class function TPlatformUIHelper.GetScreenOrientation: TScreenOrientation;
