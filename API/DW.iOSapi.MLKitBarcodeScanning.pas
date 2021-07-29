@@ -21,7 +21,7 @@ uses
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreGraphics,
   // DW
-  DW.iOSapi.MLKitVision, DW.iOSapi.MLKitCommon;
+  DW.iOSapi.MLKitVision;
 
 const
   MLKBarcodeFormatUnknown = 0;
@@ -274,6 +274,10 @@ const
   libMLKitBarcodeScanning = 'MLKitBarcodeScanning';
 
 implementation
+
+uses
+  // DW
+  DW.iOSapi.MLKitCommon;
 
 procedure MLKitBarcodeScanningLoader; cdecl; external framework libMLKitBarcodeScanning dependency 'c++';
 
