@@ -17,8 +17,7 @@ interface
 
 uses
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.PlayServices.Maps,
-  Androidapi.JNI.Support;
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.PlayServices.Maps;
 
 type
   JGeofenceIntentReceiver = interface;
