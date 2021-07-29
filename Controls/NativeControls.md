@@ -42,6 +42,8 @@ TNativeEllipse is like TEllipse in FMX
 
 Both TNativeRectangle and TNativeEllipse use [ImageView](https://developer.android.com/reference/android/widget/ImageView) and [GradientDrawable](https://developer.android.com/reference/android/graphics/drawable/GradientDrawable) on Android, and [CAShapeLayer](https://developer.apple.com/documentation/quartzcore/cashapelayer?language=objc) and [UIBezierPath](https://developer.apple.com/documentation/uikit/uibezierpath?language=objc) on iOS for rendering the shape
 
+The Stroke property has very basic support - only Color, Kind (`Solid` or `None`) and Thickness are currently supported
+
 <br>
 
 ### TNativeImage
