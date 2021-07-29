@@ -35,6 +35,7 @@ const
   NSPersonNameComponentsFormatterPhonetic = 2;
 
 type
+  NSItemProvider = interface;
   NSLocale = interface;
   NSMeasurement = interface;
   NSPersonNameComponents = interface;
@@ -54,15 +55,60 @@ type
   NSItemProviderRepresentationVisibility = NSInteger;
   NSItemProviderFileOptions = NSInteger;
 
+  NSItemProviderCompletionHandler = procedure(item: Pointer; error: NSError) of object;
+  NSItemProviderLoadHandler = procedure(completionHandler: NSItemProviderCompletionHandler; expectedValueClass: Pointer; options: NSDictionary) of object;
+  NSItemProviderErrorCode = NSInteger;
   NSProgressUnpublishingHandler = procedure of object;
   NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
 
+  TNSItemProviderBlockMethod1 = procedure of object;
+  TNSItemProviderBlockMethod2 = procedure(completionHandler: TNSItemProviderBlockMethod1) of object;
+  TNSItemProviderBlockMethod3 = procedure(data: NSData; error: NSError) of object;
+  TNSItemProviderBlockMethod4 = procedure(url: NSURL; error: NSError) of object;
+  TNSItemProviderBlockMethod5 = procedure(url: NSURL; isInPlace: Boolean; error: NSError) of object;
+  TNSItemProviderBlockMethod6 = procedure(&object: Pointer; error: NSError) of object;
   TNSProgressBlockMethod1 = procedure of object;
   TNSProgressBlockMethod2 = procedure of object;
   TNSProgressBlockMethod3 = procedure of object;
   TNSProgressBlockMethod4 = procedure of object;
   TNSUserActivityBlockMethod1 = procedure(inputStream: NSInputStream; outputStream: NSOutputStream; error: NSError) of object;
   TNSUserActivityBlockMethod2 = procedure of object;
+
+  NSItemProviderClass = interface(NSObjectClass)
+    ['{574DFF14-C35E-40E1-B7EA-C118E2FD3C53}']
+  end;
+
+  NSItemProvider = interface(NSObject)
+    ['{028F7E61-2DF3-4CB8-9CE6-8D8412114B32}']
+    function canLoadObjectOfClass(aClass: Pointer): Boolean; cdecl;
+    function hasItemConformingToTypeIdentifier(typeIdentifier: NSString): Boolean; cdecl;
+    function hasRepresentationConformingToTypeIdentifier(typeIdentifier: NSString; fileOptions: NSItemProviderFileOptions): Boolean; cdecl;
+    function initWithContentsOfURL(fileURL: NSURL): Pointer; cdecl;
+    function initWithItem(item: Pointer; typeIdentifier: NSString): Pointer; cdecl;
+    function initWithObject(&object: Pointer): Pointer; cdecl;
+    function loadDataRepresentationForTypeIdentifier(typeIdentifier: NSString; completionHandler: TNSItemProviderBlockMethod3): NSProgress; cdecl;
+    function loadFileRepresentationForTypeIdentifier(typeIdentifier: NSString; completionHandler: TNSItemProviderBlockMethod4): NSProgress; cdecl;
+    function loadInPlaceFileRepresentationForTypeIdentifier(typeIdentifier: NSString;
+      completionHandler: TNSItemProviderBlockMethod5): NSProgress; cdecl;
+    procedure loadItemForTypeIdentifier(typeIdentifier: NSString; options: NSDictionary; completionHandler: NSItemProviderCompletionHandler); cdecl;
+    function loadObjectOfClass(aClass: Pointer; completionHandler: TNSItemProviderBlockMethod6): NSProgress; cdecl;
+    procedure loadPreviewImageWithOptions(options: NSDictionary; completionHandler: NSItemProviderCompletionHandler); cdecl;
+    function previewImageHandler: NSItemProviderLoadHandler; cdecl;
+    procedure registerDataRepresentationForTypeIdentifier(typeIdentifier: NSString; visibility: NSItemProviderRepresentationVisibility;
+      loadHandler: TNSItemProviderBlockMethod2); cdecl;
+    function registeredTypeIdentifiers: NSArray; cdecl;
+    function registeredTypeIdentifiersWithFileOptions(fileOptions: NSItemProviderFileOptions): NSArray; cdecl;
+    procedure registerFileRepresentationForTypeIdentifier(typeIdentifier: NSString; fileOptions: NSItemProviderFileOptions;
+      visibility: NSItemProviderRepresentationVisibility; loadHandler: TNSItemProviderBlockMethod2); cdecl;
+    procedure registerItemForTypeIdentifier(typeIdentifier: NSString; loadHandler: NSItemProviderLoadHandler); cdecl;
+    procedure registerObject(&object: Pointer; visibility: NSItemProviderRepresentationVisibility); cdecl;
+    procedure registerObjectOfClass(aClass: Pointer; visibility: NSItemProviderRepresentationVisibility;
+      loadHandler: TNSItemProviderBlockMethod2); cdecl;
+    procedure setPreviewImageHandler(previewImageHandler: NSItemProviderLoadHandler); cdecl;
+    procedure setSuggestedName(suggestedName: NSString); cdecl;
+    function suggestedName: NSString; cdecl;
+  end;
+  TNSItemProvider = class(TOCGenericImport<NSItemProviderClass, NSItemProvider>) end;
 
   NSLocaleClass = interface(NSObjectClass)
     ['{4597A459-6F9B-49F4-8C80-3F8ED8FDB9D1}']
