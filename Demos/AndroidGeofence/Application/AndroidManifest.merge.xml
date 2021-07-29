@@ -1,0 +1,10 @@
+<manifest>
+  <application>
+    <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+    <meta-data android:name="com.delphiworlds.kastri.GeofenceIntentReceiver.SERVICE_CLASS_NAME" android:value="com.embarcadero.services.AGDemoService" />
+    <receiver android:name="com.delphiworlds.kastri.GeofenceIntentReceiver"
+        android:enabled="true"
+        android:exported="true">
+    </receiver>
+  </application>
+</manifest>

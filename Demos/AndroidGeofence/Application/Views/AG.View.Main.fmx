@@ -1,0 +1,83 @@
+object MainView: TMainView
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 522
+  ClientWidth = 517
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Client
+    Size.Width = 517.000000000000000000
+    Size.Height = 478.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Viewport.Width = 513.000000000000000000
+    Viewport.Height = 474.000000000000000000
+  end
+  object Layout1: TLayout
+    Align = Bottom
+    Padding.Left = 4.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 4.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Position.Y = 478.000000000000000000
+    Size.Width = 517.000000000000000000
+    Size.Height = 44.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object ToJsonButton: TButton
+      Align = Left
+      Margins.Right = 8.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 109.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Text = 'To Json'
+      Visible = False
+      OnClick = ToJsonButtonClick
+    end
+    object StartButton: TButton
+      Align = Left
+      Margins.Right = 8.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 109.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'Start'
+      OnClick = StartButtonClick
+    end
+    object StopButton: TButton
+      Align = Left
+      Margins.Right = 8.000000000000000000
+      Position.X = 121.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 109.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Stop'
+      OnClick = StopButtonClick
+    end
+    object ClearButton: TButton
+      Align = Left
+      Margins.Right = 8.000000000000000000
+      Position.X = 238.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 109.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Clear'
+      OnClick = ClearButtonClick
+    end
+  end
+end
