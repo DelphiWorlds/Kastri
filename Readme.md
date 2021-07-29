@@ -103,6 +103,10 @@ Uses native APIs to allow users to select one or more files on the device, for A
 
 Android and iOS implementations of Firebase Cloud Messaging using their native libraries
 
+#### Geofencing support on Android
+
+Works a little like the regions support does for iOS with [TLocationSensor](http://docwiki.embarcadero.com/Libraries/Sydney/en/System.Sensors.Components.TLocationSensor). Set up geographical regions (each region is a location with a specified radius), and events fire when the user passes in/out of those regions
+
 #### Location
 
 Android and iOS framework made specifically for location updates when the application is in any state (e.g. even when it is not running)
@@ -134,10 +138,6 @@ Allows users to follow links to content inside your app from your website.
 ### Planned Features
 
 In addition to the features listed above, several other features are [planned for Kastri](https://github.com/DelphiWorlds/Kastri/milestones), namely:
-
-#### Geofencing support on Android
-
-This feature is currently in limbo, due to there being issues with making the functionality work. Please [contact me](https://github.com/DelphiWorlds/Kastri/issues/19) if you are interested in helping.
 
 #### Google SignIn
 
