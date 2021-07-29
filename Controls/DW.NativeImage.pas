@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Classes, System.Types,
+  System.Classes, System.Types, System.UITypes,
   // FMX
   FMX.Controls.Presentation, FMX.Controls.Model, FMX.Controls, FMX.Graphics, FMX.Types;
 
@@ -28,14 +28,17 @@ const
   MM_NATIVEIMAGE_LOADFROMNATIVE = MM_USER + 4;
   MM_NATIVEIMAGE_TEXTCHANGED = MM_USER + 5;
   MM_NATIVEIMAGE_TEXTSETTINGSCHANGED = MM_USER + 6;
+  MM_NATIVEIMAGE_BACKGROUNDCOLORCHANGED = MM_USER + 7;
 
 type
   TCustomNativeImageModel = class(TDataModel)
   private
+    FBackgroundColor: TAlphaColor;
     FImage: TBitmap;
     FText: string;
     FTextSettingsInfo: TTextSettingsInfo;
     FOnTextSettingsChanged: TNotifyEvent;
+    procedure SetBackgroundColor(const Value: TAlphaColor);
     procedure SetImage(const Value: TBitmap);
     procedure SetText(const Value: string);
   protected
@@ -50,23 +53,26 @@ type
   public
     constructor Create(const AOwner: TComponent); override;
     destructor Destroy; override;
+    property BackgroundColor: TAlphaColor read FBackgroundColor write SetBackgroundColor;
     property Text: string read FText write SetText;
     property TextSettingsInfo: TTextSettingsInfo read FTextSettingsInfo;
   end;
 
   TCustomNativeImage = class(TPresentedControl)
   private
+    function GetBackgroundColor: TAlphaColor;
     function GetImage: TBitmap;
     function GetModel: TCustomNativeImageModel; overload;
-    procedure SetImage(const Value: TBitmap);
     function GetStyledSettings: TStyledSettings;
     function GetText: string;
     function GetTextSettings: TTextSettings;
+    procedure ModelTextSettingsChangedHandler(Sender: TObject);
+    procedure SetBackgroundColor(const Value: TAlphaColor);
+    procedure SetImage(const Value: TBitmap);
     procedure SetStyledSettings(const Value: TStyledSettings);
     procedure SetText(const Value: string);
     procedure SetTextSettings(const Value: TTextSettings);
     function StyledSettingsStored: Boolean;
-    procedure ModelTextSettingsChangedHandler(Sender: TObject);
   protected
     procedure AfterPaint; override;
     function DefineModelClass: TDataModelClass; override;
@@ -78,6 +84,7 @@ type
     procedure LoadFromFile(const AFileName: string);
     procedure LoadFromResource(const AResourceName: string);
     procedure LoadFromStream(const AStream: TStream);
+    property BackgroundColor: TAlphaColor read GetBackgroundColor write SetBackgroundColor;
     property Image: TBitmap read GetImage write SetImage;
     property Model: TCustomNativeImageModel read GetModel;
     property StyledSettings: TStyledSettings read GetStyledSettings write SetStyledSettings stored StyledSettingsStored nodefault;
@@ -90,6 +97,7 @@ type
   published
     property Align;
     property Anchors;
+    property BackgroundColor;
     property Height;
     property Image;
     property Margins;
@@ -208,7 +216,8 @@ var
 begin
   LStream := TMemoryStream.Create;
   try
-    FImage.SaveToStream(LStream);
+    if not FImage.IsEmpty then
+      FImage.SaveToStream(LStream);
     LoadFromStream(LStream);
   finally
     LStream.Free;
@@ -239,6 +248,12 @@ end;
 procedure TCustomNativeImageModel.LoadFromStream(const AStream: TStream);
 begin
   SendMessage<TStream>(MM_NATIVEIMAGE_LOADFROMSTREAM, AStream);
+end;
+
+procedure TCustomNativeImageModel.SetBackgroundColor(const Value: TAlphaColor);
+begin
+  FBackgroundColor := Value;
+  SendMessage(MM_NATIVEIMAGE_BACKGROUNDCOLORCHANGED);
 end;
 
 procedure TCustomNativeImageModel.SetImage(const Value: TBitmap);
@@ -275,6 +290,11 @@ end;
 function TCustomNativeImage.DefineModelClass: TDataModelClass;
 begin
   Result := TCustomNativeImageModel;
+end;
+
+function TCustomNativeImage.GetBackgroundColor: TAlphaColor;
+begin
+  Result := Model.BackgroundColor;
 end;
 
 function TCustomNativeImage.GetImage: TBitmap;
@@ -344,6 +364,8 @@ var
 begin
   if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
   begin
+    Canvas.Fill.Color := Model.BackgroundColor;
+    Canvas.FillRect(TRectF.Create(0, 0, Width, Height), 1);
     LRect := TRectF.Create(0, 0, Image.Width, Image.Height);
     Canvas.DrawBitmap(Image, LRect, LRect.FitInto(TRectF.Create(0, 0, Width, Height)), AbsoluteOpacity);
     Canvas.Font.Assign(TextSettings.Font);
@@ -355,6 +377,11 @@ end;
 function TCustomNativeImage.RecommendSize(const AWishedSize: TSizeF): TSizeF;
 begin
   Result := AWishedSize;
+end;
+
+procedure TCustomNativeImage.SetBackgroundColor(const Value: TAlphaColor);
+begin
+  Model.BackgroundColor := Value;
 end;
 
 procedure TCustomNativeImage.SetImage(const Value: TBitmap);
