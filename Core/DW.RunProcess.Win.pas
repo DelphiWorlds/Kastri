@@ -47,7 +47,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function RunAndWait(const ATimeout: Integer = 0): Boolean; override;
+    function RunAndWait(const ATimeout: Cardinal = 0): Integer; override;
     procedure Terminate; override;
   end;
 
@@ -128,18 +128,22 @@ begin
   DoTerminated(ExitCode);
 end;
 
-function TCustomRunProcess.RunAndWait(const ATimeout: Integer): Boolean;
+function TCustomRunProcess.RunAndWait(const ATimeout: Cardinal): Integer;
 var
   LStart: TDateTime;
 begin
-  Result := False;
   if InternalRun then
   begin
     LStart := Now;
     while IsRunning and (MilliSecondsBetween(Now, LStart) < ATimeout) do
       ProcessMessage;
-    Result := not IsRunning;
-  end;
+    if IsRunning then
+      Result := 1  // Still running - timed out
+    else
+      Result := 0; // Successfully ran without timing out
+  end
+  else
+    Result := -1;  // Failed to start
 end;
 
 procedure TCustomRunProcess.Terminate;

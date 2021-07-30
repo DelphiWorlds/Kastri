@@ -50,9 +50,9 @@ type
     /// </summary>
     function Run: Boolean; virtual;
     /// <summary>
-    ///   Run the process synchronously. Returns True if the process was started
+    ///   Run the process synchronously. Returns 0 if the process was started, -1 if it was not started, and 1 if timeout
     /// </summary>
-    function RunAndWait(const ATimeout: Integer = 0): Boolean; virtual; // 0 = infinite
+    function RunAndWait(const ATimeout: Cardinal = 0): Integer; virtual; // 0 = infinite
     /// <summary>
     ///   Terminate the process
     /// </summary>
@@ -157,9 +157,9 @@ begin
   Result := False;
 end;
 
-function TBaseRunProcess.RunAndWait(const ATimeout: Integer = 0): Boolean;
+function TBaseRunProcess.RunAndWait(const ATimeout: Cardinal = 0): Integer;
 begin
-  Result := False;
+  Result := -1; // Failed to start
 end;
 
 procedure TBaseRunProcess.Terminate;
