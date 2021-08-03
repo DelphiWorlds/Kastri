@@ -51,7 +51,7 @@ uses
   // Posix
   Posix.SysUtsname,
   // DW
-  DW.Macapi.Helpers, DW.iOSapi.Foundation;
+  DW.Macapi.Helpers, DW.iOSapi.Foundation, DW.iOSapi.UIKit;
 
 { TPlatformOSDevice }
 
