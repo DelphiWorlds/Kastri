@@ -5307,6 +5307,13 @@ type
     procedure addCompletion(completion: TUIPointerInteractionAnimatingBlockMethod2); cdecl;
   end;
 
+function UIApplicationOpenSettingsURLString: NSString;
+
 implementation
+
+function UIApplicationOpenSettingsURLString: NSString;
+begin
+  Result := CocoaNSStringConst(libUIKit, 'UIApplicationOpenSettingsURLString');
+end;
 
 end.
