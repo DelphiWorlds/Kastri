@@ -35,6 +35,7 @@ const
   NSPersonNameComponentsFormatterPhonetic = 2;
 
 type
+  NSDateInterval = interface;
   NSItemProvider = interface;
   NSLocale = interface;
   NSMeasurement = interface;
@@ -73,6 +74,26 @@ type
   TNSProgressBlockMethod4 = procedure of object;
   TNSUserActivityBlockMethod1 = procedure(inputStream: NSInputStream; outputStream: NSOutputStream; error: NSError) of object;
   TNSUserActivityBlockMethod2 = procedure of object;
+
+  NSDateIntervalClass = interface(NSObjectClass)
+    ['{B19E17B2-394D-45B8-AB71-E70138251973}']
+  end;
+
+  NSDateInterval = interface(NSObject)
+    ['{971BB9F8-1C61-4F2B-A1AE-C7D7D0D178A5}']
+    function compare(dateInterval: NSDateInterval): NSComparisonResult; cdecl;
+    function containsDate(date: NSDate): Boolean; cdecl;
+    function duration: NSTimeInterval; cdecl;
+    function endDate: NSDate; cdecl;
+    function initWithCoder(coder: NSCoder): Pointer; cdecl;
+    function initWithStartDate(startDate: NSDate; endDate: NSDate): Pointer; overload; cdecl;
+    function initWithStartDate(startDate: NSDate; duration: NSTimeInterval): Pointer; overload; cdecl;
+    function intersectionWithDateInterval(dateInterval: NSDateInterval): NSDateInterval; cdecl;
+    function intersectsDateInterval(dateInterval: NSDateInterval): Boolean; cdecl;
+    function isEqualToDateInterval(dateInterval: NSDateInterval): Boolean; cdecl;
+    function startDate: NSDate; cdecl;
+  end;
+  TNSDateInterval = class(TOCGenericImport<NSDateIntervalClass, NSDateInterval>) end;
 
   NSItemProviderClass = interface(NSObjectClass)
     ['{574DFF14-C35E-40E1-B7EA-C118E2FD3C53}']
@@ -339,10 +360,10 @@ type
   NSMeasurement = interface(NSObject)
     ['{AA2F9B58-7C87-4632-9A4B-8865D26F8B83}']
     [MethodName('unit')]
-    function &unit: Pointer; cdecl;  // UnitType
+    function &unit: Pointer; cdecl;
     function canBeConvertedToUnit(&unit: NSUnit): Boolean; cdecl;
     function doubleValue: Double; cdecl;
-    function initWithDoubleValue(doubleValue: Double; &unit: Pointer): Pointer; cdecl; // &unit: UnitType
+    function initWithDoubleValue(doubleValue: Double; &unit: Pointer): Pointer; cdecl;
     function measurementByAddingMeasurement(measurement: NSMeasurement): NSMeasurement; cdecl;
     function measurementByConvertingToUnit(&unit: NSUnit): NSMeasurement; cdecl;
     function measurementBySubtractingMeasurement(measurement: NSMeasurement): NSMeasurement; cdecl;
