@@ -21,7 +21,7 @@ uses
   // iOS
   iOSapi.Foundation, iOSapi.CocoaTypes, iOSapi.QuartzCore, iOSapi.UIKit, iOSapi.CoreGraphics, iOSapi.UserNotifications,
   // DW
-  DW.iOSapi.Foundation;
+  DW.iOSapi.Foundation, DW.iOSapi.Intents;
 
 const
   UIAlertActionStyleDefault = 0;
@@ -769,7 +769,6 @@ const
 
 type
   UIAlertAction = interface;
-  UIAlertController = interface;
   UIApplication = interface;
   NSCollectionLayoutAnchor = interface;
   NSCollectionLayoutBoundarySupplementaryItem = interface;
@@ -1048,128 +1047,68 @@ type
   UIWindowSceneDelegate = interface;
   UIWindowSceneDestructionRequestOptions = interface;
 
+  {$IF CompilerVersion < 34}
   UIAlertActionStyle = NSInteger;
   UIAlertControllerStyle = NSInteger;
-  UIMenuElementState = NSInteger;
-  UIMenuElementAttributes = NSInteger;
   UIMenuIdentifier = NSString;
   UIMenuOptions = NSInteger;
-  UIKeyModifierFlags = NSInteger;
-  UIEventType = NSInteger;
-  UIEventSubtype = NSInteger;
+  {$ENDIF}
+  UIMenuElementState = NSInteger;
+  UIMenuElementAttributes = NSInteger;
   UIEventButtonMask = NSInteger;
   UIEditingInteractionConfiguration = NSInteger;
-  UIFontDescriptorSymbolicTraits = NSInteger;
-  UIFontDescriptorClass = NSUInteger;
   UIFontTextStyle = NSString;
   UIFontDescriptorAttributeName = NSString;
   UIFontDescriptorTraitKey = NSString;
   UIFontDescriptorFeatureKey = NSString;
   UIFontWeight = CGFloat;
   UIFontDescriptorSystemDesign = NSString;
-  UIBarStyle = NSInteger;
-  UIUserInterfaceSizeClass = NSInteger;
-  UIUserInterfaceStyle = NSInteger;
-  UIUserInterfaceLayoutDirection = NSInteger;
   UITraitEnvironmentLayoutDirection = NSInteger;
   UIDisplayGamut = NSInteger;
   UIAccessibilityContrast = NSInteger;
   UILegibilityWeight = NSInteger;
   UIUserInterfaceLevel = NSInteger;
   UIUserInterfaceActiveAppearance = NSInteger;
-  UIDeviceOrientation = NSInteger;
-  UIDeviceBatteryState = NSInteger;
-  UIUserInterfaceIdiom = NSInteger;
-  UIRectEdge = NSInteger;
-  UIRectCorner = NSInteger;
   UIAxis = NSInteger;
   NSDirectionalRectEdge = NSInteger;
   UIDirectionalRectEdge = NSInteger;
   NSRectAlignment = NSInteger;
   UIDynamicItemCollisionBoundsType = NSInteger;
-  UILayoutPriority = Single;
-  NSLayoutRelation = NSInteger;
-  NSLayoutAttribute = NSInteger;
-  NSLayoutFormatOptions = NSInteger;
-  UITouchPhase = NSInteger;
   UIForceTouchCapability = NSInteger;
   UITouchType = NSInteger;
   UITouchProperties = NSInteger;
+  {$IF CompilerVersion < 34}
   UIContentSizeCategory = NSString;
+  {$ENDIF}
   UIFocusHeading = NSInteger;
   UIFocusSoundIdentifier = NSString;
-  UIViewAnimationCurve = NSInteger;
-  UIViewContentMode = NSInteger;
-  UIViewAnimationTransition = NSInteger;
-  UIViewAutoresizing = NSInteger;
-  UIViewAnimationOptions = NSInteger;
-  UIViewKeyframeAnimationOptions = NSInteger;
-  UISystemAnimation = NSInteger;
-  UIViewTintAdjustmentMode = NSInteger;
   UISemanticContentAttribute = NSInteger;
-  UILayoutConstraintAxis = NSInteger;
   UIActionIdentifier = NSString;
   UIContextMenuInteractionCommitStyle = NSInteger;
   UIContextMenuInteractionAppearance = NSInteger;
-  UIControlEvents = NSInteger;
-  UIControlContentVerticalAlignment = NSInteger;
-  UIControlContentHorizontalAlignment = NSInteger;
-  UIControlState = NSInteger;
-  NSTextAlignment = NSInteger;
-  NSWritingDirection = NSInteger;
-  NSLineBreakMode = NSInteger;
   NSLineBreakStrategy = NSInteger;
   NSTextTabOptionKey = NSString;
-  UILineBreakMode = NSInteger;
-  UITextAlignment = NSInteger;
-  UIBaselineAdjustment = NSInteger;
   UIDropOperation = NSInteger;
   UIViewAnimatingState = NSInteger;
   UIViewAnimatingPosition = NSInteger;
-  UITextAutocapitalizationType = NSInteger;
-  UITextAutocorrectionType = NSInteger;
-  UITextSpellCheckingType = NSInteger;
   UITextSmartQuotesType = NSInteger;
   UITextSmartDashesType = NSInteger;
   UITextSmartInsertDeleteType = NSInteger;
-  UIKeyboardType = NSInteger;
-  UIKeyboardAppearance = NSInteger;
-  UIReturnKeyType = NSInteger;
   UITextContentType = NSString;
-  UITextStorageDirection = NSInteger;
-  UITextLayoutDirection = NSInteger;
-  UITextDirection = NSInteger;
-  UITextGranularity = NSInteger;
   UITextAlternativeStyle = NSInteger;
-  UITextWritingDirection = NSWritingDirection;
   UITextDragOptions = NSInteger;
   UITextDropAction = NSInteger;
   UITextDropProgressMode = NSInteger;
   UITextDropPerformer = NSInteger;
   UITextDropEditability = NSInteger;
-  UITextBorderStyle = NSInteger;
-  UITextFieldViewMode = NSInteger;
   UITextFieldDidEndEditingReason = NSInteger;
-  UIActionSheetStyle = NSInteger;
-  UIAlertViewStyle = NSInteger;
   UISceneActivationState = NSInteger;
   UISceneSessionRole = NSString;
   UISceneErrorCode = NSInteger;
-  UIStatusBarStyle = NSInteger;
-  UIStatusBarAnimation = NSInteger;
-  UIInterfaceOrientation = NSInteger;
-  UIInterfaceOrientationMask = NSInteger;
-  UIRemoteNotificationType = NSInteger;
-  UIBackgroundFetchResult = NSInteger;
-  UIBackgroundRefreshStatus = NSInteger;
-  UIApplicationState = NSInteger;
-  UIBackgroundTaskIdentifier = NSUInteger;
   UIApplicationOpenExternalURLOptionsKey = NSString;
   UIApplicationLaunchOptionsKey = NSString;
   UIApplicationOpenURLOptionsKey = NSString;
   UIApplicationExtensionPointIdentifier = NSString;
-  UIModalTransitionStyle = NSInteger;
-  UIModalPresentationStyle = NSInteger;
   UIPreviewActionStyle = NSInteger;
   UITransitionContextViewControllerKey = NSString;
   UITransitionContextViewKey = NSString;
@@ -1178,59 +1117,35 @@ type
   UIDocumentBrowserImportMode = NSInteger;
   UIDocumentBrowserUserInterfaceStyle = NSInteger;
   UIDocumentBrowserActionAvailability = NSInteger;
-  NSUnderlineStyle = NSInteger;
   NSWritingDirectionFormatType = NSInteger;
   NSTextEffectStyle = NSString;
   NSAttributedStringDocumentType = NSString;
   NSTextLayoutSectionKey = NSString;
   NSTextScalingType = NSInteger;
   NSAttributedStringDocumentAttributeKey = NSString;
+  {$IF CompilerVersion < 34}
   NSAttributedStringDocumentReadingOptionKey = NSString;
-  NSTextWritingDirection = NSInteger;
+  {$ENDIF}
   NSDataAssetName = NSString;
   UIPreferredPresentationStyle = NSInteger;
-  NSTextStorageEditActions = NSInteger;
-  NSTextLayoutOrientation = NSInteger;
-  NSGlyphProperty = NSInteger;
-  NSControlCharacterAction = NSInteger;
-  NSStringDrawingOptions = NSInteger;
   UIActivityType = NSString;
-  UIActivityCategory = NSInteger;
-  UIAccelerationValue = Double;
-  UIScrollViewIndicatorStyle = NSInteger;
-  UIScrollViewKeyboardDismissMode = NSInteger;
   UIScrollViewIndexDisplayMode = NSInteger;
   UIScrollViewContentInsetAdjustmentBehavior = NSInteger;
   UIScrollViewDecelerationRate = CGFloat;
-  UIAccessibilityTraits = UInt64;
-  UIAccessibilityNotifications = UInt32;
   UIAccessibilityAssistiveTechnologyIdentifier = NSString;
   UIAccessibilityNavigationStyle = NSInteger;
   UIAccessibilityContainerType = NSInteger;
   UIAccessibilityTextualContext = NSString;
-  UIImageOrientation = NSInteger;
-  UIImageResizingMode = NSInteger;
-  UIImageRenderingMode = NSInteger;
   UIAccessibilityCustomRotorDirection = NSInteger;
   UIAccessibilityCustomSystemRotorType = NSInteger;
-  UIAccessibilityZoomType = NSInteger;
   UIGuidedAccessErrorCode = NSInteger;
-  UIGuidedAccessRestrictionState = NSInteger;
   UIGuidedAccessAccessibilityFeature = NSInteger;
-  UIAccessibilityScrollDirection = NSInteger;
   UIAccessibilityHearingDeviceEar = NSInteger;
-  UIButtonType = NSInteger;
   UIButtonRole = NSInteger;
-  UIActivityIndicatorViewStyle = NSInteger;
   UIActivityItemsConfigurationMetadataKey = NSString;
   UIActivityItemsConfigurationPreviewIntent = NSString;
   UIActivityItemsConfigurationInteraction = NSString;
   UIApplicationShortcutIconType = NSInteger;
-  UIAttachmentBehaviorType = NSInteger;
-  UIBarMetrics = NSInteger;
-  UIBarPosition = NSInteger;
-  UIBarButtonItemStyle = NSInteger;
-  UIBarButtonSystemItem = NSInteger;
   UIBlurEffectStyle = NSInteger;
   UICellAccessoryDisplayedState = NSInteger;
   UICellAccessoryOutlineDisclosureStyle = NSInteger;
@@ -1239,100 +1154,54 @@ type
   UICellConfigurationDragState = NSInteger;
   UICellConfigurationDropState = NSInteger;
   UICloudSharingPermissionOptions = NSInteger;
-  UICollectionViewScrollDirection = NSInteger;
-  UICollectionElementCategory = NSInteger;
-  UICollectionUpdateAction = NSInteger;
   UIContentInsetsReference = NSInteger;
   UICollectionLayoutSectionOrthogonalScrollingBehavior = NSInteger;
   UICollectionLayoutListAppearance = NSInteger;
   UICollectionLayoutListHeaderMode = NSInteger;
   UICollectionLayoutListFooterMode = NSInteger;
-  UICollectionViewScrollPosition = NSInteger;
   UICollectionViewReorderingCadence = NSInteger;
   UICollectionViewDropIntent = NSInteger;
   UICollectionViewCellDragState = NSInteger;
   UICollectionViewFlowLayoutSectionInsetReference = NSInteger;
-  UICollisionBehaviorMode = NSInteger;
   UIContextualActionStyle = NSInteger;
-  UIDataDetectorTypes = NSInteger;
-  UIDatePickerMode = NSInteger;
   UIDatePickerStyle = NSInteger;
-  UIGestureRecognizerState = NSInteger;
-  UISwipeGestureRecognizerDirection = NSInteger;
-  UITableViewCellStyle = NSInteger;
-  UITableViewCellSeparatorStyle = NSInteger;
-  UITableViewCellSelectionStyle = NSInteger;
   UITableViewCellFocusStyle = NSInteger;
-  UITableViewCellEditingStyle = NSInteger;
-  UITableViewCellAccessoryType = NSInteger;
-  UITableViewCellStateMask = NSInteger;
   UITableViewCellDragState = NSInteger;
-  UITableViewStyle = NSInteger;
-  UITableViewScrollPosition = NSInteger;
-  UITableViewRowAnimation = NSInteger;
   UITableViewRowActionStyle = NSInteger;
   UITableViewSeparatorInsetReference = NSInteger;
   UITableViewDropIntent = NSInteger;
-  UIDocumentChangeKind = NSInteger;
-  UIDocumentSaveOperation = NSInteger;
-  UIDocumentState = NSInteger;
   UIDocumentPickerMode = NSInteger;
   UIDocumentMenuOrder = NSInteger;
   UIDropSessionProgressIndicatorStyle = NSInteger;
   UIGraphicsImageRendererFormatRange = NSInteger;
   UIScrollType = NSInteger;
   UIScrollTypeMask = NSInteger;
-  UINavigationControllerOperation = NSInteger;
-  UIImagePickerControllerSourceType = NSInteger;
-  UIImagePickerControllerQualityType = NSInteger;
-  UIImagePickerControllerCameraCaptureMode = NSInteger;
-  UIImagePickerControllerCameraDevice = NSInteger;
-  UIImagePickerControllerCameraFlashMode = NSInteger;
   UIImagePickerControllerImageURLExportPreset = NSInteger;
   UIImagePickerControllerInfoKey = NSString;
   UIImageSymbolScale = NSInteger;
   UIImageSymbolWeight = NSInteger;
   UIImpactFeedbackStyle = NSInteger;
   UIScribbleElementIdentifier = Pointer;
-  UIInputViewStyle = NSInteger;
   UIKeyboardHIDUsage = NSInteger;
   UIListContentTextAlignment = NSInteger;
   UIListContentTextTransform = NSInteger;
   UIVibrancyEffectStyle = NSInteger;
-  UIUserNotificationType = NSInteger;
   UIUserNotificationActionBehavior = NSInteger;
   UIUserNotificationActivationMode = NSInteger;
   UIUserNotificationActionContext = NSInteger;
-  UIMenuControllerArrowDirection = NSInteger;
-  UIInterpolatingMotionEffectType = NSInteger;
   UINavigationItemLargeTitleDisplayMode = NSInteger;
   UINavigationItemBackButtonDisplayMode = NSInteger;
   UINibOptionsKey = NSString;
   UIPageControlInteractionState = NSInteger;
   UIPageControlBackgroundStyle = NSInteger;
-  UIPageViewControllerNavigationOrientation = NSInteger;
-  UIPageViewControllerSpineLocation = NSInteger;
-  UIPageViewControllerNavigationDirection = NSInteger;
-  UIPageViewControllerTransitionStyle = NSInteger;
   UIPageViewControllerOptionsKey = NSString;
   UIPasteboardName = NSString;
   UIPasteboardDetectionPattern = NSString;
   UIPasteboardOption = NSString;
-  UIPopoverArrowDirection = NSInteger;
   UIPressPhase = NSInteger;
   UIPressType = NSInteger;
-  UIPrinterJobTypes = NSInteger;
   UIPrintErrorCode = NSInteger;
-  UIPrintInfoOutputType = NSInteger;
-  UIPrintInfoOrientation = NSInteger;
-  UIPrintInfoDuplex = NSInteger;
   UIPrinterCutterBehavior = NSInteger;
-  UIProgressViewStyle = NSInteger;
-  UIScreenOverscanCompensation = NSInteger;
-  UISearchBarIcon = NSInteger;
-  UISearchBarStyle = NSInteger;
-  UISegmentedControlStyle = NSInteger;
-  UISegmentedControlSegment = NSInteger;
   UISplitViewControllerDisplayMode = NSInteger;
   UISplitViewControllerPrimaryEdge = NSInteger;
   UISplitViewControllerBackgroundStyle = NSInteger;
@@ -1340,18 +1209,11 @@ type
   UISplitViewControllerColumn = NSInteger;
   UISplitViewControllerSplitBehavior = NSInteger;
   UISwitchStyle = NSInteger;
-  UITabBarItemPositioning = NSInteger;
-  UITabBarSystemItem = NSInteger;
   UITextItemInteraction = NSInteger;
-  UIWebViewNavigationType = NSInteger;
-  UIWebPaginationMode = NSInteger;
-  UIWebPaginationBreakingMode = NSInteger;
-  UIWindowLevel = CGFloat;
   UISpringLoadedInteractionEffectState = NSInteger;
   UITabBarItemAppearanceStyle = NSInteger;
   UIStackViewDistribution = NSInteger;
   UIStackViewAlignment = NSInteger;
-  UIPushBehaviorMode = NSInteger;
   UINotificationFeedbackType = NSInteger;
   UITextInteractionMode = NSInteger;
   UIPencilPreferredAction = NSInteger;
@@ -1371,27 +1233,25 @@ type
   UIAccessibilityCustomActionHandler = function(customAction: UIAccessibilityCustomAction): Boolean of object;
   UIAccessibilityCustomRotorSearch = function(predicate: UIAccessibilityCustomRotorSearchPredicate): UIAccessibilityCustomRotorItemResult of object;
   UIActionHandler = procedure(action: UIAction) of object;
-  UIActivityViewControllerCompletionHandler = procedure(activityType: UIActivityType; completed: Boolean) of object;
   UIActivityViewControllerCompletionWithItemsHandler = procedure(activityType: UIActivityType; completed: Boolean; returnedItems: NSArray; activityError: NSError) of object;
   UIButtonPointerStyleProvider = function(button: UIButton; proposedEffect: UIPointerEffect; proposedShape: UIPointerShape): UIPointerStyle of object;
   UICellAccessoryPosition = function(accessories: NSArray): NSUInteger of object;
   UICollectionLayoutListSwipeActionsConfigurationProvider = function(indexPath: NSIndexPath): UISwipeActionsConfiguration of object;
   UICollectionViewCellRegistrationConfigurationHandler = procedure(cell: UICollectionViewCell; indexPath: NSIndexPath; item: Pointer) of object;
   UICollectionViewCompositionalLayoutSectionProvider = function(section: NSInteger; p2: Pointer): NSCollectionLayoutSection of object;
-  UICollectionViewLayoutInteractiveTransitionCompletion = procedure(completed: Boolean; finished: Boolean) of object;
   UICollectionViewSupplementaryRegistrationConfigurationHandler = procedure(supplementaryView: UICollectionReusableView; elementKind: NSString; indexPath: NSIndexPath) of object;
   UIConfigurationColorTransformer = function(color: UIColor): UIColor of object;
+  {$IF CompilerVersion < 34}
   UIContextMenuActionProvider = function(suggestedActions: NSArray): UIMenu of object;
   UIContextMenuContentPreviewProvider = function: UIViewController of object;
+  {$ENDIF}
   UIContextualActionHandlerCompletionHandler = procedure(actionPerformed: Boolean) of object;
   UIContextualActionHandler = procedure(action: UIContextualAction; sourceView: UIView; completionHandler: UIContextualActionHandlerCompletionHandler) of object;
   UIGraphicsDrawingActions = procedure(rendererContext: UIGraphicsRendererContext) of object;
   UIGraphicsImageDrawingActions = procedure(rendererContext: UIGraphicsImageRendererContext) of object;
   UIGraphicsPDFDrawingActions = procedure(rendererContext: UIGraphicsPDFRendererContext) of object;
-  UIPrinterPickerCompletionHandler = procedure(printerPickerController: UIPrinterPickerController; userDidSelect: Boolean; error: NSError) of object;
-  UIPrintInteractionCompletionHandler = procedure(printInteractionController: UIPrintInteractionController; completed: Boolean; error: NSError) of object;
   UIStoryboardViewControllerCreator = function(coder: NSCoder): UIViewController of object;
-  UITextAttributesConversionHandler = function(param1: NSDictionary): NSDictionary of object; // CAUTION: Declaration needs verification
+  UITextAttributesConversionHandler = function(param1: NSDictionary): NSDictionary of object;
 
   TUIAlertActionHandler = procedure(alertaction: UIAlertAction) of object;
   TUIAlertControllerConfigurationHandler = procedure(textfield: UITextField) of object;
@@ -1400,7 +1260,7 @@ type
   TUIActivityItemsConfigurationBlockMethod1 = function(param1: UIActivityItemsConfigurationMetadataKey): Pointer of object;
   TUIActivityItemsConfigurationBlockMethod2 = procedure of object;
   TUIActivityItemsConfigurationBlockMethod3 = function(param1: NSInteger; param2: UIActivityItemsConfigurationMetadataKey): Pointer of object;
-  // Foundation TUIActivityItemsConfigurationBlockMethod4 = function(param1: NSInteger; param2: UIActivityItemsConfigurationPreviewIntent; param3: CGSize): NSItemProvider of object;
+  TUIActivityItemsConfigurationBlockMethod4 = function(param1: NSInteger; param2: UIActivityItemsConfigurationPreviewIntent; param3: CGSize): NSItemProvider of object;
   TUIActivityItemsConfigurationBlockMethod5 = function: NSArray of object;
   TUIActivityItemsConfigurationBlockMethod6 = procedure of object;
   TUIAlertActionBlockMethod1 = procedure(action: UIAlertAction) of object;
@@ -1412,7 +1272,7 @@ type
   TUIApplicationDelegateBlockMethod2 = procedure(result: UIBackgroundFetchResult) of object;
   TUIApplicationDelegateBlockMethod3 = procedure(succeeded: Boolean) of object;
   TUIApplicationDelegateBlockMethod4 = procedure(replyInfo: NSDictionary) of object;
-  // Intents TUIApplicationDelegateBlockMethod5 = procedure(intentResponse: INIntentResponse) of object;
+  TUIApplicationDelegateBlockMethod5 = procedure(intentResponse: INIntentResponse) of object;
   TUIApplicationDelegateBlockMethod6 = procedure(restorableObjects: NSArray) of object;
   TUICellAccessoryDeleteBlockMethod1 = procedure of object;
   TUICellAccessoryInsertBlockMethod1 = procedure of object;
@@ -1489,6 +1349,7 @@ type
   TUIViewPropertyAnimatorBlockMethod2 = procedure(finalPosition: UIViewAnimatingPosition) of object;
   TUIWindowSceneDelegateBlockMethod1 = procedure(succeeded: Boolean) of object;
 
+  // Exists in iOSapi.UIKit in Delphi 10.4.x, however UIAlertAction is missing the setStyle method
   UIAlertActionClass = interface(NSObjectClass)
     ['{953DC1CC-483A-451B-BB66-101217A9C6BF}']
     { class } function actionWithTitle(title: NSString; style: UIAlertActionStyle; handler: TUIAlertActionHandler): Pointer; cdecl;
@@ -1505,6 +1366,7 @@ type
   TUIAlertAction = class(TOCGenericImport<UIAlertActionClass, UIAlertAction>)
   end;
 
+  {$IF CompilerVersion < 34}
   UIAlertControllerClass = interface(NSObjectClass)
     ['{DA597BCE-6687-4BCC-8B3F-57205A141193}']
     { class } function alertControllerWithTitle(title: NSString; message: NSString; preferredStyle: UIAlertControllerStyle) : Pointer; cdecl;
@@ -1526,21 +1388,27 @@ type
   end;
   TUIAlertController = class(TOCGenericImport<UIAlertControllerClass, UIAlertController>)
   end;
+  {$ENDIF}
 
   TBackgroundTaskHandler = procedure of object;
   TOpenURLCompletionHandler = procedure(success: Boolean) of object;
 
   UIApplication = interface(iOSapi.UIKit.UIApplication)
     ['{EC184C87-9109-4D61-9BCA-291F70D90D15}']
+    {$IF CompilerVersion < 34}
     function beginBackgroundTaskWithExpirationHandler(handler: TBackgroundTaskHandler): UIBackgroundTaskIdentifier; cdecl;
     procedure endBackgroundTask(identifier: UIBackgroundTaskIdentifier); cdecl;
     function isRegisteredForRemoteNotifications: Boolean; cdecl;
+    {$ENDIF}
     [MethodName('openURL:options:completionHandler:')]
     procedure openURLOptionsCompletionHandler(url: NSURL; options: NSDictionary; completionHandler: TOpenURLCompletionHandler); cdecl;
+    {$IF CompilerVersion < 34}
     procedure setMinimumBackgroundFetchInterval(minimumBackgroundFetchInterval: NSTimeInterval); cdecl;
+    {$ENDIF}
   end;
   TUIApplication = class(TOCGenericImport<UIApplicationClass, UIApplication>) end;
 
+  // Import in iOSapi.UIKit in Delphi 10.4.2 is very incomplete, so complete declaration here
   UILayoutGuideClass = interface(NSObjectClass)
     ['{AF677015-5698-4B26-A46E-147882759C1E}']
   end;
@@ -2574,7 +2442,7 @@ type
     function localObject: Pointer; cdecl;
     function metadataProvider: TUIActivityItemsConfigurationBlockMethod1; cdecl;
     function perItemMetadataProvider: TUIActivityItemsConfigurationBlockMethod3; cdecl;
-    // Foundation function previewProvider: TUIActivityItemsConfigurationBlockMethod4; cdecl;
+    function previewProvider: TUIActivityItemsConfigurationBlockMethod4; cdecl;
     procedure setApplicationActivitiesProvider(applicationActivitiesProvider: TUIActivityItemsConfigurationBlockMethod6); cdecl;
     procedure setLocalObject(localObject: Pointer); cdecl;
     procedure setMetadataProvider(metadataProvider: TUIActivityItemsConfigurationBlockMethod2); cdecl;
@@ -3696,153 +3564,6 @@ type
     function dragItem: UIDragItem; cdecl;
   end;
 
-(*
-  NSDiffableDataSourceSnapshotClass = interface(NSObjectClass)
-    ['{F384574D-745E-4ADF-B482-430354953CB2}']
-  end;
-
-  NSDiffableDataSourceSnapshot = interface(NSObject)
-    ['{D98D423D-DE0F-440C-8ED6-324FA7D51908}']
-    procedure appendItemsWithIdentifiers(identifiers: NSArray; intoSectionWithIdentifier: SectionIdentifierType); overload; cdecl;
-    procedure appendItemsWithIdentifiers(identifiers: NSArray); overload; cdecl;
-    procedure appendSectionsWithIdentifiers(sectionIdentifiers: NSArray); cdecl;
-    procedure deleteAllItems; cdecl;
-    procedure deleteItemsWithIdentifiers(identifiers: NSArray); cdecl;
-    procedure deleteSectionsWithIdentifiers(sectionIdentifiers: NSArray); cdecl;
-    function indexOfItemIdentifier(itemIdentifier: ItemIdentifierType): NSInteger; cdecl;
-    function indexOfSectionIdentifier(sectionIdentifier: SectionIdentifierType): NSInteger; cdecl;
-    [MethodName('insertItemsWithIdentifiers:afterItemWithIdentifier:')]
-    procedure insertItemsWithIdentifiersAfterItemWithIdentifier(identifiers: NSArray; afterItemWithIdentifier: ItemIdentifierType); cdecl;
-    [MethodName('insertItemsWithIdentifiers:beforeItemWithIdentifier:')]
-    procedure insertItemsWithIdentifiersBeforeItemWithIdentifier(identifiers: NSArray; beforeItemWithIdentifier: ItemIdentifierType); cdecl;
-    [MethodName('insertSectionsWithIdentifiers:afterSectionWithIdentifier:')]
-    procedure insertSectionsWithIdentifiersAfterSectionWithIdentifier(sectionIdentifiers: NSArray; afterSectionWithIdentifier: SectionIdentifierType); cdecl;
-    [MethodName('insertSectionsWithIdentifiers:beforeSectionWithIdentifier:')]
-    procedure insertSectionsWithIdentifiersBeforeSectionWithIdentifier(sectionIdentifiers: NSArray; beforeSectionWithIdentifier: SectionIdentifierType); cdecl;
-    function itemIdentifiers: NSArray; cdecl;
-    function itemIdentifiersInSectionWithIdentifier(sectionIdentifier: SectionIdentifierType): NSArray; cdecl;
-    [MethodName('moveItemWithIdentifier:afterItemWithIdentifier:')]
-    procedure moveItemWithIdentifierAfterItemWithIdentifier(fromIdentifier: ItemIdentifierType; afterItemWithIdentifier: ItemIdentifierType); cdecl;
-    [MethodName('moveItemWithIdentifier:beforeItemWithIdentifier:')]
-    procedure moveItemWithIdentifierBeforeItemWithIdentifier(fromIdentifier: ItemIdentifierType; beforeItemWithIdentifier: ItemIdentifierType); cdecl;
-    [MethodName('moveSectionWithIdentifier:afterSectionWithIdentifier:')]
-    procedure moveSectionWithIdentifierAfterSectionWithIdentifier(fromSectionIdentifier: SectionIdentifierType; afterSectionWithIdentifier: SectionIdentifierType); cdecl;
-    [MethodName('moveSectionWithIdentifier:beforeSectionWithIdentifier:')]
-    procedure moveSectionWithIdentifierBeforeSectionWithIdentifier(fromSectionIdentifier: SectionIdentifierType; beforeSectionWithIdentifier: SectionIdentifierType); cdecl;
-    function numberOfItems: NSInteger; cdecl;
-    function numberOfItemsInSection(sectionIdentifier: SectionIdentifierType): NSInteger; cdecl;
-    function numberOfSections: NSInteger; cdecl;
-    procedure reloadItemsWithIdentifiers(identifiers: NSArray); cdecl;
-    procedure reloadSectionsWithIdentifiers(sectionIdentifiers: NSArray); cdecl;
-    function sectionIdentifierForSectionContainingItemIdentifier(itemIdentifier: ItemIdentifierType): SectionIdentifierType; cdecl;
-    function sectionIdentifiers: NSArray; cdecl;
-  end;
-  TNSDiffableDataSourceSnapshot = class(TOCGenericImport<NSDiffableDataSourceSnapshotClass, NSDiffableDataSourceSnapshot>) end;
-
-  NSDiffableDataSourceSectionTransactionClass = interface(NSObjectClass)
-    ['{A54ED13A-7C99-415E-88C8-04DD8A2561D2}']
-  end;
-
-  NSDiffableDataSourceSectionTransaction = interface(NSObject)
-    ['{FE05579A-B933-48B0-A33C-48F4FE613E99}']
-    function difference: NSOrderedCollectionDifference; cdecl;
-    function finalSnapshot: NSDiffableDataSourceSectionSnapshot; cdecl;
-    function initialSnapshot: NSDiffableDataSourceSectionSnapshot; cdecl;
-    function sectionIdentifier: SectionIdentifierType; cdecl;
-  end;
-  TNSDiffableDataSourceSectionTransaction = class(TOCGenericImport<NSDiffableDataSourceSectionTransactionClass, NSDiffableDataSourceSectionTransaction>) end;
-
-  NSDiffableDataSourceTransactionClass = interface(NSObjectClass)
-    ['{016C8204-A2F8-4C06-8ACC-D6D5DEFF1B2F}']
-  end;
-
-  NSDiffableDataSourceTransaction = interface(NSObject)
-    ['{4D2A76B2-8339-47FA-B1DD-7DB16EF4F417}']
-    function difference: NSOrderedCollectionDifference; cdecl;
-    function finalSnapshot: NSDiffableDataSourceSnapshot; cdecl;
-    function initialSnapshot: NSDiffableDataSourceSnapshot; cdecl;
-    function sectionTransactions: NSArray; cdecl;
-  end;
-  TNSDiffableDataSourceTransaction = class(TOCGenericImport<NSDiffableDataSourceTransactionClass, NSDiffableDataSourceTransaction>) end;
-
-  UICollectionViewDiffableDataSourceReorderingHandlersClass = interface(NSObjectClass)
-    ['{1340B794-8813-464D-9651-90DF664FB148}']
-  end;
-
-  UICollectionViewDiffableDataSourceReorderingHandlers = interface(NSObject)
-    ['{0E0BAD6A-9926-47A7-BD93-251CDBA0E3EB}']
-    function canReorderItemHandler: TUICollectionViewDiffableDataSourceReorderingHandlersBlockMethod1; cdecl;
-    function didReorderHandler: TUICollectionViewDiffableDataSourceReorderingHandlersBlockMethod3; cdecl;
-    procedure setCanReorderItemHandler(canReorderItemHandler: TUICollectionViewDiffableDataSourceReorderingHandlersBlockMethod2); cdecl;
-    procedure setDidReorderHandler(didReorderHandler: TUICollectionViewDiffableDataSourceReorderingHandlersBlockMethod2); cdecl;
-    procedure setWillReorderHandler(willReorderHandler: TUICollectionViewDiffableDataSourceReorderingHandlersBlockMethod2); cdecl;
-    function willReorderHandler: TUICollectionViewDiffableDataSourceReorderingHandlersBlockMethod3; cdecl;
-  end;
-  TUICollectionViewDiffableDataSourceReorderingHandlers = class(TOCGenericImport<UICollectionViewDiffableDataSourceReorderingHandlersClass, UICollectionViewDiffableDataSourceReorderingHandlers>) end;
-
-  UICollectionViewDiffableDataSourceSectionSnapshotHandlersClass = interface(NSObjectClass)
-    ['{C3C70FF1-EE19-4B56-99C7-C431ED90997C}']
-  end;
-
-  UICollectionViewDiffableDataSourceSectionSnapshotHandlers = interface(NSObject)
-    ['{E54B1310-75F4-4DC4-BBF8-BEB41098131C}']
-    procedure setShouldCollapseItemHandler(shouldCollapseItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod2); cdecl;
-    procedure setShouldExpandItemHandler(shouldExpandItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod2); cdecl;
-    procedure setSnapshotForExpandingParentItemHandler(snapshotForExpandingParentItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod2); cdecl;
-    procedure setWillCollapseItemHandler(willCollapseItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod2); cdecl;
-    procedure setWillExpandItemHandler(willExpandItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod2); cdecl;
-    function shouldCollapseItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod1; cdecl;
-    function shouldExpandItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod1; cdecl;
-    function snapshotForExpandingParentItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod6; cdecl;
-    function willCollapseItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod3; cdecl;
-    function willExpandItemHandler: TUICollectionViewDiffableDataSourceSectionSnapshotHandlersBlockMethod3; cdecl;
-  end;
-  TUICollectionViewDiffableDataSourceSectionSnapshotHandlers = class(TOCGenericImport<UICollectionViewDiffableDataSourceSectionSnapshotHandlersClass, UICollectionViewDiffableDataSourceSectionSnapshotHandlers>) end;
-
-  UICollectionViewDiffableDataSourceClass = interface(NSObjectClass)
-    ['{A0071539-A70F-4522-B55F-661C427F465B}']
-    {class} function new: Pointer; cdecl;
-  end;
-
-  UICollectionViewDiffableDataSource = interface(NSObject)
-    ['{F64D7C21-84B8-42FF-BB80-3090BFB8C97F}']
-    procedure applySnapshot(snapshot: NSDiffableDataSourceSnapshot; animatingDifferences: Boolean; completion: TUICollectionViewDiffableDataSourceBlockMethod1); overload; cdecl;
-    procedure applySnapshot(snapshot: NSDiffableDataSourceSectionSnapshot; toSection: SectionIdentifierType; animatingDifferences: Boolean); overload; cdecl;
-    procedure applySnapshot(snapshot: NSDiffableDataSourceSectionSnapshot; toSection: SectionIdentifierType; animatingDifferences: Boolean; completion: TUICollectionViewDiffableDataSourceBlockMethod1); overload; cdecl;
-    procedure applySnapshot(snapshot: NSDiffableDataSourceSnapshot; animatingDifferences: Boolean); overload; cdecl;
-    function indexPathForItemIdentifier(identifier: ItemIdentifierType): NSIndexPath; cdecl;
-    function initWithCollectionView(collectionView: UICollectionView; cellProvider: UICollectionViewDiffableDataSourceCellProvider): Pointer; cdecl;
-    function itemIdentifierForIndexPath(indexPath: NSIndexPath): ItemIdentifierType; cdecl;
-    function reorderingHandlers: UICollectionViewDiffableDataSourceReorderingHandlers; cdecl;
-    function sectionSnapshotHandlers: UICollectionViewDiffableDataSourceSectionSnapshotHandlers; cdecl;
-    procedure setReorderingHandlers(reorderingHandlers: UICollectionViewDiffableDataSourceReorderingHandlers); cdecl;
-    procedure setSectionSnapshotHandlers(sectionSnapshotHandlers: UICollectionViewDiffableDataSourceSectionSnapshotHandlers); cdecl;
-    procedure setSupplementaryViewProvider(supplementaryViewProvider: UICollectionViewDiffableDataSourceSupplementaryViewProvider); cdecl;
-    function snapshot: NSDiffableDataSourceSnapshot; cdecl;
-    function snapshotForSection(section: SectionIdentifierType): NSDiffableDataSourceSectionSnapshot; cdecl;
-    function supplementaryViewProvider: UICollectionViewDiffableDataSourceSupplementaryViewProvider; cdecl;
-  end;
-  TUICollectionViewDiffableDataSource = class(TOCGenericImport<UICollectionViewDiffableDataSourceClass, UICollectionViewDiffableDataSource>) end;
-
-  UITableViewDiffableDataSourceClass = interface(NSObjectClass)
-    ['{98D2850D-6B7D-4A63-A4DC-ED8FF4C3F327}']
-    {class} function new: Pointer; cdecl;
-  end;
-
-  UITableViewDiffableDataSource = interface(NSObject)
-    ['{ED0909BB-33A3-499A-9C5E-EE4DC53A63D8}']
-    procedure applySnapshot(snapshot: NSDiffableDataSourceSnapshot; animatingDifferences: Boolean; completion: TUITableViewDiffableDataSourceBlockMethod1); overload; cdecl;
-    procedure applySnapshot(snapshot: NSDiffableDataSourceSnapshot; animatingDifferences: Boolean); overload; cdecl;
-    function defaultRowAnimation: UITableViewRowAnimation; cdecl;
-    function indexPathForItemIdentifier(identifier: ItemIdentifierType): NSIndexPath; cdecl;
-    function initWithTableView(tableView: UITableView; cellProvider: UITableViewDiffableDataSourceCellProvider): Pointer; cdecl;
-    function itemIdentifierForIndexPath(indexPath: NSIndexPath): ItemIdentifierType; cdecl;
-    procedure setDefaultRowAnimation(defaultRowAnimation: UITableViewRowAnimation); cdecl;
-    function snapshot: NSDiffableDataSourceSnapshot; cdecl;
-  end;
-  TUITableViewDiffableDataSource = class(TOCGenericImport<UITableViewDiffableDataSourceClass, UITableViewDiffableDataSource>) end;
-
-*)
   UIDocumentPickerDelegate = interface(IObjectiveC)
     ['{4F94C432-A848-4294-A617-F79304AE0B09}']
     procedure documentPicker(controller: UIDocumentPickerViewController; didPickDocumentsAtURLs: NSArray); overload; cdecl;
@@ -3920,8 +3641,8 @@ type
 
   UIDragItem = interface(NSObject)
     ['{AF05584C-95E8-4D00-89C2-25EABE90BE54}']
-    // Foundation function initWithItemProvider(itemProvider: NSItemProvider): Pointer; cdecl;
-    // Foundation function itemProvider: NSItemProvider; cdecl;
+    function initWithItemProvider(itemProvider: NSItemProvider): Pointer; cdecl;
+    function itemProvider: NSItemProvider; cdecl;
     function localObject: Pointer; cdecl;
     function previewProvider: TUIDragItemBlockMethod1; cdecl;
     procedure setLocalObject(localObject: Pointer); cdecl;
