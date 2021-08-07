@@ -21,9 +21,200 @@ uses
 
 type
   JBase64 = interface;
+  JLinkedHashSet = interface;
+  JMap_Entry = interface;
+  JNavigableMap = interface;
+  JNavigableSet = interface;
+  JRational = interface;
+  JSortedSet = interface;
   JTimerTask = interface;
   JTimer = interface;
+  JTreeMap = interface;
   Jutil_Log = interface;
+
+  JSortedSetClass = interface(JSetClass)
+    ['{D632DFD2-D924-463C-8111-EEB33B490B09}']
+    {class} function last: JObject; cdecl;
+    {class} function subSet(start: JObject; end_: JObject): JSortedSet; cdecl;
+    {class} function tailSet(start: JObject): JSortedSet; cdecl;
+  end;
+
+  [JavaSignature('java/util/SortedSet')]
+  JSortedSet = interface(JSet)
+    ['{D812E9E6-D0D0-4974-9E17-20601495F86C}']
+    function comparator: JComparator; cdecl;
+    function first: JObject; cdecl;
+    function headSet(end_: JObject): JSortedSet; cdecl;
+  end;
+  TJSortedSet = class(TJavaGenericImport<JSortedSetClass, JSortedSet>) end;
+
+  JNavigableSetClass = interface(JSortedSetClass)
+    ['{6BB98CBF-284D-4FC5-A792-09DBB1168402}']
+    {class} function ceiling(e: JObject): JObject; cdecl;
+    {class} function headSet(toElement: JObject; inclusive: Boolean): JNavigableSet; cdecl; overload;
+    {class} function headSet(toElement: JObject): JSortedSet; cdecl; overload;
+    {class} function pollFirst: JObject; cdecl;
+    {class} function pollLast: JObject; cdecl;
+    {class} function subSet(fromElement: JObject; fromInclusive: Boolean; toElement: JObject; toInclusive: Boolean): JNavigableSet; cdecl; overload;
+  end;
+
+  [JavaSignature('java/util/NavigableSet')]
+  JNavigableSet = interface(JSortedSet)
+    ['{FFE5FDC3-1071-413A-9D8D-4873ECBE3685}']
+    function descendingIterator: JIterator; cdecl;
+    function descendingSet: JNavigableSet; cdecl;
+    function floor(e: JObject): JObject; cdecl;
+    function higher(e: JObject): JObject; cdecl;
+    function iterator: JIterator; cdecl;
+    function lower(e: JObject): JObject; cdecl;
+    function subSet(fromElement: JObject; toElement: JObject): JSortedSet; cdecl; overload;
+    function tailSet(fromElement: JObject; inclusive: Boolean): JNavigableSet; cdecl; overload;
+    function tailSet(fromElement: JObject): JSortedSet; cdecl; overload;
+  end;
+  TJNavigableSet = class(TJavaGenericImport<JNavigableSetClass, JNavigableSet>) end;
+
+  JMap_EntryClass = interface(IJavaClass)
+    ['{CC37442E-BEA1-4D74-827E-0C89FA654831}']
+    {class} function equals(object_: JObject): Boolean; cdecl;
+    {class} function getKey: JObject; cdecl;
+    {class} function getValue: JObject; cdecl;
+  end;
+
+  [JavaSignature('java/util/Map$Entry')]
+  JMap_Entry = interface(IJavaInstance)
+    ['{9D6A0684-A3FC-4629-A08A-36EDDA31753D}']
+    function hashCode: Integer; cdecl;
+    function setValue(object_: JObject): JObject; cdecl;
+  end;
+  TJMap_Entry = class(TJavaGenericImport<JMap_EntryClass, JMap_Entry>) end;
+
+  JNavigableMapClass = interface(JSortedMapClass)
+    ['{27C8F820-A5B6-4C9E-AC50-46708A7506F5}']
+    {class} function ceilingEntry(key: JObject): JMap_Entry; cdecl;
+    {class} function ceilingKey(key: JObject): JObject; cdecl;
+    {class} function floorEntry(key: JObject): JMap_Entry; cdecl;
+    {class} function floorKey(key: JObject): JObject; cdecl;
+    {class} function headMap(toKey: JObject; inclusive: Boolean): JNavigableMap; cdecl; overload;
+    {class} function lastEntry: JMap_Entry; cdecl;
+    {class} function lowerEntry(key: JObject): JMap_Entry; cdecl;
+    {class} function lowerKey(key: JObject): JObject; cdecl;
+    {class} function pollLastEntry: JMap_Entry; cdecl;
+    {class} function subMap(fromKey: JObject; fromInclusive: Boolean; toKey: JObject; toInclusive: Boolean): JNavigableMap; cdecl; overload;
+    {class} function subMap(fromKey: JObject; toKey: JObject): JSortedMap; cdecl; overload;
+  end;
+
+  [JavaSignature('java/util/NavigableMap')]
+  JNavigableMap = interface(JSortedMap)
+    ['{A922D082-DCAE-41C9-ABC7-6B01F0B2378C}']
+    function descendingKeySet: JNavigableSet; cdecl;
+    function descendingMap: JNavigableMap; cdecl;
+    function firstEntry: JMap_Entry; cdecl;
+    function headMap(toKey: JObject): JSortedMap; cdecl; overload;
+    function higherEntry(key: JObject): JMap_Entry; cdecl;
+    function higherKey(key: JObject): JObject; cdecl;
+    function navigableKeySet: JNavigableSet; cdecl;
+    function pollFirstEntry: JMap_Entry; cdecl;
+    function tailMap(fromKey: JObject; inclusive: Boolean): JNavigableMap; cdecl; overload;
+    function tailMap(fromKey: JObject): JSortedMap; cdecl; overload;
+  end;
+  TJNavigableMap = class(TJavaGenericImport<JNavigableMapClass, JNavigableMap>) end;
+
+  JTreeMapClass = interface(JAbstractMapClass)
+    ['{6EFAF8FF-6DD5-46E5-B4C7-BCD5E00B6173}']
+    {class} function init: JTreeMap; cdecl; overload;
+    {class} function init(copyFrom: JMap): JTreeMap; cdecl; overload;
+    {class} function init(comparator: JComparator): JTreeMap; cdecl; overload;
+    {class} function init(copyFrom: JSortedMap): JTreeMap; cdecl; overload;
+    {class} function ceilingEntry(key: JObject): JMap_Entry; cdecl;
+    {class} function comparator: JComparator; cdecl;
+    {class} function containsKey(key: JObject): Boolean; cdecl;
+    {class} function descendingKeySet: JNavigableSet; cdecl;
+    {class} function firstKey: JObject; cdecl;
+    {class} function floorEntry(key: JObject): JMap_Entry; cdecl;
+    {class} function floorKey(key: JObject): JObject; cdecl;
+    {class} function higherEntry(key: JObject): JMap_Entry; cdecl;
+    {class} function higherKey(key: JObject): JObject; cdecl;
+    {class} function isEmpty: Boolean; cdecl;
+    {class} function lowerEntry(key: JObject): JMap_Entry; cdecl;
+    {class} function lowerKey(key: JObject): JObject; cdecl;
+    {class} function navigableKeySet: JNavigableSet; cdecl;
+    {class} function put(key: JObject; value: JObject): JObject; cdecl;
+    {class} function remove(key: JObject): JObject; cdecl;
+    {class} function size: Integer; cdecl;
+    {class} function tailMap(fromInclusive: JObject): JSortedMap; cdecl; overload;
+  end;
+
+  [JavaSignature('java/util/TreeMap')]
+  JTreeMap = interface(JAbstractMap)
+    ['{659B2DE2-814C-454C-B7B9-BB38FE5F836B}']
+    function ceilingKey(key: JObject): JObject; cdecl;
+    procedure clear; cdecl;
+    function clone: JObject; cdecl;
+    function descendingMap: JNavigableMap; cdecl;
+    function entrySet: JSet; cdecl;
+    function firstEntry: JMap_Entry; cdecl;
+    function &get(key: JObject): JObject; cdecl;
+    function headMap(to_: JObject; inclusive: Boolean): JNavigableMap; cdecl; overload;
+    function headMap(toExclusive: JObject): JSortedMap; cdecl; overload;
+    function keySet: JSet; cdecl;
+    function lastEntry: JMap_Entry; cdecl;
+    function lastKey: JObject; cdecl;
+    function pollFirstEntry: JMap_Entry; cdecl;
+    function pollLastEntry: JMap_Entry; cdecl;
+    function subMap(from: JObject; fromInclusive: Boolean; to_: JObject; toInclusive: Boolean): JNavigableMap; cdecl; overload;
+    function subMap(fromInclusive: JObject; toExclusive: JObject): JSortedMap; cdecl; overload;
+    function tailMap(from: JObject; inclusive: Boolean): JNavigableMap; cdecl; overload;
+  end;
+  TJTreeMap = class(TJavaGenericImport<JTreeMapClass, JTreeMap>) end;
+
+  JLinkedHashSetClass = interface(JHashSetClass)
+    ['{55F18D87-F52A-42CF-A679-528B2A46B0AB}']
+    {class} function init: JLinkedHashSet; cdecl; overload;
+    {class} function init(capacity: Integer): JLinkedHashSet; cdecl; overload;
+    {class} function init(capacity: Integer; loadFactor: Single): JLinkedHashSet; cdecl; overload;
+    {class} function init(collection: JCollection): JLinkedHashSet; cdecl; overload;
+  end;
+
+  [JavaSignature('java/util/LinkedHashSet')]
+  JLinkedHashSet = interface(JHashSet)
+    ['{5B386475-6963-49C7-978E-77F8849ABC39}']
+  end;
+  TJLinkedHashSet = class(TJavaGenericImport<JLinkedHashSetClass, JLinkedHashSet>) end;
+
+  JRationalClass = interface(JNumberClass)
+    ['{592776A4-0BC8-4829-88B1-714E90C34FE1}']
+    {class} function _GetNEGATIVE_INFINITY: JRational; cdecl;
+    {class} function _GetNaN: JRational; cdecl;
+    {class} function _GetPOSITIVE_INFINITY: JRational; cdecl;
+    {class} function _GetZERO: JRational; cdecl;
+    {class} function init(numerator: Integer; denominator: Integer): JRational; cdecl;
+    {class} function compareTo(another: JRational): Integer; cdecl;
+    {class} function doubleValue: Double; cdecl;
+    {class} function getNumerator: Integer; cdecl;
+    {class} function hashCode: Integer; cdecl;
+    {class} function intValue: Integer; cdecl;
+    {class} function isZero: Boolean; cdecl;
+    {class} function longValue: Int64; cdecl;
+    {class} function parseRational(&string: JString): JRational; cdecl;
+    {class} property NEGATIVE_INFINITY: JRational read _GetNEGATIVE_INFINITY;
+    {class} property NaN: JRational read _GetNaN;
+    {class} property POSITIVE_INFINITY: JRational read _GetPOSITIVE_INFINITY;
+    {class} property ZERO: JRational read _GetZERO;
+  end;
+
+  [JavaSignature('android/util/Rational')]
+  JRational = interface(JNumber)
+    ['{5DEFEB1B-2D1F-4ADF-B69B-54B0498F8544}']
+    function equals(obj: JObject): Boolean; cdecl;
+    function floatValue: Single; cdecl;
+    function getDenominator: Integer; cdecl;
+    function isFinite: Boolean; cdecl;
+    function isInfinite: Boolean; cdecl;
+    function isNaN: Boolean; cdecl;
+    function shortValue: SmallInt; cdecl;
+    function toString: JString; cdecl;
+  end;
+  TJRational = class(TJavaGenericImport<JRationalClass, JRational>) end;
 
   JBase64Class = interface(JObjectClass)
     ['{DA78E162-4CB0-455B-ACC0-BEDDE5484C85}']
