@@ -42,8 +42,9 @@ type
     procedure DoOutput(const AOutput: string); override;
     function GetIsRunning: Boolean; override;
     function InternalRun: Boolean;
-    function MakeWorkingPath: string;
     property Process: TJvCreateProcess read FProcess;
+  public
+    class function MakeWorkingPath: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -172,7 +173,7 @@ begin
   Result := True;
 end;
 
-function TCustomRunProcess.MakeWorkingPath: string;
+class function TCustomRunProcess.MakeWorkingPath: string;
 var
   LGUID: string;
 begin
