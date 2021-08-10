@@ -31,14 +31,18 @@ type
     const cSelectorCode = 1001;
   private
     FIntent: JIntent;
-    FIntentActivities: TStrings;
+    FMimeTypes: TArray<string>;
     procedure AddFile(const AURI: Jnet_Uri);
     procedure CreateIntent;
+    function GetMimeType(const AFileKind: TFileKind): string;
     procedure HandleSelectorOK(const AData: JIntent);
     procedure MessageResultNotificationMessageHandler(const Sender: TObject; const M: TMessage);
+    procedure UpdateIntentMimeTypes;
     procedure UpdateIntentActivities;
   protected
-    procedure DoSelect; override;
+    procedure DoSelect(const AMode: TSelectionMode); override;
+    procedure FileKindsChanged; override;
+    procedure FileTypesChanged; override;
   public
     constructor Create(const ASelector: TFilesSelector); override;
     destructor Destroy; override;
@@ -60,23 +64,36 @@ constructor TPlatformFilesSelector.Create(const ASelector: TFilesSelector);
 begin
   inherited;
   TMessageManager.DefaultManager.SubscribeToMessage(TMessageResultNotification, MessageResultNotificationMessageHandler);
-  FIntentActivities := TStringList.Create;
   CreateIntent;
 end;
 
 destructor TPlatformFilesSelector.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TMessageResultNotification, MessageResultNotificationMessageHandler);
-  FIntentActivities.Free;
   inherited;
+end;
+
+function TPlatformFilesSelector.GetMimeType(const AFileKind: TFileKind): string;
+begin
+  case AFileKind of
+    TFileKind.Image:
+      Result := 'image/*';
+    TFileKind.Audio:
+      Result := 'audio/*';
+    TFileKind.Movie:
+      Result := 'video/*';
+    TFileKind.Text, TFileKind.Content, TFileKind.SourceCode:
+      Result := 'text/*';
+  else
+    Result := '';
+  end;
 end;
 
 procedure TPlatformFilesSelector.CreateIntent;
 begin
   FIntent := TJIntent.JavaClass.init;
-  FIntent.setType(StringToJString('*/*')); // EXTRA_MIME_TYPES  = String[] eg image/*
-  FIntent.setAction(TJIntent.JavaClass.ACTION_OPEN_DOCUMENT);
   FIntent.putExtra(TJIntent.JavaClass.EXTRA_ALLOW_MULTIPLE, True);
+  FIntent.setType(StringToJString('*/*'));
   UpdateIntentActivities;
 end;
 
@@ -100,7 +117,6 @@ begin
     if (LCursor <> nil) and LCursor.moveToFirst then
       LSelectedFile.DisplayName := JStringToString(LCursor.getString(0));
     AddSelectedFile(LSelectedFile);
-    Files.Add(LSelectedFile.RawPath);
   end;
 end;
 
@@ -135,9 +151,89 @@ begin
   end;
 end;
 
-procedure TPlatformFilesSelector.DoSelect;
+procedure TPlatformFilesSelector.DoSelect(const AMode: TSelectionMode);
+var
+  LMimeTypes: TJavaObjectArray<JString>;
+  I: Integer;
 begin
+  if Length(FMimeTypes) > 0 then
+  begin
+    FIntent.setType(StringToJString(FMimeTypes[0]));
+    if Length(FMimeTypes) > 1 then
+    begin
+      LMimeTypes := TJavaObjectArray<JString>.Create(Length(FMimeTypes));
+      try
+        for I := 1 to Length(FMimeTypes) - 1 do
+          LMimeTypes.Items[I] := StringToJString(FMimeTypes[I]);
+        FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
+      finally
+        LMimeTypes.Free;
+      end;
+    end
+    else
+    begin
+      LMimeTypes := nil;
+      FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
+    end;
+  end
+  else
+    FIntent.setType(StringToJString('*/*'));
+  case AMode of
+    TSelectionMode.Documents:
+      FIntent.setAction(TJIntent.JavaClass.ACTION_OPEN_DOCUMENT);
+    TSelectionMode.Content:
+      FIntent.setAction(TJIntent.JavaClass.ACTION_GET_CONTENT);
+  end;
   TAndroidHelper.Activity.startActivityForResult(FIntent, cSelectorCode);
+end;
+
+procedure TPlatformFilesSelector.FileKindsChanged;
+var
+  LFileKind: TFileKind;
+begin
+  FMimeTypes := [];
+  for LFileKind := Low(TFileKind) to High(TFileKind) do
+  begin
+    if LFileKind in FileKinds then
+      FMimeTypes := FMimeTypes + [GetMimeType(LFileKind)];
+  end;
+  UpdateIntentMimeTypes;
+end;
+
+procedure TPlatformFilesSelector.FileTypesChanged;
+begin
+  FMimeTypes := FFileTypes.ToStringArray;
+  UpdateIntentMimeTypes;
+end;
+
+procedure TPlatformFilesSelector.UpdateIntentMimeTypes;
+var
+  LMimeTypes: TJavaObjectArray<JString>;
+  I: Integer;
+begin
+  if Length(FMimeTypes) > 0 then
+  begin
+    FIntent.setType(StringToJString(FMimeTypes[0]));
+    if Length(FMimeTypes) > 1 then
+    begin
+      LMimeTypes := TJavaObjectArray<JString>.Create(Length(FMimeTypes));
+      try
+        for I := 1 to Length(FMimeTypes) - 1 do
+          LMimeTypes.Items[I] := StringToJString(FMimeTypes[I]);
+        FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
+      finally
+        LMimeTypes.Free;
+      end;
+    end
+    else
+    begin
+      LMimeTypes := nil;
+      FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
+    end;
+  end
+  else
+    FIntent.setType(StringToJString('*/*'));
+  UpdateIntentActivities;
 end;
 
 procedure TPlatformFilesSelector.UpdateIntentActivities;
@@ -147,15 +243,18 @@ var
   LActivityInfo: JActivityInfo;
   LApplicationInfo: JApplicationInfo;
   I: Integer;
+  LActivityClassName: string;
 begin
-  FIntentActivities.Clear;
+  Activities.Clear;
   LList := TAndroidHelper.Context.getPackageManager.queryIntentActivities(FIntent, 0);
   for I := 0 to LList.size - 1 do
   begin
-    LResolveInfo := TJResolveInfo.Wrap((LList.get(i) as ILocalObject).GetObjectID);
-    LActivityInfo := TJActivityInfo.Wrap((LResolveInfo.activityInfo as ILocalObject).GetObjectID);
-    LApplicationInfo := TJApplicationInfo.Wrap((LActivityInfo.applicationInfo as ILocalObject).GetObjectID);
-    FIntentActivities.Add(JStringToString(LApplicationInfo.className));
+    LResolveInfo := TJResolveInfo.Wrap(LList.get(i));
+    LActivityInfo := TJActivityInfo.Wrap(LResolveInfo.activityInfo);
+    LApplicationInfo := TJApplicationInfo.Wrap(LActivityInfo.applicationInfo);
+    LActivityClassName := JStringToString(LApplicationInfo.className);
+    if not LActivityClassName.IsEmpty and (Activities.IndexOf(LActivityClassName) = -1) then
+      Activities.Add(LActivityClassName);
   end;
 end;
 

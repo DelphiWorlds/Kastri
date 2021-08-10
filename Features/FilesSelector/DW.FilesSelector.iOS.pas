@@ -21,49 +21,9 @@ uses
   // iOS
   iOSapi.Foundation, iOSapi.UIKit, iOSapi.CocoaTypes,
   // DW
-  DW.FilesSelector;
-
-const
-  UIDocumentPickerModeImport = 0;
-  UIDocumentPickerModeOpen = 1;
-  UIDocumentPickerModeExportToService = 2;
-  UIDocumentPickerModeMoveToService = 3;
+  DW.iOSapi.UIKit, DW.FilesSelector;
 
 type
-  UIDocumentPickerMode = NSInteger;
-
-  UIDocumentPickerViewController = interface;
-
-  UIDocumentPickerDelegate = interface(IObjectiveC)
-    ['{A67376E3-219D-4A29-9894-66806636368D}']
-    [MethodName('documentPicker:didPickDocumentsAtURLs:')]
-    procedure documentPickerDidPickDocumentsAtURLs(controller: UIDocumentPickerViewController; urls: NSArray); cdecl;
-    [MethodName('documentPicker:didPickDocumentAtURL:')]
-    procedure documentPickerDidPickDocumentAtURL(controller: UIDocumentPickerViewController; url: NSURL); cdecl;
-    procedure documentPickerWasCancelled(controller: UIDocumentPickerViewController); cdecl;
-  end;
-
-  UIDocumentPickerViewControllerClass = interface(UIViewControllerClass)
-    ['{8DFC305A-759F-4C08-914A-AC449E089E7C}']
-  end;
-
-  UIDocumentPickerViewController = interface(UIViewController)
-    ['{36D767A1-60AD-4071-839B-7D1E7345B2D9}']
-    function allowsMultipleSelection: Boolean; cdecl;
-    function delegate: Pointer; cdecl;
-    function documentPickerMode: UIDocumentPickerMode; cdecl;
-    function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
-    [MethodName('initWithDocumentTypes:inMode:')]
-    function initWithDocumentTypes(allowedUTIs: NSArray; mode: UIDocumentPickerMode): Pointer; cdecl;
-    [MethodName('initWithURL:inMode:')]
-    function initWithURL(url: NSURL; mode: UIDocumentPickerMode): Pointer; cdecl;
-    [MethodName('initWithURLs:inMode:')]
-    function initWithURLs(urls: NSArray; mode: UIDocumentPickerMode): Pointer; cdecl;
-    procedure setAllowsMultipleSelection(allowsMultipleSelection: Boolean); cdecl;
-    procedure setDelegate(delegate: Pointer); cdecl;
-  end;
-  TUIDocumentPickerViewController = class(TOCGenericImport<UIDocumentPickerViewControllerClass, UIDocumentPickerViewController>) end;
-
   TPlatformFilesSelector = class;
 
   TUIDocumentPickerDelegate = class(TOCLocal, UIDocumentPickerDelegate)
@@ -73,10 +33,8 @@ type
     procedure DestroyController;
   public
     { UIDocumentPickerDelegate }
-    [MethodName('documentPicker:didPickDocumentsAtURLs:')]
-    procedure documentPickerDidPickDocumentsAtURLs(controller: UIDocumentPickerViewController; urls: NSArray); cdecl;
-    [MethodName('documentPicker:didPickDocumentAtURL:')]
-    procedure documentPickerDidPickDocumentAtURL(controller: UIDocumentPickerViewController; url: NSURL); cdecl;
+    procedure documentPicker(controller: UIDocumentPickerViewController; didPickDocumentsAtURLs: NSArray); overload; cdecl;
+    procedure documentPicker(controller: UIDocumentPickerViewController; didPickDocumentAtURL: NSURL); overload; cdecl;
     procedure documentPickerWasCancelled(controller: UIDocumentPickerViewController); cdecl;
   public
     constructor Create(const ASelector: TPlatformFilesSelector);
@@ -87,8 +45,13 @@ type
   TPlatformFilesSelector = class(TCustomPlatformFilesSelector)
   private
     FPicker: TUIDocumentPickerDelegate;
+    FUTIs: TArray<string>;
+    function GetUTI(const AFileKind: TFileKind): string;
   protected
-    procedure DoSelect; override;
+    procedure DoSelect(const AMode: TSelectionMode); override;
+    procedure FileKindsChanged; override;
+    procedure FileTypesChanged; override;
+    property UTIs: TArray<string> read FUTIs;
   public
     constructor Create(const ASelector: TFilesSelector); override;
     destructor Destroy; override;
@@ -130,41 +93,32 @@ end;
 
 procedure TUIDocumentPickerDelegate.ShowPicker;
 begin
-  FSelector.FileTypes.Clear;
-  FSelector.FileTypes.Add('public.image');
-  FSelector.FileTypes.Add('public.audio');
-  FSelector.FileTypes.Add('public.movie');
-  FSelector.FileTypes.Add('public.text');
-  FSelector.FileTypes.Add('public.item');
-  FSelector.FileTypes.Add('public.content');
-  FSelector.FileTypes.Add('public.source-code');
   DestroyController;
   FController := TUIDocumentPickerViewController.Alloc;
-  FController := TUIDocumentPickerViewController.Wrap(FController.initWithDocumentTypes(StringsToNSArray(FSelector.FileTypes), UIDocumentPickerModeImport));
+  FController := TUIDocumentPickerViewController.Wrap(FController.initWithDocumentTypes(StringArrayToNSArray(FSelector.UTIs), UIDocumentPickerModeImport));
   FController.setAllowsMultipleSelection(True);
   FController.setDelegate(GetObjectID);
   FController.setTitle(StrToNSStr(FSelector.Title));
   TiOSHelper.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
 end;
 
-procedure TUIDocumentPickerDelegate.documentPickerDidPickDocumentAtURL(controller: UIDocumentPickerViewController; url: NSURL);
+procedure TUIDocumentPickerDelegate.documentPicker(controller: UIDocumentPickerViewController; didPickDocumentAtURL: NSURL);
 begin
   //
 end;
 
-procedure TUIDocumentPickerDelegate.documentPickerDidPickDocumentsAtURLs(controller: UIDocumentPickerViewController; urls: NSArray);
+procedure TUIDocumentPickerDelegate.documentPicker(controller: UIDocumentPickerViewController; didPickDocumentsAtURLs: NSArray);
 var
   I: Integer;
   LEscapedFileName: NSString;
   LSelectedFile: TSelectedFile;
 begin
-  for I := 0 to urls.count - 1 do
+  for I := 0 to didPickDocumentsAtURLs.count - 1 do
   begin
-    LEscapedFileName := TNSURL.Wrap(urls.objectAtIndex(I)).path.stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding);
+    LEscapedFileName := TNSURL.Wrap(didPickDocumentsAtURLs.objectAtIndex(I)).path.stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding);
     LSelectedFile.DecodedPath := NSStrToStr(LEscapedFileName);
-    LSelectedFile.RawPath := NSStrToStr(TNSURL.Wrap(urls.objectAtIndex(I)).path);
+    LSelectedFile.RawPath := NSStrToStr(TNSURL.Wrap(didPickDocumentsAtURLs.objectAtIndex(I)).path);
     LSelectedFile.DisplayName := TPath.GetFileName(LSelectedFile.DecodedPath);
-    FSelector.Files.Add(LSelectedFile.DecodedPath);
     FSelector.AddSelectedFile(LSelectedFile);
   end;
   FSelector.DoComplete(True);
@@ -189,9 +143,48 @@ begin
   inherited;
 end;
 
-procedure TPlatformFilesSelector.DoSelect;
+procedure TPlatformFilesSelector.DoSelect(const AMode: TSelectionMode);
 begin
   FPicker.ShowPicker;
+end;
+
+procedure TPlatformFilesSelector.FileKindsChanged;
+var
+  LFileKind: TFileKind;
+begin
+  FUTIs := [];
+  for LFileKind := Low(TFileKind) to High(TFileKind) do
+  begin
+    if LFileKind in FileKinds then
+      FUTIs := FUTIs + [GetUTI(LFileKind)];
+  end;
+end;
+
+procedure TPlatformFilesSelector.FileTypesChanged;
+begin
+  FUTIs := FFileTypes.ToStringArray;
+end;
+
+function TPlatformFilesSelector.GetUTI(const AFileKind: TFileKind): string;
+begin
+  case AFileKind of
+    TFileKind.Image:
+      Result := 'public.image';
+    TFileKind.Audio:
+      Result := 'public.audio';
+    TFileKind.Movie:
+      Result := 'public.movie';
+    TFileKind.Text:
+      Result := 'public.text';
+    TFileKind.Item:
+      Result := 'public.item';
+    TFileKind.Content:
+      Result := 'public.content';
+    TFileKind.SourceCode:
+      Result := 'public.source-code';
+  else
+    Result := 'public.item';
+  end;
 end;
 
 end.
