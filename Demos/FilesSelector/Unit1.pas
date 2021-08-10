@@ -9,13 +9,18 @@ uses
 
 type
   TForm1 = class(TForm)
-    Button1: TButton;
+    SelectImagesButton: TButton;
     ListBox1: TListBox;
     DisplayNameLabel: TLabel;
     BottomLayout: TLayout;
     DisplayNameValueLabel: TLabel;
-    procedure Button1Click(Sender: TObject);
+    ButtonsLayout: TLayout;
+    SelectImagesAndMoviesButton: TButton;
+    SelectTextButton: TButton;
+    procedure SelectImagesButtonClick(Sender: TObject);
     procedure ListBox1ItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
+    procedure SelectImagesAndMoviesButtonClick(Sender: TObject);
+    procedure SelectTextButtonClick(Sender: TObject);
   private
     FSelector: TFilesSelector;
     procedure SelectorCompleteHandler(Sender: TObject; const AOK: Boolean);
@@ -34,6 +39,7 @@ implementation
 {$R *.fmx}
 
 uses
+  System.Permissions,
   FMX.TextLayout,
   DW.UIHelper;
 
@@ -119,9 +125,22 @@ begin
   // via a ContentResolver, i.e. you will not be able to simply load the files using normal mechanisms in Delphi
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.SelectTextButtonClick(Sender: TObject);
 begin
-  FSelector.Select;
+  FSelector.FileKinds := [TFileKind.Text];
+  FSelector.Select(TSelectionMode.Content);
+end;
+
+procedure TForm1.SelectImagesButtonClick(Sender: TObject);
+begin
+  FSelector.FileKinds := [TFileKind.Image];
+  FSelector.Select(TSelectionMode.Content);
+end;
+
+procedure TForm1.SelectImagesAndMoviesButtonClick(Sender: TObject);
+begin
+  FSelector.FileKinds := [TFileKind.Image, TFileKind.Movie];
+  FSelector.Select(TSelectionMode.Content);
 end;
 
 end.

@@ -2,16 +2,16 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 549
-  ClientWidth = 340
+  ClientHeight = 637
+  ClientWidth = 493
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
   object ListBox1: TListBox
     Align = Client
-    Size.Width = 340.000000000000000000
-    Size.Height = 436.000000000000000000
+    Size.Width = 493.000000000000000000
+    Size.Height = 524.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
     DisableFocusEffect = True
@@ -19,8 +19,8 @@ object Form1: TForm1
     DefaultItemStyles.GroupHeaderStyle = ''
     DefaultItemStyles.GroupFooterStyle = ''
     OnItemClick = ListBox1ItemClick
-    Viewport.Width = 336.000000000000000000
-    Viewport.Height = 432.000000000000000000
+    Viewport.Width = 489.000000000000000000
+    Viewport.Height = 520.000000000000000000
   end
   object BottomLayout: TLayout
     Align = Bottom
@@ -29,40 +29,79 @@ object Form1: TForm1
     Padding.Right = 4.000000000000000000
     Padding.Bottom = 4.000000000000000000
     Margins.Top = 4.000000000000000000
-    Position.Y = 440.000000000000000000
-    Size.Width = 340.000000000000000000
+    Position.Y = 528.000000000000000000
+    Size.Width = 493.000000000000000000
     Size.Height = 109.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
-    object Button1: TButton
-      Align = Client
-      Size.Width = 332.000000000000000000
-      Size.Height = 48.000000000000000000
-      Size.PlatformDefault = False
-      TabOrder = 0
-      Text = 'Select'
-      OnClick = Button1Click
-    end
     object DisplayNameLabel: TLabel
       Align = Top
       Margins.Bottom = 4.000000000000000000
       Position.X = 4.000000000000000000
       Position.Y = 4.000000000000000000
-      Size.Width = 332.000000000000000000
+      Size.Width = 485.000000000000000000
       Size.Height = 21.000000000000000000
       Size.PlatformDefault = False
       Text = 'Display Name:'
-      TabOrder = 1
+      TabOrder = 0
     end
     object DisplayNameValueLabel: TLabel
       Align = Top
       Margins.Bottom = 4.000000000000000000
       Position.X = 4.000000000000000000
       Position.Y = 29.000000000000000000
-      Size.Width = 332.000000000000000000
+      Size.Width = 485.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
+      TabOrder = 1
+    end
+    object ButtonsLayout: TLayout
+      Align = Bottom
+      Padding.Left = 4.000000000000000000
+      Padding.Top = 4.000000000000000000
+      Padding.Right = 4.000000000000000000
+      Padding.Bottom = 4.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 60.000000000000000000
+      Size.Width = 485.000000000000000000
+      Size.Height = 45.000000000000000000
+      Size.PlatformDefault = False
       TabOrder = 2
+      object SelectImagesButton: TButton
+        Align = Left
+        Position.X = 4.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 37.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = 'Pics'
+        OnClick = SelectImagesButtonClick
+      end
+      object SelectImagesAndMoviesButton: TButton
+        Align = Left
+        Margins.Left = 12.000000000000000000
+        Position.X = 136.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 37.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = 'Pics and Movies'
+        OnClick = SelectImagesAndMoviesButtonClick
+      end
+      object SelectTextButton: TButton
+        Align = Left
+        Margins.Left = 12.000000000000000000
+        Position.X = 268.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 37.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Text = 'Text'
+        OnClick = SelectTextButtonClick
+      end
     end
   end
 end
