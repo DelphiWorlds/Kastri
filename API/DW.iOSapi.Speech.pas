@@ -19,7 +19,7 @@ uses
   // macOS
   Macapi.ObjectiveC,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.AVFoundation,
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.AVFoundation, iOSapi.CoreMedia,
   // DW
   DW.iOSapi.AVFoundation;
 
@@ -39,32 +39,83 @@ const
   SFSpeechRecognizerAuthorizationStatusAuthorized = 3;
 
 type
+  SFAcousticFeature = interface;
+  SFVoiceAnalytics = interface;
+  SFSpeechRecognitionMetadata = interface;
+  SFSpeechRecognitionResult = interface;
   SFSpeechRecognitionRequest = interface;
   SFSpeechURLRecognitionRequest = interface;
   SFSpeechAudioBufferRecognitionRequest = interface;
-  SFSpeechRecognitionResult = interface;
   SFSpeechRecognitionTask = interface;
   SFSpeechRecognitionTaskDelegate = interface;
   SFSpeechRecognizer = interface;
   SFSpeechRecognizerDelegate = interface;
-  SFTranscription = interface;
   SFTranscriptionSegment = interface;
-  SFAcousticFeature = interface;
-  SFVoiceAnalytics = interface;
+  SFTranscription = interface;
 
-  CMSampleBufferRef = Pointer;
   SFSpeechRecognitionTaskHint = NSInteger;
   SFSpeechRecognitionTaskState = NSInteger;
   SFSpeechRecognizerAuthorizationStatus = NSInteger;
   TSFSpeechRecognizerBlockMethod1 = procedure(status: SFSpeechRecognizerAuthorizationStatus) of object;
   TSFSpeechRecognizerBlockMethod2 = procedure(result: SFSpeechRecognitionResult; error: NSError) of object;
 
+  SFAcousticFeatureClass = interface(NSObjectClass)
+    ['{8079746C-3E7E-4C0A-9640-87F675A553E4}']
+  end;
+
+  SFAcousticFeature = interface(NSObject)
+    ['{8AD4DA6E-401E-4F66-B961-CB4B1D1FF3F3}']
+    function acousticFeatureValuePerFrame: NSArray; cdecl;
+    function frameDuration: NSTimeInterval; cdecl;
+  end;
+  TSFAcousticFeature = class(TOCGenericImport<SFAcousticFeatureClass, SFAcousticFeature>) end;
+
+  SFVoiceAnalyticsClass = interface(NSObjectClass)
+    ['{B57FC22D-2BFD-4069-902A-A9EC61B6ACA2}']
+  end;
+
+  SFVoiceAnalytics = interface(NSObject)
+    ['{FE0D7AD4-8788-4CE5-B197-2E52930CB0AC}']
+    function jitter: SFAcousticFeature; cdecl;
+    function pitch: SFAcousticFeature; cdecl;
+    function shimmer: SFAcousticFeature; cdecl;
+    function voicing: SFAcousticFeature; cdecl;
+  end;
+  TSFVoiceAnalytics = class(TOCGenericImport<SFVoiceAnalyticsClass, SFVoiceAnalytics>) end;
+
+  SFSpeechRecognitionMetadataClass = interface(NSObjectClass)
+    ['{32933790-45D2-457D-85E0-96CA8DB28C68}']
+  end;
+
+  SFSpeechRecognitionMetadata = interface(NSObject)
+    ['{02DFB0B2-2FFC-4BC5-BA6C-5175248241CD}']
+    function averagePauseDuration: NSTimeInterval; cdecl;
+    function speakingRate: Double; cdecl;
+    function speechDuration: NSTimeInterval; cdecl;
+    function speechStartTimestamp: NSTimeInterval; cdecl;
+    function voiceAnalytics: SFVoiceAnalytics; cdecl;
+  end;
+  TSFSpeechRecognitionMetadata = class(TOCGenericImport<SFSpeechRecognitionMetadataClass, SFSpeechRecognitionMetadata>) end;
+
+  SFSpeechRecognitionResultClass = interface(NSObjectClass)
+    ['{7A07B162-D051-4B8D-9F81-56706B101D88}']
+  end;
+
+  SFSpeechRecognitionResult = interface(NSObject)
+    ['{3A7E9CAC-6A2C-4274-8F2C-DB7B9FB26BE7}']
+    function bestTranscription: SFTranscription; cdecl;
+    function isFinal: Boolean; cdecl;
+    function speechRecognitionMetadata: SFSpeechRecognitionMetadata; cdecl;
+    function transcriptions: NSArray; cdecl;
+  end;
+  TSFSpeechRecognitionResult = class(TOCGenericImport<SFSpeechRecognitionResultClass, SFSpeechRecognitionResult>) end;
+
   SFSpeechRecognitionRequestClass = interface(NSObjectClass)
-    ['{4566BEE9-FD82-4AAE-A886-35B908647C54}']
+    ['{C209DB6B-1635-4BC2-A149-358D9B57ECA4}']
   end;
 
   SFSpeechRecognitionRequest = interface(NSObject)
-    ['{0B30EEA4-4CC0-4269-B776-4A8265163ACC}']
+    ['{790A7056-EAB7-4C4F-88FB-4CAC9DC176C0}']
     function contextualStrings: NSArray; cdecl;
     function interactionIdentifier: NSString; cdecl;
     function requiresOnDeviceRecognition: Boolean; cdecl;
@@ -79,48 +130,35 @@ type
   TSFSpeechRecognitionRequest = class(TOCGenericImport<SFSpeechRecognitionRequestClass, SFSpeechRecognitionRequest>) end;
 
   SFSpeechURLRecognitionRequestClass = interface(SFSpeechRecognitionRequestClass)
-    ['{6A942D5B-31A9-452E-86C0-8B6791433BD3}']
+    ['{D50082D7-0ADC-4ABB-9213-6BF24571D578}']
   end;
 
   SFSpeechURLRecognitionRequest = interface(SFSpeechRecognitionRequest)
-    ['{7BA4B974-93E7-40FC-B65A-9B9F9C2C56A2}']
+    ['{122F1A9E-9AE3-4F1E-B460-D7EC3E9CD126}']
     function initWithURL(URL: NSURL): Pointer; cdecl;
     function URL: NSURL; cdecl;
   end;
   TSFSpeechURLRecognitionRequest = class(TOCGenericImport<SFSpeechURLRecognitionRequestClass, SFSpeechURLRecognitionRequest>) end;
 
   SFSpeechAudioBufferRecognitionRequestClass = interface(SFSpeechRecognitionRequestClass)
-    ['{B2814305-C1AF-4238-8CB6-4FDDA8046DE7}']
+    ['{32D70BA1-C609-4DF3-80D5-76C1CBBC1CEF}']
   end;
 
   SFSpeechAudioBufferRecognitionRequest = interface(SFSpeechRecognitionRequest)
-    ['{8B030017-D7FD-4961-A7D6-2B7301DC3C28}']
+    ['{A869E100-9E11-4421-99B4-6B7D175831E9}']
     procedure appendAudioPCMBuffer(audioPCMBuffer: AVAudioPCMBuffer); cdecl;
     procedure appendAudioSampleBuffer(sampleBuffer: CMSampleBufferRef); cdecl;
     procedure endAudio; cdecl;
     function nativeAudioFormat: AVAudioFormat; cdecl;
   end;
-  TSFSpeechAudioBufferRecognitionRequest = class(TOCGenericImport<SFSpeechAudioBufferRecognitionRequestClass, SFSpeechAudioBufferRecognitionRequest>)
-  end;
-
-  SFSpeechRecognitionResultClass = interface(NSObjectClass)
-    ['{AF09448D-A044-4442-A089-9F3F2B917C05}']
-  end;
-
-  SFSpeechRecognitionResult = interface(NSObject)
-    ['{21D9172B-CACE-4EF6-AFC9-259A21F3731F}']
-    function bestTranscription: SFTranscription; cdecl;
-    function isFinal: Boolean; cdecl;
-    function transcriptions: NSArray; cdecl;
-  end;
-  TSFSpeechRecognitionResult = class(TOCGenericImport<SFSpeechRecognitionResultClass, SFSpeechRecognitionResult>) end;
+  TSFSpeechAudioBufferRecognitionRequest = class(TOCGenericImport<SFSpeechAudioBufferRecognitionRequestClass, SFSpeechAudioBufferRecognitionRequest>) end;
 
   SFSpeechRecognitionTaskClass = interface(NSObjectClass)
-    ['{2B76F35E-9250-456C-A6A7-42547F8CBFE2}']
+    ['{60774E0D-0332-4682-A885-AE48550E407E}']
   end;
 
   SFSpeechRecognitionTask = interface(NSObject)
-    ['{35CC04FF-E3A9-40BE-A615-C555B02C3578}']
+    ['{BCB2FD7C-B7EE-43EE-ACAE-797A7B82EAA4}']
     procedure cancel; cdecl;
     function error: NSError; cdecl;
     procedure finish; cdecl;
@@ -131,37 +169,32 @@ type
   TSFSpeechRecognitionTask = class(TOCGenericImport<SFSpeechRecognitionTaskClass, SFSpeechRecognitionTask>) end;
 
   SFSpeechRecognitionTaskDelegate = interface(IObjectiveC)
-    ['{AC2753AE-CF5A-4971-B2EE-FE537F6F547B}']
+    ['{92718CD6-A513-459C-9D36-6EF6AA562C04}']
     procedure speechRecognitionDidDetectSpeech(task: SFSpeechRecognitionTask); cdecl;
-    [MethodName('speechRecognitionTask:didFinishSuccessfully:')]
-    procedure speechRecognitionTask(task: SFSpeechRecognitionTask; successfully: Boolean); overload; cdecl;
-    [MethodName('speechRecognitionTask:didFinishRecognition:')]
-    procedure speechRecognitionTask(task: SFSpeechRecognitionTask; recognitionResult: SFSpeechRecognitionResult); overload; cdecl;
-    [MethodName('speechRecognitionTask:didHypothesizeTranscription:')]
-    procedure speechRecognitionTask(task: SFSpeechRecognitionTask; transcription: SFTranscription); overload; cdecl;
+    procedure speechRecognitionTask(task: SFSpeechRecognitionTask; didFinishSuccessfully: Boolean); overload; cdecl;
+    procedure speechRecognitionTask(task: SFSpeechRecognitionTask; didFinishRecognition: SFSpeechRecognitionResult); overload; cdecl;
+    procedure speechRecognitionTask(task: SFSpeechRecognitionTask; didHypothesizeTranscription: SFTranscription); overload; cdecl;
     procedure speechRecognitionTaskFinishedReadingAudio(task: SFSpeechRecognitionTask); cdecl;
     procedure speechRecognitionTaskWasCancelled(task: SFSpeechRecognitionTask); cdecl;
   end;
 
   SFSpeechRecognizerClass = interface(NSObjectClass)
-    ['{F09E365A-0445-4EE1-83DF-106F06ACC370}']
+    ['{A71F83A9-2D4F-4780-9D40-2232DED79BF1}']
     {class} function authorizationStatus: SFSpeechRecognizerAuthorizationStatus; cdecl;
     {class} procedure requestAuthorization(handler: TSFSpeechRecognizerBlockMethod1); cdecl;
     {class} function supportedLocales: NSSet; cdecl;
   end;
 
   SFSpeechRecognizer = interface(NSObject)
-    ['{7DC66BE6-338B-453D-ACD0-84D7C6F65AD2}']
+    ['{29181896-1685-44D5-894E-26A9AD92FFB6}']
     function defaultTaskHint: SFSpeechRecognitionTaskHint; cdecl;
     function delegate: Pointer; cdecl;
     function initWithLocale(locale: NSLocale): Pointer; cdecl;
     function isAvailable: Boolean; cdecl;
     function locale: NSLocale; cdecl;
     function queue: NSOperationQueue; cdecl;
-    [MethodName('recognitionTaskWithRequest:resultHandler:')]
     function recognitionTaskWithRequest(request: SFSpeechRecognitionRequest;
       resultHandler: TSFSpeechRecognizerBlockMethod2): SFSpeechRecognitionTask; overload; cdecl;
-    [MethodName('recognitionTaskWithRequest:delegate:')]
     function recognitionTaskWithRequest(request: SFSpeechRecognitionRequest; delegate: Pointer): SFSpeechRecognitionTask; overload; cdecl;
     procedure setDefaultTaskHint(defaultTaskHint: SFSpeechRecognitionTaskHint); cdecl;
     procedure setDelegate(delegate: Pointer); cdecl;
@@ -172,30 +205,16 @@ type
   TSFSpeechRecognizer = class(TOCGenericImport<SFSpeechRecognizerClass, SFSpeechRecognizer>) end;
 
   SFSpeechRecognizerDelegate = interface(IObjectiveC)
-    ['{796B2D4F-95DD-48BE-A6F7-0A8F261748E8}']
-    [MethodName('speechRecognizer:availabilityDidChange:')]
-    procedure speechRecognizer(speechRecognizer: SFSpeechRecognizer; available: Boolean); cdecl;
+    ['{6F8F57CA-346B-4E1E-BE24-DF8FAC4FA6E3}']
+    procedure speechRecognizer(speechRecognizer: SFSpeechRecognizer; availabilityDidChange: Boolean); cdecl;
   end;
-
-  SFTranscriptionClass = interface(NSObjectClass)
-    ['{3138A6C8-71A1-4E3B-A571-6D216B31F1FF}']
-  end;
-
-  SFTranscription = interface(NSObject)
-    ['{08D6927D-48CD-47BF-A8E7-240F0FF0D65A}']
-    function averagePauseDuration: NSTimeInterval; cdecl;
-    function formattedString: NSString; cdecl;
-    function segments: NSArray; cdecl;
-    function speakingRate: Double; cdecl;
-  end;
-  TSFTranscription = class(TOCGenericImport<SFTranscriptionClass, SFTranscription>) end;
 
   SFTranscriptionSegmentClass = interface(NSObjectClass)
-    ['{F27BD056-3E63-4653-B494-32B3A97BDE16}']
+    ['{73A14B9C-7E68-4D57-ABD5-9E3A12BE3E5A}']
   end;
 
   SFTranscriptionSegment = interface(NSObject)
-    ['{5B3F0F33-BD89-4414-9901-97A3695755DD}']
+    ['{3BB20070-5C98-4D43-9261-B2CD696316E8}']
     function alternativeSubstrings: NSArray; cdecl;
     function confidence: Single; cdecl;
     function duration: NSTimeInterval; cdecl;
@@ -206,51 +225,34 @@ type
   end;
   TSFTranscriptionSegment = class(TOCGenericImport<SFTranscriptionSegmentClass, SFTranscriptionSegment>) end;
 
-  SFAcousticFeatureClass = interface(NSObjectClass)
-    ['{4E8E35CE-015E-4269-A69A-A05CB8997AC3}']
+  SFTranscriptionClass = interface(NSObjectClass)
+    ['{103C53EA-79F5-48DE-8EFD-FC71936E300C}']
   end;
 
-  SFAcousticFeature = interface(NSObject)
-    ['{5D689C6E-1F8B-4CFE-ADEC-4E1C1B8FC840}']
-    function acousticFeatureValuePerFrame: NSArray; cdecl;
-    function frameDuration: NSTimeInterval; cdecl;
+  SFTranscription = interface(NSObject)
+    ['{236774EE-488C-4BFC-941A-FDCC6BB7EC36}']
+    function averagePauseDuration: NSTimeInterval; cdecl;
+    function formattedString: NSString; cdecl;
+    function segments: NSArray; cdecl;
+    function speakingRate: Double; cdecl;
   end;
-  TSFAcousticFeature = class(TOCGenericImport<SFAcousticFeatureClass, SFAcousticFeature>) end;
-
-  SFVoiceAnalyticsClass = interface(NSObjectClass)
-    ['{B679CEA9-FA51-47F5-B334-66081F6773E4}']
-  end;
-
-  SFVoiceAnalytics = interface(NSObject)
-    ['{A9E7A5E7-89F3-4A0A-B1FA-B3BBDAE0373C}']
-    function jitter: SFAcousticFeature; cdecl;
-    function pitch: SFAcousticFeature; cdecl;
-    function shimmer: SFAcousticFeature; cdecl;
-    function voicing: SFAcousticFeature; cdecl;
-  end;
-  TSFVoiceAnalytics = class(TOCGenericImport<SFVoiceAnalyticsClass, SFVoiceAnalytics>) end;
+  TSFTranscription = class(TOCGenericImport<SFTranscriptionClass, SFTranscription>) end;
 
 const
   libSpeech = '/System/Library/Frameworks/Speech.framework/Speech';
 
-procedure libSpeechLoader; cdecl; external libSpeech;
-
 implementation
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 uses
   Posix.Dlfcn;
 
 var
   SpeechModule: THandle;
-{$ENDIF}
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 initialization
   SpeechModule := dlopen(MarshaledAString(libSpeech), RTLD_LAZY);
 
 finalization
-  dlclose(SpeechModule)
-{$ENDIF}
+  dlclose(SpeechModule);
 
 end.
