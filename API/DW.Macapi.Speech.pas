@@ -17,7 +17,9 @@ interface
 
 uses
   // macOS
-  Macapi.ObjectiveC, Macapi.CoreFoundation, Macapi.CocoaTypes, Macapi.Foundation;
+  Macapi.ObjectiveC, Macapi.CocoaTypes, Macapi.Foundation, Macapi.AVFoundation,
+  // DW
+  DW.Macapi.AVFoundation;
 
 const
   SFSpeechRecognitionTaskHintUnspecified = 0;
