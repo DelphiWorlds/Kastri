@@ -29,6 +29,10 @@ type
     procedure SetAsBase64(const ASource: string);
   public
     /// <summary>
+    ///   Loads an image from a resource compiled into the application
+    /// </summary>
+    procedure LoadFromResource(const AResourceName: string);
+    /// <summary>
     ///   Converts a bitmap to/from a base64 (character) representation
     /// </summary>
     property AsBase64: string read GetAsBase64 write SetAsBase64;
@@ -38,9 +42,24 @@ implementation
 
 uses
   // RTL
-  System.Classes, System.SysUtils, System.NetEncoding;
+  System.Classes, System.SysUtils, System.NetEncoding, System.Types;
 
 { TBitmapHelper }
+
+procedure TBitmapHelper.LoadFromResource(const AResourceName: string);
+var
+  LStream: TStream;
+begin
+  if FindResource(HInstance, PChar(AResourceName), RT_RCDATA) > 0 then
+  begin
+    LStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+    try
+      LoadFromStream(LStream);
+    finally
+      LStream.Free;
+    end;
+  end;
+end;
 
 function TBitmapHelper.GetAsBase64: string;
 var
