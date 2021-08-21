@@ -20,6 +20,7 @@ uses
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes;
 
 type
+  JArrayDeque = interface;
   JBase64 = interface;
   JLinkedHashSet = interface;
   JMap_Entry = interface;
@@ -31,6 +32,51 @@ type
   JTimer = interface;
   JTreeMap = interface;
   Jutil_Log = interface;
+
+  JArrayDequeClass = interface(JAbstractCollectionClass)
+    ['{53FE7FDB-6B49-4ABF-AC02-0871A9E52A05}']
+    {class} function init: JArrayDeque; cdecl; overload;
+    {class} function init(numElements: Integer): JArrayDeque; cdecl; overload;
+    {class} function init(c: JCollection): JArrayDeque; cdecl; overload;
+    {class} function add(e: JObject): Boolean; cdecl;
+    {class} procedure addFirst(e: JObject); cdecl;
+    {class} function &contains(o: JObject): Boolean; cdecl;
+    {class} function descendingIterator: JIterator; cdecl;
+    {class} function element: JObject; cdecl;
+    {class} function isEmpty: Boolean; cdecl;
+    {class} function iterator: JIterator; cdecl;
+    {class} function offer(e: JObject): Boolean; cdecl;
+    {class} function peekFirst: JObject; cdecl;
+    {class} function peekLast: JObject; cdecl;
+    {class} function poll: JObject; cdecl;
+    {class} procedure push(e: JObject); cdecl;
+    {class} function remove: JObject; cdecl; overload;
+    {class} function remove(o: JObject): Boolean; cdecl; overload;
+    {class} function removeLastOccurrence(o: JObject): Boolean; cdecl;
+    {class} function size: Integer; cdecl;
+    {class} function toArray: TJavaObjectArray<JObject>; cdecl; overload;
+  end;
+
+  [JavaSignature('java/util/ArrayDeque')]
+  JArrayDeque = interface(JAbstractCollection)
+    ['{889EBA35-40DC-40AC-923B-40E252FBA7FB}']
+    procedure addLast(e: JObject); cdecl;
+    procedure clear; cdecl;
+    function clone: JArrayDeque; cdecl;
+    function getFirst: JObject; cdecl;
+    function getLast: JObject; cdecl;
+    function offerFirst(e: JObject): Boolean; cdecl;
+    function offerLast(e: JObject): Boolean; cdecl;
+    function peek: JObject; cdecl;
+    function pollFirst: JObject; cdecl;
+    function pollLast: JObject; cdecl;
+    function pop: JObject; cdecl;
+    function removeFirst: JObject; cdecl;
+    function removeFirstOccurrence(o: JObject): Boolean; cdecl;
+    function removeLast: JObject; cdecl;
+    function toArray(a: TJavaObjectArray<JObject>): TJavaObjectArray<JObject>; cdecl; overload;
+  end;
+  TJArrayDeque = class(TJavaGenericImport<JArrayDequeClass, JArrayDeque>) end;
 
   JSortedSetClass = interface(JSetClass)
     ['{D632DFD2-D924-463C-8111-EEB33B490B09}']
