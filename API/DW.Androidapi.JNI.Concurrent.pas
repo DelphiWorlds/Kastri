@@ -20,10 +20,30 @@ uses
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.Java.Security;
 
 type
+  JAtomicBoolean = interface;
   JAtomicReference = interface;
   JExecutors = interface;
   JListenableFuture = interface;
   JScheduledExecutorService = interface;
+
+  JAtomicBooleanClass = interface(JObjectClass)
+    ['{D089034A-914B-47EF-A17E-A37E208E4746}']
+    {class} function init(initialValue: Boolean): JAtomicBoolean; cdecl; overload;
+    {class} function init: JAtomicBoolean; cdecl; overload;
+    {class} procedure lazySet(newValue: Boolean); cdecl;
+    {class} procedure &set(newValue: Boolean); cdecl;
+    {class} function toString: JString; cdecl;
+  end;
+
+  [JavaSignature('java/util/concurrent/atomic/AtomicBoolean')]
+  JAtomicBoolean = interface(JObject)
+    ['{F1488386-E092-4CD9-BB53-639BC702F4D6}']
+    function compareAndSet(expect: Boolean; update: Boolean): Boolean; cdecl;
+    function &get: Boolean; cdecl;
+    function getAndSet(newValue: Boolean): Boolean; cdecl;
+    function weakCompareAndSet(expect: Boolean; update: Boolean): Boolean; cdecl;
+  end;
+  TJAtomicBoolean = class(TJavaGenericImport<JAtomicBooleanClass, JAtomicBoolean>) end;
 
   JAtomicReferenceClass = interface(JObjectClass)
     ['{862DE5E8-9EAB-449B-B693-4D589DF84C39}']
