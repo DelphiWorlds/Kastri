@@ -21,8 +21,27 @@ uses
 
 type
   JGravity = interface;
+  JOrientationEventListener = interface;
   JTextureView = interface;
   JTextureView_SurfaceTextureListener = interface;
+
+  JOrientationEventListenerClass = interface(JObjectClass)
+    ['{76A01C43-E540-4797-8AC6-DAC27B097967}']
+    {class} function _GetORIENTATION_UNKNOWN: Integer; cdecl;
+    {class} function init(context: JContext): JOrientationEventListener; cdecl; overload;
+    {class} function init(context: JContext; rate: Integer): JOrientationEventListener; cdecl; overload;
+    {class} procedure enable; cdecl;
+    {class} procedure onOrientationChanged(orientation: Integer); cdecl;
+    {class} property ORIENTATION_UNKNOWN: Integer read _GetORIENTATION_UNKNOWN;
+  end;
+
+  [JavaSignature('android/view/OrientationEventListener')]
+  JOrientationEventListener = interface(JObject)
+    ['{1FE75F32-B679-436C-90D1-E9951D1CEDB3}']
+    function canDetectOrientation: Boolean; cdecl;
+    procedure disable; cdecl;
+  end;
+  TJOrientationEventListener = class(TJavaGenericImport<JOrientationEventListenerClass, JOrientationEventListener>) end;
 
   JGravityClass = interface(JObjectClass)
     ['{9B523AD3-BAF8-4524-BA51-EA1F183059C8}']
