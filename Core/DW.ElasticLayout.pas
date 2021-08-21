@@ -71,6 +71,9 @@ type
 
 implementation
 
+uses
+  System.Classes;
+
 type
   TOpenControl = class(TControl);
   TOpenCellItem = class(TGridPanelLayout.TCellItem);
