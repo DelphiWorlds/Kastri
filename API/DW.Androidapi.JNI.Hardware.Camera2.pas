@@ -16,8 +16,11 @@ unit DW.Androidapi.JNI.Hardware.Camera2;
 interface
 
 uses
+  // Android
   Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes,Androidapi.JNI.Location,
-  Androidapi.JNI.Media, Androidapi.JNI.Os, Androidapi.JNI.Util;
+  Androidapi.JNI.Media, Androidapi.JNI.Os, Androidapi.JNI.Util,
+  // DW
+  DW.Androidapi.JNI.Util;
 
 type
   JCameraAccessException = interface;
@@ -50,7 +53,6 @@ type
   JRggbChannelVector = interface;
   JStreamConfigurationMap = interface;
   JTonemapCurve = interface;
-  JRational = interface;
 
   JCameraAccessExceptionClass = interface(JAndroidExceptionClass)
     ['{6D89B741-CFAB-4BF8-9D49-46781A24DA26}']
@@ -1415,41 +1417,6 @@ type
     function hashCode: Integer; cdecl;
   end;
   TJTonemapCurve = class(TJavaGenericImport<JTonemapCurveClass, JTonemapCurve>) end;
-
-  JRationalClass = interface(JNumberClass)
-    ['{592776A4-0BC8-4829-88B1-714E90C34FE1}']
-    {class} function _GetNEGATIVE_INFINITY: JRational; cdecl;
-    {class} function _GetNaN: JRational; cdecl;
-    {class} function _GetPOSITIVE_INFINITY: JRational; cdecl;
-    {class} function _GetZERO: JRational; cdecl;
-    {class} function init(numerator: Integer; denominator: Integer): JRational; cdecl;
-    {class} function compareTo(another: JRational): Integer; cdecl;
-    {class} function doubleValue: Double; cdecl;
-    {class} function getNumerator: Integer; cdecl;
-    {class} function hashCode: Integer; cdecl;
-    {class} function intValue: Integer; cdecl;
-    {class} function isZero: Boolean; cdecl;
-    {class} function longValue: Int64; cdecl;
-    {class} function parseRational(&string: JString): JRational; cdecl;
-    {class} property NEGATIVE_INFINITY: JRational read _GetNEGATIVE_INFINITY;
-    {class} property NaN: JRational read _GetNaN;
-    {class} property POSITIVE_INFINITY: JRational read _GetPOSITIVE_INFINITY;
-    {class} property ZERO: JRational read _GetZERO;
-  end;
-
-  [JavaSignature('android/util/Rational')]
-  JRational = interface(JNumber)
-    ['{5DEFEB1B-2D1F-4ADF-B69B-54B0498F8544}']
-    function equals(obj: JObject): Boolean; cdecl;
-    function floatValue: Single; cdecl;
-    function getDenominator: Integer; cdecl;
-    function isFinite: Boolean; cdecl;
-    function isInfinite: Boolean; cdecl;
-    function isNaN: Boolean; cdecl;
-    function shortValue: SmallInt; cdecl;
-    function toString: JString; cdecl;
-  end;
-  TJRational = class(TJavaGenericImport<JRationalClass, JRational>) end;
 
 implementation
 
