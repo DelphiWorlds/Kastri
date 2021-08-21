@@ -50,6 +50,7 @@ var
   LDataRef: CFDataRef;
   LImageSourceRef: CGImageSourceRef;
 begin
+  Result := nil;
   LDataRef := TNSData.OCClass.dataWithContentsOfURL(TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(AFileName)));
   if LDataRef <> nil then
   begin
@@ -72,6 +73,7 @@ var
   LCoordValue: Double;
   LCoordRef: string;
 begin
+  Result := False;
   LMetadata := nil;
   LMetadataRef := GetMetadata(StrToNSStr(AFileName));
   if LMetadataRef <> nil then
