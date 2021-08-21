@@ -96,7 +96,6 @@ var
   LError: Pointer;
   LMessage: string;
 begin
-  Result := False;
   LError := nil;
   FileManager.copyItemAtPath(StrToNSStr(ASrcDirectory).stringByResolvingSymlinksInPath, StrToNSStr(ADestDirectory), @LError);
   Result := LError = nil;
