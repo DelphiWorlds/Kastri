@@ -24,8 +24,10 @@ type
   JExemptionMechanism = interface;
   JKeyGenerator = interface;
   JKeyGenParameterSpec_Builder = interface;
+  JKeyPair = interface;
   JKeyProperties = interface;
   JMac = interface;
+  JResultData = interface;
   JSecretKey = interface;
 
   JCipherClass = interface(JObjectClass)
@@ -276,6 +278,76 @@ type
   end;
   TJKeyProperties = class(TJavaGenericImport<JKeyPropertiesClass, JKeyProperties>) end;
 
+  JKeyPairClass = interface(JObjectClass)
+    ['{61FF1195-FFFD-440B-BBDC-3D97376B2A55}']
+    function init(publicKey : JPublicKey; privateKey : JPrivateKey) : JKeyPair; cdecl;
+  end;
+
+  [JavaSignature('java/security/KeyPair')]
+  JKeyPair = interface(JObject)
+    ['{0E56BB1E-C6F8-491C-9CE0-A43AE3FE3E75}']
+    function getPrivate : JPrivateKey; cdecl;
+    function getPublic : JPublicKey; cdecl;
+  end;
+  TJKeyPair = class(TJavaGenericImport<JKeyPairClass, JKeyPair>) end;
+
+  JResultDataClass = interface(JObjectClass)
+    ['{347A8EBA-E0EE-4715-BFFB-974B42F2A444}']
+    function _GetSTATUS_NOT_IN_REQUEST_MESSAGE: Integer; cdecl;
+    function _GetSTATUS_NOT_REQUESTED: Integer; cdecl;
+    function _GetSTATUS_NO_ACCESS_CONTROL_PROFILES: Integer; cdecl;
+    function _GetSTATUS_NO_SUCH_ENTRY: Integer; cdecl;
+    function _GetSTATUS_OK: Integer; cdecl;
+    function _GetSTATUS_READER_AUTHENTICATION_FAILED: Integer; cdecl;
+    function _GetSTATUS_USER_AUTHENTICATION_FAILED: Integer; cdecl;
+    property STATUS_NOT_IN_REQUEST_MESSAGE: Integer read _GetSTATUS_NOT_IN_REQUEST_MESSAGE;
+    property STATUS_NOT_REQUESTED: Integer read _GetSTATUS_NOT_REQUESTED;
+    property STATUS_NO_ACCESS_CONTROL_PROFILES: Integer read _GetSTATUS_NO_ACCESS_CONTROL_PROFILES;
+    property STATUS_NO_SUCH_ENTRY: Integer read _GetSTATUS_NO_SUCH_ENTRY;
+    property STATUS_OK: Integer read _GetSTATUS_OK;
+    property STATUS_READER_AUTHENTICATION_FAILED: Integer read _GetSTATUS_READER_AUTHENTICATION_FAILED;
+    property STATUS_USER_AUTHENTICATION_FAILED: Integer read _GetSTATUS_USER_AUTHENTICATION_FAILED;
+  end;
+
+  [JavaSignature('android/security/identity/ResultData')]
+  JResultData = interface(JObject)
+    ['{CE53B8A5-C27E-440B-9294-AD5357BCCB43}']
+    function getAuthenticatedData: TJavaArray<Byte>; cdecl;
+    function getEntry(namespaceName: JString; name: JString): TJavaArray<Byte>; cdecl;
+    function getEntryNames(namespaceName: JString): JCollection; cdecl;
+    function getMessageAuthenticationCode: TJavaArray<Byte>; cdecl;
+    function getNamespaces: JCollection; cdecl;
+    function getRetrievedEntryNames(namespaceName: JString): JCollection; cdecl;
+    function getStaticAuthenticationData: TJavaArray<Byte>; cdecl;
+    function getStatus(namespaceName: JString; name: JString): Integer; cdecl;
+  end;
+  TJResultData = class(TJavaGenericImport<JResultDataClass, JResultData>)
+  end;
+
+  // API 30
+  JIdentityCredentialClass = interface(JObjectClass)
+    ['{144C6375-3BCD-4B16-ADBE-37E02D5771B7}']
+  end;
+
+  [JavaSignature('android/security/identity/IdentityCredential')]
+  JIdentityCredential = interface(JObject)
+    ['{01F87605-B702-4D66-A182-2BF27A024FCD}']
+    function createEphemeralKeyPair: JKeyPair; cdecl;
+    function decryptMessageFromReader(messageCiphertext: TJavaArray<Byte>): TJavaArray<Byte>; cdecl;
+    function encryptMessageToReader(messageCiphertext: TJavaArray<Byte>): TJavaArray<Byte>; cdecl;
+    function getAuthKeysNeedingCertification: JCollection; cdecl;
+    function getAuthenticationDataUsageCount: TJavaArray<Integer>; cdecl;
+    function getCredentialKeyCertificateChain: JCollection; cdecl;
+    function getEntries(requestMessage: TJavaArray<Byte>; entriesToRequest: JMap; sessionTranscript: TJavaArray<Byte>;
+      readerSignature: TJavaArray<Byte>): JResultData; cdecl;
+    procedure setAllowUsingExhaustedKeys(allowUsingExhaustedKeys: boolean); cdecl;
+    procedure setAvailableAuthenticationKeys(keyCount: Integer; maxUsesPerKey: Integer); cdecl;
+    procedure setReaderEphemeralPublicKey(readerEphemeralPublicKey: JPublicKey); cdecl;
+    procedure storeStaticAuthenticationData(authenticationKey: JX509Certificate; staticAuthData: TJavaArray<Byte>); cdecl;
+  end;
+  TJIdentityCredential = class(TJavaGenericImport<JIdentityCredentialClass, JIdentityCredential>)
+  end;
+
   JMacClass = interface(JObjectClass)
     ['{2B12D705-6AA8-4626-A061-7010A7CC4E55}']
     {class} function getInstance(algorithm: JString): JMac; cdecl; overload;
@@ -306,7 +378,7 @@ type
   JSecretKeyClass = interface(JKeyClass)
     ['{631CE56D-D41C-4899-A6BF-BEE8992932BF}']
     {class} function _GetserialVersionUID: Int64; cdecl;
-    {class} //serialVersionUID is defined in parent interface
+    {class} // serialVersionUID is defined in parent interface
   end;
 
   [JavaSignature('javax/crypto/SecretKey')]
