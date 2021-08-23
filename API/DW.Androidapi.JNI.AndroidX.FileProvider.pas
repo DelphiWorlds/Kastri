@@ -1,4 +1,4 @@
-unit DW.Androidapi.JNI.Androidx.Core.FileProvider;
+unit DW.Androidapi.JNI.AndroidX.FileProvider;
 
 {*******************************************************}
 {                                                       }
