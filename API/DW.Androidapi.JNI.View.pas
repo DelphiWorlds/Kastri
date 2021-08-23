@@ -17,13 +17,17 @@ interface
 
 uses
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.JNI.Util;
+  Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.JNI.Util,
+  // DW
+  DW.Androidapi.JNI.Animation;
 
 type
   JGravity = interface;
+  JInterpolator = interface;
   JOrientationEventListener = interface;
   JTextureView = interface;
   JTextureView_SurfaceTextureListener = interface;
+  JViewAnimationUtils = interface;
 
   JOrientationEventListenerClass = interface(JObjectClass)
     ['{76A01C43-E540-4797-8AC6-DAC27B097967}']
@@ -164,6 +168,22 @@ type
     procedure onSurfaceTextureSizeChanged(texture: JSurfaceTexture; width: Integer; height: Integer); cdecl;
   end;
   TJTextureView_SurfaceTextureListener = class(TJavaGenericImport<JTextureView_SurfaceTextureListenerClass, JTextureView_SurfaceTextureListener>) end;
+
+  [JavaSignature('android/view/ViewAnimationUtils')]
+  JViewAnimationUtils = interface(JObject)
+    ['{41EDD777-1D4A-4094-ABEA-2FE0330F4003}']
+  end;
+  TJViewAnimationUtils = class(TJavaGenericImport<JViewAnimationUtilsClass, JViewAnimationUtils>) end;
+
+  JInterpolatorClass = interface(JTimeInterpolatorClass)
+    ['{32C937C5-70CB-4807-ACA2-5C10A726397A}']
+  end;
+
+  [JavaSignature('android/view/animation/Interpolator')]
+  JInterpolator = interface(JTimeInterpolator)
+    ['{A62397C9-0F59-428A-9659-6FBB75456C22}']
+  end;
+  TJInterpolator = class(TJavaGenericImport<JInterpolatorClass, JInterpolator>) end;
 
 implementation
 
