@@ -60,6 +60,7 @@ type
     {$IF Defined(USE_FUSED_LOCATION)}
     procedure LocationChangeHandler(Sender: TObject; const AData: TLocationData);
     procedure LocationStateChangeHandler(Sender: TObject);
+    procedure LocationNmeaMessageHandler(Sender: TObject; const AMsg: string; const ATimestamp: Int64);
     {$ELSE}
     procedure LocationChangeHandler(Sender: TObject; const AData: TLocationData; const ASource: TLocationSource);
     {$ENDIF}
