@@ -84,7 +84,7 @@ implementation
 {$R *.dfm}
 
 uses
-  System.Permissions, System.IOUtils,
+  System.Permissions, System.IOUtils, System.DateUtils,
   Androidapi.Helpers, Androidapi.JNI.Support, AndroidApi.JNI.JavaTypes,
   {$IF Defined(CLOUDLOGGING)}
   Grijjy.CloudLogging,
@@ -202,6 +202,7 @@ begin
     FLocation.TimerTask.Schedule(cLocationTimerInterval);
     {$ELSE}
     FLocation.OnStateChange := LocationStateChangeHandler;
+    FLocation.OnNmeaMessage := LocationNmeaMessageHandler;
     // Uncomment this line and use the desired value from DW.Consts.Android
     // FLocation.Priority := cLocationPriorityBalancedPowerAccuracy;
     {$ENDIF}
@@ -396,6 +397,12 @@ procedure TServiceModule.LocationStateChangeHandler(Sender: TObject);
 begin
   TOSLog.d('TServiceModule.LocationStateChangeHandler > FLocation.IsPaused: %s', [BoolToStr(FLocation.IsPaused, True)]);
   SendState;
+end;
+
+procedure TServiceModule.LocationNmeaMessageHandler(Sender: TObject; const AMsg: string; const ATimestamp: Int64);
+begin
+  // There can be a lot of these, so use logging wisely
+  // TOSLog.d('TServiceModule.LocationNmeaMessageHandler > %s: %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', UnixToDateTime(ATimestamp div 1000, False)), AMsg]);
 end;
 {$ENDIF}
 
