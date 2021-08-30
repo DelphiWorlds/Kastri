@@ -21,7 +21,7 @@ uses
   // RTL
   System.Sensors, System.Classes,
   // Android
-  AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNIBridge, Androidapi.JNI.Location,
+  AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNIBridge, Androidapi.JNI.Location, Androidapi.JNI.JavaTypes,
   // DW
   DW.Androidapi.JNI.DWFusedLocation, DW.Location;
 
@@ -32,15 +32,28 @@ type
   private
     FLocation: TLocation;
   public
-    constructor Create(const ALocation: TLocation);
+    { JDWFusedLocationClientDelegate }
     procedure onLocation(location: JLocation); cdecl;
     procedure onLocationUpdatesChange(active: Boolean); cdecl;
     procedure onLocationSettingsChange(success: Boolean); cdecl;
     procedure onSetMockLocationResult(location: JLocation); cdecl;
     procedure onSetMockModeResult(success: Boolean); cdecl;
+  public
+    constructor Create(const ALocation: TLocation);
+  end;
+
+  TNmeaMessageListener = class(TJavaLocal, JOnNmeaMessageListener)
+  private
+    FLocation: TLocation;
+  public
+    { JOnNmeaMessageListener }
+    procedure onNmeaMessage(message: JString; timestamp: Int64); cdecl;
+  public
+    constructor Create(const ALocation: TLocation);
   end;
 
   TLocationChangeEvent = procedure(Sender: TObject; const Data: TLocationData) of object;
+  TNmeaMessageEvent = procedure(Sender: TObject; const Msg: string; const Timestamp: Int64) of object;
   TSetMockLocationResultEvent = procedure(Sender: TObject; const Success: Boolean; const Location: TLocationCoord2D) of object;
   TSetMockModeResultEvent = procedure(Sender: TObject; const Success: Boolean) of object;
 
@@ -50,8 +63,11 @@ type
     FDelegate: JDWFusedLocationClientDelegate;
     FIsPaused: Boolean;
     FLastData: TLocationData;
+    FLocationManager: JLocationManager;
     FNeedsBackgroundAccess: Boolean;
+    FNmeaMessageListener: JOnNmeaMessageListener;
     FOnLocationChange: TLocationChangeEvent;
+    FOnNmeaMessage: TNmeaMessageEvent;
     FOnSetMockLocationResult: TSetMockLocationResultEvent;
     FOnSetMockModeResult: TSetMockModeResultEvent;
     FOnStateChange: TNotifyEvent;
@@ -69,6 +85,7 @@ type
     procedure SetPriority(const Value: Integer);
   protected
     procedure LocationChange(const ALocation: JLocation);
+    procedure NmeaMessage(const AMsg: JString; const ATimestamp: Int64);
     procedure SetIsPaused(const AValue: Boolean);
     procedure SettingsChange(const ASuccess: Boolean);
   public
@@ -107,6 +124,7 @@ type
     property NeedsBackgroundAccess: Boolean read FNeedsBackgroundAccess write FNeedsBackgroundAccess;
     property Priority: Integer read GetPriority write SetPriority;
     property OnLocationChange: TLocationChangeEvent read FOnLocationChange write FOnLocationChange;
+    property OnNmeaMessage: TNmeaMessageEvent read FOnNmeaMessage write FOnNmeaMessage;
     /// <summary>
     ///   Called when SetMockLocation is called. If successful, Success will be true, so the Location parameter will be valid
     /// </summary>
@@ -121,7 +139,7 @@ uses
   // RTL
   System.Permissions, System.SysUtils, System.DateUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI.JavaTypes,
+  Androidapi.Helpers, Androidapi.JNI.Provider,
   // DW
   DW.OSLog, DW.Consts.Android, DW.Geodetic, DW.Androidapi.JNI.SupportV4;
 
@@ -164,6 +182,19 @@ begin
   //
 end;
 
+{ TNmeaMessageListener }
+
+constructor TNmeaMessageListener.Create(const ALocation: TLocation);
+begin
+  inherited Create;
+  FLocation := ALocation;
+end;
+
+procedure TNmeaMessageListener.onNmeaMessage(message: JString; timestamp: Int64);
+begin
+  FLocation.NmeaMessage(message, timestamp);
+end;
+
 { TLocation }
 
 constructor TLocation.Create;
@@ -177,6 +208,9 @@ begin
   FClient.setInterval(cDefaultLocationInterval);
   FClient.setFastestInterval(cDefaultLocationFastestInterval);
   FClient.setPriority(cLocationPriorityHighAccuracy);
+  FNmeaMessageListener := TNmeaMessageListener.Create(Self);
+  FLocationManager := TJLocationManager.Wrap(TAndroidHelper.Context.getSystemService(TJContext.JavaClass.LOCATION_SERVICE));
+  FLocationManager.addNmeaListener(FNmeaMessageListener);
 end;
 
 destructor TLocation.Destroy;
@@ -327,6 +361,12 @@ begin
   BroadcastLocation(LData);
   if Assigned(FOnLocationChange) then
     FOnLocationChange(Self, LData);
+end;
+
+procedure TLocation.NmeaMessage(const AMsg: JString; const ATimestamp: Int64);
+begin
+  if Assigned(FOnNmeaMessage) then
+    FOnNmeaMessage(Self, JStringToString(AMsg), ATimestamp);
 end;
 
 procedure TLocation.Pause;
