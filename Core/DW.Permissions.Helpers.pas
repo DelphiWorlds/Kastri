@@ -19,18 +19,19 @@ uses
   System.Permissions;
 
 type
-  TGrantResults = TArray<TPermissionStatus>;
+  TPermissionArray = TArray<string>;
+  TPermissionStatusArray = TArray<TPermissionStatus>;
 
-  TGrantResultsHelper = record helper for TGrantResults
+  TPermissionStatusArrayHelper = record helper for TPermissionStatusArray
   public
     function AreAllGranted: Boolean;
   end;
 
 implementation
 
-{ TGrantResultsHelper }
+{ TPermissionStatusArrayHelper }
 
-function TGrantResultsHelper.AreAllGranted: Boolean;
+function TPermissionStatusArrayHelper.AreAllGranted: Boolean;
 var
   LStatus: TPermissionStatus;
 begin
