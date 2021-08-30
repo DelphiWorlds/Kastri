@@ -48,14 +48,17 @@ type
     {$IF Defined(ANDROID)}
     FReceiver: TLocalReceiver;
     {$ENDIF}
+    procedure DoRequestBackgroundLocationPermission;
     function GetBasePermissions: TArray<string>;
     procedure LocationChangedHandler(Sender: TObject; const AData: TLocationData);
     procedure ReceiverMessageReceivedHandler(Sender: TObject; const AMsg: string);
     procedure ReceiverStateHandler(Sender: TObject; const AState: Integer);
-    procedure RequestLocationPermissions(const APermissions: TArray<string>);
-    procedure RequestLocationPermissionsPrelude;
+    procedure RequestBackgroundLocationPermission;
+    procedure RequestForegroundLocationPermission;
+    procedure RequestPermissions;
+    procedure RequestPermissionsComplete;
     procedure StartLocation;
-    procedure ShowRationale(const APostRationaleProc: TProc);
+    procedure ShowBackgroundPermissionRationale(const APostRationaleProc: TProc);
   protected
     procedure DoShow; override;
     procedure Resize; override;
@@ -82,7 +85,7 @@ uses
   Androidapi.Helpers, Androidapi.JNI.JavaTypes,
   DW.ServiceCommander.Android, DW.Android.Helpers,
   {$ENDIF}
-  DW.Sensors, DW.Consts.Android, DW.UIHelper,
+  DW.Sensors, DW.Consts.Android, DW.UIHelper, DW.Permissions.Helpers,
   CPL.Consts;
 
 const
@@ -153,7 +156,7 @@ procedure TMainView.DoShow;
 begin
   inherited;
   {$IF Defined(ANDROID)}
-  RequestLocationPermissionsPrelude;
+  RequestPermissions;
   {$ELSE}
   StartLocation;
   {$ENDIF}
@@ -199,9 +202,41 @@ begin
   Result := [cPermissionAccessCoarseLocation, cPermissionAccessFineLocation];
 end;
 
-procedure TMainView.ShowRationale(const APostRationaleProc: TProc);
+procedure TMainView.RequestPermissions;
 begin
-  if TOSVersion.Check(10) and not PermissionsService.IsPermissionGranted(cPermissionAccessBackgroundLocation) then
+  {$IF Defined(ANDROID)}
+  TServiceCommander.IsRequestingPermissions := True;
+  {$ENDIF}
+  if PermissionsService.IsPermissionGranted(cPermissionAccessFineLocation) then
+    RequestBackgroundLocationPermission
+  else
+    RequestForegroundLocationPermission;
+end;
+
+procedure TMainView.RequestForegroundLocationPermission;
+begin
+  PermissionsService.RequestPermissions(GetBasePermissions,
+    procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
+    begin
+      if AGrantResults.AreAllGranted then
+        RequestBackgroundLocationPermission
+      else
+        RequestPermissionsComplete; // Show location updates will not work message
+    end
+  );
+end;
+
+procedure TMainView.RequestBackgroundLocationPermission;
+begin
+  if TOSVersion.Check(10) then
+    ShowBackgroundPermissionRationale(DoRequestBackgroundLocationPermission)
+  else
+    StartLocation;
+end;
+
+procedure TMainView.ShowBackgroundPermissionRationale(const APostRationaleProc: TProc);
+begin
+  if not PermissionsService.IsPermissionGranted(cPermissionAccessBackgroundLocation) then
   begin
     TDialogServiceAsync.MessageDialog(cBackgroundPermissionsMessage, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], TMsgDlgBtn.mbOK, 0,
       procedure(const AResult: TModalResult)
@@ -214,53 +249,28 @@ begin
     APostRationaleProc;
 end;
 
-procedure TMainView.RequestLocationPermissions(const APermissions: TArray<string>);
+procedure TMainView.DoRequestBackgroundLocationPermission;
 begin
-  {$IF Defined(ANDROID)}
-  TServiceCommander.IsRequestingPermissions := True;
-  {$ENDIF}
-  PermissionsService.RequestPermissions(APermissions,
-    procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
+  PermissionsService.RequestPermissions([cPermissionAccessBackgroundLocation],
+    procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
     begin
-      if PermissionsService.IsEveryPermissionGranted(GetBasePermissions) then
+      if AGrantResults.AreAllGranted then
         StartLocation;
-      {$IF Defined(ANDROID)}
-      TServiceCommander.IsRequestingPermissions := False;
-      {$ENDIF}
-    end,
-    procedure(const APermissions: TArray<string>; const APostRationaleProc: TProc)
-    begin
-      ShowRationale(APostRationaleProc);
+      // else show that location updates will not occur in the background
     end
   );
 end;
 
-procedure TMainView.RequestLocationPermissionsPrelude;
-var
-  LPermissions: TArray<string>;
+procedure TMainView.RequestPermissionsComplete;
 begin
-  LPermissions := GetBasePermissions;
-  if not PermissionsService.IsEveryPermissionGranted(LPermissions) then
-  begin
-    // Calling ShowRationale here because the user needs to be aware that the background updates require the "Always" permission
-    ShowRationale(
-      procedure
-      begin
-        if TOSVersion.Check(10) then
-          LPermissions := LPermissions + [cPermissionAccessBackgroundLocation];
-        RequestLocationPermissions(LPermissions);
-      end
-    );
-  end
-  // Just request background permission
-  else if TOSVersion.Check(10) and not PermissionsService.IsPermissionGranted(cPermissionAccessBackgroundLocation) then
-    RequestLocationPermissions([cPermissionAccessBackgroundLocation])
-  else
-    StartLocation;
+  {$IF Defined(ANDROID)}
+  TServiceCommander.IsRequestingPermissions := False;
+  {$ENDIF}
 end;
 
 procedure TMainView.StartLocation;
 begin
+  RequestPermissionsComplete;
   {$IF Defined(ANDROID)}
   if not TServiceCommander.StartService(cServiceName) then
     TServiceCommander.SendCommand(cServiceCommandCheckState);
