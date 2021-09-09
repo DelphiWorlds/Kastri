@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{73CEA810-BFE3-4B7F-8C41-35E9EBE509A8}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Application\CrossPlatformLocationD11.dproj">
+            <Dependencies>Service\CrossPlatformLocationService.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Service\CrossPlatformLocationService.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CrossPlatformLocationD11" DependsOnTargets="CrossPlatformLocationService">
+        <MSBuild Projects="Application\CrossPlatformLocationD11.dproj"/>
+    </Target>
+    <Target Name="CrossPlatformLocationD11:Clean" DependsOnTargets="CrossPlatformLocationService:Clean">
+        <MSBuild Projects="Application\CrossPlatformLocationD11.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CrossPlatformLocationD11:Make" DependsOnTargets="CrossPlatformLocationService:Make">
+        <MSBuild Projects="Application\CrossPlatformLocationD11.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CrossPlatformLocationService">
+        <MSBuild Projects="Service\CrossPlatformLocationService.dproj"/>
+    </Target>
+    <Target Name="CrossPlatformLocationService:Clean">
+        <MSBuild Projects="Service\CrossPlatformLocationService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CrossPlatformLocationService:Make">
+        <MSBuild Projects="Service\CrossPlatformLocationService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CrossPlatformLocationD11;CrossPlatformLocationService"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CrossPlatformLocationD11:Clean;CrossPlatformLocationService:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CrossPlatformLocationD11:Make;CrossPlatformLocationService:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

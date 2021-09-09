@@ -58,8 +58,8 @@ type
     FReceiver: JBroadcastReceiver;
     FReceiverDelegate: JDWMultiBroadcastReceiverDelegate;
   protected
-    procedure Receive(context: JContext; intent: JIntent); virtual; abstract;
     procedure ConfigureActions; virtual; abstract;
+    procedure Receive(context: JContext; intent: JIntent); virtual; abstract;
     property IntentFilter: JIntentFilter read FIntentFilter;
   public
     constructor Create(const ALocal: Boolean = False);
@@ -73,7 +73,7 @@ uses
   // Android
   Androidapi.Helpers,
   // DW
-  DW.Androidapi.JNI.SupportV4, DW.Android.Helpers;
+  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.Androidx.LocalBroadcastManager, {$ENDIF} DW.Android.Helpers;
 
 { TMultiBroadcastReceiverDelegate }
 

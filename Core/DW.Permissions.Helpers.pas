@@ -16,11 +16,16 @@ unit DW.Permissions.Helpers;
 interface
 
 uses
-  System.Permissions;
+  System.Permissions, System.Types;
 
 type
+  {$IF CompilerVersion < 35}
   TPermissionArray = TArray<string>;
   TPermissionStatusArray = TArray<TPermissionStatus>;
+  {$ELSE}
+  TPermissionArray = TClassicStringDynArray;
+  TPermissionStatusArray = TClassicPermissionStatusDynArray;
+  {$ENDIF}
 
   TPermissionStatusArrayHelper = record helper for TPermissionStatusArray
   public

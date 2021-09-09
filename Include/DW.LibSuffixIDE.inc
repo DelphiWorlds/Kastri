@@ -13,3 +13,6 @@
 {$IF CompilerVersion = 34}
   {$LIBSUFFIX '270'}
 {$ENDIF}
+{$IF CompilerVersion = 35}
+  {$LIBSUFFIX '280'}
+{$ENDIF}

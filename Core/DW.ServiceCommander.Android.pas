@@ -55,7 +55,8 @@ uses
   // FMX
   FMX.Platform,
   // DW
-  DW.Androidapi.JNI.SupportV4, DW.Android.Helpers, DW.Consts.Android;
+  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.Androidx.LocalBroadcastManager, {$ENDIF}
+  DW.Android.Helpers, DW.Consts.Android;
 
 class constructor TServiceCommander.CreateClass;
 begin
@@ -114,6 +115,7 @@ begin
     AServiceName := cEMBTJavaServicePrefix + AServiceName;
   if not TAndroidHelperEx.IsServiceRunning(AServiceName) then
   begin
+    TOSLog.d('Starting %s', [AServiceName]);
     TLocalServiceConnection.StartService(AServiceName);
     Result := True;
   end;

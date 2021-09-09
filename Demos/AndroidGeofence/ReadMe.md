@@ -4,7 +4,9 @@
 
 Demonstrates the Android Geofence implementation in Kastri. The main files used in the implementation are in the `Features\Geofence` folder and `Java\Geofence` folder
 
-The demo has been tested using Delphi 10.4.2, however it may work on earlier versions.
+**NOTE**
+
+There are 2 project groups, one named `AGDemoAndroidGroup` and the other `AGDemoAndroidGroupD11`. The former is for Delphi 10.4.2 (and possibly below), and the latter is for Delphi 11 and above **only**. Each group has a corresponding application project (`AGDemo` and `AGDemo11`), however they use the **same** service project (`AGDemoService`). If you build the demo using `AGDemoAndroidGroup`, then later use `AGDemoAndroidGroupD11` you will need first to delete the `.java` files in the `Service` folder
 
 ## Configuration
 

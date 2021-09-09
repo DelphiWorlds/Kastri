@@ -67,7 +67,7 @@ end;
 procedure TForm1.ScanButtonClick(Sender: TObject);
 begin
   PermissionsService.RequestPermissions([cPermissionReadExternalStorage, cPermissionWriteExternalStorage, cPermissionCamera],
-    procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
+    procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
     begin
       if AGrantResults.AreAllGranted then
         TakePhotoFromCameraAction.ExecuteTarget(ScanButton);

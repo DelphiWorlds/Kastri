@@ -4,7 +4,7 @@
 
 From [Delphi Worlds](http://www.delphiworlds.com)
 
-Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two point releases of major releases** (e.g. at present that includes 10.3.3 and 10.4.2) are "officially" supported. 
+Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two point releases of major releases** (e.g. at present that includes Delphi 10.4.2 and Delphi 11) are "officially" supported. 
 
 Development of Kastri can be helped along with [Github Sponsorship](https://github.com/sponsors/DelphiWorlds), so please consider sponsoring today!
 
@@ -20,6 +20,10 @@ If you're looking to [learn Delphi, please visit this link](https://learndelphi.
 * Follows strict coding standards to ensure consistency and readability
 * Is kept as simple as practicable
 * Is named after the [place in Greece](https://en.wikipedia.org/wiki/Kastri,_Phocis) where [Delphi](https://en.wikipedia.org/wiki/Delphi) once stood
+
+## Delphi 11 changes
+
+With the introduction of Delphi 11, there have been some changes related to Android. You may notice new jar files in the `Lib` folder where the name is the same as an existing jar, with a suffix of `2.0.0` (or greater) e.g. `dw-kastri-base-2.0.0.jar`. Jars with a `2.0.0` suffix will work **only with Delphi 11** (and possibly later). If a jar does not have a corresponding jar with a `2.0.0` (or greater) suffix, it should also work with Delphi 11. Please also see the Demos section below.
 
 ## Intro video
 
@@ -50,6 +54,8 @@ If you would like to join the Delphi Worlds Slack workspace, [please visit this 
 ### Demos
 
 You'll find demo applications in the [Demos](./Demos) folder, including those associated with articles posted on the [Delphi Worlds blog](http://www.delphiworlds.com/blog)
+
+**Delphi 11 users please note**: Some of the demos that have Android support have been updated in line with changes in Delphi 11, and now have separate project (`.dproj`) and group project (`.groupproj`) (where applicable) files, which have been suffixed with `D11`. For demos that do not have a suffix of `D11` in the name, you may need to open Project Manager and for each Android target you wish to use, right-click the `Libraries` node and click `Revery System Files to Default` before building the project. 
 
 ### API imports
 
@@ -139,13 +145,13 @@ Allows users to follow links to content inside your app from your website.
 
 In addition to the features listed above, several other features are [planned for Kastri](https://github.com/DelphiWorlds/Kastri/milestones), namely:
 
+#### Assets Manager
+
+For accessing photos/videos stored on the device via the albums on Android and iOS
+
 #### Google SignIn
 
 A (hopefully) simplified variation on [Grijjy's excellent Google SignIn](https://github.com/grijjy/DelphiGoogleSignIn) implementation, **with added support for iOS**
-
-#### Photos Library
-
-For accessing photos stored on the device via the albums on Android and iOS
 
 #### Simple backend framework for managing push tokens
 

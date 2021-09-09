@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{FB734327-D084-4CAB-8EC8-BB043760782C}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Application\AGDemoD11.dproj">
+            <Dependencies>Service\AGDemoService.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Service\AGDemoService.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="AGDemoD11" DependsOnTargets="AGDemoService">
+        <MSBuild Projects="Application\AGDemoD11.dproj"/>
+    </Target>
+    <Target Name="AGDemoD11:Clean" DependsOnTargets="AGDemoService:Clean">
+        <MSBuild Projects="Application\AGDemoD11.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AGDemoD11:Make" DependsOnTargets="AGDemoService:Make">
+        <MSBuild Projects="Application\AGDemoD11.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AGDemoService">
+        <MSBuild Projects="Service\AGDemoService.dproj"/>
+    </Target>
+    <Target Name="AGDemoService:Clean">
+        <MSBuild Projects="Service\AGDemoService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AGDemoService:Make">
+        <MSBuild Projects="Service\AGDemoService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="AGDemoD11;AGDemoService"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="AGDemoD11:Clean;AGDemoService:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="AGDemoD11:Make;AGDemoService:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
