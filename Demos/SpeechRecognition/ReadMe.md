@@ -4,7 +4,9 @@ This demo allows you to record your speech and convert it into text
 
 ### Supported Delphi versions
 
-The demo should compile and work for at least versions 10.3.3 and 10.4.x
+The demo should compile and work for at least versions 10.3.3, 10.4.x and 11
+
+When moving between Delphi versions, for Android please make sure you right-click the Libraries node under Target Platforms > Android (32 or 64-bit) and click "Revert System files to default"
 
 ### Supported Platforms
 

@@ -141,7 +141,8 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.Provider,
   // DW
-  DW.OSLog, DW.Consts.Android, DW.Geodetic, DW.Androidapi.JNI.SupportV4;
+  DW.OSLog, DW.Consts.Android, DW.Geodetic,
+  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4 {$ELSE} DW.Androidapi.JNI.AndroidX.LocalBroadcastManager {$ENDIF};
 
 const
   cDefaultLocationInterval = 10000;

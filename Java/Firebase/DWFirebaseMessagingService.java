@@ -8,14 +8,23 @@ package com.delphiworlds.kastri;
  *                                                     *
  *******************************************************/
 
-import android.support.v4.content.LocalBroadcastManager;
 import android.content.Context;
 import android.content.Intent;
+// Delphi 10.4.2 or earlier
+// import android.support.v4.content.LocalBroadcastManager;
+
 import android.util.Log;
+
+// Delphi 11 and later
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+// Delphi 10.4.2 or earlier
+/*
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+*/
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import java.util.HashMap;
@@ -46,6 +55,8 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
     }  
   }
 
+  // Delphi 10.4.2 and earlier
+  /*
   public static void queryToken(final Context context) {
     FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
       @Override
@@ -54,6 +65,7 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
       }
     });
   }
+  */
 
   @Override
   public void onCreate() {
@@ -68,45 +80,52 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
 
   @Override
   public void onMessageReceived(RemoteMessage remoteMessage) {
-    Log.v(TAG, "+onMessageReceived");
     Map<String, String> data = null;
     Intent intent = new Intent(ACTION_MESSAGE_RECEIVED);
     // Process either data section (if present) or notification, but not both
-    if (remoteMessage.getData() != null) {
+    if ((remoteMessage.getData() != null) && !remoteMessage.getData().isEmpty()) {
+      Log.d(TAG, "Message has data: " + data); 
       data = remoteMessage.getData();
       this.addExtras(intent, data);
     } 
     else if (remoteMessage.getNotification() != null) {
+      Log.d(TAG, "Message has notification");
       RemoteMessage.Notification notification = remoteMessage.getNotification();
       data = new HashMap<String, String>();
       // data.put("android_channel_id", notification.getChannelId()); 18.0.0
       data.put("body", notification.getBody());
       data.put("color", notification.getColor());
       data.put("icon", notification.getIcon());
-      // data.put("image", notification.getImageUrl().getPath()); 18.0.0
-      data.put("link", notification.getLink().getPath());
+      if (notification.getImageUrl() != null)
+        data.put("image", notification.getImageUrl().toString());
+      if (notification.getLink() != null)
+        data.put("link", notification.getLink().toString());
       data.put("sound", notification.getSound());
-      // data.put("priority", notification.getNotificationPriority().toString()); 20.0.0
+      if (notification.getNotificationPriority() != null)
+        data.put("priority", notification.getNotificationPriority().toString());
       data.put("title", notification.getTitle());
-      // data.put("visibility", notification.getVisibility().toString()); 20.0.0
+      if (notification.getVisibility() != null)
+        data.put("visibility", notification.getVisibility().toString());
       this.addExtras(intent, data);
     }
-    if (data != null)
-      Log.d(TAG, "Message data: " + data); 
-    intent.putExtra("gcm.from", remoteMessage.getFrom()); /* String */
-    intent.putExtra("gcm.message_id", remoteMessage.getMessageId()); /* String */
-    intent.putExtra("gcm.message_type", remoteMessage.getMessageType()); /* String */
-    intent.putExtra("gcm.sent_time", remoteMessage.getSentTime()); /* long */
-    intent.putExtra("gcm.to", remoteMessage.getTo()); /* String */
-    intent.putExtra("gcm.ttl", remoteMessage.getTtl()); /* int */
+    else
+      Log.d(TAG, "Message has either no data or is empty, and no notification");
+    Log.d(TAG, "Intent before details: " + intent.toURI());
+    intent.putExtra("gcm.from", remoteMessage.getFrom());
+    intent.putExtra("gcm.message_id", remoteMessage.getMessageId());
+    intent.putExtra("gcm.message_type", remoteMessage.getMessageType());
+    intent.putExtra("gcm.sent_time", remoteMessage.getSentTime());
+    intent.putExtra("gcm.to", remoteMessage.getTo());
+    intent.putExtra("gcm.ttl", remoteMessage.getTtl());
     boolean hasReceiver = false;
     try {
       hasReceiver = LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    } catch (Throwable e){
+    } catch (Throwable e) {
       // No exception handling
     }
     // App is not running if no receiver
     if (!hasReceiver) {
+      Log.d(TAG, "App not running - posting notification");
       DWNotificationPublisher.sendNotification(this, intent, true);
       // Launch the application if launchapp is 1
       if (intent.hasExtra("launchapp")) {
@@ -118,6 +137,5 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
         }
       }
     }
-    Log.v(TAG, "-onMessageReceived");
   }
 }

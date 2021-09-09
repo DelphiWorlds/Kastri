@@ -29,6 +29,20 @@ const
   cMultiBroadcastReceiverName = 'com.delphiworlds.kastri.' + cMultiBroadcastReceiverClassName;
 
 type
+  JDWUtility = interface;
+
+  JDWUtilityClass = interface(JObjectClass)
+    ['{CD282406-0D42-4EEE-B42E-24E79D058B30}']
+    {class} function isPackageInstalled(context: JContext; packageName: JString): Boolean; cdecl;
+    {class} function createObjectMap: JMap; cdecl;
+  end;
+
+  [JavaSignature('com/delphiworlds/kastri/DWUtility')]
+  JDWUtility = interface(JObject)
+    ['{5C9753FA-7746-4DCE-A709-E68F1319CB97}']
+  end;
+  TJDWUtility = class(TJavaGenericImport<JDWUtilityClass, JDWUtility>) end;
+
   TAndroidHelperEx = record
   private
     class var FKeyguardManager: JKeyguardManager;
@@ -105,6 +119,10 @@ type
     /// </summary>
     class function IsIgnoringBatteryOptimizations: Boolean; static;
     /// <summary>
+    ///   Returns whether a package is present on the device
+    /// </summary>
+    class function IsPackageInstalled(const APackageName: string): Boolean; static;
+    /// <summary>
     ///   Returns whether a service is running foreground
     /// </summary>
     class function IsServiceForeground(const AServiceName: string): Boolean; static;
@@ -142,6 +160,7 @@ type
     ///   Used in conjunction with dw-multireceiver.jar
     /// </remarks>
     class procedure SetStartAlarm(const AAlarm: TDateTime; const AStartFromLock: Boolean); static;
+    class procedure ShowLocationPermissionSettings; static;
     /// <summary>
     ///   Converts file to uri, using FileProvider if target API >= 24
     /// </summary>
@@ -189,6 +208,20 @@ type
     class function JImageToStream(const AImage: JImage; const ARotation: Integer = 0): TStream; static;
   end;
 
+  /// <summary>
+  ///   Utility class implementing JRunnable
+  /// </summary>
+  TRunnable = class(TJavaLocal, JRunnable)
+  private
+    FRunHandler: TThreadProcedure;
+    FSync: Boolean;
+  public
+    { JRunnable }
+    procedure run; cdecl;
+  public
+    constructor Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
+  end;
+
 implementation
 
 uses
@@ -197,7 +230,7 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI,
   // DW
-  DW.Androidapi.JNI.SupportV4, DW.Androidapi.JNI.Util;
+  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.AndroidX.FileProvider, {$ENDIF} DW.Androidapi.JNI.Util;
 
 const
   cActionStartAlarm = cMultiBroadcastReceiverName + '.ACTION_START_ALARM';
@@ -325,6 +358,11 @@ begin
   Result := PowerManager.isIgnoringBatteryOptimizations(TAndroidHelper.Context.getPackageName);
 end;
 
+class function TAndroidHelperEx.IsPackageInstalled(const APackageName: string): Boolean;
+begin
+  Result := TJDWUtility.JavaClass.isPackageInstalled(TAndroidHelper.Context, StringToJString(APackageName));
+end;
+
 class function TAndroidHelperEx.GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo;
 var
   LService: JObject;
@@ -446,6 +484,36 @@ begin
     TAndroidHelper.AlarmManager.&set(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, LAlarmIntent);
 end;
 
+//class procedure TAndroidHelperEx.ShowLocationPermissionSettings;
+//var
+//  LIntent: JIntent;
+//begin
+//  LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_LOCATION_SOURCE_SETTINGS);
+//  TAndroidHelper.Activity.startActivityForResult(LIntent, 0);
+//end;
+
+
+class procedure TAndroidHelperEx.ShowLocationPermissionSettings;
+var
+  LIntent: JIntent;
+  LUri: Jnet_Uri;
+begin
+  LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
+  LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_APPLICATION_DETAILS_SETTINGS, LUri); // ACTION_LOCATION_SOURCE_SETTINGS
+  TAndroidHelper.Context.startActivity(LIntent);
+end;
+
+(*
+var
+  LIntent: JIntent;
+  // LUri: Jnet_Uri;
+begin
+  // LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
+  LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_LOCATION_SOURCE_SETTINGS); // , LUri
+  TAndroidHelper.Activity.startActivityForResult(LIntent, 0);
+end;
+*)
+
 { TJImageHelper }
 
 class function TJImageHelper.RotateBytes(const ABytes: TJavaArray<Byte>; const ARotation: Integer): TJavaArray<Byte>;
@@ -565,6 +633,23 @@ begin
   LYBuffer.get(Result, 0, LYSize);
   LVBuffer.get(Result, LYSize, LVSize);
   LUBuffer.get(Result, LYSize + LVSize, LUSize);
+end;
+
+{ TRunnable }
+
+constructor TRunnable.Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
+begin
+  inherited Create;
+  FRunHandler := ARunHandler;
+  FSync := ASync;
+end;
+
+procedure TRunnable.run;
+begin
+  if FSync then
+    TThread.ForceQueue(nil, FRunHandler)
+  else
+    FRunHandler;
 end;
 
 end.

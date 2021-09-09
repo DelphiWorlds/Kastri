@@ -11,13 +11,16 @@ package com.delphiworlds.kastri;
  *                                                     *
  *******************************************************/
 
- // Example metadata: <meta-data android:name="DWNotificationPublisher.WAKE_ON_NOTIFICATION" android:value="true" />
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.support.v4.app.NotificationCompat;
+
+// Delphi 10.4.2 and earlier
+// import android.support.v4.app.NotificationCompat;
+// Delphi 11 and later
+import androidx.core.app.NotificationCompat;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;

@@ -83,7 +83,7 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes,
   // DW
-  DW.Consts.Android, DW.Types;
+  DW.Consts.Android, DW.Types, DW.Permissions.Helpers;
 
 { TSpeechRecognitionListener }
 
@@ -157,7 +157,7 @@ end;
 procedure TPlatformSpeechRecognition.RequestAuthorization;
 begin
   PermissionsService.RequestPermissions([cPermissionRecordAudio],
-    procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
+    procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
     begin
       case AGrantResults[0] of
         TPermissionStatus.Granted:

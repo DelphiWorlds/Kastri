@@ -25,9 +25,9 @@ import android.util.Log;
 // androidx-annotation.jar
 import androidx.annotation.NonNull;
 // Delphi 10.4.2
-import android.support.v4.app.ActivityCompat;
+// import android.support.v4.app.ActivityCompat;
 // Delphi 11
-// import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.common.api.ApiException;
 

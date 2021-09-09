@@ -22,15 +22,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 // Delphi 10.4.2
-import android.support.v4.app.JobIntentService;
-import android.support.v4.content.LocalBroadcastManager;
+// import android.support.v4.app.JobIntentService;
+// import android.support.v4.content.LocalBroadcastManager;
 
 import android.text.TextUtils;
 import android.util.Log;
 
 // Delphi 11
-// import androidx.core.app.JobIntentService;
-// import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.app.JobIntentService;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 // play-services-location.jar  (17.0.0 may be compatible with Delphi 10.4.x)
 import com.google.android.gms.location.Geofence;

@@ -61,8 +61,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
+// Delphi 10.4.2 and earlier
+// import android.support.v4.app.NotificationCompat;
+// import android.support.v4.content.LocalBroadcastManager;
+// Delphi 11 and later
+import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;

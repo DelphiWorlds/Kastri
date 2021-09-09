@@ -299,7 +299,7 @@ end;
 procedure TGeofenceManager.DoRequestBackgroundLocationPermission;
 begin
   PermissionsService.RequestPermissions([cPermissionAccessBackgroundLocation],
-    procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
+    procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
     begin
       if AGrantResults.AreAllGranted then
         DoStart;
@@ -319,7 +319,7 @@ end;
 procedure TGeofenceManager.RequestForegroundLocationPermission;
 begin
   PermissionsService.RequestPermissions([cPermissionAccessFineLocation],
-    procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
+    procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
     begin
       if AGrantResults.AreAllGranted then
         RequestBackgroundLocationPermission

@@ -5,6 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.ScrollBox, FMX.Memo, FMX.Controls.Presentation, FMX.StdCtrls,
+  FMX.Memo.Types, FMX.Layouts,
   DW.SpeechRecognition, DW.Types;
 
 type
@@ -12,6 +13,7 @@ type
     RecordButton: TButton;
     Memo: TMemo;
     MessageLabel: TLabel;
+    BottomLayout: TLayout;
     procedure RecordButtonClick(Sender: TObject);
   private
     FSpeech: TSpeechRecognition;

@@ -2,37 +2,26 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'Speech Recognition Demo'
-  ClientHeight = 480
-  ClientWidth = 364
+  ClientHeight = 655
+  ClientWidth = 450
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
-  object RecordButton: TButton
-    Position.X = 140.000000000000000000
-    Position.Y = 384.000000000000000000
-    Size.Width = 80.000000000000000000
-    Size.Height = 29.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 0
-    Text = 'Record'
-    OnClick = RecordButtonClick
-  end
   object Memo: TMemo
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
-    Align = Top
+    TextSettings.WordWrap = True
+    Align = Client
     Margins.Left = 4.000000000000000000
     Margins.Top = 4.000000000000000000
     Margins.Right = 4.000000000000000000
-    Position.X = 4.000000000000000000
-    Position.Y = 4.000000000000000000
-    Size.Width = 356.000000000000000000
-    Size.Height = 325.000000000000000000
+    Size.Width = 442.000000000000000000
+    Size.Height = 568.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 1
-    Viewport.Width = 352.000000000000000000
-    Viewport.Height = 321.000000000000000000
+    TabOrder = 0
+    Viewport.Width = 438.000000000000000000
+    Viewport.Height = 564.000000000000000000
   end
   object MessageLabel: TLabel
     Align = Top
@@ -40,9 +29,26 @@ object frmMain: TfrmMain
     Margins.Top = 4.000000000000000000
     Margins.Right = 4.000000000000000000
     Position.X = 4.000000000000000000
-    Position.Y = 333.000000000000000000
-    Size.Width = 356.000000000000000000
+    Position.Y = 4.000000000000000000
+    Size.Width = 442.000000000000000000
     Size.Height = 20.000000000000000000
     Size.PlatformDefault = False
+  end
+  object BottomLayout: TLayout
+    Align = Bottom
+    Position.Y = 596.000000000000000000
+    Size.Width = 450.000000000000000000
+    Size.Height = 59.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object RecordButton: TButton
+      Align = Center
+      Size.Width = 116.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Record'
+      OnClick = RecordButtonClick
+    end
   end
 end
