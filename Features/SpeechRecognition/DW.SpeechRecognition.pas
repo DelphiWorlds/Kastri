@@ -137,6 +137,8 @@ uses
   System.SysUtils,
   {$IF Defined(IOS)}
   DW.SpeechRecognition.iOS;
+  {$ELSEIF Defined(MACOS)}
+  DW.SpeechRecognition.Mac;
   {$ELSEIF Defined(Android)}
   DW.SpeechRecognition.Android;
   {$ELSE}

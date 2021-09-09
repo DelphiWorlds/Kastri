@@ -1,4 +1,4 @@
-unit DW.SpeechRecognition.iOS;
+unit DW.SpeechRecognition.Mac;
 
 {*******************************************************}
 {                                                       }
@@ -16,10 +16,12 @@ unit DW.SpeechRecognition.iOS;
 interface
 
 uses
-  // iOS
-  iOSapi.Foundation, iOSapi.AVFoundation,
+  // RTL
+  System.SysUtils,
+  // macOS
+  Macapi.ObjectiveC, Macapi.Foundation, Macapi.AVFoundation,
   // DW
-  DW.iOSapi.Speech, DW.iOSapi.AVFoundation,
+  DW.Macapi.Speech, DW.Macapi.AVFoundation,
   DW.SpeechRecognition.Cocoa, DW.SpeechRecognition, DW.Types;
 
 type
@@ -50,9 +52,8 @@ type
 implementation
 
 uses
-  DW.OSLog,
   // RTL
-  System.Classes, System.SysUtils,
+  System.Classes,
   // macOS
   Macapi.ObjCRuntime, Macapi.Helpers;
 
@@ -153,7 +154,7 @@ end;
 
 procedure TPlatformSpeechRecognition.StopRecording;
 begin
-  if IsStopped then
+  if not IsStopped then
   begin
     if FAudioEngine.isRunning then
     begin
@@ -166,6 +167,7 @@ begin
     FTask := nil;
     FInputNode := nil;
     StoppedRecording;
+    QueueRecordingStatusChanged;
   end;
 end;
 
