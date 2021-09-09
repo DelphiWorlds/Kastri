@@ -101,11 +101,12 @@ function StringsToNSArray(const AStrings: TStrings; const ADequote: Boolean = Fa
 /// <summary>
 ///   Converts a string directly into an NSString reference (ID)
 /// </summary>
-function StrToObjectID(const AStr: string): Pointer;
+function StrToObjectID(const AStr: string): Pointer; deprecated 'Use StringToID from Macapi.Helpers';
 /// <summary>
 ///   Converts a string into an CFStringRef
 /// </summary>
 function StrToCFStringRef(const AStr: string): CFStringRef;
+function NSErrorToStr(const AError: NSError): string;
 
 implementation
 
@@ -262,6 +263,12 @@ begin
   Result := CFStringCreateWithCharacters(kCFAllocatorDefault, PChar(AStr), Length(AStr));
 end;
 
+function NSErrorToStr(const AError: NSError): string;
+begin
+  Result := Format('%s (%d): %s (%s)', [NSStrToStr(AError.domain), AError.code, NSStrToStr(AError.localizedDescription),
+    NSStrToStr(AError.localizedFailureReason)]);
+end;
+
 function GetLocalDateTime(const ADateTime: TDateTime): TDateTime;
 begin
   Result := IncSecond(ADateTime, TNSTimeZone.Wrap(TNSTimeZone.OCClass.localTimeZone).secondsFromGMT);
@@ -271,13 +278,13 @@ end;
 
 class function TNSArrayHelper.FromNSObjects(const AArray: array of NSObject): NSArray;
 var
-  LArray: array of Pointer;
   I: Integer;
+  LArray: NSMutableArray;
 begin
-  SetLength(LArray, Length(AArray));
+  LArray := TNSMutableArray.Create;
   for I := 0 to Length(AArray) - 1 do
-    LArray[I] := NSObjectToID(AArray[I]);
-  Result := TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@LArray[0], Length(LArray)));
+    LArray.addObject(NSObjectToID(AArray[I]));
+  Result := LArray;
 end;
 
 { TMacHelperEx }
@@ -297,7 +304,7 @@ var
   LValueObject: Pointer;
 begin
   Result := nil;
-  LValueObject := MainBundle.infoDictionary.objectForKey(StrToObjectID(AKey));
+  LValueObject := MainBundle.infoDictionary.objectForKey(StringToID(AKey));
   if LValueObject <> nil then
     Result := TNSString.Wrap(LValueObject);
 end;
