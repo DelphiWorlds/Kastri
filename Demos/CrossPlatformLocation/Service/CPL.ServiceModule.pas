@@ -91,6 +91,7 @@ uses
   {$ENDIF}
   DW.OSLog,
   DW.Android.Helpers, DW.Consts.Android, DW.OSDevice, DW.Androidapi.JNI.SupportV4,
+  {$IF CompilerVersion >= 35} DW.Androidapi.JNI.AndroidX.LocalBroadcastManager, {$ENDIF}
   CPL.LocationsDataModule,
   CPL.Consts;
 
@@ -402,7 +403,7 @@ end;
 procedure TServiceModule.LocationNmeaMessageHandler(Sender: TObject; const AMsg: string; const ATimestamp: Int64);
 begin
   // There can be a lot of these, so use logging wisely
-  // TOSLog.d('TServiceModule.LocationNmeaMessageHandler > %s: %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', UnixToDateTime(ATimestamp div 1000, False)), AMsg]);
+  TOSLog.d('TServiceModule.LocationNmeaMessageHandler > %s: %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', UnixToDateTime(ATimestamp div 1000, False)), AMsg]);
 end;
 {$ENDIF}
 
