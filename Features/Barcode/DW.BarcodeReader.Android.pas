@@ -26,7 +26,6 @@ uses
 type
   TPlatformBarcodeReader = class(TCustomPlatformBarcodeReader)
   private
-    FDetector: JBarcodeDetector;
     function GetBarcodeFormat(const AFormat: Integer): TBarcodeFormat;
     function GetFormats: Integer;
   protected
@@ -39,6 +38,8 @@ type
 implementation
 
 uses
+  // RTL
+  System.SysUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.Util,
   // DW
@@ -126,7 +127,6 @@ var
   LFrameBuilder: JFrame_Builder;
   LResults: JSparseArray;
   LJBarcode: JBarcode;
-  LObject: JObject;
   I: Integer;
   LBarcode: TBarcode;
   LBarcodes: TBarcodes;
