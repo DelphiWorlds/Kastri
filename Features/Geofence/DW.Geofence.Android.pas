@@ -50,7 +50,6 @@ type
     FDelegate: JGeofenceManagerDelegate;
     FGeofence: JGeofenceManager;
     FIsLoading: Boolean;
-    FIsShowingLocationSettings: Boolean;
     FTransitionReceiver: TGeofenceTransitionReceiver;
     FSavedApplicationCommandEventHandler: TOnApplicationCommand;
     procedure ApplicationCommandEventHandler(const AAppGlue: TAndroidApplicationGlue; const ACommand: TAndroidApplicationCommand);
