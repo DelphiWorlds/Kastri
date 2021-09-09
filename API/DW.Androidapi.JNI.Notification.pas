@@ -37,7 +37,9 @@ type
     function addAction(action: JNotification_Action): JNotification_Builder; cdecl; overload;
     function addAction(icon: Integer; title: JCharSequence; intent: JPendingIntent): JNotification_Builder;  cdecl; overload;
     function addExtras(extras: JBundle): JNotification_Builder; cdecl;
+    {$IF CompilerVersion < 35}
     function addPerson(person: JPerson): JNotification_Builder; cdecl; overload;
+    {$ENDIF}
     function addPerson(uri: JString): JNotification_Builder;  cdecl; overload;
     function build: JNotification; cdecl;
     function createBigContentView: JRemoteViews; cdecl;
