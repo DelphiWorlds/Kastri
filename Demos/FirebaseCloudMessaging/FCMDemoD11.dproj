@@ -157,7 +157,7 @@
         <PostBuildEvent><![CDATA[..\..\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
 $(PostBuildEvent)]]></PostBuildEvent>
         <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
-        <Android_ApiKey>AIzaSyBotu72dQeWcl9_6pSupg48arBi1irrhDQ</Android_ApiKey>
+        <Android_ApiKey></Android_ApiKey>
         <Android_ProjectId>delphi-worlds-test</Android_ProjectId>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
@@ -186,7 +186,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <PostBuildEvent><![CDATA[..\..\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
 $(PostBuildEvent)]]></PostBuildEvent>
         <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
-        <Android_ApiKey>AIzaSyBotu72dQeWcl9_6pSupg48arBi1irrhDQ</Android_ApiKey>
+        <Android_ApiKey></Android_ApiKey>
         <Android_AppId>1:952580923416:android:962c46cef614c7a8</Android_AppId>
         <Android_GcmDefaultSenderId>952580923416</Android_GcmDefaultSenderId>
         <Android_ProjectId>delphi-worlds-test</Android_ProjectId>
