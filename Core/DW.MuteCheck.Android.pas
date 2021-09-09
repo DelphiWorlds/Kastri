@@ -16,6 +16,7 @@ unit DW.MuteCheck.Android;
 interface
 
 uses
+  // DW
   DW.MuteCheck;
 
 type
@@ -30,7 +31,10 @@ type
 implementation
 
 uses
-  Androidapi.JNI.JavaTypes, Androidapi.JNI.Media, Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers;
+  // RTL
+  System.SysUtils,
+  // Android
+  Androidapi.JNI.JavaTypes, Androidapi.JNI.Media, Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers, Androidapi.JNI.App;
 
 { TPlatformMuteCheck }
 
