@@ -29,7 +29,7 @@ implementation
 
 uses
   // Android
-  Androidapi.JNI.Media, Androidapi.JNIBridge, Androidapi.Helpers;
+  Androidapi.JNI.Media, Androidapi.JNIBridge, Androidapi.Helpers, Androidapi.JNI.JavaTypes;
 
 { TPlatformEXIF }
 
