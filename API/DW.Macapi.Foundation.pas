@@ -21,6 +21,11 @@ uses
 
 type
   NSData = interface;
+  NSLocale = interface;
+  NSNetService = interface;
+  NSNetServiceBrowser = interface;
+  NSNetServiceDelegate = interface;
+  NSNetServiceBrowserDelegate = interface;
 
   NSDataReadingOptions = NSInteger;
   NSDataWritingOptions = NSInteger;
@@ -30,6 +35,9 @@ type
   NSDataCompressionAlgorithm = NSInteger;
   NSLocaleKey = NSString;
   NSLocaleLanguageDirection = NSInteger;
+  PNSInputStream = ^NSInputStream;
+  PNSOutputStream = ^NSOutputStream;
+  NSRunLoopMode = NSString;
 
   TNSDataBlockMethod1 = procedure(bytes: Pointer; byteRange: NSRange; stop: PBoolean) of object;
   TNSDataBlockMethod2 = procedure(bytes: Pointer; length: NSUInteger) of object;
@@ -166,6 +174,84 @@ type
     function variantCode: NSString; cdecl;
   end;
   TNSLocale = class(TOCGenericImport<NSLocaleClass, NSLocale>) end;
+
+  NSNetServiceClass = interface(NSObjectClass)
+    ['{3E78C456-0906-4BDB-98A3-946ACF2A36B7}']
+    {class} function dataFromTXTRecordDictionary(txtDictionary: NSDictionary): NSData; cdecl;
+    {class} function dictionaryFromTXTRecordData(txtData: NSData): NSDictionary; cdecl;
+  end;
+
+  NSNetService = interface(NSObject)
+    ['{64E3A9B9-03F2-4E69-8586-FF6AAB14E94E}']
+    function &type: NSString; cdecl;
+    function addresses: NSArray; cdecl;
+    function delegate: Pointer; cdecl;
+    function domain: NSString; cdecl;
+    function getInputStream(inputStream: PNSInputStream; outputStream: PNSOutputStream): Boolean; cdecl;
+    function hostName: NSString; cdecl;
+    function includesPeerToPeer: Boolean; cdecl;
+    function initWithDomain(domain: NSString; &type: NSString; name: NSString): Pointer; overload; cdecl;
+    function initWithDomain(domain: NSString; &type: NSString; name: NSString; port: Integer): Pointer; overload; cdecl;
+    function name: NSString; cdecl;
+    function port: NSInteger; cdecl;
+    procedure publish; cdecl;
+    procedure publishWithOptions(options: NSNetServiceOptions); cdecl;
+    procedure removeFromRunLoop(aRunLoop: NSRunLoop; forMode: NSRunLoopMode); cdecl;
+    procedure resolveWithTimeout(timeout: NSTimeInterval); cdecl;
+    procedure scheduleInRunLoop(aRunLoop: NSRunLoop; forMode: NSRunLoopMode); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setIncludesPeerToPeer(includesPeerToPeer: Boolean); cdecl;
+    function setTXTRecordData(recordData: NSData): Boolean; cdecl;
+    procedure startMonitoring; cdecl;
+    procedure stop; cdecl;
+    procedure stopMonitoring; cdecl;
+    function TXTRecordData: NSData; cdecl;
+  end;
+  TNSNetService = class(TOCGenericImport<NSNetServiceClass, NSNetService>) end;
+
+  NSNetServiceBrowserClass = interface(NSObjectClass)
+    ['{3DF1D675-454A-4382-8E1F-33386913CC39}']
+  end;
+
+  NSNetServiceBrowser = interface(NSObject)
+    ['{37E423C2-4941-486A-B0B1-13DBAF19E086}']
+    function delegate: Pointer; cdecl;
+    function includesPeerToPeer: Boolean; cdecl;
+    procedure removeFromRunLoop(aRunLoop: NSRunLoop; forMode: NSRunLoopMode); cdecl;
+    procedure scheduleInRunLoop(aRunLoop: NSRunLoop; forMode: NSRunLoopMode); cdecl;
+    procedure searchForBrowsableDomains; cdecl;
+    procedure searchForRegistrationDomains; cdecl;
+    procedure searchForServicesOfType(&type: NSString; inDomain: NSString); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setIncludesPeerToPeer(includesPeerToPeer: Boolean); cdecl;
+    procedure stop; cdecl;
+  end;
+  TNSNetServiceBrowser = class(TOCGenericImport<NSNetServiceBrowserClass, NSNetServiceBrowser>) end;
+
+  NSNetServiceDelegate = interface(IObjectiveC)
+    ['{00728682-DC04-47C4-9497-43D2BBA88F2F}']
+    procedure netServiceDidAcceptConnectionWithInputStream(sender: NSNetService; didAcceptConnectionWithInputStream: NSInputStream;
+      outputStream: NSOutputStream); cdecl;
+    procedure netServiceDidNotPublish(sender: NSNetService; didNotPublish: NSDictionary); cdecl;
+    procedure netServiceDidNotResolve(sender: NSNetService; didNotResolve: NSDictionary); cdecl;
+    procedure netServiceDidPublish(sender: NSNetService); cdecl;
+    procedure netServiceDidResolveAddress(sender: NSNetService); cdecl;
+    procedure netServiceDidStop(sender: NSNetService); cdecl;
+    procedure netServiceDidUpdateTXTRecordData(sender: NSNetService; didUpdateTXTRecordData: NSData); cdecl;
+    procedure netServiceWillPublish(sender: NSNetService); cdecl;
+    procedure netServiceWillResolve(sender: NSNetService); cdecl;
+  end;
+
+  NSNetServiceBrowserDelegate = interface(IObjectiveC)
+    ['{CAB8636E-EDE2-4456-91AD-657247F3EB5A}']
+    procedure netServiceBrowserDidFindDomain(browser: NSNetServiceBrowser; didFindDomain: NSString; moreComing: Boolean); cdecl;
+    procedure netServiceBrowserDidFindService(browser: NSNetServiceBrowser; didFindService: NSNetService; moreComing: Boolean); cdecl;
+    procedure netServiceBrowserDidNotSearch(browser: NSNetServiceBrowser; didNotSearch: NSDictionary); cdecl;
+    procedure netServiceBrowserDidRemoveDomain(browser: NSNetServiceBrowser; didRemoveDomain: NSString; moreComing: Boolean); cdecl;
+    procedure netServiceBrowserDidRemoveService(browser: NSNetServiceBrowser; didRemoveService: NSNetService; moreComing: Boolean); cdecl;
+    procedure netServiceBrowserDidStopSearch(browser: NSNetServiceBrowser); cdecl;
+    procedure netServiceBrowserWillSearch(browser: NSNetServiceBrowser); cdecl;
+  end;
 
 implementation
 
