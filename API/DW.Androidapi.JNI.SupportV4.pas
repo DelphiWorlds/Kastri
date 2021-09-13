@@ -22,13 +22,11 @@ uses
 type
   JFileProvider = interface;
   JLocalBroadcastManager = interface;
-  {$IF CompilerVersion > 34}
   Japp_RemoteInput = interface;
   JNotificationCompat_Action = interface;
   JNotificationCompat_Builder = interface;
   JNotificationCompat_Extender = interface;
   JNotificationCompat_Style = interface;
-  {$ENDIF}
 
   JFileProviderClass = interface(JContentProviderClass)
     ['{33A87969-5731-4791-90F6-3AD22F2BB822}']
@@ -66,7 +64,6 @@ type
   end;
   TJLocalBroadcastManager = class(TJavaGenericImport<JLocalBroadcastManagerClass, JLocalBroadcastManager>) end;
 
-  {$IF CompilerVersion > 34}
   JNotificationCompat_ExtenderClass = interface(IJavaClass)
     ['{FE44EF36-1DB6-47B7-AA66-5F91FE5134C5}']
   end;
@@ -146,7 +143,7 @@ type
   JNotificationCompat_BuilderClass = interface(JObjectClass)
     ['{6EC74C2C-EBCC-4A55-98B6-6DD36DE3BA8C}']
     {class} function init(context: JContext; channelId: JString): JNotificationCompat_Builder; cdecl; overload;
-    {class} function init(context: JContext): JNotificationCompat_Builder; cdecl; overload;//Deprecated
+    {class} function init(context: JContext): JNotificationCompat_Builder; cdecl; overload;
   end;
 
   [JavaSignature('android/support/v4/app/NotificationCompat$Builder')]
@@ -161,11 +158,11 @@ type
     function build: JNotification; cdecl;
     function extend(extender: JNotificationCompat_Extender): JNotificationCompat_Builder; cdecl;
     function getExtras: JBundle; cdecl;
-    function getNotification: JNotification; cdecl;//Deprecated
+    function getNotification: JNotification; cdecl;
     function setAutoCancel(autoCancel: Boolean): JNotificationCompat_Builder; cdecl;
     function setBadgeIconType(icon: Integer): JNotificationCompat_Builder; cdecl;
     function setCategory(category: JString): JNotificationCompat_Builder; cdecl;
-    function setChannel(channelId: JString): JNotificationCompat_Builder; cdecl;//Deprecated
+    function setChannel(channelId: JString): JNotificationCompat_Builder; cdecl;
     function setChannelId(channelId: JString): JNotificationCompat_Builder; cdecl;
     function setColor(argb: Integer): JNotificationCompat_Builder; cdecl;
     function setColorized(colorize: Boolean): JNotificationCompat_Builder; cdecl;
@@ -205,7 +202,7 @@ type
     function setSubText(text: JCharSequence): JNotificationCompat_Builder; cdecl;
     function setTicker(tickerText: JCharSequence): JNotificationCompat_Builder; cdecl; overload;
     function setTicker(tickerText: JCharSequence; views: JRemoteViews): JNotificationCompat_Builder; cdecl; overload;
-    function setTimeout(durationMs: Int64): JNotificationCompat_Builder; cdecl;//Deprecated
+    function setTimeout(durationMs: Int64): JNotificationCompat_Builder; cdecl;
     function setTimeoutAfter(durationMs: Int64): JNotificationCompat_Builder; cdecl;
     function setUsesChronometer(b: Boolean): JNotificationCompat_Builder; cdecl;
     function setVibrate(pattern: TJavaArray<Int64>): JNotificationCompat_Builder; cdecl;
@@ -214,7 +211,6 @@ type
     property mPeople: JArrayList read _GetmPeople write _SetmPeople;
   end;
   TJNotificationCompat_Builder = class(TJavaGenericImport<JNotificationCompat_BuilderClass, JNotificationCompat_Builder>) end;
-{$ENDIF}
 
 implementation
 
