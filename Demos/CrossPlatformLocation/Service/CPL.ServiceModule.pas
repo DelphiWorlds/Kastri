@@ -90,8 +90,12 @@ uses
   Grijjy.CloudLogging,
   {$ENDIF}
   DW.OSLog,
-  DW.Android.Helpers, DW.Consts.Android, DW.OSDevice, DW.Androidapi.JNI.SupportV4,
-  {$IF CompilerVersion >= 35} DW.Androidapi.JNI.AndroidX.LocalBroadcastManager, {$ENDIF}
+  DW.Android.Helpers, DW.Consts.Android, DW.OSDevice,
+  {$IF CompilerVersion < 35}
+  DW.Androidapi.JNI.SupportV4,
+  {$ELSE}
+  DW.Androidapi.JNI.AndroidX.LocalBroadcastManager, DW.Androidapi.JNI.AndroidX.App,
+  {$ENDIF}
   CPL.LocationsDataModule,
   CPL.Consts;
 
