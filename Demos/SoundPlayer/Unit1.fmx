@@ -1,0 +1,59 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 650
+  ClientWidth = 476
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object Layout2: TLayout
+    Align = Client
+    Size.Width = 476.000000000000000000
+    Size.Height = 650.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object SoundsListBox: TListBox
+      Align = Client
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Size.Width = 468.000000000000000000
+      Size.Height = 592.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      DisableFocusEffect = True
+      DefaultItemStyles.ItemStyle = ''
+      DefaultItemStyles.GroupHeaderStyle = ''
+      DefaultItemStyles.GroupFooterStyle = ''
+      Viewport.Width = 464.000000000000000000
+      Viewport.Height = 588.000000000000000000
+    end
+    object Layout1: TLayout
+      Align = Bottom
+      Padding.Left = 4.000000000000000000
+      Padding.Top = 4.000000000000000000
+      Padding.Right = 4.000000000000000000
+      Padding.Bottom = 4.000000000000000000
+      Position.Y = 600.000000000000000000
+      Size.Width = 476.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object PlaySoundButton: TButton
+        Align = Left
+        Position.X = 4.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 117.000000000000000000
+        Size.Height = 42.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Text = 'Play Sound'
+        OnClick = PlaySoundButtonClick
+      end
+    end
+  end
+end
