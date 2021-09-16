@@ -235,14 +235,17 @@ class function TPlatformBiometric.GetBiometryKind: TBiometryKind;
 var
   LContext: LAContext;
 begin
+  // None will also mean undetermined if LContext.biometryType returns an unsupported value
+  Result := TBiometryKind.None;
   LContext := TLAContext.Create;
-  case LContext.biometryType of
-    LABiometryTypeFaceID:
-      Result := TBiometryKind.Face;
-    LABiometryTypeTouchID:
-      Result := TBiometryKind.Touch;
-  else
-    Result := TBiometryKind.None;
+  if LContext.canEvaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, nil) then
+  begin
+    case LContext.biometryType of
+      LABiometryTypeFaceID:
+        Result := TBiometryKind.Face;
+      LABiometryTypeTouchID:
+        Result := TBiometryKind.Touch;
+    end;
   end;
 end;
 
