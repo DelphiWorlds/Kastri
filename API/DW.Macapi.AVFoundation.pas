@@ -255,6 +255,7 @@ type
   end;
   TAVAudioSession = class(TOCGenericImport<AVAudioSessionClass, AVAudioSession>) end;
 
+function AVAudioSessionCategoryPlayback: NSString;
 function AVAudioSessionCategoryRecord: NSString;
 function AVAudioSessionModeMeasurement: NSString;
 
@@ -268,6 +269,11 @@ end;
 function AVAudioSessionModeMeasurement: NSString;
 begin
   Result := CocoaNSStringConst(libAVFoundation, 'AVAudioSessionModeMeasurement');
+end;
+
+function AVAudioSessionCategoryPlayback: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVAudioSessionCategoryPlayback');
 end;
 
 end.
