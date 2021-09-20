@@ -18,11 +18,22 @@ interface
 uses
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Embarcadero,
+  Androidapi.JNI.PlayServices.Tasks,
   // DW
   DW.Firebase.Messaging, DW.Android.Helpers;
 
 type
   TPlatformFirebaseMessaging = class;
+
+  TTokenTaskCompleteListener = class(TJavaLocal, JOnCompleteListener)
+  private
+    FFirebaseMessaging: TPlatformFirebaseMessaging;
+  public
+    { JOnCompleteListener }
+    procedure onComplete(task: JTask); cdecl;
+  public
+    constructor Create(const AFirebaseMessaging: TPlatformFirebaseMessaging);
+  end;
 
   TFirebaseMessagingReceiverListener = class(TJavaLocal, JFMXBroadcastReceiverListener)
   private
@@ -39,6 +50,7 @@ type
     FFirebaseMessagingBroadcastReceiver: JFMXBroadcastReceiver;
     FFirebaseMessagingReceiverListener: TFirebaseMessagingReceiverListener;
     FStartupIntentHandled: Boolean;
+    FTokenTaskCompleteListener: JOnCompleteListener;
   protected
     procedure Connect; override;
     procedure Disconnect; override;
@@ -67,7 +79,22 @@ uses
   // DW
   DW.OSLog,
   DW.Classes.Helpers, DW.Androidapi.JNI.DWFirebaseServiceHelpers, DW.FirebaseApp.Android,
-  DW.Androidapi.JNI.SupportV4, DW.Androidapi.JNI.Firebase, DW.Androidapi.JNI.Content;
+  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.Androidx.LocalBroadcastManager, {$ENDIF}
+  DW.Androidapi.JNI.Firebase, DW.Androidapi.JNI.Content;
+
+{ TTokenTaskCompleteListener }
+
+constructor TTokenTaskCompleteListener.Create(const AFirebaseMessaging: TPlatformFirebaseMessaging);
+begin
+  inherited Create;
+  FFirebaseMessaging := AFirebaseMessaging;
+end;
+
+procedure TTokenTaskCompleteListener.onComplete(task: JTask);
+begin
+  if task.isSuccessful then
+    FFirebaseMessaging.DoTokenReceived(JStringToString(TJString.Wrap(task.getResult)));
+end;
 
 { TFirebaseMessagingReceiverListener }
 
@@ -119,7 +146,12 @@ end;
 procedure TPlatformFirebaseMessaging.Connect;
 begin
   IsConnected := True;
+  {$IF CompilerVersion < 35}
   TJDWFirebaseMessagingService.JavaClass.queryToken(TAndroidHelper.Context);
+  {$ELSE}
+  FTokenTaskCompleteListener := TTokenTaskCompleteListener.Create(Self);
+  TJFirebaseMessaging.JavaClass.getInstance.getToken.addOnCompleteListener(FTokenTaskCompleteListener);
+  {$ENDIF}
 end;
 
 procedure TPlatformFirebaseMessaging.Disconnect;
@@ -147,7 +179,6 @@ var
   LValueObject: JObject;
   LValue: string;
 begin
-  TOSLog.d('+TPlatformFirebaseMessaging.HandleMessageReceived');
   LPayload := TStringList.Create;
   try
     LBundle := data.getExtras;
@@ -181,7 +212,6 @@ begin
   finally
     LPayload.Free;
   end;
-  TOSLog.d('-TPlatformFirebaseMessaging.HandleMessageReceived');
 end;
 
 procedure TPlatformFirebaseMessaging.PublishNotification(const data: JIntent);
