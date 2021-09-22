@@ -67,10 +67,10 @@ end;
 procedure TOrientationNotificationListener.AddOrientationObservers;
 begin
   TiOSHelper.DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('onOrientationDidChange:'),
-    StrToObjectID('UIDeviceOrientationDidChangeNotification'), nil);
+    StringToID('UIDeviceOrientationDidChangeNotification'), nil);
   //  !!!! Undocumented!!
   TiOSHelper.DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('onOrientationWillChange:'),
-    StrToObjectID('UIDeviceOrientationWillChangeNotification'), nil);
+    StringToID('UIDeviceOrientationWillChangeNotification'), nil);
 end;
 
 function TOrientationNotificationListener.GetObjectiveCClass: PTypeInfo;
