@@ -1349,7 +1349,7 @@ type
   TUIViewPropertyAnimatorBlockMethod2 = procedure(finalPosition: UIViewAnimatingPosition) of object;
   TUIWindowSceneDelegateBlockMethod1 = procedure(succeeded: Boolean) of object;
 
-  // Exists in iOSapi.UIKit in Delphi 10.4.x, however UIAlertAction is missing the setStyle method
+  // Exists in iOSapi.UIKit in Delphi 10.4.x and Delphi 11, however UIAlertAction is missing the setStyle method
   UIAlertActionClass = interface(NSObjectClass)
     ['{953DC1CC-483A-451B-BB66-101217A9C6BF}']
     { class } function actionWithTitle(title: NSString; style: UIAlertActionStyle; handler: TUIAlertActionHandler): Pointer; cdecl;
@@ -1366,7 +1366,6 @@ type
   TUIAlertAction = class(TOCGenericImport<UIAlertActionClass, UIAlertAction>)
   end;
 
-  {$IF CompilerVersion < 34}
   UIAlertControllerClass = interface(NSObjectClass)
     ['{DA597BCE-6687-4BCC-8B3F-57205A141193}']
     { class } function alertControllerWithTitle(title: NSString; message: NSString; preferredStyle: UIAlertControllerStyle) : Pointer; cdecl;
@@ -1388,7 +1387,6 @@ type
   end;
   TUIAlertController = class(TOCGenericImport<UIAlertControllerClass, UIAlertController>)
   end;
-  {$ENDIF}
 
   TBackgroundTaskHandler = procedure of object;
   TOpenURLCompletionHandler = procedure(success: Boolean) of object;
