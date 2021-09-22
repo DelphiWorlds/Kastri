@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Types, System.Classes, System.SysUtils;
+  System.Types, System.Classes, System.SysUtils, System.JSON;
 
 type
   TStringDynArrayHelper = record helper for TStringDynArray
@@ -31,6 +31,7 @@ type
     function Clone: TStringDynArray;
     function Count: Integer;
     procedure Delete(const AIndex: Integer);
+    procedure FromJsonValue(const AValue: TJSONValue);
     function IndexOf(const AValue: string): Integer;
     function IndexOfName(const AName: string): Integer;
     procedure LoadFromStrings(const AStrings: TStrings; const AOverwrite: Boolean = True);
@@ -40,6 +41,7 @@ type
     procedure Sort(const ACaseSensitive: Boolean = False; const AReverse: Boolean = False);
     function ToBytes(const AEncoding: TEncoding = nil): TBytes; overload;
     function ToBytes(const AIncludeLineBreaks: Boolean; const AEncoding: TEncoding = nil): TBytes; overload;
+    function ToJSONValue: TJSONValue;
     function ToText(const ASeparator: string): string;
     property Values[const AName: string]: string read GetValue write SetValue;
   end;
@@ -267,6 +269,31 @@ begin
       LValue := Self[I];
     Result := Concat(Result, LEncoding.GetBytes(LValue));
   end;
+end;
+
+procedure TStringDynArrayHelper.FromJsonValue(const AValue: TJSONValue);
+var
+  LJSON: TJSONArray;
+  I: Integer;
+begin
+  Self := [];
+  if AValue is TJSONArray then
+  begin
+    LJSON := TJSONArray(AValue);
+    for I := 0 to LJSON.Count - 1 do
+      Self := Self + [LJSON.Items[I].ToString.DeQuotedString('"')];
+  end;
+end;
+
+function TStringDynArrayHelper.ToJSONValue: TJSONValue;
+var
+  LJSONArray: TJSONArray;
+  I: Integer;
+begin
+  LJSONArray := TJSONArray.Create;
+  for I := 0 to Length(Self) - 1 do
+    LJSONArray.Add(Self[I]);
+  Result := LJSONArray;
 end;
 
 function TStringDynArrayHelper.ToText(const ASeparator: string): string;
