@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{89260CB0-9D0C-49E5-8BE3-5864FB53966F}</ProjectGuid>
+        <ProjectGuid>{08F2E6A2-1C50-4D1E-846A-87316B5A8434}</ProjectGuid>
         <ProjectVersion>19.3</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <MainSource>BarcodeReaderD11.dpr</MainSource>
