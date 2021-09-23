@@ -6,6 +6,15 @@
         <Projects Include="AndroidStartAtBoot\AndroidStartAtBoot.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="AppleSignIn\AppleSigninDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="BarcodeReader\BarcodeReader.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="BarcodeReader\BarcodeReaderD11.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="Biometric\BiometricDemo.dproj">
             <Dependencies/>
         </Projects>
@@ -13,6 +22,12 @@
             <Dependencies/>
         </Projects>
         <Projects Include="ElasticLayout\ElasticLayoutDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="EXIF\EXIFDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="FilesSelector\FilesSelectorDemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="FirebaseCloudMessaging\FCMDemo.dproj">
@@ -24,6 +39,18 @@
         <Projects Include="macOSStatusBar\macOSStatusBarDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="macOSToolbar\macOSToolbarDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="MuteCheck\MuteCheckDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NativeControls\NativeControlsDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NativeControls\NativeControlsDemoD11.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="NFC\NFCDemo.dproj">
             <Dependencies/>
         </Projects>
@@ -33,16 +60,34 @@
         <Projects Include="OSTimer\OSTimerDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Proximity\ProximityDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="QuickLook\QuickLookDemo.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="RichEdit\RichEditFMXDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ShareItems\ShareItemsDemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="ScrollNoClick\ScrollNoClickDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="SoundPlayer\SoundPlayerDemo.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="SpeechRecognition\SpeechRecognitionDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="SymbolScanner\SymbolScannerDemo.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="Swizzler\SwizzlerDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="UniversalLinks\UniversalLinksDemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="VKVertScrollbox\VKVertScrollboxDemo.dproj">
@@ -67,6 +112,33 @@
     </Target>
     <Target Name="AndroidStartAtBoot:Make">
         <MSBuild Projects="AndroidStartAtBoot\AndroidStartAtBoot.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AppleSigninDemo">
+        <MSBuild Projects="AppleSignIn\AppleSigninDemo.dproj"/>
+    </Target>
+    <Target Name="AppleSigninDemo:Clean">
+        <MSBuild Projects="AppleSignIn\AppleSigninDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AppleSigninDemo:Make">
+        <MSBuild Projects="AppleSignIn\AppleSigninDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BarcodeReader">
+        <MSBuild Projects="BarcodeReader\BarcodeReader.dproj"/>
+    </Target>
+    <Target Name="BarcodeReader:Clean">
+        <MSBuild Projects="BarcodeReader\BarcodeReader.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BarcodeReader:Make">
+        <MSBuild Projects="BarcodeReader\BarcodeReader.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BarcodeReaderD11">
+        <MSBuild Projects="BarcodeReader\BarcodeReaderD11.dproj"/>
+    </Target>
+    <Target Name="BarcodeReaderD11:Clean">
+        <MSBuild Projects="BarcodeReader\BarcodeReaderD11.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BarcodeReaderD11:Make">
+        <MSBuild Projects="BarcodeReader\BarcodeReaderD11.dproj" Targets="Make"/>
     </Target>
     <Target Name="BiometricDemo">
         <MSBuild Projects="Biometric\BiometricDemo.dproj"/>
@@ -95,6 +167,24 @@
     <Target Name="ElasticLayoutDemo:Make">
         <MSBuild Projects="ElasticLayout\ElasticLayoutDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="EXIFDemo">
+        <MSBuild Projects="EXIF\EXIFDemo.dproj"/>
+    </Target>
+    <Target Name="EXIFDemo:Clean">
+        <MSBuild Projects="EXIF\EXIFDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EXIFDemo:Make">
+        <MSBuild Projects="EXIF\EXIFDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FilesSelectorDemo">
+        <MSBuild Projects="FilesSelector\FilesSelectorDemo.dproj"/>
+    </Target>
+    <Target Name="FilesSelectorDemo:Clean">
+        <MSBuild Projects="FilesSelector\FilesSelectorDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FilesSelectorDemo:Make">
+        <MSBuild Projects="FilesSelector\FilesSelectorDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="FCMDemo">
         <MSBuild Projects="FirebaseCloudMessaging\FCMDemo.dproj"/>
     </Target>
@@ -121,6 +211,42 @@
     </Target>
     <Target Name="macOSStatusBarDemo:Make">
         <MSBuild Projects="macOSStatusBar\macOSStatusBarDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="macOSToolbarDemo">
+        <MSBuild Projects="macOSToolbar\macOSToolbarDemo.dproj"/>
+    </Target>
+    <Target Name="macOSToolbarDemo:Clean">
+        <MSBuild Projects="macOSToolbar\macOSToolbarDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="macOSToolbarDemo:Make">
+        <MSBuild Projects="macOSToolbar\macOSToolbarDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MuteCheckDemo">
+        <MSBuild Projects="MuteCheck\MuteCheckDemo.dproj"/>
+    </Target>
+    <Target Name="MuteCheckDemo:Clean">
+        <MSBuild Projects="MuteCheck\MuteCheckDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MuteCheckDemo:Make">
+        <MSBuild Projects="MuteCheck\MuteCheckDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NativeControlsDemo">
+        <MSBuild Projects="NativeControls\NativeControlsDemo.dproj"/>
+    </Target>
+    <Target Name="NativeControlsDemo:Clean">
+        <MSBuild Projects="NativeControls\NativeControlsDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NativeControlsDemo:Make">
+        <MSBuild Projects="NativeControls\NativeControlsDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="NativeControlsDemoD11">
+        <MSBuild Projects="NativeControls\NativeControlsDemoD11.dproj"/>
+    </Target>
+    <Target Name="NativeControlsDemoD11:Clean">
+        <MSBuild Projects="NativeControls\NativeControlsDemoD11.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="NativeControlsDemoD11:Make">
+        <MSBuild Projects="NativeControls\NativeControlsDemoD11.dproj" Targets="Make"/>
     </Target>
     <Target Name="NFCDemo">
         <MSBuild Projects="NFC\NFCDemo.dproj"/>
@@ -149,6 +275,24 @@
     <Target Name="OSTimerDemo:Make">
         <MSBuild Projects="OSTimer\OSTimerDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="ProximityDemo">
+        <MSBuild Projects="Proximity\ProximityDemo.dproj"/>
+    </Target>
+    <Target Name="ProximityDemo:Clean">
+        <MSBuild Projects="Proximity\ProximityDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ProximityDemo:Make">
+        <MSBuild Projects="Proximity\ProximityDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="QuickLookDemo">
+        <MSBuild Projects="QuickLook\QuickLookDemo.dproj"/>
+    </Target>
+    <Target Name="QuickLookDemo:Clean">
+        <MSBuild Projects="QuickLook\QuickLookDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="QuickLookDemo:Make">
+        <MSBuild Projects="QuickLook\QuickLookDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="RichEditFMXDemo">
         <MSBuild Projects="RichEdit\RichEditFMXDemo.dproj"/>
     </Target>
@@ -157,6 +301,15 @@
     </Target>
     <Target Name="RichEditFMXDemo:Make">
         <MSBuild Projects="RichEdit\RichEditFMXDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ShareItemsDemo">
+        <MSBuild Projects="ShareItems\ShareItemsDemo.dproj"/>
+    </Target>
+    <Target Name="ShareItemsDemo:Clean">
+        <MSBuild Projects="ShareItems\ShareItemsDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ShareItemsDemo:Make">
+        <MSBuild Projects="ShareItems\ShareItemsDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="ScrollNoClickDemo">
         <MSBuild Projects="ScrollNoClick\ScrollNoClickDemo.dproj"/>
@@ -167,6 +320,15 @@
     <Target Name="ScrollNoClickDemo:Make">
         <MSBuild Projects="ScrollNoClick\ScrollNoClickDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="SoundPlayerDemo">
+        <MSBuild Projects="SoundPlayer\SoundPlayerDemo.dproj"/>
+    </Target>
+    <Target Name="SoundPlayerDemo:Clean">
+        <MSBuild Projects="SoundPlayer\SoundPlayerDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SoundPlayerDemo:Make">
+        <MSBuild Projects="SoundPlayer\SoundPlayerDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="SpeechRecognitionDemo">
         <MSBuild Projects="SpeechRecognition\SpeechRecognitionDemo.dproj"/>
     </Target>
@@ -176,6 +338,15 @@
     <Target Name="SpeechRecognitionDemo:Make">
         <MSBuild Projects="SpeechRecognition\SpeechRecognitionDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="SymbolScannerDemo">
+        <MSBuild Projects="SymbolScanner\SymbolScannerDemo.dproj"/>
+    </Target>
+    <Target Name="SymbolScannerDemo:Clean">
+        <MSBuild Projects="SymbolScanner\SymbolScannerDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SymbolScannerDemo:Make">
+        <MSBuild Projects="SymbolScanner\SymbolScannerDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="SwizzlerDemo">
         <MSBuild Projects="Swizzler\SwizzlerDemo.dproj"/>
     </Target>
@@ -184,6 +355,15 @@
     </Target>
     <Target Name="SwizzlerDemo:Make">
         <MSBuild Projects="Swizzler\SwizzlerDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="UniversalLinksDemo">
+        <MSBuild Projects="UniversalLinks\UniversalLinksDemo.dproj"/>
+    </Target>
+    <Target Name="UniversalLinksDemo:Clean">
+        <MSBuild Projects="UniversalLinks\UniversalLinksDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="UniversalLinksDemo:Make">
+        <MSBuild Projects="UniversalLinks\UniversalLinksDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="VKVertScrollboxDemo">
         <MSBuild Projects="VKVertScrollbox\VKVertScrollboxDemo.dproj"/>
@@ -204,13 +384,13 @@
         <MSBuild Projects="WebBrowserFileChooser\WBFileChooserDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="AndroidStartAtBoot;BiometricDemo;ConnectivityDemo;ElasticLayoutDemo;FCMDemo;GestureLagDemo;macOSStatusBarDemo;NFCDemo;OSInfoDemo;OSTimerDemo;RichEditFMXDemo;ScrollNoClickDemo;SpeechRecognitionDemo;SwizzlerDemo;VKVertScrollboxDemo;WBFileChooserDemo"/>
+        <CallTarget Targets="AndroidStartAtBoot;AppleSigninDemo;BarcodeReader;BarcodeReaderD11;BiometricDemo;ConnectivityDemo;ElasticLayoutDemo;EXIFDemo;FilesSelectorDemo;FCMDemo;GestureLagDemo;macOSStatusBarDemo;macOSToolbarDemo;MuteCheckDemo;NativeControlsDemo;NativeControlsDemoD11;NFCDemo;OSInfoDemo;OSTimerDemo;ProximityDemo;QuickLookDemo;RichEditFMXDemo;ShareItemsDemo;ScrollNoClickDemo;SoundPlayerDemo;SpeechRecognitionDemo;SymbolScannerDemo;SwizzlerDemo;UniversalLinksDemo;VKVertScrollboxDemo;WBFileChooserDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="AndroidStartAtBoot:Clean;BiometricDemo:Clean;ConnectivityDemo:Clean;ElasticLayoutDemo:Clean;FCMDemo:Clean;GestureLagDemo:Clean;macOSStatusBarDemo:Clean;NFCDemo:Clean;OSInfoDemo:Clean;OSTimerDemo:Clean;RichEditFMXDemo:Clean;ScrollNoClickDemo:Clean;SpeechRecognitionDemo:Clean;SwizzlerDemo:Clean;VKVertScrollboxDemo:Clean;WBFileChooserDemo:Clean"/>
+        <CallTarget Targets="AndroidStartAtBoot:Clean;AppleSigninDemo:Clean;BarcodeReader:Clean;BarcodeReaderD11:Clean;BiometricDemo:Clean;ConnectivityDemo:Clean;ElasticLayoutDemo:Clean;EXIFDemo:Clean;FilesSelectorDemo:Clean;FCMDemo:Clean;GestureLagDemo:Clean;macOSStatusBarDemo:Clean;macOSToolbarDemo:Clean;MuteCheckDemo:Clean;NativeControlsDemo:Clean;NativeControlsDemoD11:Clean;NFCDemo:Clean;OSInfoDemo:Clean;OSTimerDemo:Clean;ProximityDemo:Clean;QuickLookDemo:Clean;RichEditFMXDemo:Clean;ShareItemsDemo:Clean;ScrollNoClickDemo:Clean;SoundPlayerDemo:Clean;SpeechRecognitionDemo:Clean;SymbolScannerDemo:Clean;SwizzlerDemo:Clean;UniversalLinksDemo:Clean;VKVertScrollboxDemo:Clean;WBFileChooserDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="AndroidStartAtBoot:Make;BiometricDemo:Make;ConnectivityDemo:Make;ElasticLayoutDemo:Make;FCMDemo:Make;GestureLagDemo:Make;macOSStatusBarDemo:Make;NFCDemo:Make;OSInfoDemo:Make;OSTimerDemo:Make;RichEditFMXDemo:Make;ScrollNoClickDemo:Make;SpeechRecognitionDemo:Make;SwizzlerDemo:Make;VKVertScrollboxDemo:Make;WBFileChooserDemo:Make"/>
+        <CallTarget Targets="AndroidStartAtBoot:Make;AppleSigninDemo:Make;BarcodeReader:Make;BarcodeReaderD11:Make;BiometricDemo:Make;ConnectivityDemo:Make;ElasticLayoutDemo:Make;EXIFDemo:Make;FilesSelectorDemo:Make;FCMDemo:Make;GestureLagDemo:Make;macOSStatusBarDemo:Make;macOSToolbarDemo:Make;MuteCheckDemo:Make;NativeControlsDemo:Make;NativeControlsDemoD11:Make;NFCDemo:Make;OSInfoDemo:Make;OSTimerDemo:Make;ProximityDemo:Make;QuickLookDemo:Make;RichEditFMXDemo:Make;ShareItemsDemo:Make;ScrollNoClickDemo:Make;SoundPlayerDemo:Make;SpeechRecognitionDemo:Make;SymbolScannerDemo:Make;SwizzlerDemo:Make;UniversalLinksDemo:Make;VKVertScrollboxDemo:Make;WBFileChooserDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
