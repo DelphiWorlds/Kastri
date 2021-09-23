@@ -105,6 +105,25 @@ type
 
 implementation
 
+uses
+  // iOS
+  iOSapi.StoreKit;
+
+const
+  libSystemConfiguration = '/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration';
+
+procedure CLangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+procedure FirebaseAnalyticsLoader; cdecl; external framework 'FirebaseAnalytics';
 procedure FirebaseCoreLoader; cdecl; external framework 'FirebaseCore';
+procedure FirebaseCoreDiagnosticsLoader; cdecl; external framework 'FirebaseCoreDiagnostics';
+procedure FirebaseInstallationsLoader cdecl; external framework 'FirebaseInstallations';
+procedure FoundationLoader; cdecl; external libFoundation;
+procedure GoogleAppMeasurementLoader; cdecl; external framework 'GoogleAppMeasurement' dependency 'sqlite3';
+procedure GoogleDataTransportLoader; cdecl; external framework 'GoogleDataTransport';
+procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
+procedure nanoPBLoader; cdecl; external framework 'nanoPB';
+procedure PromisesObjCLoader; cdecl; external framework 'PromisesObjC';
+procedure SystemConfigurationLoader; cdecl; external libSystemConfiguration;
+procedure StoreKitLoader; cdecl; external libStoreKit;
 
 end.

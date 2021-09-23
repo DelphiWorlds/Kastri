@@ -166,7 +166,10 @@ function kFIRUserPropertyAllowAdPersonalizationSignals: NSString;
 implementation
 
 uses
-  Macapi.Helpers;
+  // macOS
+  Macapi.Helpers,
+  // DW
+  DW.iOSapi.FirebaseCore;
 
 function kFIREventAddPaymentInfo: NSString;
 begin
@@ -727,7 +730,5 @@ function kFIRUserPropertyAllowAdPersonalizationSignals: NSString;
 begin
   Result := StrToNSStr('allow_personalized_ads');
 end;
-
-procedure FirebaseAnalyticsLoader; cdecl; external framework 'FirebaseAnalytics';
 
 end.
