@@ -52,8 +52,6 @@ type
     FStartupIntentHandled: Boolean;
     FTokenTaskCompleteListener: JOnCompleteListener;
   protected
-    procedure Connect; override;
-    procedure Disconnect; override;
     procedure DoApplicationBecameActive; override;
     procedure HandleMessageReceived(const data: JIntent; const AIsStartup: Boolean = False);
     procedure HandleNewToken(const data: JIntent);
@@ -140,24 +138,15 @@ begin
   LIntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_NEW_TOKEN);
   LIntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_MESSAGE_RECEIVED);
   TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FFirebaseMessagingBroadcastReceiver, LIntentFilter);
-  Result := True;
-end;
-
-procedure TPlatformFirebaseMessaging.Connect;
-begin
-  IsConnected := True;
   {$IF CompilerVersion < 35}
   TJDWFirebaseMessagingService.JavaClass.queryToken(TAndroidHelper.Context);
   {$ELSE}
   FTokenTaskCompleteListener := TTokenTaskCompleteListener.Create(Self);
   TJFirebaseMessaging.JavaClass.getInstance.getToken.addOnCompleteListener(FTokenTaskCompleteListener);
   {$ENDIF}
+  Result := True;
 end;
 
-procedure TPlatformFirebaseMessaging.Disconnect;
-begin
-  IsConnected := False;
-end;
 
 procedure TPlatformFirebaseMessaging.DoApplicationBecameActive;
 begin
