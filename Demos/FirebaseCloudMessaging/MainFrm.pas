@@ -79,8 +79,7 @@ end;
 
 procedure TfrmMain.FCMAuthorizationResultHandler(Sender: TObject; const AGranted: Boolean);
 begin
-  if AGranted then
-    FFCM.Connect;
+  //
 end;
 
 procedure TfrmMain.FCMTokenReceivedHandler(Sender: TObject; const AToken: string);
