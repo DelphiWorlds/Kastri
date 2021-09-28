@@ -23,7 +23,7 @@ uses
   // iOS
   iOSapi.Foundation,
   // DW
-  DW.Firebase.Messaging, DW.iOSapi.UserNotifications, DW.iOSapi.Firebase; // DW.Notifications;
+  DW.Firebase.Messaging, DW.iOSapi.UserNotifications, DW.iOSapi.FirebaseMessaging;
 
 type
   TPlatformFirebaseMessaging = class;
@@ -58,10 +58,6 @@ type
     procedure RegisterRemoteNotificationsIOS8OrLater;
     procedure RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
   protected
-    procedure Connect; override;
-    procedure Disconnect; override;
-    procedure DoApplicationBecameActive; override;
-    procedure DoApplicationEnteredBackground; override;
     function GetDeviceToken: string; override;
     procedure MessageReceived(const AJSON: string);
     procedure TokenReceived(const AToken: string);
@@ -86,7 +82,7 @@ uses
   // FMX
   FMX.Platform,
   // DW
-  DW.OSLog, DW.Macapi.ObjCRuntime, DW.iOSapi.Helpers, DW.Notifications.iOS, DW.Macapi.Helpers;
+  DW.OSLog, DW.Macapi.ObjCRuntime, DW.iOSapi.Helpers, DW.iOSapi.FirebaseCore, DW.Notifications.iOS, DW.Macapi.Helpers;
 
 function StringToNSData(const AString: string): NSData;
 begin
@@ -113,13 +109,11 @@ end;
 
 procedure TFIRMessagingDelegate.didReceiveRegistrationToken(messaging: FIRMessaging; fcmToken: NSString);
 begin
-  TOSLog.d('+TPlatformFirebaseMessaging.didReceiveRegistrationToken');
   FFirebaseMessaging.TokenReceived(NSStrToStr(fcmToken));
 end;
 
 procedure TFIRMessagingDelegate.didRefreshRegistrationToken(messaging: FIRMessaging; fcmToken: NSString);
 begin
-  TOSLog.d('+TPlatformFirebaseMessaging.didRefreshRegistrationToken');
   FFirebaseMessaging.TokenReceived(NSStrToStr(fcmToken));
 end;
 
@@ -135,6 +129,7 @@ begin
   inherited;
   TMessageManager.DefaultManager.SubscribeToMessage(TPushStartupNotificationMessage, PushStartupNotificationMessageMessageHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TPushDeviceTokenMessage, PushDeviceTokenMessageHandler);
+  TOSLog.d('Stored APNS Token: %s', [GetDeviceToken]);
 end;
 
 destructor TPlatformFirebaseMessaging.Destroy;
@@ -146,7 +141,6 @@ end;
 
 function TPlatformFirebaseMessaging.Start: Boolean;
 begin
-  TOSLog.d('+TPlatformFirebaseMessaging.Start');
   Result := False;
   try
     TFIRApp.OCClass.configure;
@@ -157,7 +151,6 @@ begin
     on E: Exception do
       DoException(E);
   end;
-  TOSLog.d('-TPlatformFirebaseMessaging.Start');
 end;
 
 function TPlatformFirebaseMessaging.GetDeviceToken: string;
@@ -182,30 +175,6 @@ end;
 procedure TPlatformFirebaseMessaging.PushStartupNotificationMessageMessageHandler(const Sender: TObject; const M: TMessage);
 begin
   MessageReceived(TPushStartupNotificationMessage(M).Value.Notification);
-end;
-
-procedure TPlatformFirebaseMessaging.Connect;
-begin
-  IsConnected := True;
-end;
-
-procedure TPlatformFirebaseMessaging.Disconnect;
-begin
-//  if IsConnected then
-//    Messaging.disconnect;
-  IsConnected := False;
-end;
-
-procedure TPlatformFirebaseMessaging.DoApplicationBecameActive;
-begin
-  if TOSVersion.Check(10) then
-    Messaging.setShouldEstablishDirectChannel(True);
-end;
-
-procedure TPlatformFirebaseMessaging.DoApplicationEnteredBackground;
-begin
-  if TOSVersion.Check(10) then
-    Messaging.setShouldEstablishDirectChannel(False);
 end;
 
 procedure TPlatformFirebaseMessaging.TokenReceived(const AToken: string);
@@ -251,7 +220,6 @@ end;
 
 procedure TPlatformFirebaseMessaging.RequestAuthorization;
 begin
-  TOSLog.d('TPlatformFirebaseMessaging.RequestAuthorization');
   TPlatformNotifications.UpdateDelegate;
   FAuthOptions := UNAuthorizationOptionSound or UNAuthorizationOptionAlert or UNAuthorizationOptionBadge;
   if TOSVersion.Check(10) then
@@ -266,17 +234,9 @@ procedure TPlatformFirebaseMessaging.RequestAuthorizationWithOptionsCompletionHa
 begin
   if granted then
   begin
-    TOSLog.d('Authorization GRANTED');
     if not TiOSHelperEx.SharedApplication.isRegisteredForRemoteNotifications then
-    begin
       TiOSHelperEx.SharedApplication.registerForRemoteNotifications;
-      TOSLog.d('Registered for remote notifications');
-    end
-    else
-      TOSLog.d('ALREADY registered for remote notifications');
-  end
-  else
-    TOSLog.d('Authorization NOT GRANTED');
+  end;
   TThread.Queue(nil,
     procedure
     begin
