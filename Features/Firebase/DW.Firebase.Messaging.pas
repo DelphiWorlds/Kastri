@@ -28,15 +28,11 @@ type
   TCustomPlatformFirebaseMessaging = class(TObject)
   private
     FFirebaseMessaging: TFirebaseMessaging;
-    FIsConnected: Boolean;
     FIsForeground: Boolean;
     FShowBannerWhenForeground: Boolean;
-    FWasConnected: Boolean;
   protected
     procedure ApplicationBecameActive;
     procedure ApplicationEnteredBackground;
-    procedure Connect; virtual; abstract;
-    procedure Disconnect; virtual; abstract;
     procedure DoApplicationBecameActive; virtual;
     procedure DoApplicationEnteredBackground; virtual;
     procedure DoAuthorizationResult(const AGranted: Boolean);
@@ -48,7 +44,6 @@ type
     procedure SubscribeToTopic(const ATopicName: string); virtual; abstract;
     function Start: Boolean; virtual;
     procedure UnsubscribeFromTopic(const ATopicName: string); virtual; abstract;
-    property IsConnected: Boolean read FIsConnected write FIsConnected;
     property IsForeground: Boolean read FIsForeground write FIsForeground;
     property ShowBannerWhenForeground: Boolean read FShowBannerWhenForeground write FShowBannerWhenForeground;
   public
@@ -70,7 +65,6 @@ type
     FOnTokenReceived: TFirebaseTokenReceivedEvent;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     function GetDeviceToken: string;
-    function GetIsConnected: Boolean;
     procedure PushFailToRegisterMessageHandler(const Sender: TObject; const M: TMessage);
     procedure PushRemoteNotificationMessageHandler(const Sender: TObject; const M: TMessage);
     function GetShowBannerWhenForeground: Boolean;
@@ -83,14 +77,11 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Connect;
-    procedure Disconnect;
     procedure SubscribeToTopic(const ATopicName: string);
     function Start: Boolean;
     procedure UnsubscribeFromTopic(const ATopicName: string);
     property DeviceToken: string read GetDeviceToken;
     property IsActive: Boolean read FIsActive;
-    property IsConnected: Boolean read GetIsConnected;
     property ShowBannerWhenForeground: Boolean read GetShowBannerWhenForeground write SetShowBannerWhenForeground;
     property Token: string read FToken;
     property OnAuthorizationResult: TAuthorizationResultEvent read FOnAuthorizationResult write FOnAuthorizationResult;
@@ -137,16 +128,12 @@ end;
 procedure TCustomPlatformFirebaseMessaging.ApplicationBecameActive;
 begin
   FIsForeground := True;
-  if FWasConnected then
-    Connect;
   DoApplicationBecameActive;
 end;
 
 procedure TCustomPlatformFirebaseMessaging.ApplicationEnteredBackground;
 begin
   FIsForeground := False;
-  FWasConnected := IsConnected;
-  Disconnect;
 end;
 
 procedure TCustomPlatformFirebaseMessaging.DoApplicationBecameActive;
@@ -204,16 +191,6 @@ begin
   inherited;
 end;
 
-procedure TFirebaseMessaging.Connect;
-begin
-  FPlatformFirebaseMessaging.Connect;
-end;
-
-procedure TFirebaseMessaging.Disconnect;
-begin
-  FPlatformFirebaseMessaging.Disconnect;
-end;
-
 procedure TFirebaseMessaging.DoAuthorizationResult(const AGranted: Boolean);
 begin
   if Assigned(FOnAuthorizationResult) then
@@ -246,11 +223,6 @@ end;
 function TFirebaseMessaging.GetDeviceToken: string;
 begin
   Result := FPlatformFirebaseMessaging.GetDeviceToken;
-end;
-
-function TFirebaseMessaging.GetIsConnected: Boolean;
-begin
-  Result := FPlatformFirebaseMessaging.IsConnected;
 end;
 
 function TFirebaseMessaging.GetShowBannerWhenForeground: Boolean;
