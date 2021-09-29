@@ -1,5 +1,11 @@
 # Firebase Cloud Messaging (FCM) Demo
 
+## IMPORTANT change for iOS users
+
+**FCM support in Kastri has been updated to be compatible with Firebase iOS SDK v8.7.0**
+
+Please see the Demo Configuration section below
+
 ## Using the demo
 
 Please configure for a platform only where you **require** support for that platform
@@ -24,8 +30,10 @@ In order to use this demo, you will need to:
 
 #### iOS
 
-* Unzip the latest Firebase SDK in the ThirdParty\Firebase\iOS folder of Kastri
-* In the IDE Options > Environment Variables, create a user override called Firebase which points to the unzipped SDK, **or** modify the search paths in the Project Options for iOS Device 64-bit to point to the unzipped SDK
+**Note that these configuration instructions were changed on Sept 30th, 2021 to support a more recent Firebase SDK**
+
+* Go to [this link](https://github.com/firebase/firebase-ios-sdk/releases/tag/8.7.0), download Firebase.zip, and extract it somewhere convenient
+* In the IDE Options > Environment Variables, create a user override called Firebase_8_7 which points to the unzipped SDK, **or** modify the search paths in the Project Options for iOS Device 64-bit to point to the unzipped SDK
 * In the Project Options for iOS Device 64-bit, modify the CFBundleIndentifier value  in the Version Info section to use the identifier that corresponds to your App ID
 * Put your Google-Services.info.plist file from Firebase Console into the Resources folder of the demo
 * Unzip the Firebase-6.18.zip file in the Kastri\ThirdParty\Firebase\iOS folder in-place
