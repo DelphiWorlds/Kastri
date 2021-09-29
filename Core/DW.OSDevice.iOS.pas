@@ -37,6 +37,7 @@ type
     class function IsTouchDevice: Boolean; static;
     class procedure OpenURL(const AURL: string); static;
     class procedure OpenAppSettings; static;
+    class procedure SetPreventScreenLock(const AValue: Boolean); static;
   end;
 
 implementation
@@ -129,6 +130,11 @@ end;
 class procedure TPlatformOSDevice.OpenURL(const AURL: string);
 begin
   OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(StrToNSStr(AURL))));
+end;
+
+class procedure TPlatformOSDevice.SetPreventScreenLock(const AValue: Boolean);
+begin
+  TiOSHelper.SharedApplication.setIdleTimerDisabled(AValue);
 end;
 
 class function TPlatformOSDevice.GetPackageID: string;

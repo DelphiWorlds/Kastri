@@ -35,6 +35,7 @@ type
     class function IsScreenLocked: Boolean; static;
     class function IsTouchDevice: Boolean; static;
     class procedure OpenAppSettings; static;
+    class procedure SetPreventScreenLock(const AValue: Boolean); static;
   end;
 
 implementation
@@ -146,6 +147,17 @@ begin
   LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_APPLICATION_DETAILS_SETTINGS, LUri);
   LIntent.addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_NEW_TASK);
   TAndroidHelper.Context.startActivity(LIntent);
+end;
+
+class procedure TPlatformOSDevice.SetPreventScreenLock(const AValue: Boolean);
+begin
+  if System.DelphiActivity <> nil then
+  begin
+    if AValue then
+      TAndroidHelper.Activity.getWindow.addFlags(TJWindowManager_LayoutParams.JavaClass.FLAG_KEEP_SCREEN_ON)
+    else
+      TAndroidHelper.Activity.getWindow.clearFlags(TJWindowManager_LayoutParams.JavaClass.FLAG_KEEP_SCREEN_ON);
+  end;
 end;
 
 end.

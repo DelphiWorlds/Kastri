@@ -106,6 +106,10 @@ type
     class procedure OpenURL(const AURL: string); static;
     class procedure OpenAppSettings; static;
     /// <summary>
+    ///   Prevent the screen from locking (Android and iOS)
+    /// </summary>
+    class procedure SetPreventScreenLock(const AValue: Boolean); static;
+    /// <summary>
     ///   Shows the folder that contains the nominated files
     /// </summary>
     class procedure ShowFilesInFolder(const AFileNames: array of string); static;
@@ -253,6 +257,13 @@ class procedure TOSDevice.OpenURL(const AURL: string);
 begin
   {$IF Defined(IOS)}
   TPlatformOSDevice.OpenURL(AURL);
+  {$ENDIF}
+end;
+
+class procedure TOSDevice.SetPreventScreenLock(const AValue: Boolean);
+begin
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  TPlatformOSDevice.SetPreventScreenLock(AValue);
   {$ENDIF}
 end;
 
