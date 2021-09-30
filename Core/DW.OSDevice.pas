@@ -64,6 +64,10 @@ type
     /// </summary>
     class procedure GetEnvironmentVars(const AVars: TStrings); static;
     /// <summary>
+    ///   Returns the maker of the device
+    /// </summary>
+    class function GetManufacturer: string; static;
+    /// <summary>
     ///   Returns build for the application package, if any exists
     /// </summary>
     class function GetPackageBuild: string; static;
@@ -177,6 +181,17 @@ begin
   TWinapiHelper.GetEnvironmentVars(AVars, True);
   {$ELSEIF Defined(POSIX)}
   TPosixOSDevice.GetEnvironmentVars(AVars);
+  {$ENDIF}
+end;
+
+class function TOSDevice.GetManufacturer: string;
+begin
+  {$IF Defined(MACOS)}
+  Result := 'Apple'; // Do not localize
+  {$ELSEIF Defined(ANDROID)}
+  Result := TPlatformOSDevice.GetManufacturer;
+  {$ELSE}
+  Result := ''; // To do
   {$ENDIF}
 end;
 

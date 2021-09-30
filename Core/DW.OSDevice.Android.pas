@@ -28,6 +28,7 @@ type
     class function EnableTorch(const AEnable: Boolean): Boolean; static;
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     class function GetDeviceName: string; static;
+    class function GetManufacturer: string; static;
     class function GetPackageID: string; static;
     class function GetPackageVersion: string; static;
     class function GetUniqueDeviceID: string; static;
@@ -88,6 +89,11 @@ begin
   Result := JStringToString(TJBuild.JavaClass.MODEL);
   if Result.IsEmpty then
     Result := Format('%s %s', [JStringToString(TJBuild.JavaClass.MANUFACTURER), JStringToString(TJBuild.JavaClass.PRODUCT)]);
+end;
+
+class function TPlatformOSDevice.GetManufacturer: string;
+begin
+  Result := JStringToString(TJBuild.JavaClass.MANUFACTURER);
 end;
 
 class function TPlatformOSDevice.GetPackageID: string;
