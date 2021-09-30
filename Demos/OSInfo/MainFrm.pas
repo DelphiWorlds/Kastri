@@ -4,15 +4,18 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.Memo.Types,
+  DW.MobileDeviceInfo;
 
 type
   TfrmMain = class(TForm)
     Memo: TMemo;
   private
+    FDeviceInfo: TMobileDeviceInfo;
     procedure DumpOSInfo;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
 var
@@ -23,7 +26,8 @@ implementation
 {$R *.fmx}
 
 uses
-  DW.OSDevice, DW.OSPower;
+  REST.Json,
+  DW.OSDevice, DW.OSPower, DW.Classes.Helpers;
 
 const
   cDevicePowerStatusCaptions: array[TDevicePowerStatus] of string = (
@@ -54,15 +58,28 @@ end;
 constructor TfrmMain.Create(AOwner: TComponent);
 begin
   inherited;
+  FDeviceInfo := TJson.JsonToObject<TMobileDeviceInfo>(TResourceHelper.LoadString('MobileDeviceInfo'));
   DumpOSInfo;
+end;
+
+destructor TfrmMain.Destroy;
+begin
+  FDeviceInfo.Free;
+  inherited;
 end;
 
 procedure TfrmMain.DumpOSInfo;
 var
   LSeconds: Integer;
+  LDevice: TMobileDevice;
 begin
+  Memo.Lines.Add(Format('Device manufacturer: %s', [TOSDevice.GetManufacturer]));
   Memo.Lines.Add(Format('Device name: %s', [TOSDevice.GetDeviceName]));
-  Memo.Lines.Add(Format('Device model: %s', [TOSDevice.GetDeviceModel]));
+//  Memo.Lines.Add(Format('Device model: %s', [TOSDevice.GetDeviceModel]));
+  if (FDeviceInfo <> nil) and FDeviceInfo.FindDeviceByModel(TOSDevice.GetDeviceModel, LDevice) then
+    Memo.Lines.Add(Format('Device model: %s', [LDevice.Description]))
+  else
+    Memo.Lines.Add(Format('Device model: %s', [TOSDevice.GetDeviceModel]));
   Memo.Lines.Add(Format('Unique ID: %s', [TOSDevice.GetUniqueDeviceID]));
   if TOSDevice.IsMobile then
     Memo.Lines.Add('Device is a mobile device')

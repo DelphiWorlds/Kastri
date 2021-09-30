@@ -1,5 +1,7 @@
 program OSInfoDemo;
 
+{$R 'Data.res' 'Data.rc'}
+
 uses
   System.StartUpCopy,
   FMX.Forms,
