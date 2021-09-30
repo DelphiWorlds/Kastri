@@ -1,0 +1,862 @@
+{
+  "Devices": [
+    {
+      "Code": "N45AP",
+      "Description": "iPod Touch",
+      "ModelName": "iPod1,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N72AP",
+      "Description": "iPod Touch 2G",
+      "ModelName": "iPod2,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N18AP",
+      "Description": "iPod Touch 3G",
+      "ModelName": "iPod3,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N81AP",
+      "Description": "iPod Touch 4G",
+      "ModelName": "iPod4,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N78AP",
+      "Description": "iPod Touch 5G",
+      "ModelName": "iPod5,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N78AAP",
+      "Description": "iPod Touch 5G",
+      "ModelName": "iPod5,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N102AP",
+      "Description": "iPod Touch 6G",
+      "ModelName": "iPod7,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N112AP",
+      "Description": "iPod Touch 7G",
+      "ModelName": "iPod9,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "K48AP",
+      "Description": "iPad",
+      "ModelName": "iPad1,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "K93AP",
+      "Description": "iPad 2",
+      "ModelName": "iPad2,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "K94AP",
+      "Description": "iPad 2 (GSM)",
+      "ModelName": "iPad2,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "K95AP",
+      "Description": "iPad 2 (CDMA)",
+      "ModelName": "iPad2,3",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "K93AAP",
+      "Description": "iPad 2 (Wi-Fi, revision A)",
+      "ModelName": "iPad2,4",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "J1AP",
+      "Description": "iPad 3",
+      "ModelName": "iPad3,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "J2AP",
+      "Description": "iPad 3 (GSM)",
+      "ModelName": "iPad3,2",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "J2AAP",
+      "Description": "iPad 3 (CDMA)",
+      "ModelName": "iPad3,3",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "P101AP",
+      "Description": "iPad 4",
+      "ModelName": "iPad3,4",
+      "Architecture": "armv7s"
+    },
+    {
+      "Code": "P102AP",
+      "Description": "iPad 4 (GSM)",
+      "ModelName": "iPad3,5",
+      "Architecture": "armv7s"
+    },
+    {
+      "Code": "P103AP",
+      "Description": "iPad 4 (CDMA)",
+      "ModelName": "iPad3,6",
+      "Architecture": "armv7s"
+    },
+    {
+      "Code": "J71bAP",
+      "Description": "iPad 6",
+      "ModelName": "iPad7,5",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J71AP",
+      "Description": "iPad Air",
+      "ModelName": "iPad6,11",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J72AP",
+      "Description": "iPad Air (GSM)",
+      "ModelName": "iPad6,12",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J73AP",
+      "Description": "iPad Air (CDMA)",
+      "ModelName": "iPad4,3",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J81AP",
+      "Description": "iPad Air 2",
+      "ModelName": "iPad5,3",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J82AP",
+      "Description": "iPad Air 2 (GSM)",
+      "ModelName": "iPad5,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J83AP",
+      "Description": "iPad Air 2 (CDMA)",
+      "ModelName": "iPad5,5",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J71sAP",
+      "Description": "iPad (2017)",
+      "ModelName": "iPad6,11",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J71tAP",
+      "Description": "iPad (2017)",
+      "ModelName": "iPad6,11",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J72sAP",
+      "Description": "iPad (2017)",
+      "ModelName": "iPad6,12",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J72tAP",
+      "Description": "iPad (2017)",
+      "ModelName": "iPad6,12",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J71bAP",
+      "Description": "iPad (2018)",
+      "ModelName": "iPad7,5",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J72bAP",
+      "Description": "iPad (2018)",
+      "ModelName": "iPad7,6",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J217AP",
+      "Description": "iPad Air 3",
+      "ModelName": "iPad11,3",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J218AP",
+      "Description": "iPad Air 3 (Cellular)",
+      "ModelName": "iPad11,4",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J171AP",
+      "Description": "iPad 7",
+      "ModelName": "iPad7,11",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J172AP",
+      "Description": "iPad 7 (Cellular)",
+      "ModelName": "iPad7,12",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J171aAP",
+      "Description": "iPad 8",
+      "ModelName": "iPad11,6",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J172aAP",
+      "Description": "iPad 8 (Cellular)",
+      "ModelName": "iPad11,7",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J307AP",
+      "Description": "iPad Air 4",
+      "ModelName": "iPad13,1",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J308AP",
+      "Description": "iPad Air 4 (Cellular)",
+      "ModelName": "iPad13,2",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J181AP",
+      "Description": "iPad 9",
+      "ModelName": "iPad12,1",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J182AP",
+      "Description": "iPad 9 (Cellular)",
+      "ModelName": "iPad12,2",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J98aAP",
+      "Description": "iPad Pro (12.9\")",
+      "ModelName": "iPad6,7",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J99aAP",
+      "Description": "iPad Pro (12.9\")",
+      "ModelName": "iPad6,8",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J120AP",
+      "Description": "iPad Pro 2G (12.9\")",
+      "ModelName": "iPad7,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J121AP",
+      "Description": "iPad Pro 2G (12.9\")",
+      "ModelName": "iPad7,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J127AP",
+      "Description": "iPad Pro (9.7\")",
+      "ModelName": "iPad6,3",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J128AP",
+      "Description": "iPad Pro (9.7\")",
+      "ModelName": "iPad6,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J207AP",
+      "Description": "iPad Pro (10.5\")",
+      "ModelName": "iPad7,3",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J208AP",
+      "Description": "iPad Pro (10.5\" Cell)",
+      "ModelName": "iPad7,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J317AP",
+      "Description": "iPad Pro (11\")",
+      "ModelName": "iPad8,1",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J317xAP",
+      "Description": "iPad Pro (11\")",
+      "ModelName": "iPad8,2",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J318AP",
+      "Description": "iPad Pro (11\" Cell)",
+      "ModelName": "iPad8,3",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J318xAP",
+      "Description": "iPad Pro (11\" Cell)",
+      "ModelName": "iPad8,4",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J417AP",
+      "Description": "iPad Pro 2G (11\")",
+      "ModelName": "iPad8,9",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J418AP",
+      "Description": "iPad Pro 2G (11\" Cell)",
+      "ModelName": "iPad8,10",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J517AP",
+      "Description": "iPad Pro 3G (11\")",
+      "ModelName": "iPad13,4",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J517xAP",
+      "Description": "iPad Pro 3G (11\")",
+      "ModelName": "iPad13,5",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J518AP",
+      "Description": "iPad Pro 3G (11\" Cell)",
+      "ModelName": "iPad13,6",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J518xAP",
+      "Description": "iPad Pro 3G (11\" Cell)",
+      "ModelName": "iPad13,7",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J320AP",
+      "Description": "iPad Pro 3G (12.9\")",
+      "ModelName": "iPad8,5",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J320xAP",
+      "Description": "iPad Pro 3G (12.9\")",
+      "ModelName": "iPad8,6",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J321AP",
+      "Description": "iPad Pro 3G (12.9\" Cell)",
+      "ModelName": "iPad8,7",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J321xAP",
+      "Description": "iPad Pro 3G (12.9\" Cell)",
+      "ModelName": "iPad8,8",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J420AP",
+      "Description": "iPad Pro 4G (12.9\")",
+      "ModelName": "iPad8,11",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J421AP",
+      "Description": "iPad Pro 4G (12.9\" Cell)",
+      "ModelName": "iPad8,12",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J522AP",
+      "Description": "iPad Pro 5G (12.9\")",
+      "ModelName": "iPad13,8",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J522xAP",
+      "Description": "iPad Pro 5G (12.9\")",
+      "ModelName": "iPad13,9",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J523AP",
+      "Description": "iPad Pro 5G (12.9\" Cell)",
+      "ModelName": "iPad13,10",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J523xAP",
+      "Description": "iPad Pro 5G (12.9\" Cell)",
+      "ModelName": "iPad13,11",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "P105AP",
+      "Description": "iPad mini",
+      "ModelName": "iPad2,5",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "P106AP",
+      "Description": "iPad mini (GSM)",
+      "ModelName": "iPad2,6",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "P107AP",
+      "Description": "iPad mini (CDMA)",
+      "ModelName": "iPad2,7",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "J85AP",
+      "Description": "iPad mini 2",
+      "ModelName": "iPad4,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J86AP",
+      "Description": "iPad mini 2 (GSM)",
+      "ModelName": "iPad4,5",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J87AP",
+      "Description": "iPad mini 2 (CDMA)",
+      "ModelName": "iPad4,6",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J85MAP",
+      "Description": "iPad mini 3",
+      "ModelName": "iPad4,7",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J86MAP",
+      "Description": "iPad mini 3 (GSM)",
+      "ModelName": "iPad4,8",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J87MAP",
+      "Description": "iPad mini 3 (CDMA)",
+      "ModelName": "iPad4,9",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J96AP",
+      "Description": "iPad mini 4",
+      "ModelName": "iPad5,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J97AP",
+      "Description": "iPad mini 4 (GSM)",
+      "ModelName": "iPad5,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J210AP",
+      "Description": "iPad mini 5",
+      "ModelName": "iPad11,1",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J211AP",
+      "Description": "iPad mini 5 (Cellular)",
+      "ModelName": "iPad11,2",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J310AP",
+      "Description": "iPad mini 6",
+      "ModelName": "iPad14,1",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "J311AP",
+      "Description": "iPad mini 6 (Cellular)",
+      "ModelName": "iPad14,2",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "M68AP",
+      "Description": "iPhone",
+      "ModelName": "iPhone1,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N82AP",
+      "Description": "iPhone 3G",
+      "ModelName": "iPhone1,2",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N88AP",
+      "Description": "iPhone 3GS",
+      "ModelName": "iPhone2,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N90AP",
+      "Description": "iPhone 4 (GSM)",
+      "ModelName": "iPhone3,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N92AP",
+      "Description": "iPhone 4 (CDMA)",
+      "ModelName": "iPhone3,3",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N90BAP",
+      "Description": "iPhone 4 (GSM, revision A)",
+      "ModelName": "iPhone3,2",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N94AP",
+      "Description": "iPhone 4S",
+      "ModelName": "iPhone4,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "N41AP",
+      "Description": "iPhone 5 (GSM)",
+      "ModelName": "iPhone5,1",
+      "Architecture": "armv7s"
+    },
+    {
+      "Code": "N42AP",
+      "Description": "iPhone 5 (Global/CDMA)",
+      "ModelName": "iPhone5,2",
+      "Architecture": "armv7s"
+    },
+    {
+      "Code": "N48AP",
+      "Description": "iPhone 5c (GSM)",
+      "ModelName": "iPhone5,3",
+      "Architecture": "armv7s"
+    },
+    {
+      "Code": "N49AP",
+      "Description": "iPhone 5c (Global/CDMA)",
+      "ModelName": "iPhone5,4",
+      "Architecture": "armv7s"
+    },
+    {
+      "Code": "N51AP",
+      "Description": "iPhone 5s (GSM)",
+      "ModelName": "iPhone6,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N53AP",
+      "Description": "iPhone 5s (Global/CDMA)",
+      "ModelName": "iPhone6,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N61AP",
+      "Description": "iPhone 6 (GSM)",
+      "ModelName": "iPhone7,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N56AP",
+      "Description": "iPhone 6 Plus",
+      "ModelName": "iPhone7,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N71mAP",
+      "Description": "iPhone 6s",
+      "ModelName": "iPhone8,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N71AP",
+      "Description": "iPhone 6s",
+      "ModelName": "iPhone8,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N66AP",
+      "Description": "iPhone 6s Plus",
+      "ModelName": "iPhone8,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N66mAP",
+      "Description": "iPhone 6s Plus",
+      "ModelName": "iPhone8,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N69AP",
+      "Description": "iPhone SE",
+      "ModelName": "iPhone8,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N69uAP",
+      "Description": "iPhone SE",
+      "ModelName": "iPhone8,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D10AP",
+      "Description": "iPhone 7",
+      "ModelName": "iPhone9,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D101AP",
+      "Description": "iPhone 7",
+      "ModelName": "iPhone9,3",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D11AP",
+      "Description": "iPhone 7 Plus",
+      "ModelName": "iPhone9,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D111AP",
+      "Description": "iPhone 7 Plus",
+      "ModelName": "iPhone9,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D20AP",
+      "Description": "iPhone 8",
+      "ModelName": "iPhone10,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D20AAP",
+      "Description": "iPhone 8",
+      "ModelName": "iPhone10,1",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D201AP",
+      "Description": "iPhone 8",
+      "ModelName": "iPhone10,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D201AAP",
+      "Description": "iPhone 8",
+      "ModelName": "iPhone10,4",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D21AP",
+      "Description": "iPhone 8 Plus",
+      "ModelName": "iPhone10,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D21AAP",
+      "Description": "iPhone 8 Plus",
+      "ModelName": "iPhone10,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D211AP",
+      "Description": "iPhone 8 Plus",
+      "ModelName": "iPhone10,5",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D211AAP",
+      "Description": "iPhone 8 Plus",
+      "ModelName": "iPhone10,5",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D22AP",
+      "Description": "iPhone X",
+      "ModelName": "iPhone10,3",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "D221AP",
+      "Description": "iPhone X",
+      "ModelName": "iPhone10,6",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "N841AP",
+      "Description": "iPhone XR",
+      "ModelName": "iPhone11,8",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D321AP",
+      "Description": "iPhone XS",
+      "ModelName": "iPhone11,2",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D331pAP",
+      "Description": "iPhone XS Max",
+      "ModelName": "iPhone11,6",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "N104AP",
+      "Description": "iPhone 11",
+      "ModelName": "iPhone12,1",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D421AP",
+      "Description": "iPhone 11 Pro",
+      "ModelName": "iPhone12,3",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D431AP",
+      "Description": "iPhone 11 Pro Max",
+      "ModelName": "iPhone12,5",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D79AP",
+      "Description": "iPhone SE 2G",
+      "ModelName": "iPhone12,8",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D52gAP",
+      "Description": "iPhone 12 Mini",
+      "ModelName": "iPhone13,1",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D53gAP",
+      "Description": "iPhone 12",
+      "ModelName": "iPhone13,2",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D53pAP",
+      "Description": "iPhone 12 Pro",
+      "ModelName": "iPhone13,3",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D54pAP",
+      "Description": "iPhone 12 Pro Max",
+      "ModelName": "iPhone13,4",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D16AP",
+      "Description": "iPhone 13 Mini",
+      "ModelName": "iPhone14,4",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D17AP",
+      "Description": "iPhone 13",
+      "ModelName": "iPhone14,5",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D63AP",
+      "Description": "iPhone 13 Pro",
+      "ModelName": "iPhone14,2",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "D64AP",
+      "Description": "iPhone 13 Pro Max",
+      "ModelName": "iPhone14,3",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "K66AP",
+      "Description": "Apple TV 2G",
+      "ModelName": "AppleTV2,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "J33AP",
+      "Description": "Apple TV 3G",
+      "ModelName": "AppleTV3,1",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "J33IAP",
+      "Description": "Apple TV 3.1G",
+      "ModelName": "AppleTV3,2",
+      "Architecture": "armv7"
+    },
+    {
+      "Code": "J42dAP",
+      "Description": "Apple TV 4G",
+      "ModelName": "AppleTV5,3",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J105aAP",
+      "Description": "Apple TV 4K",
+      "ModelName": "AppleTV6,2",
+      "Architecture": "arm64"
+    },
+    {
+      "Code": "J305AP",
+      "Description": "Apple TV 4K 2",
+      "ModelName": "AppleTV11,1",
+      "Architecture": "arm64e"
+    },
+    {
+      "Code": "N121sAP",
+      "Description": "Apple Watch Series 3 (GPS)",
+      "ModelName": "Watch3,3",
+      "Architecture": "armv7k"
+    },
+    {
+      "Code": "N157bAP",
+      "Description": "Apple Watch Series 6",
+      "ModelName": "Watch6,2",
+      "Architecture": "arm64"
+    }
+  ]
+}
