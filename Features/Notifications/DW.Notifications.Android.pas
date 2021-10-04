@@ -28,7 +28,8 @@ uses
   Androidapi.JNI.Os, Androidapi.JNI.Net, Androidapi.JNI.Media,
   {$ENDIF}
   // DW
-  DW.Notifications, DW.MultiReceiver.Android, DW.Androidapi.JNI.App, DW.Androidapi.JNI.SupportV4;
+  DW.Notifications, DW.MultiReceiver.Android, DW.Androidapi.JNI.App,
+  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4; {$ELSE} DW.Androidapi.JNI.AndroidX.App; {$ENDIF}
 
 type
   {$IF CompilerVersion > 32}
