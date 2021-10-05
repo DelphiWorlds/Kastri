@@ -12,7 +12,7 @@ Please refer to the [native controls documentation](../Controls/NativeControls.m
 
 ## Note about TNativeSlider on Android
 
-As TNativeSlider is based on [SeekBar](https://developer.android.com/reference/android/widget/SeekBar), and it was necessary to create a descendant of the Java class (in order to implement a vertical SeekBar), when creating your own project, you will need to add [dw-kastri-base.jar](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base.jar) to the Libraries node under the Android platform in Project Manager in your project. (This is already added in the demo)
+As TNativeSlider is based on [SeekBar](https://developer.android.com/reference/android/widget/SeekBar), and it was necessary to create a descendant of the Java class (in order to implement a vertical SeekBar), when creating your own project, you will need to add [dw-kastri-base.jar](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base.jar) or [dw-kastri-base-2.0.0.jar](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base-2.0.0.jar) for Delphi 11 and higher, to the Libraries node under the Android platform in Project Manager in your project. (This is already added in the demos)
 
 ## Appearance
 
