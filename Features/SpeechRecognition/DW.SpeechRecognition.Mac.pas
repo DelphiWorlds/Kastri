@@ -167,7 +167,6 @@ begin
     FTask := nil;
     FInputNode := nil;
     StoppedRecording;
-    QueueRecordingStatusChanged;
   end;
 end;
 
