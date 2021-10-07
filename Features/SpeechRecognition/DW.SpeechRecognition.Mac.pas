@@ -204,7 +204,7 @@ begin
   if (error <> nil) or LFinished or not IsRecording then
   begin
     Timer.IsEnabled := False;
-    StopRecording;
+    Finished;
   end;
 end;
 

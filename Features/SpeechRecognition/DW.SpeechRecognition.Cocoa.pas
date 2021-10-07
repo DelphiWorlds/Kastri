@@ -60,12 +60,14 @@ type
 
   TCocoaSpeechRecognition = class(TCustomPlatformSpeechRecognition)
   private
+    FIsFinished: Boolean;
     FIsRecording: Boolean;
     FIsRecordingPending: Boolean;
     FIsStopped: Boolean;
     FTimer: TMacOSTimer;
   protected
     procedure DoStartRecording; virtual;
+    procedure Finished;
     function IsRecording: Boolean; override;
     procedure QueueAuthorizationStatus(const AStatus: TAuthorizationStatus);
     procedure QueueRecordingStatusChanged;
@@ -78,6 +80,7 @@ type
     procedure StoppedRecording;
     procedure TimerHandler;
     property IsRecordingPending: Boolean read FIsRecordingPending;
+    property IsFinished: Boolean read FIsFinished;
     property IsStopped: Boolean read FIsStopped;
     property Timer: TMacOSTimer read FTimer;
   public
@@ -189,6 +192,18 @@ begin
   //
 end;
 
+procedure TCocoaSpeechRecognition.Finished;
+begin
+  if not FIsFinished then
+  begin
+    FIsFinished := True;
+    if IsStopped then
+      Stopped
+    else
+      StopRecording;
+  end;
+end;
+
 function TCocoaSpeechRecognition.IsRecording: Boolean;
 begin
   Result := FIsRecording;
@@ -249,6 +264,7 @@ begin
   FIsRecordingPending := False;
   FIsRecording := True;
   FIsStopped := False;
+  FIsFinished := False;
   QueueRecordingStatusChanged;
 end;
 
@@ -262,8 +278,8 @@ end;
 procedure TCocoaSpeechRecognition.TimerHandler;
 begin
   FTimer.IsEnabled := False;
+  FIsStopped := True;
   StopRecording;
-  Stopped;
 end;
 
 end.
