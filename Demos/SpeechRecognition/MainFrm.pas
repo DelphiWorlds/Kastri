@@ -35,9 +35,6 @@ implementation
 
 {$R *.fmx}
 
-uses
-  DW.OSLog;
-
 { TForm1 }
 
 constructor TfrmMain.Create(AOwner: TComponent);
@@ -84,8 +81,6 @@ procedure TfrmMain.SpeechRecordingHandler(Sender: TObject; const IsRecording: Bo
 const
   cRecordCaptions: array[Boolean] of string = ('Record', 'Stop');
 begin
-  TOSLog.d('TfrmMain.SpeechRecordingHandler IsRecording = %s. Caption should change to: %s',
-    [BoolToStr(IsRecording, True), cRecordCaptions[IsRecording]]);
   RecordButton.Text := cRecordCaptions[IsRecording];
   if IsRecording then
     MessageLabel.Text := 'Now say something!'
@@ -95,7 +90,8 @@ end;
 
 procedure TfrmMain.SpeechStoppedHandler(Sender: TObject);
 begin
-  Memo.Lines.Add('I heard this: ' + FText);
+  if not FText.IsEmpty then
+    Memo.Lines.Add('I heard this: ' + FText);
 end;
 
 procedure TfrmMain.SpeechTextHandler(Sender: TObject; const AText: string);
