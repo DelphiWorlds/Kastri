@@ -104,7 +104,10 @@ begin
   if FSpeech.IsRecording then
     FSpeech.StopRecording
   else
+  begin
+    FText := '';
     FSpeech.StartRecording;
+  end;
 end;
 
 end.
