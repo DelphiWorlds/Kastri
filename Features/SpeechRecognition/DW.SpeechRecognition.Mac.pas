@@ -153,21 +153,22 @@ begin
 end;
 
 procedure TPlatformSpeechRecognition.StopRecording;
+var
+  LWasRunning: Boolean;
 begin
-  if not IsStopped then
+  LWasRunning := FAudioEngine.isRunning;
+  if LWasRunning then
   begin
-    if FAudioEngine.isRunning then
-    begin
-      FAudioEngine.stop;
-      FRequest.endAudio;
-    end;
-    if FInputNode <> nil then
-      FInputNode.removeTapOnBus(0);
-    FRequest := nil;
-    FTask := nil;
-    FInputNode := nil;
-    StoppedRecording;
+    FAudioEngine.stop;
+    FRequest.endAudio;
   end;
+  if FInputNode <> nil then
+    FInputNode.removeTapOnBus(0);
+  FRequest := nil;
+  FTask := nil;
+  FInputNode := nil;
+  if LWasRunning then
+    StoppedRecording;
 end;
 
 procedure TPlatformSpeechRecognition.InputNodeInstallTapOnBusHandler(buffer: AVAudioPCMBuffer; when: AVAudioTime);

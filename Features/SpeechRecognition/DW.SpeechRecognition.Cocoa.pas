@@ -278,7 +278,6 @@ end;
 procedure TCocoaSpeechRecognition.TimerHandler;
 begin
   FTimer.IsEnabled := False;
-  FIsStopped := True;
   StopRecording;
 end;
 
