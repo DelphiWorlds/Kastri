@@ -27,12 +27,14 @@ type
   public
     class function EnableTorch(const AEnable: Boolean): Boolean; static;
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
+    class function GetDeviceModel: string; static;
     class function GetDeviceName: string; static;
     class function GetManufacturer: string; static;
     class function GetPackageID: string; static;
     class function GetPackageVersion: string; static;
     class function GetUniqueDeviceID: string; static;
     class function HasHardwareKeyboard: Boolean; static;
+    class function IsLocationServiceEnabled: Boolean; static;
     class function IsScreenLocked: Boolean; static;
     class function IsTouchDevice: Boolean; static;
     class procedure OpenAppSettings; static;
@@ -46,9 +48,17 @@ uses
   System.SysUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.Provider, Androidapi.JNI.Os,  Androidapi.JNI.GraphicsContentViewText,
-  Androidapi.JNI.Net, Androidapi.JNIBridge,
+  Androidapi.JNI.Net, Androidapi.JNIBridge, Androidapi.JNI.App, Androidapi.JNI.Location,
   // DW
   DW.Androidapi.JNI.Hardware.Camera2, DW.Android.Helpers;
+
+type
+  [JavaSignature('android/location/LocationManager')]
+  JLocationManager = interface(Androidapi.JNI.Location.JLocationManager)
+    ['{5F8A5E7D-7205-4423-9F13-70F2E0738822}']
+    function isLocationEnabled: Boolean;
+  end;
+  TJLocationManager = class(TJavaGenericImport<JLocationManagerClass, JLocationManager>) end;
 
 { TPlatformOSDevice }
 
@@ -96,6 +106,11 @@ begin
   Result := JStringToString(TJBuild.JavaClass.MANUFACTURER);
 end;
 
+class function TPlatformOSDevice.GetDeviceModel: string;
+begin
+  Result := JStringToString(TJBuild.JavaClass.MODEL);
+end;
+
 class function TPlatformOSDevice.GetPackageID: string;
 begin
   Result := JStringToString(TAndroidHelper.Context.getPackageName);
@@ -130,6 +145,23 @@ begin
     LConfiguration := LResources.getConfiguration;
     if LConfiguration <> nil then
       Result := LConfiguration.keyboard <> TJConfiguration.JavaClass.KEYBOARD_NOKEYS;
+  end;
+end;
+
+class function TPlatformOSDevice.IsLocationServiceEnabled: Boolean;
+var
+  LObject: JObject;
+  LMode, LModeOff: Integer;
+begin
+  if TJBuild_Version.JavaClass.SDK_INT >= 28 then
+  begin
+    LObject := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.LOCATION_SERVICE);
+    Result := TJLocationManager.Wrap(LObject).isLocationEnabled;
+  end
+  else
+  begin
+    LModeOff := TJSettings_Secure.JavaClass.LOCATION_MODE_OFF;
+    Result := TJSettings_Secure.JavaClass.getInt(TAndroidHelper.ContentResolver, TJSettings_Secure.JavaClass.LOCATION_MODE, LModeOff) <> LModeOff;
   end;
 end;
 
