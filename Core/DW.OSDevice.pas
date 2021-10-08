@@ -89,6 +89,10 @@ type
     /// </summary>
     class function IsBeta: Boolean; static;
     /// <summary>
+    ///   Returns whether the location service is enabled
+    /// </summary>
+    class function IsLocationServiceEnabled: Boolean; static;
+    /// <summary>
     ///   Returns whether the device is a mobile device
     /// </summary>
     class function IsMobile: Boolean; static;
@@ -158,7 +162,7 @@ end;
 
 class function TOSDevice.GetDeviceModel: string;
 begin
-  {$IF Defined(MACOS)}
+  {$IF Defined(MACOS) or Defined(ANDROID)}
   Result := TPlatformOSDevice.GetDeviceModel;
   {$ELSE}
   Result := '';
@@ -232,6 +236,15 @@ class function TOSDevice.IsBeta: Boolean;
 begin
   {$IF Defined(MSWINDOWS)}
   Result := TPlatformOSDevice.IsBeta;
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+class function TOSDevice.IsLocationServiceEnabled: Boolean;
+begin
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  Result := TPlatformOSDevice.IsLocationServiceEnabled;
   {$ELSE}
   Result := False;
   {$ENDIF}

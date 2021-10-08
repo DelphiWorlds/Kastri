@@ -33,6 +33,7 @@ type
     class function GetPackageID: string; static;
     class function GetPackageVersion: string; static;
     class function GetUniqueDeviceID: string; static;
+    class function IsLocationServiceEnabled: Boolean; static;
     class function IsScreenLocked: Boolean; static;
     class function IsTouchDevice: Boolean; static;
     class procedure OpenURL(const AURL: string); static;
@@ -48,7 +49,7 @@ uses
   // macOS
   Macapi.Helpers,
   // iOS
-  iOSapi.Helpers, iOSapi.UIKit, iOSapi.AVFoundation,
+  iOSapi.Helpers, iOSapi.UIKit, iOSapi.AVFoundation, iOSapi.CoreLocation,
   // Posix
   Posix.SysUtsname,
   // DW
@@ -105,6 +106,11 @@ end;
 class function TPlatformOSDevice.GetUniqueDeviceID: string;
 begin
   Result := NSStrToStr(TiOSHelper.CurrentDevice.identifierForVendor.UUIDString);
+end;
+
+class function TPlatformOSDevice.IsLocationServiceEnabled: Boolean;
+begin
+  Result := TCLLocationManager.Create.locationServicesEnabled;
 end;
 
 class function TPlatformOSDevice.IsScreenLocked: Boolean;
