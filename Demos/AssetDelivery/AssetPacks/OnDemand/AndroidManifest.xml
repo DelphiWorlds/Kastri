@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:dist="http://schemas.android.com/apk/distribution" 
+  package="com.embarcadero.AssetDeliveryDemo" split="ondemand_assetpack">
+  <dist:module dist:type="asset-pack">
+    <dist:fusing dist:include="true" />    <dist:delivery>
+      <dist:on-demand/>
+    </dist:delivery>
+  </dist:module>
+</manifest>

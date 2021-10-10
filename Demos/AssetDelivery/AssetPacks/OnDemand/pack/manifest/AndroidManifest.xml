@@ -1,0 +1,21 @@
+
+´
+9
+android*http://schemas.android.com/apk/res/android
+7
+dist+http://schemas.android.com/apk/distributionmanifest",package!com.embarcadero.AssetDeliveryDemo"splitondemand_assetpack"R
+*http://schemas.android.com/apk/res/androidcompileSdkVersion30"(òŠ„2:0"(platformBuildVersionCode30"2:0"P
+*http://schemas.android.com/apk/res/androidcompileSdkVersionCodename11(óŠ„"(platformBuildVersionName11"2:0*
+  I*Ö
+Í+http://schemas.android.com/apk/distributionmodule"?
++http://schemas.android.com/apk/distributiontype
+asset-pack*
+    &*…
+}+http://schemas.android.com/apk/distributionfusing"F
++http://schemas.android.com/apk/distributionincludetrue"2:@*    '*¢
+™+http://schemas.android.com/apk/distributiondelivery*
+      :*@
+8+http://schemas.android.com/apk/distribution	on-demand*
+    +*
+  *	
+

@@ -1,0 +1,89 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 551
+  ClientWidth = 490
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object MediaPlayerControl: TMediaPlayerControl
+    Size.Width = 490.000000000000000000
+    Size.Height = 388.000000000000000000
+    Size.PlatformDefault = False
+    Align = Client
+    MediaPlayer = MediaPlayer
+  end
+  object FilesListBox: TListBox
+    Align = Bottom
+    Position.Y = 388.000000000000000000
+    Size.Width = 490.000000000000000000
+    Size.Height = 116.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    DisableFocusEffect = True
+    ItemHeight = 24.000000000000000000
+    DefaultItemStyles.ItemStyle = ''
+    DefaultItemStyles.GroupHeaderStyle = ''
+    DefaultItemStyles.GroupFooterStyle = ''
+    Viewport.Width = 486.000000000000000000
+    Viewport.Height = 112.000000000000000000
+  end
+  object ButtonsLayout: TLayout
+    Align = Bottom
+    Padding.Left = 4.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 4.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Position.Y = 504.000000000000000000
+    Size.Width = 490.000000000000000000
+    Size.Height = 47.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    object PlayButton: TButton
+      Action = PlayAction
+      Align = Left
+      Enabled = True
+      ImageIndex = -1
+      Margins.Right = 8.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 125.000000000000000000
+      Size.Height = 39.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+    end
+    object StopButton: TButton
+      Action = StopAction
+      Align = Left
+      Enabled = True
+      ImageIndex = -1
+      Margins.Right = 8.000000000000000000
+      Position.X = 137.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 125.000000000000000000
+      Size.Height = 39.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+    end
+  end
+  object MediaPlayer: TMediaPlayer
+    Left = 64
+    Top = 68
+  end
+  object ActionList: TActionList
+    Left = 152
+    Top = 68
+    object PlayAction: TAction
+      Text = 'Play'
+      OnExecute = PlayActionExecute
+      OnUpdate = PlayActionUpdate
+    end
+    object StopAction: TAction
+      Text = 'Stop'
+      OnExecute = StopActionExecute
+      OnUpdate = StopActionUpdate
+    end
+  end
+end
