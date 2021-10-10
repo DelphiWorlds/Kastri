@@ -300,7 +300,6 @@ type
   [JavaSignature('com/google/android/play/core/listener/StateUpdatedListener')]
   JStateUpdatedListener = interface(IJavaInstance)
     ['{77BA1EEE-82AC-4905-9B87-1E3215301A5B}']
-    procedure onStateUpdate(state: JObject); cdecl;
   end;
   TJStateUpdatedListener = class(TJavaGenericImport<JStateUpdatedListenerClass, JStateUpdatedListener>) end;
 
@@ -311,6 +310,7 @@ type
   [JavaSignature('com/google/android/play/core/assetpacks/AssetPackStateUpdateListener')]
   JAssetPackStateUpdateListener = interface(JStateUpdatedListener)
     ['{F49FE6C1-FD95-4A05-87BA-50DEAC6E0523}']
+    procedure onStateUpdate(state: JAssetPackState); cdecl;
   end;
   TJAssetPackStateUpdateListener = class(TJavaGenericImport<JAssetPackStateUpdateListenerClass, JAssetPackStateUpdateListener>) end;
 
