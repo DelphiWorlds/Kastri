@@ -211,13 +211,20 @@ type
   /// <summary>
   ///   Utility class implementing JRunnable
   /// </summary>
-  TRunnable = class(TJavaLocal, JRunnable)
-  private
-    FRunHandler: TThreadProcedure;
-    FSync: Boolean;
+  TCustomRunnable = class(TJavaLocal, JRunnable)
+  protected
+    procedure DoRun; virtual;
   public
     { JRunnable }
     procedure run; cdecl;
+  end;
+
+  TRunnable = class(TCustomRunnable)
+  private
+    FRunHandler: TThreadProcedure;
+    FSync: Boolean;
+  protected
+    procedure DoRun; override;
   public
     constructor Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
   end;
@@ -635,6 +642,18 @@ begin
   LUBuffer.get(Result, LYSize + LVSize, LUSize);
 end;
 
+{ TCustomRunnable }
+
+procedure TCustomRunnable.DoRun;
+begin
+  //
+end;
+
+procedure TCustomRunnable.run;
+begin
+  DoRun;
+end;
+
 { TRunnable }
 
 constructor TRunnable.Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
@@ -644,7 +663,7 @@ begin
   FSync := ASync;
 end;
 
-procedure TRunnable.run;
+procedure TRunnable.DoRun;
 begin
   if FSync then
     TThread.ForceQueue(nil, FRunHandler)
