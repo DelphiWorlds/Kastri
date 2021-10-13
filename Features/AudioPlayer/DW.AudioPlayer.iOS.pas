@@ -105,7 +105,7 @@ begin
   FPlayer := TAVAudioPlayer.Wrap(TAVAudioPlayer.Alloc.initWithContentsOfURL(LURL, @LPointer));
   FPlayer.setDelegate(FDelegate.GetObjectID);
   FPlayer.prepareToPlay;
-  DoAudioStatusChange(TAudioStatusChange.Ready);
+  DoAudioStateChange(TAudioState.Ready);
 end;
 
 procedure TPlatformAudioPlayer.Pause;
@@ -119,7 +119,7 @@ begin
   if FPlayer <> nil then
   begin
     FPlayer.play;
-    DoAudioStatusChange(TAudioStatusChange.Playing);
+    DoAudioStateChange(TAudioState.Playing);
   end;
 end;
 

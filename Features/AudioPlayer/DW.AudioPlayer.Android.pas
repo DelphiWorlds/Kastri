@@ -204,7 +204,7 @@ procedure TPlatformAudioPlayer.PlayStarted;
 begin
   FDelay := MilliSecondsBetween(Now, FPlayStartTime);
   // TOSLog.d('Delay: %dms', [FDelay]);
-  DoAudioStatusChange(TAudioStatusChange.Playing);
+  DoAudioStateChange(TAudioState.Playing);
 end;
 
 end.
