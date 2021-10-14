@@ -2,7 +2,7 @@
 
 ## Description
 
-Demonstrates the use of the Play Asset Delivery feature in Kastri
+Demonstrates the use of the [Play Asset Delivery](https://developer.android.com/guide/playcore/asset-delivery) feature in Kastri
 
 ## Supported versions of Delphi
 
