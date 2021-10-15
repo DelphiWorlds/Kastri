@@ -13,17 +13,36 @@ unit DW.iOSapi.FBSDKCoreKit;
 
 {$I DW.GlobalDefines.inc}
 
+// Imported using Facebook iOS SDK v11.1.0
+
 interface
 
 uses
   // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation, Macapi.Dispatch,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics, iOSapi.WebKit,
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.WebKit, iOSapi.UIKit, iOSapi.CoreGraphics,
   // DW
-  DW.Macapi.Dispatch;
+  DW.Macapi.Dispatch, DW.iOSapi.Foundation;
 
 const
+  FBSDKAdvertisingTrackingAllowed = 0;
+  FBSDKAdvertisingTrackingDisallowed = 1;
+  FBSDKAdvertisingTrackingUnspecified = 2;
+  FBSDKGraphRequestFlagNone = 0;
+  FBSDKGraphRequestFlagSkipClientToken = 2;
+  FBSDKGraphRequestFlagDoNotInvalidateTokenOnError = 4;
+  FBSDKGraphRequestFlagDisableErrorRecovery = 8;
+  FBSDKAppEventsFlushBehaviorAuto = 0;
+  FBSDKAppEventsFlushBehaviorExplicitOnly = 1;
+  FBSDKProductAvailabilityInStock = 0;
+  FBSDKProductAvailabilityOutOfStock = 1;
+  FBSDKProductAvailabilityPreOrder = 2;
+  FBSDKProductAvailabilityAvailableForOrder = 3;
+  FBSDKProductAvailabilityDiscontinued = 4;
+  FBSDKProductConditionNew = 0;
+  FBSDKProductConditionRefurbished = 1;
+  FBSDKProductConditionUsed = 2;
   FBSDKErrorReserved = 0;
   FBSDKErrorEncryption = 1;
   FBSDKErrorInvalidArgument = 2;
@@ -38,24 +57,37 @@ const
   FBSDKErrorAppVersionUnsupported = 11;
   FBSDKErrorBrowserUnavailable = 12;
   FBSDKErrorBridgeAPIInterruption = 13;
+  FBSDKErrorBridgeAPIResponse = 14;
   FBSDKGraphRequestErrorOther = 0;
   FBSDKGraphRequestErrorTransient = 1;
   FBSDKGraphRequestErrorRecoverable = 2;
+  FBSDKFeatureNone = 0;
+  FBSDKFeatureCore = 16777216;
+  FBSDKFeatureAppEvents = 16842752;
+  FBSDKFeatureCodelessEvents = 16843008;
+  FBSDKFeatureRestrictiveDataFiltering = 16843264;
+  FBSDKFeatureAAM = 16843520;
+  FBSDKFeaturePrivacyProtection = 16843776;
+  FBSDKFeatureSuggestedEvents = 16843777;
+  FBSDKFeatureIntelligentIntegrity = 16843778;
+  FBSDKFeatureModelRequest = 16843779;
+  FBSDKFeatureEventDeactivation = 16844032;
+  FBSDKFeatureSKAdNetwork = 16844288;
+  FBSDKFeatureSKAdNetworkConversionValue = 16844289;
+  FBSDKFeatureATELogging = 16844544;
+  FBSDKFeatureAEM = 16844800;
+  FBSDKFeatureInstrument = 16908288;
+  FBSDKFeatureCrashReport = 16908544;
+  FBSDKFeatureCrashShield = 16908545;
+  FBSDKFeatureErrorReport = 16908800;
+  FBSDKFeatureLogin = 33554432;
+  FBSDKFeatureShare = 50331648;
+  FBSDKFeatureGamingServices = 67108864;
   FBSDKAppLinkNavigationTypeFailure = 0;
   FBSDKAppLinkNavigationTypeBrowser = 1;
   FBSDKAppLinkNavigationTypeApp = 2;
-  FBSDKIncludeStatusBarInSizeNever = 0;
-  FBSDKIncludeStatusBarInSizeAlways = 1;
-  FBSDKAppEventsFlushBehaviorAuto = 0;
-  FBSDKAppEventsFlushBehaviorExplicitOnly = 1;
-  FBSDKProductAvailabilityInStock = 0;
-  FBSDKProductAvailabilityOutOfStock = 1;
-  FBSDKProductAvailabilityPreOrder = 2;
-  FBSDKProductAvailabilityAvailableForOrder = 3;
-  FBSDKProductAvailabilityDiscontinued = 4;
-  FBSDKProductConditionNew = 0;
-  FBSDKProductConditionRefurbished = 1;
-  FBSDKProductConditionUsed = 2;
+  FBSDKBridgeAPIProtocolTypeNative = 0;
+  FBSDKBridgeAPIProtocolTypeWeb = 1;
   FBSDKProfilePictureModeSquare = 0;
   FBSDKProfilePictureModeNormal = 1;
   FBSDKProfilePictureModeAlbum = 2;
@@ -63,41 +95,72 @@ const
   FBSDKProfilePictureModeLarge = 4;
 
 type
-  FBSDKAppLinkResolving = interface;
-  FBSDKWebViewAppLinkResolver = interface;
-  FBSDKErrorRecoveryAttempting = interface;
-  FBSDKTestUsersManager = interface;
-  FBSDKAppLinkTarget = interface;
-  FBSDKAppLink = interface;
-  FBSDKAppLinkNavigation = interface;
-  FBSDKAppLinkReturnToRefererViewDelegate = interface;
-  FBSDKAppLinkReturnToRefererView = interface;
   FBSDKGraphRequestConnectionDelegate = interface;
   FBSDKGraphRequestConnection = interface;
-  FBSDKAppEvents = interface;
-  FBSDKCopying = interface;
+  FBSDKTokenCaching = interface;
   FBSDKAccessToken = interface;
-  FBSDKURL = interface;
-  FBSDKUtility = interface;
-  FBSDKSettings = interface;
-  FBSDKAppLinkReturnToRefererControllerDelegate = interface;
-  FBSDKAppLinkReturnToRefererController = interface;
-  FBSDKAppLinkUtility = interface;
-  FBSDKMeasurementEvent = interface;
+  FBSDKAccessTokenProviding = interface;
+  FBSDKAccessTokenSetting = interface;
+  FBSDKGraphRequest = interface;
+  FBSDKAppEvents = interface;
+  FBSDKApplicationObserving = interface;
   FBSDKApplicationDelegate = interface;
   FBSDKAuthenticationToken = interface;
+  FBSDKAuthenticationTokenClaims = interface;
+  FBSDKImpressionTrackingButton = interface;
   FBSDKButton = interface;
-  FBSDKGraphRequest = interface;
+  FBSDKButtonImpressionTracking = interface;
+  FBSDKErrorRecoveryAttempting = interface;
+  FBSDKError = interface;
+  FBSDKFeatureChecking = interface;
+  FBSDKGraphRequestConnecting = interface;
+  FBSDKGraphRequestConnectionProviding = interface;
+  FBSDKGraphRequestConnectionFactory = interface;
   FBSDKGraphRequestDataAttachment = interface;
+  FBSDKInternalUtility = interface;
+  FBSDKLocation = interface;
+  FBSDKSettingsLogging = interface;
+  FBSDKSettings = interface;
+  FBSDKUserAgeRange = interface;
+  FBSDKUtility = interface;
+  FBSDKAppLinkTarget = interface;
+  FBSDKAppLink = interface;
+  FBSDKAppLinkResolving = interface;
+  FBSDKAppLinkNavigation = interface;
   FBSDKAppLinkResolver = interface;
   FBSDKAppLinkResolverRequestBuilder = interface;
+  FBSDKAppLinkUtility = interface;
+  FBSDKURLOpening = interface;
   FBSDKGraphErrorRecoveryProcessorDelegate = interface;
   FBSDKGraphErrorRecoveryProcessor = interface;
+  FBSDKMeasurementEvent = interface;
   FBSDKMutableCopying = interface;
   FBSDKProfilePictureView = interface;
   FBSDKProfile = interface;
+  FBSDKURL = interface;
+  FBSDKWebDialog = interface;
+  FBSDKWebDialogDelegate = interface;
+  FBSDKWebDialogView = interface;
+  FBSDKWebDialogViewDelegate = interface;
+  FBSDKWebViewAppLinkResolver = interface;
+  FBSDKWindowFinding = interface;
 
-  FBSDKAppLinkBlock = procedure(appLink: FBSDKAppLink; error: NSError) of object;
+  FBSDKGraphRequestCompletion = procedure(connection: Pointer; result: Pointer; error: NSError) of object;
+
+  FBSDKGraphRequestBlock = procedure(connection: FBSDKGraphRequestConnection; result: Pointer; error: NSError) of object;
+  FBSDKAdvertisingTrackingStatus = NSInteger;
+  FBSDKAppEventName = NSString;
+  FBSDKAppEventParameterName = NSString;
+  FBSDKHTTPMethod = NSString;
+  FBSDKGraphRequestFlags = NSInteger;
+
+
+  FBSDKAppEventsFlushBehavior = NSInteger;
+  FBSDKProductAvailability = NSInteger;
+  FBSDKProductCondition = NSInteger;
+  FBSDKAppEventUserDataType = NSString;
+  FBSDKAppEventParameterProduct = NSString;
+  FBSDKAppEventParameterValue = NSString;
 
   FBSDKCodeBlock = procedure of object;
 
@@ -106,167 +169,51 @@ type
   FBSDKSuccessBlock = procedure(success: Boolean; error: NSError) of object;
   FBSDKCoreError = NSInteger;
   FBSDKGraphRequestError = NSInteger;
+  FBSDKFeature = NSInteger;
 
-  FBSDKAccessTokensBlock = procedure(tokens: NSArray; error: NSError) of object;
+  FBSDKFeatureManagerBlock = procedure(enabled: Boolean) of object;
+
+  FBSDKLoggingBehavior = NSString;
+
+  FBSDKAppLinkBlock = procedure(appLink: FBSDKAppLink; error: NSError) of object;
   FBSDKAppLinkNavigationType = NSInteger;
 
   FBSDKAppLinkNavigationBlock = procedure(navType: FBSDKAppLinkNavigationType; error: NSError) of object;
-  FBSDKIncludeStatusBarInSize = NSInteger;
-
-  FBSDKGraphRequestBlock = procedure(connection: FBSDKGraphRequestConnection; result: Pointer; error: NSError) of object;
-  FBSDKAppEventsFlushBehavior = NSInteger;
-  FBSDKProductAvailability = NSInteger;
-  FBSDKProductCondition = NSInteger;
-  FBSDKAppEventName = NSString;
-  FBSDKAppEventParameterName = NSString;
-  FBSDKAppEventParameterProduct = NSString;
-  FBSDKAppEventParameterValue = NSString;
-  FBSDKAppEventUserDataType = NSString;
-  FBSDKLoggingBehavior = NSString;
-
-  FBSDKURLBlock = procedure(url: NSURL; error: NSError) of object;
-  FBSDKHTTPMethod = NSString;
 
   FBSDKAppLinksBlock = procedure(appLinks: NSDictionary; error: NSError) of object;
+
+  FBSDKURLBlock = procedure(url: NSURL; error: NSError) of object;
+  FBSDKBridgeAPIProtocolType = NSInteger;
+
+  FBSDKAuthenticationCompletionHandler = procedure(callbackURL: NSURL; error: NSError) of object;
   FBSDKProfilePictureMode = NSInteger;
 
   FBSDKProfileBlock = procedure(profile: FBSDKProfile; error: NSError) of object;
-
-  FBSDKAppLinkResolving = interface(IObjectiveC)
-    ['{28B96DB9-78D5-4C31-A1AB-009F089AC4D3}']
-    procedure appLinkFromURL(url: NSURL; handler: FBSDKAppLinkBlock); cdecl;
-  end;
-
-  FBSDKWebViewAppLinkResolverClass = interface(NSObjectClass)
-    ['{FBA875E9-6A52-4FDE-B7CB-16E9EA3E2723}']
-    {class} function sharedInstance: FBSDKWebViewAppLinkResolver; cdecl;
-  end;
-
-  FBSDKWebViewAppLinkResolver = interface(NSObject)
-    ['{DDF2D16B-5412-4C53-A190-730136B0A682}']
-  end;
-  TFBSDKWebViewAppLinkResolver = class(TOCGenericImport<FBSDKWebViewAppLinkResolverClass, FBSDKWebViewAppLinkResolver>) end;
-
-  FBSDKErrorRecoveryAttempting = interface(IObjectiveC)
-    ['{746DED57-9A10-483D-B19A-AF3E09AFA697}']
-    procedure attemptRecoveryFromError(error: NSError; optionIndex: NSUInteger; delegate: Pointer; didRecoverSelector: Pointer;
-      contextInfo: Pointer); cdecl;
-  end;
-
-  FBSDKTestUsersManagerClass = interface(NSObjectClass)
-    ['{0040C4C2-3C8A-4295-8349-331ADDEF3780}']
-    {class} function new: Pointer; cdecl;
-    {class} function sharedInstanceForAppID(appID: NSString; appSecret: NSString): Pointer; cdecl;
-  end;
-
-  FBSDKTestUsersManager = interface(NSObject)
-    ['{BC172EFF-B9D5-47B3-B1CC-9D94EBAB5FA6}']
-    procedure addTestAccountWithPermissions(permissions: NSSet; completionHandler: FBSDKAccessTokensBlock); cdecl;
-    procedure makeFriendsWithFirst(first: FBSDKAccessToken; second: FBSDKAccessToken; callback: FBSDKErrorBlock); cdecl;
-    procedure removeTestAccount(userId: NSString; completionHandler: FBSDKErrorBlock); cdecl;
-    procedure requestTestAccountTokensWithArraysOfPermissions(arraysOfPermissions: NSArray; createIfNotFound: Boolean;
-      completionHandler: FBSDKAccessTokensBlock); cdecl;
-  end;
-  TFBSDKTestUsersManager = class(TOCGenericImport<FBSDKTestUsersManagerClass, FBSDKTestUsersManager>) end;
-
-  FBSDKAppLinkTargetClass = interface(NSObjectClass)
-    ['{3D701BDF-F8C2-41FC-A52F-636ECD2B77A4}']
-    {class} function appLinkTargetWithURL(url: NSURL; appStoreId: NSString; appName: NSString): Pointer; cdecl;
-    {class} function new: Pointer; cdecl;
-  end;
-
-  FBSDKAppLinkTarget = interface(NSObject)
-    ['{1F023126-AAE1-4F6E-AABE-3EC7BAEAC012}']
-    function appName: NSString; cdecl;
-    function appStoreId: NSString; cdecl;
-    function URL: NSURL; cdecl;
-  end;
-  TFBSDKAppLinkTarget = class(TOCGenericImport<FBSDKAppLinkTargetClass, FBSDKAppLinkTarget>) end;
-
-  FBSDKAppLinkClass = interface(NSObjectClass)
-    ['{8DFB9DAB-E462-412F-B459-BB5C9BDD876E}']
-    {class} function appLinkWithSourceURL(sourceURL: NSURL; targets: NSArray; webURL: NSURL): Pointer; cdecl;
-    {class} function new: Pointer; cdecl;
-  end;
-
-  FBSDKAppLink = interface(NSObject)
-    ['{040D7036-F6A7-401F-BC2A-24320086DA29}']
-    function sourceURL: NSURL; cdecl;
-    function targets: NSArray; cdecl;
-    function webURL: NSURL; cdecl;
-  end;
-  TFBSDKAppLink = class(TOCGenericImport<FBSDKAppLinkClass, FBSDKAppLink>) end;
-
-  FBSDKAppLinkNavigationClass = interface(NSObjectClass)
-    ['{6B9938E4-D286-4393-BD60-2C4E372A1502}']
-    {class} function callbackAppLinkDataForAppWithName(appName: NSString; url: NSString): NSDictionary; cdecl;
-    {class} function defaultResolver: Pointer; cdecl;
-    {class} function navigateToAppLink(link: FBSDKAppLink; error: PPointer): FBSDKAppLinkNavigationType; cdecl;
-    {class} procedure navigateToURL(destination: NSURL; handler: FBSDKAppLinkNavigationBlock); overload; cdecl;
-    {class} procedure navigateToURL(destination: NSURL; resolver: Pointer; handler: FBSDKAppLinkNavigationBlock); overload; cdecl;
-    {class} function navigationTypeForLink(link: FBSDKAppLink): FBSDKAppLinkNavigationType; cdecl;
-    {class} function navigationWithAppLink(appLink: FBSDKAppLink; extras: NSDictionary; appLinkData: NSDictionary): Pointer; cdecl;
-    {class} function new: Pointer; cdecl;
-    {class} procedure resolveAppLink(destination: NSURL; handler: FBSDKAppLinkBlock); overload; cdecl;
-    {class} procedure resolveAppLink(destination: NSURL; resolver: Pointer; handler: FBSDKAppLinkBlock); overload; cdecl;
-    {class} procedure setDefaultResolver(defaultResolver: Pointer); cdecl;
-  end;
-
-  FBSDKAppLinkNavigation = interface(NSObject)
-    ['{D9611CFB-BCE6-4406-B70E-DB05C6A49924}']
-    function appLink: FBSDKAppLink; cdecl;
-    function appLinkData: NSDictionary; cdecl;
-    function extras: NSDictionary; cdecl;
-    function navigate(error: PPointer): FBSDKAppLinkNavigationType; cdecl;
-    function navigationType: FBSDKAppLinkNavigationType; cdecl;
-  end;
-  TFBSDKAppLinkNavigation = class(TOCGenericImport<FBSDKAppLinkNavigationClass, FBSDKAppLinkNavigation>) end;
-
-  FBSDKAppLinkReturnToRefererViewDelegate = interface(IObjectiveC)
-    ['{EAE7846F-76A4-4C20-A2DB-D9E8AA349BF3}']
-    procedure returnToRefererViewDidTapInsideCloseButton(view: FBSDKAppLinkReturnToRefererView); cdecl;
-    procedure returnToRefererViewDidTapInsideLink(view: FBSDKAppLinkReturnToRefererView; link: FBSDKAppLink); cdecl;
-  end;
-
-  FBSDKAppLinkReturnToRefererViewClass = interface(UIViewClass)
-    ['{483E63C6-1E64-432B-B3B3-A450FF30EFD0}']
-  end;
-
-  FBSDKAppLinkReturnToRefererView = interface(UIView)
-    ['{3F750687-8615-423F-8525-1E3C142D2CD1}']
-    function delegate: Pointer; cdecl;
-    function includeStatusBarInSize: FBSDKIncludeStatusBarInSize; cdecl;
-    function isClosed: Boolean; cdecl;
-    function refererAppLink: FBSDKAppLink; cdecl;
-    procedure setClosed(closed: Boolean); cdecl;
-    procedure setDelegate(delegate: Pointer); cdecl;
-    procedure setIncludeStatusBarInSize(includeStatusBarInSize: FBSDKIncludeStatusBarInSize); cdecl;
-    procedure setRefererAppLink(refererAppLink: FBSDKAppLink); cdecl;
-    procedure setTextColor(textColor: UIColor); cdecl;
-    function textColor: UIColor; cdecl;
-  end;
-  TFBSDKAppLinkReturnToRefererView = class(TOCGenericImport<FBSDKAppLinkReturnToRefererViewClass, FBSDKAppLinkReturnToRefererView>) end;
+  FBSDKUserIdentifier = NSString;
+  TFBSDKErrorRecoveryAttemptingBlockMethod1 = procedure(didRecover: Boolean) of object;
 
   FBSDKGraphRequestConnectionDelegate = interface(IObjectiveC)
-    ['{A1A10E31-899E-47F8-B7E0-769D17AA009C}']
-    procedure requestConnection(connection: FBSDKGraphRequestConnection; didSendBodyData: NSInteger; totalBytesWritten: NSInteger;
-      totalBytesExpectedToWrite: NSInteger); overload; cdecl;
-    procedure requestConnection(connection: FBSDKGraphRequestConnection; didFailWithError: NSError); overload; cdecl;
-    procedure requestConnectionDidFinishLoading(connection: FBSDKGraphRequestConnection); cdecl;
-    procedure requestConnectionWillBeginLoading(connection: FBSDKGraphRequestConnection); cdecl;
+    ['{73C13B73-6633-46AA-991E-2CFC39C51899}']
+    procedure requestConnection(connection: Pointer; didSendBodyData: NSInteger; totalBytesWritten: NSInteger; totalBytesExpectedToWrite: NSInteger); overload; cdecl;
+    procedure requestConnection(connection: Pointer; didFailWithError: NSError); overload; cdecl;
+    procedure requestConnectionDidFinishLoading(connection: Pointer); cdecl;
+    procedure requestConnectionWillBeginLoading(connection: Pointer); cdecl;
   end;
 
   FBSDKGraphRequestConnectionClass = interface(NSObjectClass)
-    ['{68DDECBC-EB88-4360-9C0A-3DAD1D89A532}']
+    ['{F2A6C49F-2780-4B70-BD69-4FA231EFF89B}']
     {class} function defaultConnectionTimeout: NSTimeInterval; cdecl;
     {class} procedure setDefaultConnectionTimeout(defaultConnectionTimeout: NSTimeInterval); cdecl;
   end;
 
   FBSDKGraphRequestConnection = interface(NSObject)
-    ['{8E671212-4840-4B45-85AF-2ECD3D1B1E0A}']
-    procedure addRequest(request: FBSDKGraphRequest; batchParameters: NSDictionary; completionHandler: FBSDKGraphRequestBlock); overload; cdecl;
-    procedure addRequest(request: FBSDKGraphRequest; batchEntryName: NSString; completionHandler: FBSDKGraphRequestBlock); overload; cdecl;
-    procedure addRequest(request: FBSDKGraphRequest; completionHandler: FBSDKGraphRequestBlock); overload; cdecl;
+    ['{7BECFB26-7E70-48AE-A422-4264E41C721D}']
+    procedure addRequest(request: Pointer; name: NSString; completion: FBSDKGraphRequestCompletion); overload; cdecl;
+    procedure addRequest(request: Pointer; batchParameters: NSDictionary; completionHandler: FBSDKGraphRequestBlock); overload; cdecl;
+    procedure addRequest(request: Pointer; parameters: NSDictionary; completion: FBSDKGraphRequestCompletion); overload; cdecl;
+    procedure addRequest(request: Pointer; completionHandler: FBSDKGraphRequestBlock); overload; cdecl;
+    procedure addRequest(request: Pointer; completion: FBSDKGraphRequestCompletion); overload; cdecl;
+    procedure addRequest(request: Pointer; batchEntryName: NSString; completionHandler: FBSDKGraphRequestBlock); overload; cdecl;
     procedure cancel; cdecl;
     function delegate: Pointer; cdecl;
     function delegateQueue: NSOperationQueue; cdecl;
@@ -280,70 +227,28 @@ type
   end;
   TFBSDKGraphRequestConnection = class(TOCGenericImport<FBSDKGraphRequestConnectionClass, FBSDKGraphRequestConnection>) end;
 
-  FBSDKAppEventsClass = interface(NSObjectClass)
-    ['{840B0331-CFCE-4B0F-9DEF-D0F6CD4185C1}']
-    {class} procedure activateApp; cdecl;
-    {class} function anonymousID: NSString; cdecl;
-    {class} procedure augmentHybridWKWebView(webView: WKWebView); cdecl;
-    {class} procedure clearUserData; cdecl;
-    {class} procedure clearUserDataForType(&type: FBSDKAppEventUserDataType); cdecl;
-    {class} procedure clearUserID; cdecl;
-    {class} procedure flush; cdecl;
-    {class} function flushBehavior: FBSDKAppEventsFlushBehavior; cdecl;
-    {class} function getUserData: NSString; cdecl;
-    {class} procedure logEvent(eventName: FBSDKAppEventName; valueToSum: Double); overload; cdecl;
-    {class} procedure logEvent(eventName: FBSDKAppEventName); overload; cdecl;
-    {class} procedure logEvent(eventName: FBSDKAppEventName; valueToSum: Double; parameters: NSDictionary); overload; cdecl;
-    {class} procedure logEvent(eventName: FBSDKAppEventName; valueToSum: NSNumber; parameters: NSDictionary;
-      accessToken: FBSDKAccessToken); overload; cdecl;
-    {class} procedure logEvent(eventName: FBSDKAppEventName; parameters: NSDictionary); overload; cdecl;
-    {class} function loggingOverrideAppID: NSString; cdecl;
-    {class} procedure logProductItem(itemID: NSString; availability: FBSDKProductAvailability; condition: FBSDKProductCondition;
-      description: NSString; imageLink: NSString; link: NSString; title: NSString; priceAmount: Double; currency: NSString; gtin: NSString;
-      mpn: NSString; brand: NSString; parameters: NSDictionary); cdecl;
-    {class} procedure logPurchase(purchaseAmount: Double; currency: NSString); overload; cdecl;
-    {class} procedure logPurchase(purchaseAmount: Double; currency: NSString; parameters: NSDictionary); overload; cdecl;
-    {class} procedure logPurchase(purchaseAmount: Double; currency: NSString; parameters: NSDictionary;
-      accessToken: FBSDKAccessToken); overload; cdecl;
-    {class} procedure logPushNotificationOpen(payload: NSDictionary); overload; cdecl;
-    {class} procedure logPushNotificationOpen(payload: NSDictionary; action: NSString); overload; cdecl;
-    {class} function new: Pointer; cdecl;
-    {class} function requestForCustomAudienceThirdPartyIDWithAccessToken(accessToken: FBSDKAccessToken): FBSDKGraphRequest; cdecl;
-    {class} procedure sendEventBindingsToUnity; cdecl;
-    {class} procedure setFlushBehavior(flushBehavior: FBSDKAppEventsFlushBehavior); cdecl;
-    {class} procedure setIsUnityInit(isUnityInit: Boolean); cdecl;
-    {class} procedure setLoggingOverrideAppID(loggingOverrideAppID: NSString); cdecl;
-    {class} procedure setPushNotificationsDeviceToken(deviceToken: NSData); cdecl;
-    {class} procedure setPushNotificationsDeviceTokenString(deviceTokenString: NSString); cdecl;
-    {class} procedure setUserData(data: NSString; forType: FBSDKAppEventUserDataType); cdecl;
-    {class} procedure setUserEmail(email: NSString; firstName: NSString; lastName: NSString; phone: NSString; dateOfBirth: NSString; gender: NSString;
-      city: NSString; state: NSString; zip: NSString; country: NSString); cdecl;
-    {class} procedure setUserID(userID: NSString); cdecl;
-    {class} procedure updateUserProperties(properties: NSDictionary; handler: FBSDKGraphRequestBlock); cdecl;
-    {class} function userID: NSString; cdecl;
-  end;
-
-  FBSDKAppEvents = interface(NSObject)
-    ['{2C8A00B8-D797-479A-B716-199403B65589}']
-  end;
-  TFBSDKAppEvents = class(TOCGenericImport<FBSDKAppEventsClass, FBSDKAppEvents>) end;
-
-  FBSDKCopying = interface(IObjectiveC)
-    ['{30BF0DA8-82E9-4534-B824-A512DD39B576}']
-    function copy: Pointer; cdecl;
+  FBSDKTokenCaching = interface(IObjectiveC)
+    ['{ACC3119B-EC1C-4389-A22C-A5D341F3B43F}']
+    function accessToken: FBSDKAccessToken; cdecl;
+    function authenticationToken: FBSDKAuthenticationToken; cdecl;
+    procedure setAccessToken(accessToken: FBSDKAccessToken); cdecl;
+    procedure setAuthenticationToken(authenticationToken: FBSDKAuthenticationToken); cdecl;
   end;
 
   FBSDKAccessTokenClass = interface(NSObjectClass)
-    ['{90087E52-78D3-446F-A567-E0CB7FEC008B}']
+    ['{1551248D-30AE-4C9A-AEC4-BB0BB0AD1965}']
     {class} function currentAccessToken: FBSDKAccessToken; cdecl;
     {class} function isCurrentAccessTokenActive: Boolean; cdecl;
     {class} function new: Pointer; cdecl;
     {class} procedure refreshCurrentAccessToken(completionHandler: FBSDKGraphRequestBlock); cdecl;
+    {class} procedure refreshCurrentAccessTokenWithCompletion(completion: FBSDKGraphRequestCompletion); cdecl;
     {class} procedure setCurrentAccessToken(currentAccessToken: FBSDKAccessToken); cdecl;
+    {class} procedure setTokenCache(tokenCache: Pointer); cdecl;
+    {class} function tokenCache: Pointer; cdecl;
   end;
 
   FBSDKAccessToken = interface(NSObject)
-    ['{129C8E21-4322-4DE1-BC77-05D767B3DA97}']
+    ['{88D8656F-67F1-43FF-9B6D-BBC18E30F2D5}']
     function appID: NSString; cdecl;
     function dataAccessExpirationDate: NSDate; cdecl;
     function declinedPermissions: NSSet; cdecl;
@@ -366,45 +271,316 @@ type
   end;
   TFBSDKAccessToken = class(TOCGenericImport<FBSDKAccessTokenClass, FBSDKAccessToken>) end;
 
-  FBSDKURLClass = interface(NSObjectClass)
-    ['{2F9A3975-FF91-4EDB-8690-A14301CA1604}']
+  FBSDKAccessTokenProviding = interface(IObjectiveC)
+    ['{00A5104B-AE9D-4094-AC3E-7B8B192E2344}']
+    {class} function currentAccessToken: FBSDKAccessToken; cdecl;
+    {class} procedure setTokenCache(tokenCache: Pointer); cdecl;
+    {class} function tokenCache: Pointer; cdecl;
+  end;
+
+  FBSDKAccessTokenSetting = interface(IObjectiveC)
+    ['{D936839B-DABC-4C33-B5BF-D7861282ACCD}']
+    {class} function currentAccessToken: FBSDKAccessToken; cdecl;
+    {class} procedure setCurrentAccessToken(currentAccessToken: FBSDKAccessToken); cdecl;
+  end;
+
+  FBSDKGraphRequestClass = interface(NSObjectClass)
+    ['{640F19DA-DC81-498F-ADEC-2CFA6B96DC14}']
     {class} function new: Pointer; cdecl;
-    {class} function URLWithInboundURL(url: NSURL; sourceApplication: NSString): Pointer; cdecl;
-    {class} function URLWithURL(url: NSURL): Pointer; cdecl;
   end;
 
-  FBSDKURL = interface(NSObject)
-    ['{8AE28432-6B24-4A49-81A2-BEEAF446EECD}']
-    function appLinkData: NSDictionary; cdecl;
-    function appLinkExtras: NSDictionary; cdecl;
-    function appLinkReferer: FBSDKAppLink; cdecl;
-    function inputQueryParameters: NSDictionary; cdecl;
-    function inputURL: NSURL; cdecl;
-    function isAutoAppLink: Boolean; cdecl;
-    function targetQueryParameters: NSDictionary; cdecl;
-    function targetURL: NSURL; cdecl;
+  FBSDKGraphRequest = interface(NSObject)
+    ['{D3C57036-4FB1-446D-BB70-DBDA14B06605}']
+    function graphPath: NSString; cdecl;
+    function HTTPMethod: NSString; cdecl;
+    function initWithGraphPath(graphPath: NSString; parameters: NSDictionary; tokenString: NSString; version: NSString;
+      HTTPMethod: FBSDKHTTPMethod): Pointer; overload; cdecl;
+    function initWithGraphPath(graphPath: NSString; parameters: NSDictionary; HTTPMethod: FBSDKHTTPMethod): Pointer; overload; cdecl;
+    function initWithGraphPath(graphPath: NSString): Pointer; overload; cdecl;
+    function initWithGraphPath(graphPath: NSString; HTTPMethod: FBSDKHTTPMethod): Pointer; overload; cdecl;
+    function initWithGraphPath(graphPath: NSString; parameters: NSDictionary): Pointer; overload; cdecl;
+    function parameters: NSDictionary; cdecl;
+    procedure setGraphErrorRecoveryDisabled(disable: Boolean); cdecl;
+    procedure setParameters(parameters: NSDictionary); cdecl;
+    function startWithCompletion(completion: FBSDKGraphRequestCompletion): Pointer; cdecl;
+    function startWithCompletionHandler(handler: FBSDKGraphRequestBlock): Pointer; cdecl;
+    function tokenString: NSString; cdecl;
+    function version: NSString; cdecl;
   end;
-  TFBSDKURL = class(TOCGenericImport<FBSDKURLClass, FBSDKURL>) end;
+  TFBSDKGraphRequest = class(TOCGenericImport<FBSDKGraphRequestClass, FBSDKGraphRequest>) end;
 
-  FBSDKUtilityClass = interface(NSObjectClass)
-    ['{149F31DF-4A75-470F-8E9F-0ECD4DE2E910}']
-    {class} function dictionaryWithQueryString(queryString: NSString): NSDictionary; cdecl;
+  FBSDKAppEventsClass = interface(NSObjectClass)
+    ['{C81C801D-D0B9-471A-905F-3AAA59CC83CE}']
+    {class} procedure activateApp; cdecl;
+    {class} function anonymousID: NSString; cdecl;
+    {class} procedure augmentHybridWKWebView(webView: WKWebView); cdecl;
+    {class} procedure clearUserData; cdecl;
+    {class} procedure clearUserDataForType(&type: FBSDKAppEventUserDataType); cdecl;
+    {class} procedure clearUserID; cdecl;
+    {class} procedure flush; cdecl;
+    {class} function flushBehavior: FBSDKAppEventsFlushBehavior; cdecl;
+    {class} function getUserData: NSString; cdecl;
+    {class} procedure logEvent(eventName: FBSDKAppEventName; valueToSum: Double; parameters: NSDictionary); overload; cdecl;
+    {class} procedure logEvent(eventName: FBSDKAppEventName); overload; cdecl;
+    {class} procedure logEvent(eventName: FBSDKAppEventName; valueToSum: Double); overload; cdecl;
+    {class} procedure logEvent(eventName: FBSDKAppEventName; parameters: NSDictionary); overload; cdecl;
+    {class} procedure logEvent(eventName: FBSDKAppEventName; valueToSum: NSNumber; parameters: NSDictionary;
+      accessToken: FBSDKAccessToken); overload; cdecl;
+    {class} function loggingOverrideAppID: NSString; cdecl;
+    {class} procedure logInternalEvent(eventName: FBSDKAppEventName; parameters: NSDictionary; isImplicitlyLogged: Boolean;
+      accessToken: FBSDKAccessToken); overload; cdecl;
+    {class} procedure logInternalEvent(eventName: FBSDKAppEventName; parameters: NSDictionary; isImplicitlyLogged: Boolean); overload; cdecl;
+    {class} procedure logProductItem(itemID: NSString; availability: FBSDKProductAvailability; condition: FBSDKProductCondition;
+      description: NSString; imageLink: NSString; link: NSString; title: NSString; priceAmount: Double; currency: NSString; gtin: NSString;
+      mpn: NSString; brand: NSString; parameters: NSDictionary); cdecl;
+    {class} procedure logPurchase(purchaseAmount: Double; currency: NSString); overload; cdecl;
+    {class} procedure logPurchase(purchaseAmount: Double; currency: NSString; parameters: NSDictionary;
+      accessToken: FBSDKAccessToken); overload; cdecl;
+    {class} procedure logPurchase(purchaseAmount: Double; currency: NSString; parameters: NSDictionary); overload; cdecl;
+    {class} procedure logPushNotificationOpen(payload: NSDictionary); overload; cdecl;
+    {class} procedure logPushNotificationOpen(payload: NSDictionary; action: NSString); overload; cdecl;
     {class} function new: Pointer; cdecl;
-    {class} function queryStringWithDictionary(dictionary: NSDictionary; error: PPointer): NSString; cdecl;
-    {class} function SHA256Hash(input: NSObject): NSString; cdecl;
-    {class} function startGCDTimerWithInterval(interval: Double; block: dispatch_block_t): dispatch_source_t; cdecl;
-    {class} procedure stopGCDTimer(timer: dispatch_source_t); cdecl;
-    {class} function URLDecode(value: NSString): NSString; cdecl;
-    {class} function URLEncode(value: NSString): NSString; cdecl;
+    {class} function requestForCustomAudienceThirdPartyIDWithAccessToken(accessToken: FBSDKAccessToken): FBSDKGraphRequest; cdecl;
+    {class} procedure sendEventBindingsToUnity; cdecl;
+    {class} procedure setFlushBehavior(flushBehavior: FBSDKAppEventsFlushBehavior); cdecl;
+    {class} procedure setIsUnityInit(isUnityInit: Boolean); cdecl;
+    {class} procedure setLoggingOverrideAppID(loggingOverrideAppID: NSString); cdecl;
+    {class} procedure setPushNotificationsDeviceToken(deviceToken: NSData); cdecl;
+    {class} procedure setPushNotificationsDeviceTokenString(deviceTokenString: NSString); cdecl;
+    {class} procedure setUserData(data: NSString; forType: FBSDKAppEventUserDataType); cdecl;
+    {class} procedure setUserEmail(email: NSString; firstName: NSString; lastName: NSString; phone: NSString; dateOfBirth: NSString;
+      gender: NSString; city: NSString; state: NSString; zip: NSString; country: NSString); cdecl;
+    {class} procedure setUserID(userID: NSString); cdecl;
+    {class} function singleton: FBSDKAppEvents; cdecl;
+    {class} function userID: NSString; cdecl;
   end;
 
-  FBSDKUtility = interface(NSObject)
-    ['{017A5FED-108B-4A60-9352-5F13A92878DC}']
+  FBSDKAppEvents = interface(NSObject)
+    ['{9EB9BA58-947A-4DDC-8AE1-475D668B94D6}']
+    procedure activateApp; cdecl;
   end;
-  TFBSDKUtility = class(TOCGenericImport<FBSDKUtilityClass, FBSDKUtility>) end;
+  TFBSDKAppEvents = class(TOCGenericImport<FBSDKAppEventsClass, FBSDKAppEvents>) end;
+
+  FBSDKApplicationObserving = interface(IObjectiveC)
+    ['{F63CCE1D-9519-4688-A45E-2EB9B8FE2C47}']
+    function application(application: UIApplication; didFinishLaunchingWithOptions: NSDictionary): Boolean; overload; cdecl;
+    function application(application: UIApplication; openURL: NSURL; sourceApplication: NSString; annotation: Pointer): Boolean; overload; cdecl;
+    procedure applicationDidBecomeActive(application: UIApplication); cdecl;
+    procedure applicationDidEnterBackground(application: UIApplication); cdecl;
+    procedure applicationWillResignActive(application: UIApplication); cdecl;
+  end;
+
+  FBSDKApplicationDelegateClass = interface(NSObjectClass)
+    ['{E0CCB638-E7CD-4FE2-9640-FABC2D1C656D}']
+    {class} function new: Pointer; cdecl;
+    {class} function sharedInstance: FBSDKApplicationDelegate; cdecl;
+  end;
+
+  FBSDKApplicationDelegate = interface(NSObject)
+    ['{7486D83B-C242-47AC-843E-1E801EBE30E4}']
+    procedure addObserver(observer: Pointer); cdecl;
+    function application(application: UIApplication; didFinishLaunchingWithOptions: NSDictionary): Boolean; overload; cdecl;
+    function application(application: UIApplication; openURL: NSURL; sourceApplication: NSString; annotation: Pointer): Boolean; overload; cdecl;
+    procedure initializeSDK; cdecl;
+    procedure removeObserver(observer: Pointer); cdecl;
+  end;
+  TFBSDKApplicationDelegate = class(TOCGenericImport<FBSDKApplicationDelegateClass, FBSDKApplicationDelegate>) end;
+
+  FBSDKAuthenticationTokenClass = interface(NSObjectClass)
+    ['{E3FA20B2-6484-4F9D-ADFE-9E85B8C7377C}']
+    {class} function currentAuthenticationToken: FBSDKAuthenticationToken; cdecl;
+    {class} function new: Pointer; cdecl;
+    {class} procedure setCurrentAuthenticationToken(currentAuthenticationToken: FBSDKAuthenticationToken); cdecl;
+    {class} procedure setTokenCache(tokenCache: Pointer); cdecl;
+    {class} function tokenCache: Pointer; cdecl;
+  end;
+
+  FBSDKAuthenticationToken = interface(NSObject)
+    ['{59B630A1-0790-4C97-B0BD-568D9F83F6D2}']
+    function claims: FBSDKAuthenticationTokenClaims; cdecl;
+    function graphDomain: NSString; cdecl;
+    function nonce: NSString; cdecl;
+    function tokenString: NSString; cdecl;
+  end;
+  TFBSDKAuthenticationToken = class(TOCGenericImport<FBSDKAuthenticationTokenClass, FBSDKAuthenticationToken>) end;
+
+  FBSDKAuthenticationTokenClaimsClass = interface(NSObjectClass)
+    ['{6E06FF44-A98C-4554-9184-8727145F9341}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  FBSDKAuthenticationTokenClaims = interface(NSObject)
+    ['{AA1E6293-C860-4FC8-9B15-E944E2F09030}']
+    function aud: NSString; cdecl;
+    function email: NSString; cdecl;
+    function exp: NSTimeInterval; cdecl;
+    function familyName: NSString; cdecl;
+    function givenName: NSString; cdecl;
+    function iat: NSTimeInterval; cdecl;
+    function iss: NSString; cdecl;
+    function jti: NSString; cdecl;
+    function middleName: NSString; cdecl;
+    function name: NSString; cdecl;
+    function nonce: NSString; cdecl;
+    function picture: NSString; cdecl;
+    function sub: NSString; cdecl;
+    function userAgeRange: NSDictionary; cdecl;
+    function userBirthday: NSString; cdecl;
+    function userFriends: NSArray; cdecl;
+    function userGender: NSString; cdecl;
+    function userHometown: NSDictionary; cdecl;
+    function userLink: NSString; cdecl;
+    function userLocation: NSDictionary; cdecl;
+  end;
+  TFBSDKAuthenticationTokenClaims = class(TOCGenericImport<FBSDKAuthenticationTokenClaimsClass, FBSDKAuthenticationTokenClaims>) end;
+
+  FBSDKImpressionTrackingButtonClass = interface(UIButtonClass)
+    ['{889B64D9-F1B0-47CE-9F0A-5AC3C6E06860}']
+  end;
+
+  FBSDKImpressionTrackingButton = interface(UIButton)
+    ['{C92FD2AE-BCBF-4C0B-B216-6B2E31CEC3B6}']
+  end;
+  TFBSDKImpressionTrackingButton = class(TOCGenericImport<FBSDKImpressionTrackingButtonClass, FBSDKImpressionTrackingButton>) end;
+
+  FBSDKButtonClass = interface(FBSDKImpressionTrackingButtonClass)
+    ['{D2C7F99C-383A-485D-A203-4650107F2544}']
+  end;
+
+  FBSDKButton = interface(FBSDKImpressionTrackingButton)
+    ['{12EB6EBA-EF06-4BB1-9EEE-5638F97BBE8F}']
+  end;
+  TFBSDKButton = class(TOCGenericImport<FBSDKButtonClass, FBSDKButton>) end;
+
+  FBSDKButtonImpressionTracking = interface(IObjectiveC)
+    ['{B3A2A6B3-491D-4F4B-9B3D-DE5805696FE9}']
+    function analyticsParameters: NSDictionary; cdecl;
+    function impressionTrackingEventName: NSString; cdecl;
+    function impressionTrackingIdentifier: NSString; cdecl;
+  end;
+
+  FBSDKErrorRecoveryAttempting = interface(IObjectiveC)
+    ['{557E9AB6-1DBA-42FB-8816-4ACA6F46E918}']
+    procedure attemptRecoveryFromError(error: NSError; optionIndex: NSUInteger; completionHandler: TFBSDKErrorRecoveryAttemptingBlockMethod1); cdecl;
+  end;
+
+  FBSDKErrorClass = interface(NSObjectClass)
+    ['{B343EC78-54DD-4164-B639-D22CEC87C1C6}']
+    {class} function errorWithCode(code: NSInteger; message: NSString): NSError; overload; cdecl;
+    {class} function errorWithCode(code: NSInteger; message: NSString; underlyingError: NSError): NSError; overload; cdecl;
+    {class} function errorWithDomain(domain: NSErrorDomain; code: NSInteger; userInfo: NSDictionary; message: NSString;
+      underlyingError: NSError): NSError; overload; cdecl;
+    {class} function errorWithDomain(domain: NSErrorDomain; code: NSInteger; message: NSString; underlyingError: NSError): NSError; overload; cdecl;
+    {class} function errorWithDomain(domain: NSErrorDomain; code: NSInteger; message: NSString): NSError; overload; cdecl;
+    {class} function invalidArgumentErrorWithDomain(domain: NSErrorDomain; name: NSString; value: Pointer;
+      message: NSString): NSError; overload; cdecl;
+    {class} function invalidArgumentErrorWithDomain(domain: NSErrorDomain; name: NSString; value: Pointer; message: NSString;
+      underlyingError: NSError): NSError; overload; cdecl;
+    {class} function invalidArgumentErrorWithName(name: NSString; value: Pointer; message: NSString): NSError; cdecl;
+    {class} function isNetworkError(error: NSError): Boolean; cdecl;
+    {class} function requiredArgumentErrorWithDomain(domain: NSErrorDomain; name: NSString; message: NSString): NSError; cdecl;
+    {class} function unknownErrorWithMessage(message: NSString): NSError; cdecl;
+  end;
+
+  FBSDKError = interface(NSObject)
+    ['{5F2866EB-4D6F-4B94-BB0F-916CDE492A64}']
+  end;
+  TFBSDKError = class(TOCGenericImport<FBSDKErrorClass, FBSDKError>) end;
+
+  FBSDKFeatureChecking = interface(IObjectiveC)
+    ['{7F4E5CFD-C269-4047-9A1E-D48E33DA776C}']
+    procedure checkFeature(feature: FBSDKFeature; completionBlock: FBSDKFeatureManagerBlock); cdecl;
+    function isEnabled(feature: FBSDKFeature): Boolean; cdecl;
+  end;
+
+  FBSDKGraphRequestConnecting = interface(IObjectiveC)
+    ['{5D829D02-AA56-4F45-922C-1A2849637CAE}']
+    procedure addRequest(request: Pointer; completion: FBSDKGraphRequestCompletion); cdecl;
+    procedure cancel; cdecl;
+    function delegate: Pointer; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setTimeout(timeout: NSTimeInterval); cdecl;
+    procedure start; cdecl;
+    function timeout: NSTimeInterval; cdecl;
+  end;
+
+  FBSDKGraphRequestConnectionProviding = interface(IObjectiveC)
+    ['{D3C1F507-8AD3-441E-8D89-C5153A06A65F}']
+    function createGraphRequestConnection: Pointer; cdecl;
+  end;
+
+  FBSDKGraphRequestConnectionFactoryClass = interface(NSObjectClass)
+    ['{5FD9D340-3640-4A78-80CA-C585344DC345}']
+  end;
+
+  FBSDKGraphRequestConnectionFactory = interface(NSObject)
+    ['{CFC054ED-BAD2-4973-A33D-230B7F776BED}']
+  end;
+  TFBSDKGraphRequestConnectionFactory = class(TOCGenericImport<FBSDKGraphRequestConnectionFactoryClass, FBSDKGraphRequestConnectionFactory>) end;
+
+  FBSDKGraphRequestDataAttachmentClass = interface(NSObjectClass)
+    ['{1583A863-DDC4-4A58-94AB-162792F20CE2}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  FBSDKGraphRequestDataAttachment = interface(NSObject)
+    ['{6BCC073D-EDB6-407D-B860-5C1266959677}']
+    function contentType: NSString; cdecl;
+    function data: NSData; cdecl;
+    function filename: NSString; cdecl;
+    function initWithData(data: NSData; filename: NSString; contentType: NSString): Pointer; cdecl;
+  end;
+  TFBSDKGraphRequestDataAttachment = class(TOCGenericImport<FBSDKGraphRequestDataAttachmentClass, FBSDKGraphRequestDataAttachment>) end;
+
+  FBSDKInternalUtilityClass = interface(NSObjectClass)
+    ['{06FEC1BC-9014-47CA-8FCC-4464ED71E1D9}']
+    {class} function new: Pointer; cdecl;
+    {class} function sharedUtility: FBSDKInternalUtility; cdecl;
+  end;
+
+  FBSDKInternalUtility = interface(NSObject)
+    ['{3F9C1AB1-EF3F-4E01-807F-3308540F4C1A}']
+    [MethodName('object:isEqualToObject:')]
+    function &object(&object: Pointer; isEqualToObject: Pointer): Boolean; cdecl;
+    function appURLWithHost(host: NSString; path: NSString; queryParameters: NSDictionary; error: PPointer): NSURL; cdecl;
+    function bundleForStrings: NSBundle; cdecl;
+    procedure checkRegisteredCanOpenURLScheme(urlScheme: NSString); cdecl;
+    procedure extractPermissionsFromResponse(responseObject: NSDictionary; grantedPermissions: NSMutableSet; declinedPermissions: NSMutableSet;
+      expiredPermissions: NSMutableSet); cdecl;
+    function facebookURLWithHostPrefix(hostPrefix: NSString; path: NSString; queryParameters: NSDictionary; error: PPointer): NSURL; cdecl;
+    function isBrowserURL(URL: NSURL): Boolean; cdecl;
+    function isFacebookAppInstalled: Boolean; cdecl;
+    function isMessengerAppInstalled: Boolean; cdecl;
+    function isMSQRDPlayerAppInstalled: Boolean; cdecl;
+    function isRegisteredCanOpenURLScheme(urlScheme: NSString): Boolean; cdecl;
+    function isRegisteredURLScheme(urlScheme: NSString): Boolean; cdecl;
+    function parametersFromFBURL(url: NSURL): NSDictionary; cdecl;
+    procedure registerTransientObject(&object: Pointer); cdecl;
+    function topMostViewController: UIViewController; cdecl;
+    procedure unregisterTransientObject(&object: Pointer); cdecl;
+    function URLWithScheme(scheme: NSString; host: NSString; path: NSString; queryParameters: NSDictionary; error: PPointer): NSURL; cdecl;
+    procedure validateAppID; cdecl;
+    function validateRequiredClientAccessToken: NSString; cdecl;
+    procedure validateURLSchemes; cdecl;
+    function viewControllerForView(view: UIView): UIViewController; cdecl;
+  end;
+  TFBSDKInternalUtility = class(TOCGenericImport<FBSDKInternalUtilityClass, FBSDKInternalUtility>) end;
+
+  FBSDKLocationClass = interface(NSObjectClass)
+    ['{CD7FF8F4-1E92-4BFE-A935-520E0DAB46C4}']
+    {class} function locationFromDictionary(dictionary: NSDictionary): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
+  end;
+
+  FBSDKLocation = interface(NSObject)
+    ['{AA2607D4-BBF7-46E8-90D2-B43344596934}']
+    function id: NSString; cdecl;
+    function name: NSString; cdecl;
+  end;
+  TFBSDKLocation = class(TOCGenericImport<FBSDKLocationClass, FBSDKLocation>) end;
 
   FBSDKSettingsClass = interface(NSObjectClass)
-    ['{E284822A-836A-49F3-99A5-8EAE80F9162C}']
+    ['{2136CD59-322B-49DF-BAC5-50878ED54E83}']
     {class} function appID: NSString; cdecl;
     {class} function appURLSchemeSuffix: NSString; cdecl;
     {class} function clientToken: NSString; cdecl;
@@ -440,43 +616,140 @@ type
     {class} procedure setJPEGCompressionQuality(JPEGCompressionQuality: CGFloat); cdecl;
     {class} procedure setLimitEventAndDataUsage(limitEventAndDataUsage: Boolean); cdecl;
     {class} procedure setLoggingBehaviors(loggingBehaviors: NSSet); cdecl;
+    {class} procedure setShouldUseCachedValuesForExpensiveMetadata(shouldUseCachedValuesForExpensiveMetadata: Boolean); cdecl;
     {class} procedure setSKAdNetworkReportEnabled(SKAdNetworkReportEnabled: Boolean); cdecl;
     {class} function shouldLimitEventAndDataUsage: Boolean; cdecl;
+    {class} function shouldUseCachedValuesForExpensiveMetadata: Boolean; cdecl;
   end;
 
   FBSDKSettings = interface(NSObject)
-    ['{D02BCB3F-0EE7-4D0D-A8DD-11648D764725}']
+    ['{D2E62529-585E-46D7-B2A5-7C44C2257E09}']
   end;
   TFBSDKSettings = class(TOCGenericImport<FBSDKSettingsClass, FBSDKSettings>) end;
 
-  FBSDKAppLinkReturnToRefererControllerDelegate = interface(IObjectiveC)
-    ['{712F243E-EA36-4E22-AA00-F769A2576CF6}']
-    procedure returnToRefererController(controller: FBSDKAppLinkReturnToRefererController; willNavigateToAppLink: FBSDKAppLink); overload; cdecl;
-    procedure returnToRefererController(controller: FBSDKAppLinkReturnToRefererController; didNavigateToAppLink: FBSDKAppLink;
-      &type: FBSDKAppLinkNavigationType); overload; cdecl;
+  FBSDKSettingsLogging = interface(IObjectiveC)
+    ['{5D78A38B-C4F6-4D3E-8A73-C54505F0835E}']
+    procedure logIfSDKSettingsChanged; cdecl;
+    procedure logWarnings; cdecl;
+    procedure recordInstall; cdecl;
   end;
 
-  FBSDKAppLinkReturnToRefererControllerClass = interface(NSObjectClass)
-    ['{96B6D02E-A773-4A4D-B723-80639B4BBA4A}']
+  FBSDKUserAgeRangeClass = interface(NSObjectClass)
+    ['{21FC37C5-1A99-4094-A536-12DDE7D7F6D5}']
+    {class} function ageRangeFromDictionary(dictionary: NSDictionary): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
   end;
 
-  FBSDKAppLinkReturnToRefererController = interface(NSObject)
-    ['{7805DBC3-2797-4457-8720-4AEC4E6B9980}']
-    procedure closeViewAnimated(animated: Boolean); cdecl;
-    function delegate: Pointer; cdecl;
-    function initForDisplayAboveNavController(navController: UINavigationController): Pointer; cdecl;
-    procedure removeFromNavController; cdecl;
-    procedure setDelegate(delegate: Pointer); cdecl;
-    procedure setView(view: FBSDKAppLinkReturnToRefererView); cdecl;
-    procedure showViewForRefererAppLink(refererAppLink: FBSDKAppLink); cdecl;
-    procedure showViewForRefererURL(url: NSURL); cdecl;
-    function view: FBSDKAppLinkReturnToRefererView; cdecl;
+  FBSDKUserAgeRange = interface(NSObject)
+    ['{F4ECF311-B4D5-4F40-8D4E-B641A3652B3F}']
+    function max: NSNumber; cdecl;
+    function min: NSNumber; cdecl;
   end;
-  TFBSDKAppLinkReturnToRefererController = class(TOCGenericImport<FBSDKAppLinkReturnToRefererControllerClass,
-    FBSDKAppLinkReturnToRefererController>) end;
+  TFBSDKUserAgeRange = class(TOCGenericImport<FBSDKUserAgeRangeClass, FBSDKUserAgeRange>) end;
+
+  FBSDKUtilityClass = interface(NSObjectClass)
+    ['{329B012D-F6E8-46ED-8D44-7CD04E8D27CD}']
+    {class} function dictionaryWithQueryString(queryString: NSString): NSDictionary; cdecl;
+    {class} function getGraphDomainFromToken: NSString; cdecl;
+    {class} function new: Pointer; cdecl;
+    {class} function queryStringWithDictionary(dictionary: NSDictionary; error: PPointer): NSString; cdecl;
+    {class} function SHA256Hash(input: NSObject): NSString; cdecl;
+    {class} function startGCDTimerWithInterval(interval: Double; block: dispatch_block_t): dispatch_source_t; cdecl;
+    {class} procedure stopGCDTimer(timer: dispatch_source_t); cdecl;
+    {class} function unversionedFacebookURLWithHostPrefix(hostPrefix: NSString; path: NSString; queryParameters: NSDictionary;
+      error: PPointer): NSURL; cdecl;
+    {class} function URLDecode(value: NSString): NSString; cdecl;
+    {class} function URLEncode(value: NSString): NSString; cdecl;
+  end;
+
+  FBSDKUtility = interface(NSObject)
+    ['{E46F2B3C-251C-4E27-8BB5-D19E8297A395}']
+  end;
+  TFBSDKUtility = class(TOCGenericImport<FBSDKUtilityClass, FBSDKUtility>) end;
+
+  FBSDKAppLinkTargetClass = interface(NSObjectClass)
+    ['{69412EFA-2C16-4EDE-84A3-64BB592FA50B}']
+    {class} function appLinkTargetWithURL(url: NSURL; appStoreId: NSString; appName: NSString): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
+  end;
+
+  FBSDKAppLinkTarget = interface(NSObject)
+    ['{5BE4133F-2D3C-4062-84DF-D7AD2097062D}']
+    function appName: NSString; cdecl;
+    function appStoreId: NSString; cdecl;
+    function URL: NSURL; cdecl;
+  end;
+  TFBSDKAppLinkTarget = class(TOCGenericImport<FBSDKAppLinkTargetClass, FBSDKAppLinkTarget>) end;
+
+  FBSDKAppLinkClass = interface(NSObjectClass)
+    ['{49609765-3037-46D8-9D06-F6D0C088CC39}']
+    {class} function appLinkWithSourceURL(sourceURL: NSURL; targets: NSArray; webURL: NSURL): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
+  end;
+
+  FBSDKAppLink = interface(NSObject)
+    ['{96066AE7-141E-44EF-9EB4-56112EC30354}']
+    function sourceURL: NSURL; cdecl;
+    function targets: NSArray; cdecl;
+    function webURL: NSURL; cdecl;
+  end;
+  TFBSDKAppLink = class(TOCGenericImport<FBSDKAppLinkClass, FBSDKAppLink>) end;
+
+  FBSDKAppLinkResolving = interface(IObjectiveC)
+    ['{5E09CF44-9E72-491A-BDBE-DBCC437B6786}']
+    procedure appLinkFromURL(url: NSURL; handler: FBSDKAppLinkBlock); cdecl;
+  end;
+
+  FBSDKAppLinkNavigationClass = interface(NSObjectClass)
+    ['{0775AEFA-0446-4DC5-A315-FF148DABF57B}']
+    {class} function callbackAppLinkDataForAppWithName(appName: NSString; url: NSString): NSDictionary; cdecl;
+    {class} function defaultResolver: Pointer; cdecl;
+    {class} function navigateToAppLink(link: FBSDKAppLink; error: PPointer): FBSDKAppLinkNavigationType; cdecl;
+    {class} procedure navigateToURL(destination: NSURL; handler: FBSDKAppLinkNavigationBlock); overload; cdecl;
+    {class} procedure navigateToURL(destination: NSURL; resolver: Pointer; handler: FBSDKAppLinkNavigationBlock); overload; cdecl;
+    {class} function navigationTypeForLink(link: FBSDKAppLink): FBSDKAppLinkNavigationType; cdecl;
+    {class} function navigationWithAppLink(appLink: FBSDKAppLink; extras: NSDictionary; appLinkData: NSDictionary): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
+    {class} procedure resolveAppLink(destination: NSURL; handler: FBSDKAppLinkBlock); overload; cdecl;
+    {class} procedure resolveAppLink(destination: NSURL; resolver: Pointer; handler: FBSDKAppLinkBlock); overload; cdecl;
+    {class} procedure setDefaultResolver(defaultResolver: Pointer); cdecl;
+  end;
+
+  FBSDKAppLinkNavigation = interface(NSObject)
+    ['{1E64C43C-2EBE-4E25-BDFB-01D273BB40E1}']
+    function appLink: FBSDKAppLink; cdecl;
+    function appLinkData: NSDictionary; cdecl;
+    function extras: NSDictionary; cdecl;
+    function navigate(error: PPointer): FBSDKAppLinkNavigationType; cdecl;
+    function navigationType: FBSDKAppLinkNavigationType; cdecl;
+  end;
+  TFBSDKAppLinkNavigation = class(TOCGenericImport<FBSDKAppLinkNavigationClass, FBSDKAppLinkNavigation>) end;
+
+  FBSDKAppLinkResolverClass = interface(NSObjectClass)
+    ['{27957F30-BC54-4CDF-B94B-FB365DFC31D5}']
+    {class} function new: Pointer; cdecl;
+    {class} function resolver: Pointer; cdecl;
+  end;
+
+  FBSDKAppLinkResolver = interface(NSObject)
+    ['{366DC185-A063-402D-8ACF-3E92CB19F4C0}']
+    procedure appLinksFromURLs(urls: NSArray; handler: FBSDKAppLinksBlock); cdecl;
+  end;
+  TFBSDKAppLinkResolver = class(TOCGenericImport<FBSDKAppLinkResolverClass, FBSDKAppLinkResolver>) end;
+
+  FBSDKAppLinkResolverRequestBuilderClass = interface(NSObjectClass)
+    ['{051FDD32-2230-406F-A530-D1BEAC1339E3}']
+  end;
+
+  FBSDKAppLinkResolverRequestBuilder = interface(NSObject)
+    ['{A8D1FD0D-99F8-4BEA-AD85-1B4FC588C9CE}']
+    function getIdiomSpecificField: NSString; cdecl;
+    function requestForURLs(urls: NSArray): FBSDKGraphRequest; cdecl;
+  end;
+  TFBSDKAppLinkResolverRequestBuilder = class(TOCGenericImport<FBSDKAppLinkResolverRequestBuilderClass, FBSDKAppLinkResolverRequestBuilder>) end;
 
   FBSDKAppLinkUtilityClass = interface(NSObjectClass)
-    ['{8563ABC8-DBE1-4E9D-8214-0B885273E4DE}']
+    ['{9AECB199-5D90-4275-AC34-9A5B2A5E6F06}']
     {class} function appInvitePromotionCodeFromURL(url: NSURL): NSString; cdecl;
     {class} procedure fetchDeferredAppLink(handler: FBSDKURLBlock); cdecl;
     {class} function isMatchURLScheme(scheme: NSString): Boolean; cdecl;
@@ -484,147 +757,55 @@ type
   end;
 
   FBSDKAppLinkUtility = interface(NSObject)
-    ['{103FD572-3AE7-4AE6-87A9-FF01892BA5BD}']
+    ['{6AE59FA7-5709-4B88-9BA6-7E847699761C}']
   end;
   TFBSDKAppLinkUtility = class(TOCGenericImport<FBSDKAppLinkUtilityClass, FBSDKAppLinkUtility>) end;
 
-  FBSDKMeasurementEventClass = interface(NSObjectClass)
-    ['{24D8BF45-8F30-47C1-A122-29540DDEFB2C}']
+  FBSDKURLOpening = interface(IObjectiveC)
+    ['{8EC4FB1F-98B5-4880-90D8-719571E1003D}']
+    function application(application: UIApplication; openURL: NSURL; sourceApplication: NSString; annotation: Pointer): Boolean; cdecl;
+    procedure applicationDidBecomeActive(application: UIApplication); cdecl;
+    function canOpenURL(url: NSURL; forApplication: UIApplication; sourceApplication: NSString; annotation: Pointer): Boolean; cdecl;
+    function isAuthenticationURL(url: NSURL): Boolean; cdecl;
+    function shouldStopPropagationOfURL(url: NSURL): Boolean; cdecl;
   end;
-
-  FBSDKMeasurementEvent = interface(NSObject)
-    ['{2CF4B716-33A2-4C96-A4DE-832845A013B3}']
-  end;
-  TFBSDKMeasurementEvent = class(TOCGenericImport<FBSDKMeasurementEventClass, FBSDKMeasurementEvent>) end;
-
-  FBSDKApplicationDelegateClass = interface(NSObjectClass)
-    ['{30368E11-39DD-4210-B06E-B21421408FE5}']
-    {class} procedure initializeSDK(launchOptions: NSDictionary); cdecl;
-    {class} function new: Pointer; cdecl;
-    {class} function sharedInstance: FBSDKApplicationDelegate; cdecl;
-  end;
-
-  FBSDKApplicationDelegate = interface(NSObject)
-    ['{F5885CBF-B380-47F7-9122-C649DE220A4F}']
-    function application(application: UIApplication; openURL: NSURL; sourceApplication: NSString; annotation: Pointer): Boolean; overload; cdecl;
-    function application(application: UIApplication; didFinishLaunchingWithOptions: NSDictionary): Boolean; overload; cdecl;
-  end;
-  TFBSDKApplicationDelegate = class(TOCGenericImport<FBSDKApplicationDelegateClass, FBSDKApplicationDelegate>) end;
-
-  FBSDKAuthenticationTokenClass = interface(NSObjectClass)
-    ['{6BA230A7-C16C-4284-9D10-897B5D463E0D}']
-    {class} function currentAuthenticationToken: FBSDKAuthenticationToken; cdecl;
-    {class} function new: Pointer; cdecl;
-    {class} procedure setCurrentAuthenticationToken(currentAuthenticationToken: FBSDKAuthenticationToken); cdecl;
-  end;
-
-  FBSDKAuthenticationToken = interface(NSObject)
-    ['{FB65E6F7-422E-4002-AA18-CD419FA96C92}']
-    function graphDomain: NSString; cdecl;
-    function nonce: NSString; cdecl;
-    function tokenString: NSString; cdecl;
-  end;
-  TFBSDKAuthenticationToken = class(TOCGenericImport<FBSDKAuthenticationTokenClass, FBSDKAuthenticationToken>) end;
-
-  FBSDKButtonClass = interface(UIButtonClass)
-    ['{2947F553-6C44-4323-8FAA-5A8CDD4856B3}']
-  end;
-
-  FBSDKButton = interface(UIButton)
-    ['{F83A996E-F322-455F-83B7-0732984B4088}']
-  end;
-  TFBSDKButton = class(TOCGenericImport<FBSDKButtonClass, FBSDKButton>) end;
-
-  FBSDKGraphRequestClass = interface(NSObjectClass)
-    ['{92968D88-83F2-4C31-B563-9C783200CD26}']
-    {class} function new: Pointer; cdecl;
-  end;
-
-  FBSDKGraphRequest = interface(NSObject)
-    ['{C7660944-41F1-4AD3-9E5F-96F15E297012}']
-    function graphPath: NSString; cdecl;
-    function HTTPMethod: NSString; cdecl;
-    function initWithGraphPath(graphPath: NSString; parameters: NSDictionary; tokenString: NSString; version: NSString;
-      HTTPMethod: FBSDKHTTPMethod): Pointer; overload; cdecl;
-    function initWithGraphPath(graphPath: NSString; parameters: NSDictionary; HTTPMethod: FBSDKHTTPMethod): Pointer; overload; cdecl;
-    function initWithGraphPath(graphPath: NSString): Pointer; overload; cdecl;
-    function initWithGraphPath(graphPath: NSString; HTTPMethod: FBSDKHTTPMethod): Pointer; overload; cdecl;
-    function initWithGraphPath(graphPath: NSString; parameters: NSDictionary): Pointer; overload; cdecl;
-    function parameters: NSDictionary; cdecl;
-    procedure setGraphErrorRecoveryDisabled(disable: Boolean); cdecl;
-    procedure setParameters(parameters: NSDictionary); cdecl;
-    function startWithCompletionHandler(handler: FBSDKGraphRequestBlock): FBSDKGraphRequestConnection; cdecl;
-    function tokenString: NSString; cdecl;
-    function version: NSString; cdecl;
-  end;
-  TFBSDKGraphRequest = class(TOCGenericImport<FBSDKGraphRequestClass, FBSDKGraphRequest>) end;
-
-  FBSDKGraphRequestDataAttachmentClass = interface(NSObjectClass)
-    ['{E1536F2D-9491-4FBB-A071-AD8B281259F1}']
-    {class} function new: Pointer; cdecl;
-  end;
-
-  FBSDKGraphRequestDataAttachment = interface(NSObject)
-    ['{F392E941-A4ED-4920-BB02-31223DD3AF7D}']
-    function contentType: NSString; cdecl;
-    function data: NSData; cdecl;
-    function filename: NSString; cdecl;
-    function initWithData(data: NSData; filename: NSString; contentType: NSString): Pointer; cdecl;
-  end;
-  TFBSDKGraphRequestDataAttachment = class(TOCGenericImport<FBSDKGraphRequestDataAttachmentClass, FBSDKGraphRequestDataAttachment>) end;
-
-  FBSDKAppLinkResolverClass = interface(NSObjectClass)
-    ['{C09B4534-05F9-484E-BDCB-7BCCD2D219B7}']
-    {class} function new: Pointer; cdecl;
-    {class} function resolver: Pointer; cdecl;
-  end;
-
-  FBSDKAppLinkResolver = interface(NSObject)
-    ['{C7859CF0-9980-47B4-A1C6-E4810FDDA305}']
-    procedure appLinksFromURLs(urls: NSArray; handler: FBSDKAppLinksBlock); cdecl;
-  end;
-  TFBSDKAppLinkResolver = class(TOCGenericImport<FBSDKAppLinkResolverClass, FBSDKAppLinkResolver>) end;
-
-  FBSDKAppLinkResolverRequestBuilderClass = interface(NSObjectClass)
-    ['{FA054392-5745-4BEF-A2E8-DEE0B9E5255C}']
-  end;
-
-  FBSDKAppLinkResolverRequestBuilder = interface(NSObject)
-    ['{99067AA0-3E6D-4F67-A36C-2C43C838267F}']
-    function getIdiomSpecificField: NSString; cdecl;
-    function requestForURLs(urls: NSArray): FBSDKGraphRequest; cdecl;
-  end;
-  TFBSDKAppLinkResolverRequestBuilder = class(TOCGenericImport<FBSDKAppLinkResolverRequestBuilderClass, FBSDKAppLinkResolverRequestBuilder>) end;
 
   FBSDKGraphErrorRecoveryProcessorDelegate = interface(IObjectiveC)
-    ['{EFF83A5B-A951-4112-AF1F-410442E8DD70}']
+    ['{A9972DE6-5F0E-447D-8C20-501567D2CB69}']
     procedure processorDidAttemptRecovery(processor: FBSDKGraphErrorRecoveryProcessor; didRecover: Boolean; error: NSError); cdecl;
     function processorWillProcessError(processor: FBSDKGraphErrorRecoveryProcessor; error: NSError): Boolean; cdecl;
   end;
 
   FBSDKGraphErrorRecoveryProcessorClass = interface(NSObjectClass)
-    ['{36EC7F03-E16F-4CF0-B166-B0AEACFA2C5E}']
+    ['{E06BA7D3-731E-4A16-AAD1-6C0A6664E3B5}']
   end;
 
   FBSDKGraphErrorRecoveryProcessor = interface(NSObject)
-    ['{6E2323FF-EB9C-4C1C-A155-8857C97A5818}']
-    function delegate: Pointer; cdecl;
-    procedure didPresentErrorWithRecovery(didRecover: Boolean; contextInfo: Pointer); cdecl;
-    function processError(error: NSError; request: FBSDKGraphRequest; delegate: Pointer): Boolean; cdecl;
+    ['{D7C1205C-8D6F-4C24-8370-B868AE1F8DCE}']
+    function processError(error: NSError; request: Pointer; delegate: Pointer): Boolean; cdecl;
   end;
   TFBSDKGraphErrorRecoveryProcessor = class(TOCGenericImport<FBSDKGraphErrorRecoveryProcessorClass, FBSDKGraphErrorRecoveryProcessor>) end;
 
+  FBSDKMeasurementEventClass = interface(NSObjectClass)
+    ['{A6983CC2-9AAA-4EF6-94C0-6A8D4CCEEA16}']
+  end;
+
+  FBSDKMeasurementEvent = interface(NSObject)
+    ['{FB4FD41C-544F-46B6-98C6-23F9D16772D6}']
+  end;
+  TFBSDKMeasurementEvent = class(TOCGenericImport<FBSDKMeasurementEventClass, FBSDKMeasurementEvent>) end;
+
   FBSDKMutableCopying = interface(IObjectiveC)
-    ['{03896F40-1439-41B8-8404-0A52AC6A6822}']
+    ['{BEB20403-F3E4-4222-8727-7ED7A24FA303}']
     function mutableCopy: Pointer; cdecl;
   end;
 
   FBSDKProfilePictureViewClass = interface(UIViewClass)
-    ['{0AD56DFA-588C-41E9-B816-F8BCAFF3F3C6}']
+    ['{639D6DF0-45FC-4479-ADD6-93C6CAD19FFF}']
   end;
 
   FBSDKProfilePictureView = interface(UIView)
-    ['{ED3AD8D3-E6EF-41DB-9FAA-905A116FDB7D}']
+    ['{5C2C40E9-D05F-4930-8BBD-2C77FFF6E87B}']
     function initWithFrame(frame: CGRect; profile: FBSDKProfile): Pointer; cdecl;
     function initWithProfile(profile: FBSDKProfile): Pointer; cdecl;
     function pictureMode: FBSDKProfilePictureMode; cdecl;
@@ -636,7 +817,7 @@ type
   TFBSDKProfilePictureView = class(TOCGenericImport<FBSDKProfilePictureViewClass, FBSDKProfilePictureView>) end;
 
   FBSDKProfileClass = interface(NSObjectClass)
-    ['{DE408DBB-EAC5-4494-9799-4B12F272CABA}']
+    ['{DA41350E-0966-4898-918D-D071F19213F2}']
     {class} function currentProfile: FBSDKProfile; cdecl;
     {class} procedure enableUpdatesOnAccessTokenChange(enable: Boolean); cdecl;
     {class} procedure loadCurrentProfileWithCompletion(completion: FBSDKProfileBlock); cdecl;
@@ -645,30 +826,129 @@ type
   end;
 
   FBSDKProfile = interface(NSObject)
-    ['{55A4E8FF-5505-474A-A504-0B3C0E312456}']
+    ['{B7D0ABEF-1002-4760-A09F-A64D05E87AF6}']
+    function ageRange: FBSDKUserAgeRange; cdecl;
+    function birthday: NSDate; cdecl;
     function email: NSString; cdecl;
     function firstName: NSString; cdecl;
+    function friendIDs: NSArray; cdecl;
+    function gender: NSString; cdecl;
+    function hometown: FBSDKLocation; cdecl;
     function imageURL: NSURL; cdecl;
     function imageURLForPictureMode(mode: FBSDKProfilePictureMode; size: CGSize): NSURL; cdecl;
-    function initWithUserID(userID: NSString; firstName: NSString; middleName: NSString; lastName: NSString; name: NSString; linkURL: NSURL;
-      refreshDate: NSDate): Pointer; overload; cdecl;
-    function initWithUserID(userID: NSString; firstName: NSString; middleName: NSString; lastName: NSString; name: NSString; linkURL: NSURL;
-      refreshDate: NSDate; imageURL: NSURL; email: NSString): Pointer; overload; cdecl;
+    function initWithUserID(userID: FBSDKUserIdentifier; firstName: NSString; middleName: NSString; lastName: NSString; name: NSString;
+      linkURL: NSURL; refreshDate: NSDate): Pointer; overload; cdecl;
+    function initWithUserID(userID: FBSDKUserIdentifier; firstName: NSString; middleName: NSString; lastName: NSString; name: NSString;
+      linkURL: NSURL; refreshDate: NSDate; imageURL: NSURL; email: NSString; friendIDs: NSArray; birthday: NSDate; ageRange: FBSDKUserAgeRange;
+      hometown: FBSDKLocation; location: FBSDKLocation; gender: NSString): Pointer; overload; cdecl;
+    function initWithUserID(userID: FBSDKUserIdentifier; firstName: NSString; middleName: NSString; lastName: NSString; name: NSString;
+      linkURL: NSURL; refreshDate: NSDate; imageURL: NSURL; email: NSString; friendIDs: NSArray; birthday: NSDate; ageRange: FBSDKUserAgeRange;
+      hometown: FBSDKLocation; location: FBSDKLocation; gender: NSString; isLimited: Boolean): Pointer; overload; cdecl;
     function isEqualToProfile(profile: FBSDKProfile): Boolean; cdecl;
     function lastName: NSString; cdecl;
     function linkURL: NSURL; cdecl;
+    function location: FBSDKLocation; cdecl;
     function middleName: NSString; cdecl;
     function name: NSString; cdecl;
     function refreshDate: NSDate; cdecl;
-    function userID: NSString; cdecl;
+    function userID: FBSDKUserIdentifier; cdecl;
   end;
   TFBSDKProfile = class(TOCGenericImport<FBSDKProfileClass, FBSDKProfile>) end;
 
+  FBSDKURLClass = interface(NSObjectClass)
+    ['{D83878C7-BD16-4BC8-8CBF-4DD2A9478D09}']
+    {class} function new: Pointer; cdecl;
+    {class} function URLWithInboundURL(url: NSURL; sourceApplication: NSString): Pointer; cdecl;
+    {class} function URLWithURL(url: NSURL): Pointer; cdecl;
+  end;
+
+  FBSDKURL = interface(NSObject)
+    ['{BEC6BD4C-BDF1-4AA8-AC54-75305BF20B92}']
+    function appLinkData: NSDictionary; cdecl;
+    function appLinkExtras: NSDictionary; cdecl;
+    function appLinkReferer: FBSDKAppLink; cdecl;
+    function inputQueryParameters: NSDictionary; cdecl;
+    function inputURL: NSURL; cdecl;
+    function isAutoAppLink: Boolean; cdecl;
+    function targetQueryParameters: NSDictionary; cdecl;
+    function targetURL: NSURL; cdecl;
+  end;
+  TFBSDKURL = class(TOCGenericImport<FBSDKURLClass, FBSDKURL>) end;
+
+  FBSDKWebDialogClass = interface(NSObjectClass)
+    ['{781A6395-6616-4692-89FD-4C33C0D81969}']
+    {class} function createAndShow(name: NSString; parameters: NSDictionary; frame: CGRect; delegate: Pointer; windowFinder: Pointer): Pointer; cdecl;
+    {class} function dialogWithName(name: NSString; delegate: Pointer): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
+    {class} function showWithName(name: NSString; parameters: NSDictionary; delegate: Pointer): Pointer; cdecl;
+  end;
+
+  FBSDKWebDialog = interface(NSObject)
+    ['{3E7BD388-25E5-4266-99C6-8810A5E03A26}']
+    procedure setShouldDeferVisibility(shouldDeferVisibility: Boolean); cdecl;
+    procedure setWindowFinder(windowFinder: Pointer); cdecl;
+    function shouldDeferVisibility: Boolean; cdecl;
+    function windowFinder: Pointer; cdecl;
+  end;
+  TFBSDKWebDialog = class(TOCGenericImport<FBSDKWebDialogClass, FBSDKWebDialog>) end;
+
+  FBSDKWebDialogDelegate = interface(IObjectiveC)
+    ['{6FE70F5B-EC7C-4D2B-8BB3-527AA460B6BF}']
+    procedure webDialog(webDialog: FBSDKWebDialog; didFailWithError: NSError); overload; cdecl;
+    procedure webDialog(webDialog: FBSDKWebDialog; didCompleteWithResults: NSDictionary); overload; cdecl;
+    procedure webDialogDidCancel(webDialog: FBSDKWebDialog); cdecl;
+  end;
+
+  FBSDKWebDialogViewClass = interface(UIViewClass)
+    ['{E9B9D1A1-60F6-46FA-8850-EBDD09829242}']
+    {class} procedure configureWithWebViewProvider(provider: Pointer; urlOpener: Pointer); cdecl;
+  end;
+
+  FBSDKWebDialogView = interface(UIView)
+    ['{B8B93CAA-6018-4612-B9D2-09E560ACFC00}']
+    function delegate: Pointer; cdecl;
+    procedure loadURL(URL: NSURL); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure stopLoading; cdecl;
+  end;
+  TFBSDKWebDialogView = class(TOCGenericImport<FBSDKWebDialogViewClass, FBSDKWebDialogView>) end;
+
+  FBSDKWebDialogViewDelegate = interface(IObjectiveC)
+    ['{7D4EE5DC-ED09-4A18-AD1E-8A6C99E2C00C}']
+    procedure webDialogView(webDialogView: FBSDKWebDialogView; didFailWithError: NSError); overload; cdecl;
+    procedure webDialogView(webDialogView: FBSDKWebDialogView; didCompleteWithResults: NSDictionary); overload; cdecl;
+    procedure webDialogViewDidCancel(webDialogView: FBSDKWebDialogView); cdecl;
+    procedure webDialogViewDidFinishLoad(webDialogView: FBSDKWebDialogView); cdecl;
+  end;
+
+  FBSDKWebViewAppLinkResolverClass = interface(NSObjectClass)
+    ['{D577DD33-FB97-4F26-8AC5-F59481808672}']
+    {class} function sharedInstance: FBSDKWebViewAppLinkResolver; cdecl;
+  end;
+
+  FBSDKWebViewAppLinkResolver = interface(NSObject)
+    ['{118C15C1-E9AB-4D6E-B00A-884A76846EFF}']
+  end;
+  TFBSDKWebViewAppLinkResolver = class(TOCGenericImport<FBSDKWebViewAppLinkResolverClass, FBSDKWebViewAppLinkResolver>) end;
+
+  FBSDKWindowFinding = interface(IObjectiveC)
+    ['{4D34C434-B3D9-4284-BFBC-FF93E0108BCA}']
+    function findWindow: UIWindow; cdecl;
+  end;
+
 const
-  libFBSDKCoreKit = 'FBSDKCoreKit';
+  libFBAEMKit = 'FBAEMKit.a';
+  libFBSDKCoreKit = 'FBSDKCoreKit.a';
+
+function fb_randomString(numberOfBytes: NSUInteger): NSString; cdecl;
+  external libFBSDKCoreKit name _PU + 'fb_randomString';
 
 implementation
 
-procedure FBSDKCoreLoader; cdecl; external framework libFBSDKCoreKit;
+//procedure FBAEMKitLoader; cdecl; external framework libFBAEMKit;
+//procedure FBSDKCoreKitLoader; cdecl; external framework libFBSDKCoreKit;
+procedure AccelerateLoader; cdecl; external framework 'Accelerate';
+procedure ClangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
+procedure FBSDKCoreKitLoader; cdecl; external libFBSDKCoreKit dependency 'c++';
 
 end.
