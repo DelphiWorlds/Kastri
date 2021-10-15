@@ -118,7 +118,9 @@ begin
     TOSLog.d('Starting %s', [AServiceName]);
     TLocalServiceConnection.StartService(AServiceName);
     Result := True;
-  end;
+  end
+  else
+    TOSLog.d('Service %s is already running', [AServiceName]);
 end;
 
 end.
