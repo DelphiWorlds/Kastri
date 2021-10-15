@@ -35,7 +35,8 @@ type
     procedure Add(const AValue: string);
     procedure Clear;
     function Count: Integer;
-    function GetKey(const AValue: string): string;
+    function GetKey(const AValue: string): string; overload;
+    function GetKey(const AIndex: Integer): string; overload;
     function GetValue(const AKey: string): string;
     function IndexOf(const AValue: string): Integer;
     function IndexOfName(const AKey: string): Integer;
@@ -120,6 +121,7 @@ type
     procedure DoProcessListUpdated;
     procedure DoRowAdded;
     procedure DoStartLogcat;
+    function GetIsLogcatRunning: Boolean;
     procedure HandleLogCatOutput(const AOutput: string);
     procedure LogcatStopped;
     procedure ProcessListTerminated;
@@ -134,7 +136,6 @@ type
     procedure SetSelectedDevice(const Value: string);
     procedure SetTagFilter(const Value: string);
     procedure SetTextFilter(const Value: string);
-    function GetIsLogcatRunning: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -380,6 +381,19 @@ begin
       Result := LParts[0];
       Break;
     end;
+  end;
+end;
+
+function TStringArray.GetKey(const AIndex: Integer): string;
+var
+  LParts: TArray<string>;
+begin
+  Result := '';
+  if (AIndex >= 0) and (AIndex < Count) then
+  begin
+    LParts := Items[AIndex].Split(['='], 2);
+    if Length(LParts) > 0 then
+      Result := LParts[0];
   end;
 end;
 
@@ -664,7 +678,6 @@ begin
   LogFDMemTable.EmptyDataSet;
   if TFile.Exists(FADBEXEPath) then
   begin
-    // SelectedDevicePanel.Caption := FSelectedDevice;
     FADBLogCat.CommandLine := Format(cADBLogCatRecentLinesCommand, [FADBEXEPath, SerialFromSelectedDevice, 500]); // Last 500 lines
     FADBLogCat.Run;
     DoLogcatStatus(TLogcatStatus.Started);
@@ -828,10 +841,6 @@ begin
   if not FADBProcessList.IsRunning then
     UpdateProcessList;
 end;
-
-// '09-25 12:39:23.938  3682  4522 I LocSvc_eng_nmea: <=== nmea_cb line 62 0x70bbbc12f0'
-
-// '09-25 12:41:16.938  3682  4539 E LocSvc_ApiV02: I/<--- globalEventCb line 86 QMI_LOC_EVENT_GNSS_SV_INFO_IND_V02'
 
 procedure TADBModule.HandleLogCatOutput(const AOutput: string);
 var
