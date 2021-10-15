@@ -114,8 +114,13 @@ begin
     finally
       LProjection.Free;
     end;
-    if (LCursor <> nil) and LCursor.moveToFirst then
-      LSelectedFile.DisplayName := JStringToString(LCursor.getString(0));
+    if LCursor <> nil then
+    try
+      if LCursor.moveToFirst then
+        LSelectedFile.DisplayName := JStringToString(LCursor.getString(0));
+    finally
+      LCursor.close;
+    end;
     AddSelectedFile(LSelectedFile);
   end;
 end;
