@@ -1,4 +1,5 @@
 package com.delphiworlds.kastri;
+
 /*******************************************************
  *                                                     *
  *                     Kastri                          *
@@ -212,6 +213,8 @@ public class DWFusedLocationClient {
           int statusCode = ((ApiException) e).getStatusCode();
           switch (statusCode) {
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+// Changed this part to show a toast until a solution about startResolutionForResult from a service is worked out
+/*
               Log.i(TAG, "Location settings are not satisfied. Attempting to upgrade location settings ");
               try {
                 // Show the dialog by calling startResolutionForResult(), and check the
@@ -222,11 +225,13 @@ public class DWFusedLocationClient {
                 Log.i(TAG, "PendingIntent unable to execute request.");
               }
               break;
+*/
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
               String errorMessage = "Location settings are inadequate, and cannot be fixed here. Please fix in Settings.";
               Log.e(TAG, errorMessage);
               Toast.makeText(mContext, errorMessage, Toast.LENGTH_LONG).show();
               // mRequestingLocationUpdates = false;
+              break;
             }
             mDelegate.onLocationSettingsChange(false);
           }
