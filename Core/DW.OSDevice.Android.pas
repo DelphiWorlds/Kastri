@@ -151,7 +151,7 @@ end;
 class function TPlatformOSDevice.IsLocationServiceEnabled: Boolean;
 var
   LObject: JObject;
-  LMode, LModeOff: Integer;
+  LModeOff: Integer;
 begin
   if TJBuild_Version.JavaClass.SDK_INT >= 28 then
   begin
