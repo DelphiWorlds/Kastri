@@ -42,6 +42,7 @@ type
     function GetView: UIView;
     function GetModel: TCustomNativeShapeModel; overload;
     procedure MMFillChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_FILL_CHANGED;
+    procedure MMSetOpacity(var AMessage: TDispatchMessageWithValue<Single>); message MM_NATIVESHAPE_SET_OPACITY;
     procedure MMStrokeChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_STROKE_CHANGED;
   protected
     procedure FillChanged; virtual;
@@ -160,6 +161,12 @@ end;
 procedure TiOSNativeShape.MMFillChanged(var AMessage: TDispatchMessage);
 begin
   FillChanged;
+end;
+
+procedure TiOSNativeShape.MMSetOpacity(var AMessage: TDispatchMessageWithValue<Single>);
+begin
+  FFillLayer.setOpacity(AMessage.Value);
+  FShapeLayer.setOpacity(AMessage.Value);
 end;
 
 procedure TiOSNativeShape.MMStrokeChanged(var AMessage: TDispatchMessage);

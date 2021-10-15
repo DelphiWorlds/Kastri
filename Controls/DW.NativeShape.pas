@@ -28,6 +28,7 @@ const
   MM_NATIVESHAPE_CORNERS_CHANGED = MM_USER + 4;
   MM_NATIVESHAPE_RADIUS_CHANGED = MM_USER + 5;
   MM_NATIVESHAPE_CORNERTYPE_CHANGED = MM_USER + 6;
+  MM_NATIVESHAPE_SET_OPACITY = MM_USER + 7;
 
 type
   TCustomNativeShapeModel = class(TDataModel)
@@ -39,6 +40,7 @@ type
     procedure FillChanged(Sender: TObject); virtual;
     procedure StrokeChanged(Sender: TObject); virtual;
     procedure SetFill(const Value: TBrush);
+    procedure SetOpacity(const Value: Single);
     procedure SetStroke(const Value: TStrokeBrush);
   protected
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
@@ -62,6 +64,7 @@ type
     procedure AfterPaint; override;
     function DefineModelClass: TDataModelClass; override;
     function GetShapeRect: TRectF;
+    procedure RecalcOpacity; override;
     function RecommendSize(const AWishedSize: TSizeF): TSizeF; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -282,6 +285,11 @@ begin
   FFill.Assign(Value);
 end;
 
+procedure TCustomNativeShapeModel.SetOpacity(const Value: Single);
+begin
+  SendMessage<Single>(MM_NATIVESHAPE_SET_OPACITY, Value);
+end;
+
 procedure TCustomNativeShapeModel.SetStroke(const Value: TStrokeBrush);
 begin
   FStroke.Assign(Value);
@@ -345,6 +353,11 @@ end;
 procedure TCustomNativeShape.SetStroke(const Value: TStrokeBrush);
 begin
   Model.Stroke := Value;
+end;
+
+procedure TCustomNativeShape.RecalcOpacity;
+begin
+  Model.SetOpacity(Opacity);
 end;
 
 function TCustomNativeShape.RecommendSize(const AWishedSize: TSizeF): TSizeF;
