@@ -67,11 +67,16 @@ type
     class function AsString(const AStream: TStream): string; static;
   end;
 
+  TResourceHelper = record
+  public
+    class function LoadString(const AResourceName: string): string; static;
+  end;
+
 implementation
 
 uses
   // RTL
-  System.SysUtils;
+  System.SysUtils, System.Types;
 
 { TDo }
 
@@ -160,6 +165,30 @@ begin
     Result := LStream.DataString;
   finally
     LStream.Free;
+  end;
+end;
+
+{ TResourceHelper }
+
+class function TResourceHelper.LoadString(const AResourceName: string): string;
+var
+  LResourceStream: TStream;
+  LStringStream: TStringStream;
+begin
+  if FindResource(HInstance, PChar(AResourceName), RT_RCDATA) > 0 then
+  begin
+    LResourceStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+    try
+      LStringStream := TStringStream.Create;
+      try
+        LStringStream.CopyFrom(LResourceStream, LResourceStream.Size);
+        Result := LStringStream.DataString;
+      finally
+        LStringStream.Free;
+      end;
+    finally
+      LResourceStream.Free;
+    end;
   end;
 end;
 
