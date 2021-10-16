@@ -8,7 +8,7 @@ Demonstrates the use of the `DW.StartupHook.Android` unit in the `Core` folder
 
 Application events can be handled by using `TMessageManager` to `Subscribe` to events by using `TApplicationEventMessage`, however there are at least two events that are missing. 
 
-In the `Androidapi.AppGlue` unit in the Delphi source, there are "hooks" into native methods such as for the `OnPause` and `OnResume` methods of the activity. The `TPlatformAndroid` class in `FMX.Platform.Android` connects to these events, and sends a `TApplicationEventMessage` that your app can listen for, such as in this demo. Unfortunately, the `GainedFocus` and `LostFocus` events handled by the AppGlue are **not** handled by `TPlatformAndroid` - this has been reported here, but will need to wait until at least the next _major_ version of Delphi, since it would be interface-breaking. 
+In the `Androidapi.AppGlue` unit in the Delphi source, there are "hooks" into native methods such as for the `OnPause` and `OnResume` methods of the activity. The `TPlatformAndroid` class in `FMX.Platform.Android` connects to these events, and sends a `TApplicationEventMessage` that your app can listen for, such as in this demo. Unfortunately, the `GainedFocus` and `LostFocus` events handled by the AppGlue are **not** handled by `TPlatformAndroid` - this has been [reported here](https://quality.embarcadero.com/browse/RSP-35891), but will need to wait until at least the next _major_ version of Delphi, since it would be interface-breaking. 
 
 What the `DW.StartUpHook.Android` unit does is re-routes the events in the AppGlue so that the missing events **_can_** be handled, and sends a TWindowFocusChanged method that the app can listen for.
 
