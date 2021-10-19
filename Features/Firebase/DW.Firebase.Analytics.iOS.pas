@@ -50,7 +50,7 @@ uses
   // Mac
   Macapi.Helpers,
   // DW
-  DW.iOSapi.FirebaseAnalytics, DW.iOSapi.FirebaseCore;
+  DW.iOSapi.FirebaseAnalytics, DW.iOSapi.FirebaseCore, DW.Firebase.Common.iOS;
 
 // https://firebase.google.com/docs/reference/ios/firebaseanalytics/api/reference/Type-Definitions
 const
@@ -63,7 +63,7 @@ constructor TPlatformFirebaseAnalytics.Create(const AFirebaseAnalytics: TFirebas
 begin
   inherited;
   // https://firebase.google.com/docs/analytics/get-started?platform=ios
-  TFIRApp.OCClass.configure;
+  TFirebaseCommon.Initialize;
 end;
 
 function TPlatformFirebaseAnalytics.GetNativeConsent(const ASettings: TConsentSettings): NSDictionary;

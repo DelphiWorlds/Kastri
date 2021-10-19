@@ -82,7 +82,7 @@ uses
   // FMX
   FMX.Platform,
   // DW
-  DW.OSLog, DW.Macapi.ObjCRuntime, DW.iOSapi.Helpers, DW.iOSapi.FirebaseCore, DW.Notifications.iOS, DW.Macapi.Helpers;
+  DW.OSLog, DW.Macapi.ObjCRuntime, DW.iOSapi.Helpers, DW.iOSapi.FirebaseCore, DW.Notifications.iOS, DW.Macapi.Helpers, DW.Firebase.Common.iOS;
 
 function StringToNSData(const AString: string): NSData;
 begin
@@ -143,7 +143,7 @@ function TPlatformFirebaseMessaging.Start: Boolean;
 begin
   Result := False;
   try
-    TFIRApp.OCClass.configure;
+    TFirebaseCommon.Initialize;
     FFIRMessagingDelegate := TFIRMessagingDelegate.Create(self);
     Messaging.setDelegate(FFIRMessagingDelegate.GetObjectID);
     Result := True;
