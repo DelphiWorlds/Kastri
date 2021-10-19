@@ -23,7 +23,7 @@ uses
   // FMX
   FMX.WebBrowser,
   // DW
-  DW.Androidapi.JNI.DWWebChromeClient;
+  DW.Androidapi.JNI.DWWebChromeClient, DW.WebChromeClient;
 
 type
   TWebChromeClientManager = class;
@@ -38,17 +38,20 @@ type
     constructor Create(const AManager: TWebChromeClientManager);
   end;
 
-  TWebChromeClientManager = class(TComponent)
+  TWebChromeClientManager = class(TCustomPlatformWebChromeClientManager)
   private
     FWebChromeClient: JDWWebChromeClient;
     FDelegate: JDWWebChromeClientDelegate;
     procedure MessageResultNotificationHandler(const Sender: TObject; const M: TMessage);
   protected
+    procedure FlushCookies; override;
     function HandleFileChooserIntent(intent: JIntent): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   end;
+
+  TPlatformWebChromeClientManager = class(TWebChromeClientManager);
 
 implementation
 
@@ -112,6 +115,11 @@ begin
     if LResult.RequestCode = cFileChooserRequestCode then
       FWebChromeClient.handleFileChooserResult(LResult.Value, LResult.ResultCode);
   end;
+end;
+
+procedure TWebChromeClientManager.FlushCookies;
+begin
+  TJCookieManager.JavaClass.getInstance.Flush;
 end;
 
 end.
