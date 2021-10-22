@@ -19,183 +19,213 @@ uses
   // RTL
   System.SysUtils,
   // Android
-  Androidapi.JNI.Java.Security, Androidapi.JNI.Os, Androidapi.JNI.JavaTypes, Androidapi.JNIBridge,
+  Androidapi.JNI.JavaTypes, Androidapi.JNIBridge, Androidapi.Jni.GraphicsContentViewText,
   // DW
-  DW.Biometric, DW.Androidapi.JNI.Security, DW.Androidapi.JNI.Hardware, DW.Androidapi.JNI.DWFingerprintAuthenticationCallback;
+  DW.Biometric, DW.Androidapi.JNI.AndroidX.Biometric, DW.MultiReceiver.Android;
 
 type
   TPlatformBiometric = class;
-
-  /// <summary>
-  ///   This class is how the authentication events are implemented on the Delphi side
-  ///   Refer to DWFingerprintAuthenticationCallback.java
-  /// <summary>
-  TFingerprintAuthenticationCallbackDelegate = class(TJavaLocal, JDWFingerprintAuthenticationCallbackDelegate)
+  
+  TBiometricFragmentActivityReceiver = class(TMultiReceiver)
   private
-    FCallback: JFingerprintManager_AuthenticationCallback;
     FPlatformBiometric: TPlatformBiometric;
-  public
-    { JDWFingerprintAuthenticationCallbackDelegate }
-    procedure onAuthenticationError(errMsgId: Integer; errString: JCharSequence); cdecl;
-    procedure onAuthenticationFailed; cdecl;
-    procedure onAuthenticationHelp(helpMsgId: Integer; helpString: JCharSequence); cdecl;
-    procedure onAuthenticationSucceeded(result: JFingerprintManager_AuthenticationResult); cdecl;
+  protected
+    procedure ConfigureActions; override;
+    procedure Receive(context: JContext; intent: JIntent); override;
   public
     constructor Create(const APlatformBiometric: TPlatformBiometric);
-    property Callback: JFingerprintManager_AuthenticationCallback read FCallback;
   end;
 
-  /// <summary>
-  ///   The Android implementation of Biometric
-  /// <summary>
   TPlatformBiometric = class(TCustomPlatformBiometric)
-  strict private
-    FAuthenticationCallbackDelegate: TFingerprintAuthenticationCallbackDelegate;
-    FCancelSignal: JCancellationSignal;
-    FFailResultMethod: TBiometricFailResultMethod;
-    FFingerprintManager: JFingerprintManager;
-    FIsKeyGenerated: Boolean;
-    FIsBiometryLockedOut: Boolean;
-    FJKeyName: JString;
-    FKeyProviderName: JString;
-    FKeyStore: JKeyStore;
-    FKeyName: string;
-    FSuccessResultMethod: TProc;
-    procedure DoGenerateKey;
-    function GenerateKey: Boolean;
-    function GetCipher: JCipher;
-    function HasFingerprintPermission: Boolean;
+  private
+    FActivityReceiver: TBiometricFragmentActivityReceiver;
+    FBiometricManager: JBiometricManager;
+    FVerifySuccessResultMethod: TProc;
+    FVerifyFailResultMethod: TBiometricFailResultMethod;
+    function CanAllowDeviceCredential: Boolean;
+    function GetPromptInfoIntent: JIntent;
+    procedure InitializeStrengths;
   protected
-    procedure DoFailResult(const AFailResult: TBiometricFailResult; const AResultMessage: string);
-    procedure DoSuccessResult;
-    procedure SetLockedOut(const AValue: Boolean);
+    function  GetBiometricCapability: TBiometricCapabilityResult; override;
+    procedure HandleAuthenticationResult(const AIntent: JIntent);
+    function  ShowPrompt: Boolean;
+    procedure Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod); override;
+  public
+    procedure Cancel; override;
+    function CanVerify: Boolean; override;
+    function HasUserInterface: Boolean; override;
+    function IsBiometryLockedOut: Boolean; override;
   public
     class function GetBiometryKind: TBiometryKind; override;
     class function IsSupported: Boolean; override;
   public
     constructor Create(const ABiometric: TBiometric); override;
     destructor Destroy; override;
-    procedure Cancel; override;
-    function CanVerify: Boolean; override;
-    function GetKeyName: string; override;
-    function HasUserInterface: Boolean; override;
-    function IsBiometryLockedOut: Boolean; override;
-    procedure SetKeyName(const AValue: string); override;
-    procedure Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod); override;
   end;
 
 implementation
 
 uses
-  // RTL
-  System.Classes, System.Permissions,
   // Android
-  Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers,
+  Androidapi.Helpers, Androidapi.JNI.Os,
   // DW
-  DW.Consts.Android;
+  DW.Androidapi.JNI.DWBiometricFragmentActivity;
 
-{ TFingerprintAuthenticationCallbackDelegate }
+const
+  cAUTHENTICATION_RESULT_SUCCESS = 0;
+  cAUTHENTICATION_RESULT_ERROR = 1;
+  cAUTHENTICATION_RESULT_FAILED = 2;
 
-constructor TFingerprintAuthenticationCallbackDelegate.Create(const APlatformBiometric: TPlatformBiometric);
+{ TBiometricFragmentActivityReceiver }
+
+constructor TBiometricFragmentActivityReceiver.Create(const APlatformBiometric: TPlatformBiometric);
 begin
-  inherited Create;
+  inherited Create(True);
   FPlatformBiometric := APlatformBiometric;
-  FCallback := TJDWFingerprintAuthenticationCallback.JavaClass.init(Self);
 end;
 
-procedure TFingerprintAuthenticationCallbackDelegate.onAuthenticationError(errMsgId: Integer; errString: JCharSequence);
-var
-  LMessage: string;
+procedure TBiometricFragmentActivityReceiver.ConfigureActions;
 begin
-  if errMsgId = TJFingerprintManager.JavaClass.FINGERPRINT_ERROR_CANCELED then
-    FPlatformBiometric.DoFailResult(TBiometricFailResult.Cancelled, '')
-  else if errMsgId = TJFingerprintManager.JavaClass.FINGERPRINT_ERROR_LOCKOUT then
-  begin
-    FPlatformBiometric.SetLockedOut(True);
-    FPlatformBiometric.DoFailResult(TBiometricFailResult.LockedOut, '');
-  end
-  else
-  begin
-    LMessage := Format('%d : %s', [errMsgId, JCharSequenceToStr(errString)]);
-    FPlatformBiometric.DoFailResult(TBiometricFailResult.Error, LMessage);
-  end;
+  IntentFilter.addAction(TJDWBiometricFragmentActivity.JavaClass.ACTION_AUTHENTICATION);
 end;
 
-procedure TFingerprintAuthenticationCallbackDelegate.onAuthenticationFailed;
+procedure TBiometricFragmentActivityReceiver.Receive(context: JContext; intent: JIntent);
 begin
-  // Might a hacker be able to re-direct from here to FPlatformBiometric.DoSuccessResult instead?
-  FPlatformBiometric.DoFailResult(TBiometricFailResult.Denied, '');
-end;
-
-procedure TFingerprintAuthenticationCallbackDelegate.onAuthenticationHelp(helpMsgId: Integer; helpString: JCharSequence);
-var
-  LMessage: string;
-begin
-  LMessage := Format('%d : %s', [helpMsgId, JCharSequenceToStr(helpString)]);
-  FPlatformBiometric.DoFailResult(TBiometricFailResult.Help, LMessage);
-end;
-
-procedure TFingerprintAuthenticationCallbackDelegate.onAuthenticationSucceeded(result: JFingerprintManager_AuthenticationResult);
-begin
-  FPlatformBiometric.SetLockedOut(False); // Might need to use another API to check this status
-  FPlatformBiometric.DoSuccessResult;
+  if (intent.getAction <> nil) and intent.getAction.equals(TJDWBiometricFragmentActivity.JavaClass.ACTION_AUTHENTICATION) then
+    FPlatformBiometric.HandleAuthenticationResult(intent);
 end;
 
 { TPlatformBiometric }
 
 constructor TPlatformBiometric.Create(const ABiometric: TBiometric);
-var
-  LService: JObject;
 begin
   inherited;
-  FAuthenticationCallbackDelegate := TFingerprintAuthenticationCallbackDelegate.Create(Self);
-  FKeyProviderName := StringToJString('AndroidKeyStore');
-  FKeyStore := TJKeyStore.JavaClass.getInstance(FKeyProviderName);
-  LService := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.FINGERPRINT_SERVICE);
-  FFingerprintManager := TJFingerprintManager.Wrap(TAndroidHelper.JObjectToID(LService));
+  InitializeStrengths;
+  FBiometricManager := TJBiometricManager.JavaClass.from(TAndroidHelper.Context);
+  FActivityReceiver := TBiometricFragmentActivityReceiver.Create(Self);
 end;
 
 destructor TPlatformBiometric.Destroy;
 begin
-  FAuthenticationCallbackDelegate.Free;
+  FActivityReceiver.Free;
   inherited;
 end;
 
-procedure TPlatformBiometric.DoFailResult(const AFailResult: TBiometricFailResult; const AResultMessage: string);
+procedure TPlatformBiometric.Cancel;
 begin
-  TThread.Queue(nil,
-    procedure
-    begin
-      if Assigned(FFailResultMethod) then
-        FFailResultMethod(AFailResult, AResultMessage);
-    end
-  );
+  //
 end;
 
-procedure TPlatformBiometric.DoSuccessResult;
+function TPlatformBiometric.CanVerify: Boolean;
 begin
-  TThread.Queue(nil,
-    procedure
-    begin
-      if Assigned(FSuccessResultMethod) then
-        FSuccessResultMethod;
-    end
-  );
+  Result:=(GetBiometricCapability = TBiometricCapabilityResult.Available);
 end;
 
-function TPlatformBiometric.HasFingerprintPermission: Boolean;
+function TPlatformBiometric.CanAllowDeviceCredential: Boolean;
+var
+  LSDK: Integer;
+  LDeviceCredentialOnly: Boolean;
 begin
-  Result := PermissionsService.IsPermissionGranted(cPermissionUseFingerprint);
+  // https://developer.android.com/reference/androidx/biometric/BiometricManager?hl=en#canAuthenticate(int)
+  LDeviceCredentialOnly := BiometricStrengths = [TBiometricStrength.DeviceCredential];
+  LSDK := TJBuild_VERSION.JavaClass.SDK_INT;
+  if LSDK in [28, 29] then
+    // Cannot combine Strong and DeviceCredential, or have DeviceCredential only in API 28, 29
+    Result := not LDeviceCredentialOnly and (BiometricStrengths <> [TBiometricStrength.DeviceCredential, TBiometricStrength.Strong])
+  else if LSDK < 28 then
+    // Cannot have DeviceCredential on its own in API < 30
+    Result := not LDeviceCredentialOnly
+  else
+    // API >= 30 can have DeviceCredential in any circumstances
+    Result := TBiometricStrength.DeviceCredential in BiometricStrengths;
 end;
 
-function TPlatformBiometric.HasUserInterface: Boolean;
+function TPlatformBiometric.GetBiometricCapability: TBiometricCapabilityResult;
+var
+  LAuthResult: Integer;
 begin
-  Result := False;
+  LAuthResult := FBiometricManager.canAuthenticate;
+  if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_SUCCESS then
+    Result := TBiometricCapabilityResult.Available
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_HW_UNAVAILABLE then
+    Result := TBiometricCapabilityResult.HardwareUnavailable
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_NONE_ENROLLED then
+    Result := TBiometricCapabilityResult.NoneEnrolled
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_NO_HARDWARE then
+    Result := TBiometricCapabilityResult.NoHardware
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED then
+    Result := TBiometricCapabilityResult.SecurityUpdateRequired
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_UNSUPPORTED then
+    Result := TBiometricCapabilityResult.Unsupported
+  else
+    Result := TBiometricCapabilityResult.Unknown;
+end;
+
+class function TPlatformBiometric.GetBiometryKind: TBiometryKind;
+begin
+  if IsSupported then
+    Result := TBiometryKind.Touch
+  else
+    Result := TBiometryKind.None;
+end;
+
+(*
+// 1.1.0
+function TPlatformBiometric.GetBiometricCapability: TBiometricCapabilityResult;
+var
+  LAuthenticators, LSDK, LAuthResult: Integer;
+begin
+  LAuthenticators := 0;
+  if CanAllowDeviceCredential then
+    LAuthenticators := LAuthenticators or TJBiometricManager_Authenticators.JavaClass.DEVICE_CREDENTIAL;
+  if TBiometricStrength.Weak in BiometricStrengths then
+    LAuthenticators := LAuthenticators or TJBiometricManager_Authenticators.JavaClass.BIOMETRIC_WEAK;
+  if TBiometricStrength.Strong in BiometricStrengths then
+    LAuthenticators := LAuthenticators or TJBiometricManager_Authenticators.JavaClass.BIOMETRIC_STRONG;
+  LAuthResult := FBiometricManager.canAuthenticate(LAuthenticators);
+  if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_SUCCESS then
+    Result := TBiometricCapabilityResult.Available
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_HW_UNAVAILABLE then
+    Result := TBiometricCapabilityResult.HardwareUnavailable
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_NONE_ENROLLED then
+    Result := TBiometricCapabilityResult.NoneEnrolled
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_NO_HARDWARE then
+    Result := TBiometricCapabilityResult.NoHardware
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED then
+    Result := TBiometricCapabilityResult.SecurityUpdateRequired
+  else if LAuthResult = TJBiometricManager.JavaClass.BIOMETRIC_ERROR_UNSUPPORTED then
+    Result := TBiometricCapabilityResult.Unsupported
+  else
+    Result := TBiometricCapabilityResult.Unknown;
+end;
+*)
+
+function TPlatformBiometric.GetPromptInfoIntent: JIntent;
+begin
+  Result := TJIntent.JavaClass.init;
+  Result.putExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_PROMPT_DESCRIPTION, StrToJCharSequence(PromptDescription));
+  Result.putExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_PROMPT_SUBTITLE, StrToJCharSequence(PromptSubtitle));
+  Result.putExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_PROMPT_TITLE, StrToJCharSequence(PromptTitle));
+  Result.putExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_PROMPT_ALLOW_DEVICE_CREDENTIAL, CanAllowDeviceCredential);
+  Result.putExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_PROMPT_CANCEL_BUTTON_TEXT, StrToJCharSequence(PromptCancelButtonText));
+  Result.putExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_PROMPT_CONFIRMATION_REQUIRED, PromptConfirmationRequired);
+end;
+
+procedure TPlatformBiometric.InitializeStrengths;
+var
+  LSDK: Integer;
+  LStrengths: TBiometricStrengths;
+begin
+  LStrengths := [TBiometricStrength.Strong];
+  LSDK := TJBuild_VERSION.JavaClass.SDK_INT;
+  if LSDK >= 30 then
+    Include(LStrengths, TBiometricStrength.DeviceCredential);
+  BiometricStrengths := LStrengths;
 end;
 
 function TPlatformBiometric.IsBiometryLockedOut: Boolean;
 begin
-  Result := FIsBiometryLockedOut;
+  Result:=False; //TODO: Check is Android biometry can be locked out or not
 end;
 
 class function TPlatformBiometric.IsSupported: Boolean;
@@ -203,137 +233,69 @@ begin
   Result := TOSVersion.Check(6);
 end;
 
-class function TPlatformBiometric.GetBiometryKind: TBiometryKind;
-begin
-  // NOTE: This implementation supports only Touch on Android. Future versions may support Face
-  if IsSupported then
-    Result := TBiometryKind.Touch
-  else
-    Result := TBiometryKind.None;
-end;
-
-function TPlatformBiometric.GetKeyName: string;
-begin
-  Result := FKeyName;
-end;
-
-procedure TPlatformBiometric.SetKeyName(const AValue: string);
-begin
-  FKeyName := AValue;
-end;
-
-procedure TPlatformBiometric.SetLockedOut(const AValue: Boolean);
-begin
-  FIsBiometryLockedOut := AValue;
-end;
-
-procedure TPlatformBiometric.DoGenerateKey;
-var
-  LKeyGenerator: JKeyGenerator;
-  LKeyGenParameterSpecBuilder: JKeyGenParameterSpec_Builder;
-  LKeyGenParameterSpec: JKeyGenParameterSpec;
-  LBlockModes, LPaddings: TJavaObjectArray<JString>;
-begin
-  LBlockModes := TJavaObjectArray<JString>.Create(1);
-  LBlockModes.Items[0] := TJKeyProperties.JavaClass.BLOCK_MODE_CBC;
-  LPaddings := TJavaObjectArray<JString>.Create(1);
-  LPaddings.Items[0] := TJKeyProperties.JavaClass.ENCRYPTION_PADDING_PKCS7;
-  LKeyGenerator := TJKeyGenerator.JavaClass.getInstance(TJKeyProperties.JavaClass.KEY_ALGORITHM_AES, FKeyProviderName);
-  LKeyGenParameterSpecBuilder := TJKeyGenParameterSpec_Builder.JavaClass.init(FJKeyName, TJKeyProperties.JavaClass.PURPOSE_ENCRYPT or
-    TJKeyProperties.JavaClass.PURPOSE_DECRYPT);
-  LKeyGenParameterSpec := LKeyGenParameterSpecBuilder
-    .setBlockModes(LBlockModes)
-    .setUserAuthenticationRequired(True)
-    .setEncryptionPaddings(LPaddings)
-    .build;
-  LKeyGenerator.init(LKeyGenParameterSpec);
-  LKeyGenerator.generateKey;
-end;
-
-function TPlatformBiometric.GenerateKey: Boolean;
-begin
-  if not FIsKeyGenerated then
-  try
-    DoGenerateKey;
-    FIsKeyGenerated := True;
-  except
-    FIsKeyGenerated := False;
-  end;
-  Result := FIsKeyGenerated;
-end;
-
-function TPlatformBiometric.GetCipher: JCipher;
-var
-  LTransform, LSep: JString;
-  LCipher: JCipher;
-  LKey: JKey;
-begin
-  LSep := StringToJString('/');
-  LTransform := TJKeyProperties.JavaClass.KEY_ALGORITHM_AES;
-  LTransform := LTransform.concat(LSep.concat(TJKeyProperties.JavaClass.BLOCK_MODE_CBC));
-  LTransform := LTransform.concat(LSep.concat(TJKeyProperties.JavaClass.ENCRYPTION_PADDING_PKCS7));
-  try
-    LCipher := TJCipher.JavaClass.getInstance(LTransform); // NoSuchAlgorithmException | NoSuchPaddingException
-    FKeyStore.load(nil);
-    LKey := FKeyStore.getKey(FJKeyName, nil);
-    LCipher.init(TJCipher.JavaClass.ENCRYPT_MODE, LKey); //
-    Result := LCipher;
-  except
-    // KeyPermanentlyInvalidatedException | KeyStoreException | CertificateException | UnrecoverableKeyException |
-    //   IOException | NoSuchAlgorithmException | InvalidKeyException
-    Result := nil;
-  end;
-end;
-
-procedure TPlatformBiometric.Cancel;
-begin
-  if FCancelSignal <> nil then
-  begin
-    FCancelSignal.cancel;
-    FCancelSignal := nil;
-  end;
-end;
-
-function TPlatformBiometric.CanVerify: Boolean;
+function TPlatformBiometric.ShowPrompt: Boolean;
 begin
   Result := False;
-  if HasFingerprintPermission and FFingerprintManager.hasEnrolledFingerprints then
+  if GetBiometricCapability = TBiometricCapabilityResult.Available then
+  begin
+    TJDWBiometricFragmentActivity.JavaClass.start(TAndroidHelper.Context, GetPromptInfoIntent);
     Result := True;
+  end;
 end;
 
-procedure TPlatformBiometric.Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod);
-var
-  LCrypto: JFingerprintManager_CryptoObject;
-  LCipher: JCipher;
+procedure TPlatformBiometric.Verify(const AMessage: string; const ASuccessResultMethod: TProc;
+  const AFailResultMethod: TBiometricFailResultMethod);
 begin
-  FSuccessResultMethod := ASuccessResultMethod;
-  FFailResultMethod := AFailResultMethod;
-  if FKeyName.IsEmpty then
+  FVerifySuccessResultMethod := ASuccessResultMethod;
+  FVerifyFailResultMethod := AFailResultMethod;
+
+  PromptDescription:=AMessage;
+
+  var res:=ShowPrompt;
+  if not res and Assigned(FVerifyFailResultMethod) then
+    FVerifyFailResultMethod(TBiometricFailResult.Error, 'Biometry not available');
+end;
+
+procedure TPlatformBiometric.HandleAuthenticationResult(const AIntent: JIntent);
+  var
+    AuthRes: Integer;
+    ErrorCode: Integer;
+    ErrorMsg: String;
+begin
+  if not AIntent.hasExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT) then
+    Exit;
+
+  AuthRes:=AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT, 2);
+
+  if AuthRes = cAUTHENTICATION_RESULT_SUCCESS then
   begin
-    DoFailResult(TBiometricFailResult.Error, SBiometricErrorKeyNameEmpty);
-    Exit; // <======
-  end;
-  FJKeyName := StringToJString(FKeyName);
-  if not CanVerify then
+    if Assigned(FVerifySuccessResultMethod) then
+      FVerifySuccessResultMethod;
+  end
+  // Called when a biometric (e.g. fingerprint, face, etc.) is presented but not recognized as belonging to the user.
+  // No error code or message will be returned but the UI will display the failure reason anyway.
+  else if AuthRes = cAUTHENTICATION_RESULT_ERROR then
   begin
-    DoFailResult(TBiometricFailResult.Error, SBiometricErrorCannotVerify);
-    Exit; // <======
-  end;
-  if not GenerateKey then
+    // See https://developer.android.com/reference/androidx/biometric/BiometricPrompt for error codes
+    ErrorCode:=AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_CODE, 0);
+    ErrorMsg:=JStringToString(AIntent.getStringExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_MESSAGE));
+
+    if Assigned(FVerifyFailResultMethod) then
+      FVerifyFailResultMethod(TBiometricFailResult.Error, ErrorMsg)
+  end
+  // Failed will happen if auth is working but the user couldn't be autheticated.
+  // E.g. couldn't match the finger or face. The UI will tell the user what's wrong
+  // so the error message and code will always be empty.
+  else if AuthRes = cAUTHENTICATION_RESULT_FAILED then
   begin
-    DoFailResult(TBiometricFailResult.Error, SBiometricErrorKeyGenerationFailed);
-    Exit; // <======
+    if Assigned(FVerifyFailResultMethod) then
+      FVerifyFailResultMethod(TBiometricFailResult.Denied, '');
   end;
-  LCipher := GetCipher;
-  if LCipher = nil then
-  begin
-    DoFailResult(TBiometricFailResult.Error, SBiometricErrorCipherGenerationFailed);
-    Exit; // <======
-  end;
-  LCrypto := TJFingerprintManager_CryptoObject.JavaClass.init(LCipher);
-  FCancelSignal := TJCancellationSignal.JavaClass.init;
-  FFingerprintManager.authenticate(LCrypto, FCancelSignal, 0, FAuthenticationCallbackDelegate.Callback, nil);
+end;
+
+function TPlatformBiometric.HasUserInterface: Boolean;
+begin
+  Result:=True;
 end;
 
 end.
-
