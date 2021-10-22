@@ -343,12 +343,13 @@ var
   I: Integer;
   LMacOSMenuItem: TMacOSMenuItem;
 begin
-  if not AItem.Visible then
-    Exit; // <======
-  AItem.FreeNotification(Self);
-  LMacOSMenuItem := TMacOSMenuItem.Create(Self, AItem);
-  for I := 0 to AItem.ItemsCount - 1 do
-    AddSubMenuItem(LMacOSMenuItem, AItem.Items[I]);
+  if AItem.Visible then
+  begin
+    AItem.FreeNotification(Self);
+    LMacOSMenuItem := TMacOSMenuItem.Create(Self, AItem);
+    for I := 0 to AItem.ItemsCount - 1 do
+      AddSubMenuItem(LMacOSMenuItem, AItem.Items[I]);
+  end;
 end;
 
 procedure TStatusBarMenu.AddSubMenuItem(const AMacOSMenuItem: TMacOSMenuItem; const AItem: TMenuItem);
@@ -356,12 +357,13 @@ var
   I: Integer;
   LSubItem: TMacOSMenuItem;
 begin
-  if not AItem.Visible then
-    Exit; // <======
-  AItem.FreeNotification(Self);
-  LSubItem := TMacOSMenuItem.Create(AMacOSMenuItem, AItem);
-  for I := 0 to AItem.ItemsCount - 1 do
-    AddSubMenuItem(LSubItem, AItem.Items[I]);
+  if AItem.Visible then
+  begin
+    AItem.FreeNotification(Self);
+    LSubItem := TMacOSMenuItem.Create(AMacOSMenuItem, AItem);
+    for I := 0 to AItem.ItemsCount - 1 do
+      AddSubMenuItem(LSubItem, AItem.Items[I]);
+  end;
 end;
 
 procedure TStatusBarMenu.ClearMenuItems;
