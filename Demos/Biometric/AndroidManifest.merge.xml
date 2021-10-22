@@ -1,0 +1,8 @@
+<manifest>
+  <application>
+    <activity merge:update="add" android:name="com.delphiworlds.kastri.DWBiometricFragmentActivity"
+        android:theme="@android:style/Theme.Translucent.NoTitleBar"
+        android:excludeFromRecents="true"
+        android:exported="false"/>
+  </application>
+</manifest>
