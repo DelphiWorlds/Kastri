@@ -19,6 +19,7 @@ type
     procedure CancelButtonClick(Sender: TObject);
     procedure ResetButtonClick(Sender: TObject);
   private
+    FBiometric: TBiometric;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     procedure Listening(const AIsListening: Boolean);
     procedure VerificationFailResultHandler(const AFailResult: TBiometricFailResult; const AResultMessage: string);
@@ -49,7 +50,8 @@ begin
   Listening(False);
   if TBiometric.IsSupported then
   begin
-    case TBiometric.Current.GetBiometryKind of
+    FBiometric := TBiometric.Current;
+    case FBiometric.GetBiometryKind of
       TBiometryKind.None:
         KindLabel.Text := 'Biometry kind: None, or not implemented';
       TBiometryKind.Face:
@@ -57,7 +59,7 @@ begin
       TBiometryKind.Touch:
         KindLabel.Text := 'Biometry kind: Touch';
     end;
-    TBiometric.Current.KeyName := ChangeFileExt(ExtractFileName(ParamStr(0)), '') + '.key';
+    // FBiometric.KeyName := ChangeFileExt(ExtractFileName(ParamStr(0)), '') + '.key';
   end
   else
   begin
@@ -84,7 +86,8 @@ end;
 
 procedure TfrmMain.ResetButtonClick(Sender: TObject);
 begin
-  TBiometric.Current.Reset;
+  if FBiometric <> nil then
+    FBiometric.Reset;
   ShowMessage('Authentication has been reset, if supported');
 end;
 
@@ -94,31 +97,39 @@ begin
     TApplicationEvent.EnteredBackground:
     begin
       // When your app goes into the background, you should cancel listening for verification!
-      TBiometric.Current.Cancel;
+      if FBiometric <> nil then
+        FBiometric.Cancel;
     end;
   end;
 end;
 
 procedure TfrmMain.CancelButtonClick(Sender: TObject);
 begin
-  TBiometric.Current.Cancel;
+  if FBiometric <> nil then
+    FBiometric.Cancel;
 end;
 
 procedure TfrmMain.BiometricImageClick(Sender: TObject);
 begin
-  if TBiometric.Current.CanVerify then
-    Verify
-  else if TBiometric.Current.IsBiometryLockedOut then
-    TBiometric.Current.RestoreBiometry(VerificationSuccessResultHandler, VerificationFailResultHandler) // or perhaps use a separate handler for Biometry
-  else
-    ShowMessage('Unable to verify. If on Android, check that the USE_FINGERPRINT permission has been added to the manifest');
+  if FBiometric <> nil then
+  begin
+    if FBiometric.CanVerify then
+      Verify
+    else if FBiometric.IsBiometryLockedOut then
+      FBiometric.RestoreBiometry(VerificationSuccessResultHandler, VerificationFailResultHandler) // or perhaps use a separate handler for Biometry
+    else
+      ShowMessage('Unable to verify. If on Android, check that the USE_FINGERPRINT permission has been added to the manifest');
+  end;
 end;
 
 procedure TfrmMain.Verify;
 begin
-  if not TBiometric.Current.HasUserInterface then
-    Listening(True);
-  TBiometric.Current.Verify(cTouchMeCaption, VerificationSuccessResultHandler, VerificationFailResultHandler);
+  if FBiometric <> nil then
+  begin
+    if not FBiometric.HasUserInterface then
+      Listening(True);
+    FBiometric.Verify(cTouchMeCaption, VerificationSuccessResultHandler, VerificationFailResultHandler);
+  end;
 end;
 
 procedure TfrmMain.VerificationFailResultHandler(const AFailResult: TBiometricFailResult; const AResultMessage: string);
