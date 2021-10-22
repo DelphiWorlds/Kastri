@@ -102,6 +102,7 @@ type
 
   TPlatformBiometric = class(TCustomPlatformBiometric)
   private
+    const cBiometryMode = LAPolicyDeviceOwnerAuthentication;
     class function CheckBiometry: NSError;
   private
     FContext: LAContext;
@@ -121,6 +122,7 @@ type
   protected
     procedure Cancel; override;
     function CanVerify: Boolean; override;
+    function  GetBiometricCapability: TBiometricCapabilityResult; override;
     function HasUserInterface: Boolean; override;
     function IsBiometryLockedOut: Boolean; override;
     procedure Reset; override;
@@ -145,6 +147,18 @@ uses
 
 const
   libLocalAuthentication = '/System/Library/Frameworks/LocalAuthentication.framework/LocalAuthentication';
+
+resourcestring
+  SBiometricNotImplemented = 'Biometric support is not implemented for this platform';
+  SBiometricErrorKeyNameEmpty = 'Keyname cannot be empty';
+  SBiometricErrorCannotVerify = 'Unable to perform verification';
+  SBiometricErrorKeyGenerationFailed = 'Failed to generate key';
+  SBiometricErrorCipherGenerationFailed = 'Failed to generate cipher';
+  SBiometricErrorSystemError = 'A system error occurred: %s';
+  SBiometricErrorNotAvailable = 'Biometrics not available';
+  SBiometricEnterPINToRestore = 'Enter PIN to restore biometry';
+  SFingerprintNotImplemented = 'Fingerprints support is not implemented for this platform';
+  SFingerprintErrorNotAvailable = 'Fingerprints not available';
 
 function LATouchIDAuthenticationMaximumAllowableReuseDuration: Double;
 begin
@@ -185,60 +199,68 @@ end;
 
 procedure TPlatformBiometric.DoRestoreBiometryFailResult(const AResult: TBiometricFailResult; const AResultMessage: string);
 begin
-  if not Assigned(FRestoreBiometryFailResultMethod) then
-    Exit; // <======
-  TThread.Queue(nil,
-    procedure
-    begin
-      FRestoreBiometryFailResultMethod(AResult, AResultMessage);
-    end
-  );
+  if Assigned(FRestoreBiometryFailResultMethod) then
+  begin
+    TThread.Queue(nil,
+      procedure
+      begin
+        FRestoreBiometryFailResultMethod(AResult, AResultMessage);
+      end
+    );
+  end;
 end;
 
 procedure TPlatformBiometric.DoRestoreBiometrySuccessResult;
 begin
-  if not Assigned(FRestoreBiometrySuccessResultMethod) then
-    Exit; // <======
-  TThread.Queue(nil,
-    procedure
-    begin
-      FRestoreBiometrySuccessResultMethod;
-    end
-  );
+  if Assigned(FRestoreBiometrySuccessResultMethod) then
+  begin
+    TThread.Queue(nil,
+      procedure
+      begin
+        FRestoreBiometrySuccessResultMethod;
+      end
+    );
+  end;
 end;
 
 procedure TPlatformBiometric.DoVerifyFailResult(const AResult: TBiometricFailResult; const AResultMessage: string);
 begin
-  if not Assigned(FVerifyFailResultMethod) then
-    Exit; // <======
-  TThread.Queue(nil,
-    procedure
-    begin
-      FVerifyFailResultMethod(AResult, AResultMessage);
-    end
-  );
+  if Assigned(FVerifyFailResultMethod) then
+  begin
+    TThread.Queue(nil,
+      procedure
+      begin
+        FVerifyFailResultMethod(AResult, AResultMessage);
+      end
+    );
+  end;
 end;
 
 procedure TPlatformBiometric.DoVerifySuccessResult;
 begin
-  if not Assigned(FVerifySuccessResultMethod) then
-    Exit; // <======
-  TThread.Queue(nil,
-    procedure
-    begin
-      FVerifySuccessResultMethod;
-    end
-  );
+  if Assigned(FVerifySuccessResultMethod) then
+  begin
+    TThread.Queue(nil,
+      procedure
+      begin
+        FVerifySuccessResultMethod;
+      end
+    );
+  end;
+end;
+
+function TPlatformBiometric.GetBiometricCapability: TBiometricCapabilityResult;
+begin
+  Result := TBiometricCapabilityResult.Unknown;
 end;
 
 class function TPlatformBiometric.GetBiometryKind: TBiometryKind;
 var
   LContext: LAContext;
 begin
-  // None will also mean undetermined if LContext.biometryType returns an unsupported value
   Result := TBiometryKind.None;
   LContext := TLAContext.Create;
-  if LContext.canEvaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, nil) then
+  if LContext.canEvaluatePolicy(cBiometryMode, nil) then
   begin
     case LContext.biometryType of
       LABiometryTypeFaceID:
@@ -309,7 +331,7 @@ begin
   FVerifySuccessResultMethod := ASuccessResultMethod;
   FVerifyFailResultMethod := AFailResultMethod;
   if CanVerify then
-    FContext.evaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, StrToNSStr(AMessage), VerifyReplyHandler)
+    FContext.evaluatePolicy(cBiometryMode, StrToNSStr(AMessage), VerifyReplyHandler)
   else
     DoVerifyFailResult(TBiometricFailResult.Error, SBiometricErrorCannotVerify);
 end;
@@ -322,7 +344,7 @@ end;
 
 function TPlatformBiometric.CanVerify: Boolean;
 begin
-  Result := FContext.canEvaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, nil);
+  Result := FContext.canEvaluatePolicy(cBiometryMode, nil);
 end;
 
 function TPlatformBiometric.IsBiometryLockedOut: Boolean;
@@ -341,7 +363,7 @@ var
   LContext: LAContext;
 begin
   LContext := TLAContext.Create;
-  LContext.canEvaluatePolicy(LAPolicyDeviceOwnerAuthenticationWithBiometrics, @LPointer);
+  LContext.canEvaluatePolicy(cBiometryMode, @LPointer);
   Result := TNSError.Wrap(LPointer);
 end;
 
@@ -361,7 +383,7 @@ procedure TPlatformBiometric.RestoreBiometry(const ASuccessResultMethod: TProc; 
 begin
   FRestoreBiometryFailResultMethod := AFailResultMethod;
   FRestoreBiometrySuccessResultMethod := ASuccessResultMethod;
-  FContext.evaluatePolicy(LAPolicyDeviceOwnerAuthentication, StrToNSStr(SBiometricEnterPINToRestore), RestoreBiometryReplyHandler);
+  FContext.evaluatePolicy(cBiometryMode, StrToNSStr(SBiometricEnterPINToRestore), RestoreBiometryReplyHandler);
 end;
 
 procedure TPlatformBiometric.RestoreBiometryReplyHandler(success: Boolean; error: Pointer);

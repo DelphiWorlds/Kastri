@@ -20,20 +20,37 @@ uses
   System.SysUtils;
 
 type
+  TBiometricStrength = (DeviceCredential, Strong, Weak);
+
+  TBiometricStrengths = set of TBiometricStrength;
+
+  TBiometricCapabilityResult = (Unknown, Available, HardwareUnavailable, NoHardware, NoneEnrolled, SecurityUpdateRequired, Unsupported);
+
   TBiometricFailResult = (Unknown, Cancelled, Fallback, Denied, LockedOut, Error, Help);
 
   TBiometryKind = (None, Face, Touch);
 
-  TBiometricFailResultMethod = procedure (const FailResult: TBiometricFailResult; const ResultMessage: string) of object;
+  TBiometricFailResultMethod = procedure(const FailResult: TBiometricFailResult; const ResultMessage: string) of object;
 
   TBiometric = class;
 
   TCustomPlatformBiometric = class(TObject)
   private
     FBiometric: TBiometric;
+    FBiometricStrengths: TBiometricStrengths;
+    FPromptCancelButtonText: string;
+    FPromptConfirmationRequired: Boolean;
+    FPromptDescription: string;
+    FPromptSubtitle: string;
+    FPromptTitle: string;
+    procedure SetPromptCancelButtonText(const Value: string);
+    procedure SetPromptDescription(const Value: string);
+    procedure SetPromptSubtitle(const Value: string);
+    procedure SetPromptTitle(const Value: string);
   protected
     procedure Cancel; virtual;
     function CanVerify: Boolean; virtual;
+    function GetBiometricCapability: TBiometricCapabilityResult; virtual; abstract;
     function GetKeyName: string; virtual;
     function HasUserInterface: Boolean; virtual;
     function IsBiometryLockedOut: Boolean; virtual;
@@ -43,6 +60,12 @@ type
     procedure SetReuseTime(const AInterval: Double); virtual;
     procedure Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod); virtual;
     property Biometric: TBiometric read FBiometric;
+    property BiometricStrengths: TBiometricStrengths read FBiometricStrengths write FBiometricStrengths;
+    property PromptCancelButtonText: string read FPromptCancelButtonText write SetPromptCancelButtonText;
+    property PromptDescription: string read FPromptDescription write SetPromptDescription;
+    property PromptSubtitle: string read FPromptSubtitle write SetPromptSubtitle;
+    property PromptTitle: string read FPromptTitle write SetPromptTitle;
+    property PromptConfirmationRequired: Boolean read FPromptConfirmationRequired write FPromptConfirmationRequired;
   public
     class function GetBiometryKind: TBiometryKind; virtual;
     class function IsSupported: Boolean; virtual;
@@ -56,6 +79,16 @@ type
     class function GetCurrent: TBiometric; static;
   private
     FPlatformBiometric: TCustomPlatformBiometric;
+    function GetPromptCancelButtonText: string;
+    function GetPromptConfirmationRequired: Boolean;
+    function GetPromptDescription: string;
+    function GetPromptSubtitle: string;
+    function GetPromptTitle: string;
+    procedure SetPromptCancelButtonText(const Value: string);
+    procedure SetPromptConfirmationRequired(const Value: Boolean);
+    procedure SetPromptDescription(const Value: string);
+    procedure SetPromptSubtitle(const Value: string);
+    procedure SetPromptTitle(const Value: string);
   public
     class destructor DestroyClass;
     class property Current: TBiometric read GetCurrent;
@@ -103,9 +136,14 @@ type
     /// </summary>
     procedure Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod);
     /// <summary>
-    ///   Key name used for key storage (currently applies to Android only)
+    ///   Key name used for key storage (currently applies to Android only - Delphi 10.4.x)
     /// </summary>
     property KeyName: string read GetKeyName write SetKeyName;
+    property PromptCancelButtonText: string read GetPromptCancelButtonText write SetPromptCancelButtonText;
+    property PromptDescription: string read GetPromptDescription write SetPromptDescription;
+    property PromptSubtitle: string read GetPromptSubtitle write SetPromptSubtitle;
+    property PromptTitle: string read GetPromptTitle write SetPromptTitle;
+    property PromptConfirmationRequired: Boolean read GetPromptConfirmationRequired write SetPromptConfirmationRequired;
   end;
 
 resourcestring
@@ -122,17 +160,18 @@ resourcestring
 
 implementation
 
-// DW
-{$IF Defined(IOS)}
 uses
+  {$IF Defined(IOS)}
   DW.Biometric.iOS;
-{$ELSEIF Defined(Android)}
-uses
+  {$ELSEIF Defined(ANDROID)}
+  {$IF CompilerVersion >= 35}
   DW.Biometric.Android;
-{$ELSE}
-type
-  TPlatformBiometric = class(TCustomPlatformBiometric);
-{$ENDIF}
+  {$ELSE}
+  DW.Biometric.Android.Legacy;
+  {$ENDIF}
+  {$ELSE}
+  DW.Biometric.Default;
+  {$ENDIF}
 
 { TCustomPlatformBiometric }
 
@@ -140,16 +179,20 @@ constructor TCustomPlatformBiometric.Create(const ABiometric: TBiometric);
 begin
   inherited Create;
   FBiometric := ABiometric;
-end;
-
-function TCustomPlatformBiometric.CanVerify: Boolean;
-begin
-  Result := False;
+  FPromptConfirmationRequired := False;
+  FPromptCancelButtonText := 'Cancel';
+  FPromptDescription := 'I need to know it''s really you';
+  FPromptTitle := 'Authenticate!';
 end;
 
 procedure TCustomPlatformBiometric.Cancel;
 begin
   //
+end;
+
+function TCustomPlatformBiometric.CanVerify: Boolean;
+begin
+  Result := False;
 end;
 
 class function TCustomPlatformBiometric.GetBiometryKind: TBiometryKind;
@@ -184,12 +227,33 @@ end;
 
 procedure TCustomPlatformBiometric.RestoreBiometry(const ASuccessResultMethod: TProc; const AResultMethod: TBiometricFailResultMethod);
 begin
-  //
+  if Assigned(AResultMethod) then
+    AResultMethod(TBiometricFailResult.Error, SBiometricNotImplemented);
 end;
 
 procedure TCustomPlatformBiometric.SetKeyName(const AValue: string);
 begin
   //
+end;
+
+procedure TCustomPlatformBiometric.SetPromptCancelButtonText(const Value: string);
+begin
+  FPromptCancelButtonText := Value;
+end;
+
+procedure TCustomPlatformBiometric.SetPromptDescription(const Value: string);
+begin
+  FPromptDescription := Value;
+end;
+
+procedure TCustomPlatformBiometric.SetPromptSubtitle(const Value: string);
+begin
+  FPromptSubtitle := Value;
+end;
+
+procedure TCustomPlatformBiometric.SetPromptTitle(const Value: string);
+begin
+  FPromptTitle := Value;
 end;
 
 procedure TCustomPlatformBiometric.SetReuseTime(const AInterval: Double);
@@ -200,18 +264,21 @@ end;
 procedure TCustomPlatformBiometric.Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod);
 begin
   if Assigned(AFailResultMethod) then
-    AFailResultMethod(TBiometricFailResult.Unknown, SBiometricNotImplemented);
+    AFailResultMethod(TBiometricFailResult.Error, SBiometricNotImplemented);
 end;
 
 { TBiometric }
 
+class destructor TBiometric.DestroyClass;
+begin
+  FCurrent.Free;
+  FCurrent := nil;
+end;
+
 constructor TBiometric.Create;
 begin
   inherited;
-  if TPlatformBiometric.IsSupported then
-    FPlatformBiometric := TPlatformBiometric.Create(Self)
-  else
-    FPlatformBiometric := TCustomPlatformBiometric.Create(Self);
+  FPlatformBiometric := TPlatformBiometric.Create(Self);
 end;
 
 destructor TBiometric.Destroy;
@@ -247,6 +314,31 @@ begin
   Result := FPlatformBiometric.GetKeyName;
 end;
 
+function TBiometric.GetPromptCancelButtonText: string;
+begin
+  Result := FPlatformBiometric.PromptCancelButtonText;
+end;
+
+function TBiometric.GetPromptConfirmationRequired: Boolean;
+begin
+  Result := FPlatformBiometric.PromptConfirmationRequired;
+end;
+
+function TBiometric.GetPromptDescription: string;
+begin
+  Result := FPlatformBiometric.PromptDescription;
+end;
+
+function TBiometric.GetPromptSubtitle: string;
+begin
+  Result := FPlatformBiometric.PromptSubtitle;
+end;
+
+function TBiometric.GetPromptTitle: string;
+begin
+  Result := FPlatformBiometric.PromptTitle;
+end;
+
 function TBiometric.HasUserInterface: Boolean;
 begin
   Result := FPlatformBiometric.HasUserInterface;
@@ -277,15 +369,34 @@ begin
   FPlatformBiometric.SetKeyName(AValue);
 end;
 
+procedure TBiometric.SetPromptCancelButtonText(const Value: string);
+begin
+  FPlatformBiometric.PromptCancelButtonText:=Value;
+end;
+
+procedure TBiometric.SetPromptConfirmationRequired(const Value: Boolean);
+begin
+  FPlatformBiometric.PromptConfirmationRequired:=Value;
+end;
+
+procedure TBiometric.SetPromptDescription(const Value: string);
+begin
+  FPlatformBiometric.PromptDescription:=Value;
+end;
+
+procedure TBiometric.SetPromptSubtitle(const Value: string);
+begin
+  FPlatformBiometric.PromptSubtitle:=Value;
+end;
+
+procedure TBiometric.SetPromptTitle(const Value: string);
+begin
+  FPlatformBiometric.PromptTitle:=Value;
+end;
+
 procedure TBiometric.SetReuseTime(const AInterval: Double);
 begin
   FPlatformBiometric.SetReuseTime(AInterval);
-end;
-
-class destructor TBiometric.DestroyClass;
-begin
-  FCurrent.Free;
-  FCurrent := nil;
 end;
 
 procedure TBiometric.Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod);
