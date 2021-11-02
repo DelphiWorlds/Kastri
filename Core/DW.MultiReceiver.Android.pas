@@ -59,6 +59,7 @@ type
     FReceiverDelegate: JDWMultiBroadcastReceiverDelegate;
   protected
     procedure ConfigureActions; virtual; abstract;
+    function GetResultCode: Integer;
     procedure Receive(context: JContext; intent: JIntent); virtual; abstract;
     property IntentFilter: JIntentFilter read FIntentFilter;
   public
@@ -126,6 +127,11 @@ begin
       TOSLog.d('TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).unregisterReceiver(FReceiver)');
     TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).unregisterReceiver(FReceiver);
   end;
+end;
+
+function TMultiReceiver.GetResultCode: Integer;
+begin
+  Result := FReceiver.getResultCode;
 end;
 
 end.
