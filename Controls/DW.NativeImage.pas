@@ -92,7 +92,11 @@ type
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
   end;
 
+  {$IF CompilerVersion >= 35}
+  [ComponentPlatformsAttribute(pfidiOS or pidAndroidArm32 or pidAndroidArm64)]
+  {$ELSE}
   [ComponentPlatformsAttribute(pfidiOS or pidAndroid32Arm or pidAndroid64Arm)]
+  {$ENDIF}
   TNativeImage = class(TCustomNativeImage)
   published
     property Align;
