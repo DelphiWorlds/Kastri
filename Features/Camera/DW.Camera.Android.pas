@@ -49,7 +49,7 @@ type
     FSession: JCameraCaptureSession;
     FStillImageAvailableListener: JImageReader_OnImageAvailableListener;
     FStillImageReader: JImageReader;
-    FStillImageOrientation: Integer;
+    // FStillImageOrientation: Integer;
     FSurfaceTexture: JSurfaceTexture;
     FSurfaceTextureListener: JTextureView_SurfaceTextureListener;
     FThread: JHandlerThread;
@@ -142,7 +142,7 @@ uses
   FMX.Forms, FMX.Media,
   // DW
   DW.OSLog,
-  DW.CameraPreview.Android, DW.Android.Helpers, DW.Consts.Android, DW.UIHelper, DW.Types;
+  DW.CameraPreview.Android, DW.Android.Helpers, DW.Consts.Android, DW.UIHelper, DW.Types, DW.Permissions.Helpers;
 
 const
   cCaptureModeCaptions: array[TCaptureMode] of string = ('None', 'Still', 'Faces');
@@ -435,7 +435,7 @@ end;
 
 procedure TCameraCaptureSession.UpdatePreview;
 var
-  LScale, LScreenScale: Single;
+  LScreenScale: Single;
   LSize: TSizeF;
   LViewSize, LPreviewSize: TSize;
   LIsPortrait: Boolean;
@@ -824,7 +824,7 @@ const
   cStatus: array[Boolean] of TAuthorizationStatus = (TAuthorizationStatus.Denied, TAuthorizationStatus.Authorized);
 begin
   PermissionsService.RequestPermissions([cPermissionCamera],
-    procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
+    procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
     begin
       QueueAuthorizationStatus(cStatus[AGrantResults[0] = TPermissionStatus.Granted]);
     end
