@@ -21,8 +21,6 @@ uses
 type
   TPlatformFirebaseMessaging = class(TCustomPlatformFirebaseMessaging)
   protected
-    procedure Connect; override;
-    procedure Disconnect; override;
     procedure RequestAuthorization; override;
     procedure SubscribeToTopic(const ATopicName: string); override;
     procedure UnsubscribeFromTopic(const ATopicName: string); override;
@@ -31,16 +29,6 @@ type
 implementation
 
 { TPlatformFirebaseMessaging }
-
-procedure TPlatformFirebaseMessaging.Connect;
-begin
-  //
-end;
-
-procedure TPlatformFirebaseMessaging.Disconnect;
-begin
-  //
-end;
 
 procedure TPlatformFirebaseMessaging.RequestAuthorization;
 begin
