@@ -16,11 +16,16 @@ unit DW.OSDevice.Mac;
 interface
 
 uses
+  // macOS
+  Macapi.Foundation, Macapi.AppKit,
   // DW
   DW.OSDevice;
 
 type
   TPlatformOSDevice = record
+  private
+    class function SharedWorkspace: NSWorkspace; static;
+    class procedure OpenNSURL(const AURL: NSURL); static;
   public
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     class function GetDeviceModel: string; static;
@@ -31,6 +36,7 @@ type
     class function GetUniqueDeviceID: string; static;
     class function GetUsername: string; static;
     class function IsTouchDevice: Boolean; static;
+    class procedure OpenURL(const AURL: string); static;
     class procedure ShowFilesInFolder(const AFileNames: array of string); static;
   end;
 
@@ -40,7 +46,7 @@ uses
   // RTL
   System.SysUtils,
   // macOS
-  Macapi.CoreFoundation, Macapi.Foundation, Macapi.Helpers, Macapi.IOKit, Macapi.AppKit,
+  Macapi.CoreFoundation, Macapi.Helpers, Macapi.IOKit,
   // Posix
   Posix.SysUtsname, Posix.SysSysctl,
   // DW
@@ -112,6 +118,16 @@ begin
   Result := False;
 end;
 
+class procedure TPlatformOSDevice.OpenNSURL(const AURL: NSURL);
+begin
+  SharedWorkspace.openURL(AURL);
+end;
+
+class procedure TPlatformOSDevice.OpenURL(const AURL: string);
+begin
+  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(StrToNSStr(AURL))));
+end;
+
 class function TPlatformOSDevice.GetPackageID: string;
 begin
   Result := TMacHelperEx.GetBundleValue('CFBundleIdentifier');
@@ -120,6 +136,11 @@ end;
 class function TPlatformOSDevice.GetPackageVersion: string;
 begin
   Result := TMacHelperEx.GetBundleValue('CFBundleVersion');
+end;
+
+class function TPlatformOSDevice.SharedWorkspace: NSWorkspace;
+begin
+  Result := TNSWorkspace.Wrap(TNSWorkspace.OCClass.sharedWorkspace);
 end;
 
 class procedure TPlatformOSDevice.ShowFilesInFolder(const AFileNames: array of string);

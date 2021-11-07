@@ -283,7 +283,7 @@ end;
 
 class procedure TOSDevice.OpenURL(const AURL: string);
 begin
-  {$IF Defined(IOS)}
+  {$IF Defined(MACOS) or Defined(ANDROID) or Defined(MSWINDOWS)}
   TPlatformOSDevice.OpenURL(AURL);
   {$ENDIF}
 end;

@@ -36,6 +36,7 @@ type
     class function IsBeta: Boolean; static;
     class function IsScreenLocked: Boolean; static;
     class function IsTouchDevice: Boolean; static;
+    class procedure OpenURL(const AURL: string); static;
     class procedure ShowFilesInFolder(const AFileNames: array of string); static;
   end;
 
@@ -45,7 +46,7 @@ uses
   // RTL
   System.SysUtils, System.Win.Registry, System.IOUtils,
   // Windows
-  Winapi.Windows, Winapi.ShlObj;
+  Winapi.Windows, Winapi.ShlObj, Winapi.ShellAPI;
 
 const
   cMicrosoftCryptographyKey = 'SOFTWARE\Microsoft\Cryptography';
@@ -178,6 +179,11 @@ var
 begin
   LValue := GetSystemMetrics(SM_DIGITIZER);
   Result := ((LValue and NID_READY) = NID_READY) and (((LValue and NID_MULTI_INPUT) = NID_MULTI_INPUT));
+end;
+
+class procedure TPlatformOSDevice.OpenURL(const AURL: string);
+begin
+  ShellExecute(0, 'open', PChar(AURL), nil, nil, SW_SHOWNORMAL);
 end;
 
 class procedure TPlatformOSDevice.ShowFilesInFolder(const AFileNames: array of string);

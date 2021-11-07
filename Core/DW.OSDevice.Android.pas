@@ -38,6 +38,7 @@ type
     class function IsScreenLocked: Boolean; static;
     class function IsTouchDevice: Boolean; static;
     class procedure OpenAppSettings; static;
+    class procedure OpenURL(const AURL: string); static;
     class procedure SetPreventScreenLock(const AValue: Boolean); static;
   end;
 
@@ -185,6 +186,15 @@ begin
   LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_APPLICATION_DETAILS_SETTINGS, LUri);
   LIntent.addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_NEW_TASK);
   TAndroidHelper.Context.startActivity(LIntent);
+end;
+
+class procedure TPlatformOSDevice.OpenURL(const AURL: string);
+var
+  LIntent: JIntent;
+begin
+  LIntent := TJIntent.JavaClass.init(StringToJString('android.intent.action.VIEW'));
+  LIntent.setData(TJnet_Uri.JavaClass.parse(StringToJString(AURL)));
+  TAndroidHelper.Activity.startActivity(LIntent);
 end;
 
 class procedure TPlatformOSDevice.SetPreventScreenLock(const AValue: Boolean);
