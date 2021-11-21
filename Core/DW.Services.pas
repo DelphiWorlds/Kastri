@@ -28,8 +28,8 @@ type
   TServices = class(TObject)
   private
     class var FServices: TServices;
-    class constructor Initialise;
-    class destructor Finalise;
+    class constructor CreateClass;
+    class destructor DestroyClass;
   private
     FList: TServiceList;
     class function GetService(const AIndex: Integer): IInterface; static;
@@ -41,7 +41,7 @@ type
     /// <summary>
     ///   Adds a service to the list. First checks if the service has already been added
     /// </summary>
-    class procedure Add(const AServiceGUID: TGUID; const AService: IInterface);
+    class function Add(const AServiceGUID: TGUID; const AService: IInterface): Boolean;
     /// <summary>
     ///   Retrieves a service from the list
     /// </summary>
@@ -80,20 +80,24 @@ begin
   inherited;
 end;
 
-class constructor TServices.Initialise;
+class constructor TServices.CreateClass;
 begin
   FServices := TServices.Create;
 end;
 
-class destructor TServices.Finalise;
+class destructor TServices.DestroyClass;
 begin
   FServices.Free;
 end;
 
-class procedure TServices.Add(const AServiceGUID: TGUID; const AService: IInterface);
+class function TServices.Add(const AServiceGUID: TGUID; const AService: IInterface): Boolean;
 begin
+  Result := False;
   if not FServices.List.ContainsKey(AServiceGUID) then
+  begin
     FServices.List.Add(AServiceGUID, AService);
+    Result := True;
+  end;
 end;
 
 class function TServices.Get(const AServiceGUID: TGUID; out AService): Boolean;
