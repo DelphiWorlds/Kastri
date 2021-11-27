@@ -102,7 +102,7 @@ uses
   DW.ShareItems.Android;
 {$ENDIF}
 
-{$IF not Defined(IOS) or Defined(ANDROID)}
+{$IF not (Defined(IOS) or Defined(ANDROID))}
 type
   TPlatformShareItems = class(TCustomPlatformShareItems);
 {$ENDIF}
