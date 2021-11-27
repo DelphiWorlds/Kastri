@@ -94,14 +94,18 @@ type
 
 implementation
 
+{$IF Defined(IOS)}
 uses
-  {$IF Defined(IOS)}
   DW.ShareItems.iOS;
-  {$ELSEIF Defined(ANDROID)}
+{$ELSEIF Defined(ANDROID)}
+uses
   DW.ShareItems.Android;
-  {$ELSE}
-  DW.ShareItems.Default;
-  {$ENDIF}
+{$ENDIF}
+
+{$IF not Defined(IOS) or Defined(ANDROID)}
+type
+  TPlatformShareItems = class(TCustomPlatformShareItems);
+{$ENDIF}
 
 { TSharingItemTextBase }
 
