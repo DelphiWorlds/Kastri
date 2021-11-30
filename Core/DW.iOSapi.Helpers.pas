@@ -100,15 +100,19 @@ begin
   Result := False;
   LBundle := TiOSHelper.MainBundle;
   LPointer := LBundle.infoDictionary.valueForKey(StrToNSStr('UIBackgroundModes')); // Do not localise
-  if LPointer = nil then
-    Exit; // <======
-  LModesArray := TNSArray.Wrap(LPointer);
-  for I := 0 to LModesArray.count - 1 do
+  if LPointer <> nil then
   begin
-    LModeString := NSStrToStr(TNSString.Wrap(LModesArray.objectAtIndex(I)));
-    if AMode.Equals(LModeString) then
-      Exit(True); // <======
-  end;
+    LModesArray := TNSArray.Wrap(LPointer);
+    for I := 0 to LModesArray.count - 1 do
+    begin
+      LModeString := NSStrToStr(TNSString.Wrap(LModesArray.objectAtIndex(I)));
+      if AMode.Equals(LModeString) then
+      begin
+        Result := True;
+        Break;
+      end;
+    end;
+   end;
 end;
 
 class function TiOSHelperEx.IsBackground: Boolean;
