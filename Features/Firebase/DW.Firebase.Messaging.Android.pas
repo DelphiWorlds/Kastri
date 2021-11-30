@@ -16,11 +16,13 @@ unit DW.Firebase.Messaging.Android;
 interface
 
 uses
+  // RTL
+  System.Messaging,
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Embarcadero,
   Androidapi.JNI.PlayServices.Tasks,
   // DW
-  DW.Firebase.Messaging, DW.Android.Helpers;
+  DW.Firebase.Messaging, DW.Android.Helpers, DW.MultiReceiver.Android;
 
 type
   TPlatformFirebaseMessaging = class;
@@ -35,24 +37,26 @@ type
     constructor Create(const AFirebaseMessaging: TPlatformFirebaseMessaging);
   end;
 
-  TFirebaseMessagingReceiverListener = class(TJavaLocal, JFMXBroadcastReceiverListener)
+  TFirebaseMessagingReceiver = class(TMultiReceiver)
   private
     FFirebaseMessaging: TPlatformFirebaseMessaging;
-  public
-    { JFMXBroadcastReceiverListener }
-    procedure onReceive(context: JContext; intent: JIntent); cdecl;
+  protected
+    procedure ConfigureActions; override;
+    procedure Receive(context: JContext; intent: JIntent); override;
   public
     constructor Create(const AFirebaseMessaging: TPlatformFirebaseMessaging);
   end;
 
   TPlatformFirebaseMessaging = class(TCustomPlatformFirebaseMessaging)
   private
-    FFirebaseMessagingBroadcastReceiver: JFMXBroadcastReceiver;
-    FFirebaseMessagingReceiverListener: TFirebaseMessagingReceiverListener;
+    FFirebaseMessagingReceiver: TFirebaseMessagingReceiver;
+    FIntent: JIntent;
     FStartupIntentHandled: Boolean;
     FTokenTaskCompleteListener: JOnCompleteListener;
+    procedure MessageReceivedNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
   protected
     procedure DoApplicationBecameActive; override;
+    procedure DoApplicationEnteredBackground; override;
     procedure HandleMessageReceived(const data: JIntent; const AIsStartup: Boolean = False);
     procedure HandleNewToken(const data: JIntent);
     procedure PublishNotification(const data: JIntent);
@@ -80,6 +84,79 @@ uses
   {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.Androidx.LocalBroadcastManager, {$ENDIF}
   DW.Androidapi.JNI.Firebase, DW.Androidapi.JNI.Content;
 
+type
+  TBundlePair = record
+    Key: JObject;
+    Value: JObject;
+    constructor Create(const AKey, AValue: JObject);
+    function KeyAsString: string;
+    function ValueAsString: string;
+  end;
+
+  TBundlePairs = TArray<TBundlePair>;
+
+  TBundleParser = record
+    Pairs: TBundlePairs;
+    function Count: Integer;
+    procedure Parse(const ABundle: JBundle);
+    procedure ToStrings(const AStrings: TStrings);
+  end;
+
+{ TBundlePair }
+
+constructor TBundlePair.Create(const AKey, AValue: JObject);
+begin
+  Key := AKey;
+  Value := AValue;
+end;
+
+function TBundlePair.KeyAsString: string;
+begin
+  if Key <> nil then
+    Result := JStringToString(Key.toString)
+  else
+    Result := '';
+end;
+
+function TBundlePair.ValueAsString: string;
+begin
+  if Value <> nil then
+    Result := JStringToString(Value.toString)
+  else
+    Result := '';
+end;
+
+{ TBundleParser }
+
+function TBundleParser.Count: Integer;
+begin
+  Result := Length(Pairs);
+end;
+
+procedure TBundleParser.Parse(const ABundle: JBundle);
+var
+  LIterator: JIterator;
+  LKeyObject: JObject;
+begin
+  Pairs := [];
+  LIterator := ABundle.keySet.iterator;
+  while LIterator.hasNext do
+  begin
+    LKeyObject := LIterator.next;
+    if LKeyObject <> nil then
+      Pairs := Pairs + [TBundlePair.Create(LKeyObject, ABundle.&get(LKeyObject.toString))];
+  end;
+end;
+
+procedure TBundleParser.ToStrings(const AStrings: TStrings);
+var
+  LPair: TBundlePair;
+begin
+  AStrings.Clear;
+  for LPair in Pairs do
+    AStrings.Values[LPair.KeyAsString] := LPair.ValueAsString;
+end;
+
 { TTokenTaskCompleteListener }
 
 constructor TTokenTaskCompleteListener.Create(const AFirebaseMessaging: TPlatformFirebaseMessaging);
@@ -94,15 +171,21 @@ begin
     FFirebaseMessaging.DoTokenReceived(JStringToString(TJString.Wrap(task.getResult)));
 end;
 
-{ TFirebaseMessagingReceiverListener }
+{ TFirebaseMessagingReceiver }
 
-constructor TFirebaseMessagingReceiverListener.Create(const AFirebaseMessaging: TPlatformFirebaseMessaging);
+constructor TFirebaseMessagingReceiver.Create(const AFirebaseMessaging: TPlatformFirebaseMessaging);
 begin
-  inherited Create;
+  inherited Create(True);
   FFirebaseMessaging := AFirebaseMessaging;
 end;
 
-procedure TFirebaseMessagingReceiverListener.onReceive(context: JContext; intent: JIntent);
+procedure TFirebaseMessagingReceiver.ConfigureActions;
+begin
+  IntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_NEW_TOKEN);
+  IntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_MESSAGE_RECEIVED);
+end;
+
+procedure TFirebaseMessagingReceiver.Receive(context: JContext; intent: JIntent);
 begin
   if intent <> nil then
   begin
@@ -118,26 +201,28 @@ end;
 constructor TPlatformFirebaseMessaging.Create(const AFirebaseMessaging: TFirebaseMessaging);
 begin
   inherited;
-  FFirebaseMessagingReceiverListener := TFirebaseMessagingReceiverListener.Create(Self);
-  FFirebaseMessagingBroadcastReceiver := TJFMXBroadcastReceiver.JavaClass.init(FFirebaseMessagingReceiverListener);
+  // Startup intent
+  FIntent := MainActivity.getIntent;
+  TMessageManager.DefaultManager.SubscribeToMessage(TMessageReceivedNotification, MessageReceivedNotificationMessageHandler);
+  FFirebaseMessagingReceiver := TFirebaseMessagingReceiver.Create(Self);
 end;
 
 destructor TPlatformFirebaseMessaging.Destroy;
 begin
-  FFirebaseMessagingReceiverListener.Free;
-  FFirebaseMessagingBroadcastReceiver := nil;
+  TMessageManager.DefaultManager.Unsubscribe(TMessageReceivedNotification, MessageReceivedNotificationMessageHandler);
+  FFirebaseMessagingReceiver.Free;
   inherited;
 end;
 
+procedure TPlatformFirebaseMessaging.MessageReceivedNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
+begin
+  // "App switching" intent
+  FIntent := TMessageReceivedNotification(AMsg).Value;
+end;
+
 function TPlatformFirebaseMessaging.Start: Boolean;
-var
-  LIntentFilter: JIntentFilter;
 begin
   TPlatformFirebaseApp.Start;
-  LIntentFilter := TJIntentFilter.JavaClass.init;
-  LIntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_NEW_TOKEN);
-  LIntentFilter.addAction(TJDWFirebaseMessagingService.JavaClass.ACTION_MESSAGE_RECEIVED);
-  TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FFirebaseMessagingBroadcastReceiver, LIntentFilter);
   {$IF CompilerVersion < 35}
   TJDWFirebaseMessagingService.JavaClass.queryToken(TAndroidHelper.Context);
   {$ELSE}
@@ -147,47 +232,41 @@ begin
   Result := True;
 end;
 
-
 procedure TPlatformFirebaseMessaging.DoApplicationBecameActive;
 begin
   if not FStartupIntentHandled then
   begin
-    HandleMessageReceived(MainActivity.getIntent, True);
+    if FIntent <> nil then
+      HandleMessageReceived(FIntent, True);
     FStartupIntentHandled := True;
   end;
+end;
+
+procedure TPlatformFirebaseMessaging.DoApplicationEnteredBackground;
+begin
+  FStartupIntentHandled := False;
 end;
 
 procedure TPlatformFirebaseMessaging.HandleMessageReceived(const data: JIntent; const AIsStartup: Boolean = False);
 const
   cGCMMessageIDKey = 'gcm.message_id';
+  cGoogleMessageIDKey = 'google.message_id';
 var
   LPayload: TStrings;
   LBundle: JBundle;
-  LIterator: JIterator;
-  LKeyObject: JObject;
-  LValueObject: JObject;
-  LValue: string;
+  LParser: TBundleParser;
 begin
   LPayload := TStringList.Create;
   try
     LBundle := data.getExtras;
     if LBundle <> nil then
     begin
-      LIterator := LBundle.keySet.iterator;
-      while LIterator.hasNext do
-      begin
-        LKeyObject := LIterator.next;
-        if LKeyObject = nil then
-          Continue;
-        LValueObject := LBundle.&get(LKeyObject.toString);
-        if LValueObject = nil then
-          LValue := ''
-        else
-          LValue := JStringToString(LValueObject.toString);
-        LPayload.Values[JStringToString(LKeyObject.toString)] := LValue;
-      end;
+      LParser.Parse(LBundle);
+      if (LParser.Count = 1) and LParser.Pairs[0].KeyAsString.Equals('fcm') then
+        LParser.Parse(TJBundle.Wrap(LParser.Pairs[0].Value));
+      LParser.ToStrings(LPayload);
     end;
-    if LPayload.IndexOfName(cGCMMessageIDKey) > -1 then
+    if (LPayload.IndexOfName(cGCMMessageIDKey) > -1) or (LPayload.IndexOfName(cGoogleMessageIDKey) > -1) then
     begin
       if not AIsStartup and (ShowBannerWhenForeground or not IsForeground) then
         PublishNotification(data);
