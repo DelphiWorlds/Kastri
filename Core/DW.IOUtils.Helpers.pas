@@ -307,24 +307,25 @@ var
   LSourceStream, LDestStream: TFileStream;
   LAppend: Boolean;
 begin
-  if not TFIle.Exists(ASourceName) then
-    Exit; // <======
-  LAppend := TFile.Exists(ADestName);
-  if LAppend then
-    LDestStream := TFileStream.Create(ADestName, fmOpenReadWrite)
-  else
-    LDestStream := TFileStream.Create(ADestName, fmCreate);
-  try
+  if TFIle.Exists(ASourceName) then
+  begin
+    LAppend := TFile.Exists(ADestName);
     if LAppend then
-      LDestStream.Position := LDestStream.Size;
-    LSourceStream := TFileStream.Create(ASourceName, fmOpenRead);
+      LDestStream := TFileStream.Create(ADestName, fmOpenReadWrite)
+    else
+      LDestStream := TFileStream.Create(ADestName, fmCreate);
     try
-      LDestStream.CopyFrom(LSourceStream, LSourceStream.Size);
+      if LAppend then
+        LDestStream.Position := LDestStream.Size;
+      LSourceStream := TFileStream.Create(ASourceName, fmOpenRead);
+      try
+        LDestStream.CopyFrom(LSourceStream, LSourceStream.Size);
+      finally
+        LSourceStream.Free;
+      end;
     finally
-      LSourceStream.Free;
+      LDestStream.Free;
     end;
-  finally
-    LDestStream.Free;
   end;
 end;
 
@@ -365,9 +366,9 @@ end;
 
 class function TFileHelper.ReadString(const AFileName: string): string;
 begin
-  if not TFile.Exists(AFileName) then
-    Exit(''); // <======
-  Result := TFile.ReadAllText(AFileName);
+  Result := '';
+  if TFile.Exists(AFileName) then
+    Result := TFile.ReadAllText(AFileName);
 end;
 
 class procedure TFileHelper.WriteString(const AFileName, AContent: string);
