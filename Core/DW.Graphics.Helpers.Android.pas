@@ -23,7 +23,6 @@ uses
 
 type
   TBitmapHelper = class helper for TBitmap
-  private
   public
     /// <summary>
     ///   Imports from a JBitmap into this bitmap
