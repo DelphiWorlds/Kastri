@@ -67,22 +67,23 @@ var
   LOutputStream: TStringStream;
 begin
   Result := '';
-  if IsEmpty then
-    Exit; // <======
-  LInputStream := TBytesStream.Create;
-  try
-    SaveToStream(LInputStream);
-    LInputStream.Position := 0;
-    LOutputStream := TStringStream.Create('');
+  if not IsEmpty then
+  begin
+    LInputStream := TBytesStream.Create;
     try
-      TNetEncoding.Base64.Encode(LInputStream, LOutputStream);
-      Result := LOutputStream.DataString;
+      SaveToStream(LInputStream);
+      LInputStream.Position := 0;
+      LOutputStream := TStringStream.Create('');
+      try
+        TNetEncoding.Base64.Encode(LInputStream, LOutputStream);
+        Result := LOutputStream.DataString;
+      finally
+        LOutputStream.Free;
+      end;
     finally
-      LOutputStream.Free;
+      LInputStream.Free;
     end;
-  finally
-    LInputStream.Free;
-  end;
+   end;
 end;
 
 procedure TBitmapHelper.SetAsBase64(const ASource: string);
