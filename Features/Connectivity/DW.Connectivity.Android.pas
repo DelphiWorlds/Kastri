@@ -40,7 +40,6 @@ type
     procedure ConnectivityChange;
     procedure CheckConnectivityChange;
     function IsConnectedToInternet: Boolean;
-    function IndexOfNetwork(const ANetwork: JNetwork): Integer;
   protected
     class function ConnectivityManager: JConnectivityManager; static;
     class function GetConnectedNetworkInfoFromNetwork(const ANetwork: JNetwork; const ASkipValidation: Boolean): JNetworkInfo; static;
@@ -120,21 +119,6 @@ begin
     end;
   finally
     LNetworks.Sync;
-  end;
-end;
-
-function TNetworkCallbackDelegate.IndexOfNetwork(const ANetwork: JNetwork): Integer;
-var
-  I: Integer;
-begin
-  Result := -1;
-  for I := 0 to Length(FConnectedNetworks) - 1 do
-  begin
-    if FConnectedNetworks[I] = ANetwork then
-    begin
-      Result := I;
-      Break;
-    end;
   end;
 end;
 
