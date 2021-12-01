@@ -27,14 +27,16 @@ uses
   DW.Notifications, DW.iOSapi.UserNotifications;
 
 type
+  TNotificationMode = (DidReceive, WillPresent);
+
   TPlatformNotifications = class;
 
   TUserNotificationCenterDelegate = class(TOCLocal, UNUserNotificationCenterDelegate)
   private
     FNotifications: TNotifications;
-    procedure ProcessLocalNotification(request: UNNotificationRequest);
-    procedure ProcessNotificationRequest(request: UNNotificationRequest);
-    procedure ProcessRemoteNotification(request: UNNotificationRequest);
+    procedure ProcessLocalNotification(request: UNNotificationRequest; const AMode: TNotificationMode);
+    procedure ProcessNotificationRequest(request: UNNotificationRequest; const AMode: TNotificationMode);
+    procedure ProcessRemoteNotification(request: UNNotificationRequest; const AMode: TNotificationMode);
   protected
     property Notifications: TNotifications read FNotifications write FNotifications;
   public
@@ -98,41 +100,46 @@ end;
 
 { TUserNotificationCenterDelegate }
 
-procedure TUserNotificationCenterDelegate.ProcessNotificationRequest(request: UNNotificationRequest);
+procedure TUserNotificationCenterDelegate.ProcessNotificationRequest(request: UNNotificationRequest; const AMode: TNotificationMode);
 begin
   if request.trigger.isKindOfClass(objc_getClass('UNPushNotificationTrigger')) then
-    ProcessRemoteNotification(request)
+    ProcessRemoteNotification(request, AMode)
   else
-    ProcessLocalNotification(request);
+    ProcessLocalNotification(request, AMode);
 end;
 
-procedure TUserNotificationCenterDelegate.ProcessRemoteNotification(request: UNNotificationRequest);
+procedure TUserNotificationCenterDelegate.ProcessRemoteNotification(request: UNNotificationRequest; const AMode: TNotificationMode);
 var
   LJSON: string;
+  LUserInfo: NSMutableDictionary;
 begin
-  LJSON := TiOSHelperEx.NSDictionaryToJSON(request.content.userInfo);
+  LUserInfo := TNSMutableDictionary.Wrap(TNSMutableDictionary.OCClass.dictionaryWithDictionary(request.content.userInfo));
+  if AMode = TNotificationMode.DidReceive then
+    LUserInfo.setValueForKey(StringToID('1'), StrToNSStr('didReceive'));
+  LJSON := TiOSHelperEx.NSDictionaryToJSON(LUserInfo);
   TMessageManager.DefaultManager.SendMessage(nil, TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJSON)));
 end;
 
-procedure TUserNotificationCenterDelegate.ProcessLocalNotification(request: UNNotificationRequest);
+procedure TUserNotificationCenterDelegate.ProcessLocalNotification(request: UNNotificationRequest; const AMode: TNotificationMode);
 var
   LNotification: TNotification;
   LContent: UNNotificationContent;
   LUserInfo: TNSDictionaryHelper;
 begin
-  if FNotifications = nil then
-    Exit; // <======
-  LContent := request.content;
-  LNotification.Name := NSStrToStr(request.identifier);
-  LNotification.AlertBody := NSStrToStr(LContent.body);
-  LNotification.Title := NSStrToStr(LContent.title);
-  LNotification.Subtitle := NSStrToStr(LContent.subtitle);
-  LNotification.EnableSound := LContent.sound <> nil;
-  // Result.SoundName := ?
-  LNotification.HasAction := LContent.categoryIdentifier <> nil;
-  LUserInfo := TNSDictionaryHelper.Create(LContent.userInfo);
-  LNotification.RepeatInterval := TRepeatInterval(LUserInfo.GetValue('RepeatInterval', 0));
-  TOpenNotifications(FNotifications).DoNotificationReceived(LNotification);
+  if FNotifications <> nil then
+  begin
+    LContent := request.content;
+    LNotification.Name := NSStrToStr(request.identifier);
+    LNotification.AlertBody := NSStrToStr(LContent.body);
+    LNotification.Title := NSStrToStr(LContent.title);
+    LNotification.Subtitle := NSStrToStr(LContent.subtitle);
+    LNotification.EnableSound := LContent.sound <> nil;
+    // Result.SoundName := ?
+    LNotification.HasAction := LContent.categoryIdentifier <> nil;
+    LUserInfo := TNSDictionaryHelper.Create(LContent.userInfo);
+    LNotification.RepeatInterval := TRepeatInterval(LUserInfo.GetValue('RepeatInterval', 0));
+    TOpenNotifications(FNotifications).DoNotificationReceived(LNotification);
+  end;
 end;
 
 procedure TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter;
@@ -140,8 +147,7 @@ procedure TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserN
 var
   LBlockImp: procedure; cdecl;
 begin
-  TOSLog.d('TUserNotificationCenterDelegate.userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler');
-  ProcessNotificationRequest(response.notification.request);
+  ProcessNotificationRequest(response.notification.request, TNotificationMode.DidReceive);
   @LBlockImp := imp_implementationWithBlock(completionHandler);
   LBlockImp;
   imp_removeBlock(@LBlockImp);
@@ -153,8 +159,7 @@ var
   LBlockImp: procedure(options: UNNotificationPresentationOptions); cdecl;
   LOptions: UNNotificationPresentationOptions;
 begin
-  TOSLog.d('TUserNotificationCenterDelegate.userNotificationCenterWillPresentNotificationWithCompletionHandler');
-  ProcessNotificationRequest(notification.request);
+  ProcessNotificationRequest(notification.request, TNotificationMode.WillPresent);
   @LBlockImp := imp_implementationWithBlock(completionHandler);
   LOptions := UNNotificationPresentationOptionAlert;
   LBlockImp(LOptions);
