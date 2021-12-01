@@ -451,6 +451,7 @@ begin
   else
     LData := TJSONObject.Create;
   try
+    // The big_text and big_image flags are specific to FCM handling code in Kastri
     if TFCMMessageOption.BigText in FOptions then
       LData.AddPair('big_text', '1');
     if not FImageURL.IsEmpty and (TFCMMessageOption.BigImage in FOptions) then
