@@ -122,7 +122,7 @@ end;
 
 procedure TCustomPlatformFirebaseMessaging.DoException(const AException: Exception);
 begin
-  //
+  TOSLog.d('Exception - %s: %s', [AException.ClassName, AException.Message]);
 end;
 
 procedure TCustomPlatformFirebaseMessaging.ApplicationBecameActive;
@@ -134,6 +134,7 @@ end;
 procedure TCustomPlatformFirebaseMessaging.ApplicationEnteredBackground;
 begin
   FIsForeground := False;
+  DoApplicationEnteredBackground;
 end;
 
 procedure TCustomPlatformFirebaseMessaging.DoApplicationBecameActive;
