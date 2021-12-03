@@ -18,13 +18,15 @@ import android.util.Log;
 // Delphi 11 and later
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-// Delphi 10.4.2 or earlier
+// Delphi 10.4.2 or earlier - begin
 /*
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 */
+// Delphi 10.4.2 or earlier - end
+
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import java.util.HashMap;
@@ -44,6 +46,17 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
     }
   }
 
+  private static String priorityToString(int priority) {
+    if (priority == -1) 
+      return "low";
+    else if (priority == 1)
+      return "high";
+    else if (priority == 2)
+      return "max";
+    else  
+      return "none";
+  }
+
   public static void sendTokenBroadcast(Context context, String token) {
     Intent intent = new Intent(ACTION_NEW_TOKEN);
     intent.putExtra("token", token);
@@ -55,7 +68,7 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
     }  
   }
 
-  // Delphi 10.4.2 and earlier
+  // Delphi 10.4.2 and earlier - begin
   /*
   public static void queryToken(final Context context) {
     FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
@@ -66,15 +79,16 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
     });
   }
   */
+  // Delphi 10.4.2 and earlier - end
 
   @Override
   public void onCreate() {
-    Log.v(TAG, "onCreate");
+    // Log.d(TAG, "onCreate");
   }
 
   @Override
   public void onNewToken(String token) {
-    Log.v(TAG, "onNewToken - " + token);
+    // Log.d(TAG, "onNewToken - " + token);
     sendTokenBroadcast(this, token);
   }
 
@@ -96,27 +110,30 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
       data.put("body", notification.getBody());
       data.put("color", notification.getColor());
       data.put("icon", notification.getIcon());
-      if (notification.getImageUrl() != null)
-        data.put("image", notification.getImageUrl().toString());
       if (notification.getLink() != null)
         data.put("link", notification.getLink().toString());
       data.put("sound", notification.getSound());
+      data.put("title", notification.getTitle());
+      // Delphi 11 and later - begin
+      if (notification.getImageUrl() != null)
+        data.put("image", notification.getImageUrl().toString());
       if (notification.getNotificationPriority() != null)
         data.put("priority", notification.getNotificationPriority().toString());
-      data.put("title", notification.getTitle());
       if (notification.getVisibility() != null)
         data.put("visibility", notification.getVisibility().toString());
+      // Delphi 11 and later - end
       this.addExtras(intent, data);
     }
     else
       Log.d(TAG, "Message has either no data or is empty, and no notification");
-    Log.d(TAG, "Intent before details: " + intent.toURI());
-    intent.putExtra("gcm.from", remoteMessage.getFrom());
-    intent.putExtra("gcm.message_id", remoteMessage.getMessageId());
-    intent.putExtra("gcm.message_type", remoteMessage.getMessageType());
-    intent.putExtra("gcm.sent_time", remoteMessage.getSentTime());
-    intent.putExtra("gcm.to", remoteMessage.getTo());
-    intent.putExtra("gcm.ttl", remoteMessage.getTtl());
+    intent.putExtra("google.from", remoteMessage.getFrom());
+    intent.putExtra("google.message_id", remoteMessage.getMessageId());
+    intent.putExtra("google.message_type", remoteMessage.getMessageType());
+    intent.putExtra("google.sent_time", remoteMessage.getSentTime());
+    intent.putExtra("google.to", remoteMessage.getTo());
+    intent.putExtra("google.ttl", remoteMessage.getTtl());
+    intent.putExtra("google.original_priority", DWFirebaseMessagingService.priorityToString(remoteMessage.getOriginalPriority()));
+    intent.putExtra("google.delivered_priority", DWFirebaseMessagingService.priorityToString(remoteMessage.getPriority()));
     boolean hasReceiver = false;
     try {
       hasReceiver = LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
