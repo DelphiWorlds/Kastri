@@ -15,6 +15,8 @@ package com.delphiworlds.kastri;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageInfo;
+import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -25,6 +27,8 @@ public class DWWakeUp {
   private static final String TAG = "DWWakeUp";
 
   public static void checkWakeUp(Context context, String metaDataKey, boolean force) {
+    if (!DWUtility.isPermissionInManifest(context, Manifest.permission.WAKE_LOCK))
+      return;
     Bundle metaData = null;
     try {
       metaData = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData;
@@ -42,7 +46,11 @@ public class DWWakeUp {
       String wakeLockTag = context.getPackageName() + "." + TAG + "WakeLock";
       PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, wakeLockTag);
       if (!wakeLock.isHeld())
+      try {
         wakeLock.acquire();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }  
   }
 }
