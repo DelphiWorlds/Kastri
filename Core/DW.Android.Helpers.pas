@@ -30,10 +30,12 @@ const
 
 type
   JDWUtility = interface;
+  JStringWriter = interface;
 
   JDWUtilityClass = interface(JObjectClass)
     ['{CD282406-0D42-4EEE-B42E-24E79D058B30}']
     {class} function isPackageInstalled(context: JContext; packageName: JString): Boolean; cdecl;
+    {class} procedure crashTest; cdecl;
     {class} function createObjectMap: JMap; cdecl;
   end;
 
@@ -43,11 +45,42 @@ type
   end;
   TJDWUtility = class(TJavaGenericImport<JDWUtilityClass, JDWUtility>) end;
 
+  JStringWriterClass = interface(JWriterClass)
+    ['{CF281518-33EA-42C7-B15D-3E53DF6316BC}']
+    {class} function init: JStringWriter; cdecl; overload;
+    {class} function init(initialSize: Integer): JStringWriter; cdecl; overload;
+  end;
+
+  [JavaSignature('java/io/StringWriter')]
+  JStringWriter = interface(JWriter)
+    ['{914B33F0-4C43-4730-82AE-985B65D989E5}']
+    function append(c: Char): JWriter; cdecl; overload;
+    function append(csq: JCharSequence): JWriter; cdecl; overload;
+    function append(csq: JCharSequence; start: Integer; end_: Integer): JWriter; cdecl; overload;
+    procedure close; cdecl;
+    procedure flush; cdecl;
+    function getBuffer: JStringBuffer; cdecl;
+    function toString: JString; cdecl;
+    procedure write(c: Integer); cdecl; overload;
+    procedure write(cbuf: TJavaArray<Char>); cdecl; overload;
+    procedure write(cbuf: TJavaArray<Char>; off: Integer; len: Integer); cdecl; overload;
+    procedure write(str: JString); cdecl; overload;
+    procedure write(str: JString; off: Integer; len: Integer); cdecl; overload;
+  end;
+  TJStringWriter = class(TJavaGenericImport<JStringWriterClass, JStringWriter>) end;
+
+  TUncaughtExceptionHandler = class(TJavaLocal, JThread_UncaughtExceptionHandler)
+  public
+    procedure uncaughtException(t: JThread; e: JThrowable); cdecl;
+  end;
+
   TAndroidHelperEx = record
   private
+    class var FAlarmManager: JAlarmManager;
     class var FKeyguardManager: JKeyguardManager;
     class var FNotificationManager: JNotificationManager;
     class var FPowerManager: JPowerManager;
+    class var FUncaughtExceptionHandler: JThread_UncaughtExceptionHandler;
     class var FWakeLock: JPowerManager_WakeLock;
   public
     const
@@ -67,6 +100,10 @@ type
       OREO_MR1 = 27;
       PIE = 28;
       Q = 29;
+    /// <summary>
+    ///   Returns the alarm manager
+    /// </summary>
+    class function AlarmManager: JAlarmManager; static;
     /// <summary>
     ///   Checks if both build and target are greater or equal to the tested value
     /// </summary>
@@ -103,6 +140,7 @@ type
     ///   Returns information about a running service, if the service is running
     /// </summary>
     class function GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo; static;
+    class procedure HookUncaughtExceptionHandler; static;
     /// <summary>
     ///   Imports a file that can be accessed only via ContentResolver
     /// </summary>
@@ -147,6 +185,10 @@ type
     /// </summary>
     class function PowerManager: JPowerManager; static;
     /// <summary>
+    ///   Makes the app quit entirely
+    /// </summary>
+    class procedure QuitApplication; static;
+    /// <summary>
     ///   Restarts the app if it is not ignoring battery optimizations.
     /// </summary>
     /// <remarks>
@@ -160,6 +202,7 @@ type
     ///   Used in conjunction with dw-multireceiver.jar
     /// </remarks>
     class procedure SetStartAlarm(const AAlarm: TDateTime; const AStartFromLock: Boolean); static;
+    class function ShowAllFilesAccessPermissionSettings: Boolean; static;
     class procedure ShowLocationPermissionSettings; static;
     /// <summary>
     ///   Converts file to uri, using FileProvider if target API >= 24
@@ -243,7 +286,41 @@ const
   cActionStartAlarm = cMultiBroadcastReceiverName + '.ACTION_START_ALARM';
   cExtraStartUnlock = cMultiBroadcastReceiverClassName + '.EXTRA_START_UNLOCK';
 
+{ TUncaughtExceptionHandler }
+
+procedure TUncaughtExceptionHandler.uncaughtException(t: JThread; e: JThrowable);
+var
+  LStringWriter: JStringWriter;
+  LPrintWriter: JPrintWriter;
+  LIntent: JIntent;
+  LFlags: Integer;
+begin
+  LStringWriter := TJStringWriter.JavaClass.init;
+  LPrintWriter := TJPrintWriter.JavaClass.init(LStringWriter);
+  e.printStackTrace(LPrintWriter);
+  LFlags := TJIntent.JavaClass.FLAG_ACTIVITY_CLEAR_TOP or TJIntent.JavaClass.FLAG_ACTIVITY_CLEAR_TASK or TJIntent.JavaClass.FLAG_ACTIVITY_NEW_TASK;
+  LIntent := TAndroidHelper.Context.getPackageManager.getLaunchIntentForPackage(TAndroidHelper.Context.getPackageName);
+  LIntent.putExtra(StringToJString('CRASHED'), True);
+  LIntent.putExtra(StringToJString('TRACE'), LStringWriter.toString);
+  LIntent.setFlags(LFlags);
+  TAndroidHelper.Context.startActivity(LIntent);
+  TAndroidHelperEx.QuitApplication;
+end;
+
 { TAndroidHelperEx }
+
+class function TAndroidHelperEx.AlarmManager: JAlarmManager;
+var
+  LService: JObject;
+begin
+  if FAlarmManager = nil then
+  begin
+    LService := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.ALARM_SERVICE);
+    if LService <> nil then
+      FAlarmManager := TJAlarmManager.Wrap(LService);
+  end;
+  Result := FAlarmManager;
+end;
 
 class function TAndroidHelperEx.CheckBuildAndTarget(const AValue: Integer): Boolean;
 begin
@@ -280,6 +357,15 @@ end;
 class function TAndroidHelperEx.GetTimeFromNowInMillis(const ASecondsFromNow: Int64): Int64;
 begin
   Result := TJSystem.JavaClass.currentTimeMillis + (ASecondsFromNow * 1000);
+end;
+
+class procedure TAndroidHelperEx.HookUncaughtExceptionHandler;
+begin
+  if FUncaughtExceptionHandler = nil then
+  begin
+    FUncaughtExceptionHandler := TUncaughtExceptionHandler.Create;
+    TJThread.JavaClass.setDefaultUncaughtExceptionHandler(FUncaughtExceptionHandler);
+  end;
 end;
 
 class function TAndroidHelperEx.GetClass(const APackageClassName: string): Jlang_Class;
@@ -449,6 +535,12 @@ begin
   Result := FPowerManager;
 end;
 
+class procedure TAndroidHelperEx.QuitApplication;
+begin
+  TAndroidHelper.Activity.finishAndRemoveTask;
+  TJSystem.JavaClass.exit(2);
+end;
+
 class procedure TAndroidHelperEx.RestartIfNotIgnoringBatteryOptimizations;
 var
   LIntent: JIntent;
@@ -491,14 +583,22 @@ begin
     TAndroidHelper.AlarmManager.&set(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, LAlarmIntent);
 end;
 
-//class procedure TAndroidHelperEx.ShowLocationPermissionSettings;
-//var
-//  LIntent: JIntent;
-//begin
-//  LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_LOCATION_SOURCE_SETTINGS);
-//  TAndroidHelper.Activity.startActivityForResult(LIntent, 0);
-//end;
-
+class function TAndroidHelperEx.ShowAllFilesAccessPermissionSettings: Boolean;
+var
+  LIntent: JIntent;
+  LUri: Jnet_Uri;
+  LAction: JString;
+begin
+  Result := False;
+  if TOSVersion.Check(11) and not TJEnvironment.JavaClass.isExternalStorageManager then
+  begin
+    LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
+    LAction := StringToJString('android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION'); // TJSettings.JavaClass.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+    LIntent := TJIntent.JavaClass.init(LAction, LUri);
+    TAndroidHelper.Context.startActivity(LIntent);
+    Result := True;
+  end;
+end;
 
 class procedure TAndroidHelperEx.ShowLocationPermissionSettings;
 var
@@ -506,20 +606,9 @@ var
   LUri: Jnet_Uri;
 begin
   LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
-  LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_APPLICATION_DETAILS_SETTINGS, LUri); // ACTION_LOCATION_SOURCE_SETTINGS
+  LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_APPLICATION_DETAILS_SETTINGS, LUri);
   TAndroidHelper.Context.startActivity(LIntent);
 end;
-
-(*
-var
-  LIntent: JIntent;
-  // LUri: Jnet_Uri;
-begin
-  // LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
-  LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_LOCATION_SOURCE_SETTINGS); // , LUri
-  TAndroidHelper.Activity.startActivityForResult(LIntent, 0);
-end;
-*)
 
 { TJImageHelper }
 
