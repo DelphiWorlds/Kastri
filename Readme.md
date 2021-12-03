@@ -8,6 +8,10 @@ Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www
 
 Development of Kastri can be helped along with [Github Sponsorship](https://github.com/sponsors/DelphiWorlds), so please consider sponsoring today!
 
+Alternatively, you might like to make a donation via PayPal: 
+
+[![paypal](https://www.paypalobjects.com/en_AU/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=CGHWQ28MKBGAA)
+
 Please star this repo by clicking the Star box in the top right corner if you find it useful!
 
 If you're looking to [learn Delphi, please visit this link](https://learndelphi.org)
