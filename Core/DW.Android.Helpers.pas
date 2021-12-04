@@ -537,7 +537,10 @@ end;
 
 class procedure TAndroidHelperEx.QuitApplication;
 begin
-  TAndroidHelper.Activity.finishAndRemoveTask;
+  if TOSVersion.Check(5) then
+    TAndroidHelper.Activity.finishAndRemoveTask
+  else
+    TAndroidHelper.Activity.finish;
   TJSystem.JavaClass.exit(2);
 end;
 
