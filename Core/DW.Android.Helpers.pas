@@ -22,7 +22,7 @@ uses
   Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App, Androidapi.JNI.Media,
   Androidapi.JNIBridge,
   // DW
-  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os;
+  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes;
 
 const
   cMultiBroadcastReceiverClassName = 'DWMultiBroadcastReceiver';
@@ -30,7 +30,6 @@ const
 
 type
   JDWUtility = interface;
-  JStringWriter = interface;
 
   JDWUtilityClass = interface(JObjectClass)
     ['{CD282406-0D42-4EEE-B42E-24E79D058B30}']
@@ -44,30 +43,6 @@ type
     ['{5C9753FA-7746-4DCE-A709-E68F1319CB97}']
   end;
   TJDWUtility = class(TJavaGenericImport<JDWUtilityClass, JDWUtility>) end;
-
-  JStringWriterClass = interface(JWriterClass)
-    ['{CF281518-33EA-42C7-B15D-3E53DF6316BC}']
-    {class} function init: JStringWriter; cdecl; overload;
-    {class} function init(initialSize: Integer): JStringWriter; cdecl; overload;
-  end;
-
-  [JavaSignature('java/io/StringWriter')]
-  JStringWriter = interface(JWriter)
-    ['{914B33F0-4C43-4730-82AE-985B65D989E5}']
-    function append(c: Char): JWriter; cdecl; overload;
-    function append(csq: JCharSequence): JWriter; cdecl; overload;
-    function append(csq: JCharSequence; start: Integer; end_: Integer): JWriter; cdecl; overload;
-    procedure close; cdecl;
-    procedure flush; cdecl;
-    function getBuffer: JStringBuffer; cdecl;
-    function toString: JString; cdecl;
-    procedure write(c: Integer); cdecl; overload;
-    procedure write(cbuf: TJavaArray<Char>); cdecl; overload;
-    procedure write(cbuf: TJavaArray<Char>; off: Integer; len: Integer); cdecl; overload;
-    procedure write(str: JString); cdecl; overload;
-    procedure write(str: JString; off: Integer; len: Integer); cdecl; overload;
-  end;
-  TJStringWriter = class(TJavaGenericImport<JStringWriterClass, JStringWriter>) end;
 
   TUncaughtExceptionHandler = class(TJavaLocal, JThread_UncaughtExceptionHandler)
   public
@@ -260,6 +235,15 @@ type
   public
     { JRunnable }
     procedure run; cdecl;
+  end;
+
+  THandlerRunnable = class(TCustomRunnable)
+  private
+    FHandler: JHandler;
+  protected
+    procedure Execute; virtual;
+  public
+    constructor Create;
   end;
 
   TRunnable = class(TCustomRunnable)
@@ -744,6 +728,19 @@ end;
 procedure TCustomRunnable.run;
 begin
   DoRun;
+end;
+
+{ THandlerRunnable }
+
+constructor THandlerRunnable.Create;
+begin
+  inherited;
+  FHandler := TJHandler.JavaClass.init;
+end;
+
+procedure THandlerRunnable.Execute;
+begin
+  FHandler.post(Self);
 end;
 
 { TRunnable }
