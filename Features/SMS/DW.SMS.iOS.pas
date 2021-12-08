@@ -80,8 +80,6 @@ constructor TPlatformSMS.Create(const ASMS: TSMS);
 begin
   inherited;
   FDelegate := TMFMessageComposeViewControllerDelegate.Create(Self);
-  FController := TMFMessageComposeViewController.Create;
-  FController.setMessageComposeDelegate(FDelegate.GetObjectID);
 end;
 
 destructor TPlatformSMS.Destroy;
@@ -123,6 +121,9 @@ end;
 procedure TPlatformSMS.SendTextMessage(const AText: string; const ADestinations: TArray<string>);
 begin
   // Should check: TMFMessageComposeViewController.OCClass.canSendText;
+  FController := nil;
+  FController := TMFMessageComposeViewController.Create;
+  FController.setMessageComposeDelegate(FDelegate.GetObjectID);
   FDestinations := ADestinations;
   FController.setBody(StrToNSStr(AText));
   FController.setRecipients(StringArrayToNSArray(ADestinations));
