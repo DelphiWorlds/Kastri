@@ -116,6 +116,13 @@ type
 
   TFCMSenderErrorEvent = procedure(Sender: TObject; const Error: TFCMSenderError) of object;
 
+  TFCMSenderResponse = record
+    Response: string;
+    constructor Create(const AResponse: string);
+  end;
+
+  TFCMSenderResponseEvent = procedure(Sender: TObject; const Response: TFCMSenderResponse) of object;
+
   /// <summary>
   ///   Base class for sending FCM messages
   /// </summary>
@@ -129,20 +136,23 @@ type
     FServiceAccount: TServiceAccount;
     FOnError: TFCMSenderErrorEvent;
     FOnNewAccessToken: TNotifyEvent;
+    FOnResponse: TFCMSenderResponseEvent;
   protected
     procedure DoError(const AError: TFCMSenderError); virtual;
     function DoPost(const AJSON: string): Boolean; virtual; abstract;
     function DoGetAccessToken(const AJWT: string): Boolean; virtual; abstract;
     procedure DoNewAccessToken; virtual;
+    procedure DoResponse(const AResponse: TFCMSenderResponse); virtual;
     function GenerateJWT: string;
     function GetAccessToken: Boolean;
-    property ServiceAccount: TServiceAccount read FServiceAccount;
   public
     function LoadServiceAccount(const AFileName: string): Boolean;
     function Post(const AJSON: string): Boolean;
     property BearerToken: TBearerToken read FBearerToken;
+    property ServiceAccount: TServiceAccount read FServiceAccount;
     property OnError: TFCMSenderErrorEvent read FOnError write FOnError;
     property OnNewAccessToken: TNotifyEvent read FOnNewAccessToken write FOnNewAccessToken;
+    property OnResponse: TFCMSenderResponseEvent read FOnResponse write FOnResponse;
   end;
 
   /// <summary>
@@ -422,12 +432,12 @@ begin
     if not FSoundName.IsEmpty then
       LAPS.AddPair('sound', FSoundName);
     if FBadgeCount >= 0 then
-      LAPS.AddPair('badge', FBadgeCount.ToString);
+      LAPS.AddPair('badge', TJSONNumber.Create(FBadgeCount));
     if TFCMMessageOption.ContentAvailable in FOptions then
       LAPS.AddPair('content-available', TJSONBool.Create(True));
     // Add this LAST
     if LAPS.Count > 0 then
-      LAPS.AddPair('mutable-content', TJSONBool.Create(True));
+      LAPS.AddPair('mutable-content', TJSONNumber.Create(1));
     LHasAPS := LAPS.Count > 0;
   finally
     if LHasAPS then
@@ -570,6 +580,13 @@ begin
   ErrorMessage := AErrorMessage;
 end;
 
+{ TFCMSenderResponse }
+
+constructor TFCMSenderResponse.Create(const AResponse: string);
+begin
+  Response := AResponse;
+end;
+
 { TTFCMSenderErrorKindHelper }
 
 function TFCMSenderErrorKindHelper.ToString: string;
@@ -611,6 +628,12 @@ procedure TCustomFCMSender.DoNewAccessToken;
 begin
   if Assigned(FOnNewAccessToken) then
     FOnNewAccessToken(Self);
+end;
+
+procedure TCustomFCMSender.DoResponse(const AResponse: TFCMSenderResponse);
+begin
+  if Assigned(FOnResponse) then
+    FOnResponse(Self, AResponse);
 end;
 
 function TCustomFCMSender.GenerateJWT: string;
@@ -696,7 +719,9 @@ begin
     begin
       LErrorMessage := Format('%d: %s - %s', [LResponse.StatusCode, LResponse.StatusText, LResponse.ContentAsString]);
       DoError(TFCMSenderError.Create(TFCMSenderErrorKind.PostFailure, AJSON, LErrorMessage));
-    end;
+    end
+    else
+      DoResponse(TFCMSenderResponse.Create(LResponse.ContentAsString));
   finally
     LHTTP.Free;
   end;
