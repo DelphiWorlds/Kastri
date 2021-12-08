@@ -28,12 +28,13 @@ const
   MM_NATIVESHAPE_CORNERS_CHANGED = MM_USER + 4;
   MM_NATIVESHAPE_RADIUS_CHANGED = MM_USER + 5;
   MM_NATIVESHAPE_CORNERTYPE_CHANGED = MM_USER + 6;
-  MM_NATIVESHAPE_SET_OPACITY = MM_USER + 7;
+  MM_NATIVESHAPE_OPACITY_CHANGED = MM_USER + 7;
 
 type
   TCustomNativeShapeModel = class(TDataModel)
   private
     FFill: TBrush;
+    FOpacity: Single;
     FStroke: TStrokeBrush;
     FOnChange: TNotifyEvent;
     procedure DoChange;
@@ -48,6 +49,7 @@ type
     constructor Create(const AOwner: TComponent); override;
     destructor Destroy; override;
     property Fill: TBrush read FFill write SetFill;
+    property Opacity: Single read FOpacity;
     property Stroke: TStrokeBrush read FStroke write SetStroke;
   end;
 
@@ -64,11 +66,11 @@ type
     procedure AfterPaint; override;
     function DefineModelClass: TDataModelClass; override;
     function GetShapeRect: TRectF;
-    procedure RecalcOpacity; override;
     function RecommendSize(const AWishedSize: TSizeF): TSizeF; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure RecalcOpacity; override;
     property Fill: TBrush read GetFill write SetFill;
     property Model: TCustomNativeShapeModel read GetModel;
     property Stroke: TStrokeBrush read GetStroke write SetStroke;
@@ -287,7 +289,9 @@ end;
 
 procedure TCustomNativeShapeModel.SetOpacity(const Value: Single);
 begin
-  SendMessage<Single>(MM_NATIVESHAPE_SET_OPACITY, Value);
+  FOpacity := Value;
+  DoChange;
+  SendMessage(MM_NATIVESHAPE_OPACITY_CHANGED);
 end;
 
 procedure TCustomNativeShapeModel.SetStroke(const Value: TStrokeBrush);
@@ -542,7 +546,7 @@ begin
         if not (TSide.Right in Sides) then
           LShapeRect.Right := LShapeRect.Right + LOffset;
         if LNeedsFillRect then
-          Canvas.FillRect(LShapeRect, XRadius, YRadius, Corners, AbsoluteOpacity, Fill, CornerType);
+          Canvas.FillRect(LShapeRect, XRadius, YRadius, Corners, Opacity, Fill, CornerType);
         if LNeedsDrawRect then
           Canvas.DrawRectSides(GetShapeRect, XRadius, YRadius, Corners,  Opacity, Sides, Stroke, CornerType);
       end

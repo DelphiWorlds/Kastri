@@ -37,6 +37,7 @@ type
     function GetShapeControl: TCustomNativeShape;
     function GetModel: TCustomNativeShapeModel; overload;
     procedure MMFillChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_FILL_CHANGED;
+    procedure MMOpacityChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_OPACITY_CHANGED;
     procedure MMStrokeChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_STROKE_CHANGED;
   protected
     function CreateView: JView; override;
@@ -117,24 +118,46 @@ begin
   FillChanged;
 end;
 
+procedure TAndroidNativeShape.MMOpacityChanged(var AMessage: TDispatchMessage);
+begin
+  FillChanged;
+  StrokeChanged;
+end;
+
 procedure TAndroidNativeShape.MMStrokeChanged(var AMessage: TDispatchMessage);
 begin
   StrokeChanged;
 end;
 
 procedure TAndroidNativeShape.FillChanged;
+var
+  LNativeColor: Integer;
+  LColor: TAlphaColorRec;
 begin
-  FBackground.setColor(TAndroidHelper.AlphaColorToJColor(Model.Fill.Color));
+  if (Model.Fill.Color = TAlphaColors.Null) or (Model.Fill.Kind = TBrushKind.None) or (Model.Opacity = 0) then
+    LNativeColor := TJColor.JavaClass.TRANSPARENT
+  else
+  begin
+    LColor := TAlphaColorRec(Model.Fill.Color);
+    LColor.A := Round(Model.Opacity * 255);
+    LNativeColor := TAndroidHelper.AlphaColorToJColor(LColor.Color);
+  end;
+  FBackground.setColor(LNativeColor);
 end;
 
 procedure TAndroidNativeShape.StrokeChanged;
 var
   LNativeColor: Integer;
+  LColor: TAlphaColorRec;
 begin
-  if (Model.Stroke.Color = TAlphaColors.Null) or (Model.Stroke.Kind = TBrushKind.None) then
+  if (Model.Stroke.Color = TAlphaColors.Null) or (Model.Stroke.Kind = TBrushKind.None) or (Model.Opacity = 0) then
     LNativeColor := TJColor.JavaClass.TRANSPARENT
   else
-    LNativeColor := TAndroidHelper.AlphaColorToJColor(Model.Stroke.Color);
+  begin
+    LColor := TAlphaColorRec(Model.Stroke.Color);
+    LColor.A := Round(Model.Opacity * 255);
+    LNativeColor := TAndroidHelper.AlphaColorToJColor(LColor.Color);
+  end;
   FBackground.setStroke(Round(Model.Stroke.Thickness * ScreenScale), LNativeColor);
 end;
 
