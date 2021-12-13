@@ -84,10 +84,12 @@ begin
   if not FStarted then
   begin
     FStarted := True;
-    // FPackCount := FAssetDelivery.Fetch(['fastfollow_assetpack', 'ondemand_assetpack']);
     FAssetPackStates := [];
     // Query will request ONLY asset packs that have not already been fully downloaded
-    FPackCount := FAssetDelivery.Query(['fastfollow_assetpack', 'ondemand_assetpack']);
+    // FPackCount := FAssetDelivery.Query(['fastfollow_assetpack', 'ondemand_assetpack']);
+    FPackCount := FAssetDelivery.Fetch(['fastfollow_assetpack', 'ondemand_assetpack']);
+    if FPackCount = 0 then
+      UpdateFilesList;
   end;
 end;
 
@@ -138,8 +140,7 @@ end;
 
 procedure TForm1.UpdateFilesList;
 begin
-//!!!! Install time packs are just "normal" assets
-//  GetFiles(FAssetDelivery.GetAssetPackPath('installtime_assetpack'));
+  // Install time assets are part of the "normal" assets
   GetFiles(FAssetDelivery.GetAssetPackPath('fastfollow_assetpack'));
   GetFiles(FAssetDelivery.GetAssetPackPath('ondemand_assetpack'));
 end;
