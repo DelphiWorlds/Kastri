@@ -32,22 +32,24 @@ type
   TUIHelper = record
   public
     class procedure CopyImageToClipboard(const AImage: TStream); static;
-    class function GetStatusBarOffset: Single; static;
+    class function GetBrightness: Single; static;
     /// <summary>
     ///   Special function for handling of "notch" based devices
     /// </summary>
     class function GetOffsetRect: TRectF; overload; static;
     class function GetOffsetRect(const AHandle: TWindowHandle): TRectF; overload; static;
+    class function GetScreenOrientation: TScreenOrientation; static;
+    class function GetStatusBarOffset: Single; static;
     /// <summary>
     ///   Returns Black or White, depending on the background color supplied
     /// </summary>
     class function GetTextColor(const ABackgroundColor: TAlphaColor): TAlphaColor; static;
-    class function GetScreenOrientation: TScreenOrientation; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
     /// <summary>
     ///   Force a repaint of the form
     /// </summary>
     class procedure Render(const AForm: TForm); static;
+    class procedure SetBrightness(const AValue: Single); static;
   end;
 
 implementation
@@ -80,6 +82,15 @@ begin
   {$ENDIF}
 end;
 
+class function TUIHelper.GetBrightness: Single;
+begin
+  {$IF Defined(IOS) or Defined(Android)}
+  Result := TPlatformUIHelper.GetBrightness;
+  {$ELSE}
+  Result := 1;
+  {$ENDIF}
+end;
+
 class function TUIHelper.GetOffsetRect(const AHandle: TWindowHandle): TRectF;
 begin
   {$IF Defined(IOS) or Defined(Android)}
@@ -95,6 +106,11 @@ begin
   {$IF Defined(Android)}
   TPlatformUIHelper.Render(AForm);
   {$ENDIF}
+end;
+
+class procedure TUIHelper.SetBrightness(const AValue: Single);
+begin
+  TPlatformUIHelper.SetBrightness(AValue);
 end;
 
 class function TUIHelper.GetTextColor(const ABackgroundColor: TAlphaColor): TAlphaColor;

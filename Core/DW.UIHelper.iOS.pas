@@ -30,6 +30,7 @@ type
   TPlatformUIHelper = record
   public
     class procedure CopyImageToClipboard(const AImage: TStream); static;
+    class function GetBrightness: Single; static;
     class function GetStatusBarOffset: Single; static;
     /// <summary>
     ///   Special function for handling of "notch" based devices
@@ -38,6 +39,7 @@ type
     class function GetOffsetRect(const AHandle: TWindowHandle): TRectF; overload; static;
     class function GetScreenOrientation: TScreenOrientation; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
+    class procedure SetBrightness(const AValue: Single); static;
   end;
 
 implementation
@@ -168,6 +170,11 @@ begin
   end;
 end;
 
+class function TPlatformUIHelper.GetBrightness: Single;
+begin
+  Result := TiOSHelper.MainScreen.brightness;
+end;
+
 class function TPlatformUIHelper.GetOffsetRect(const AHandle: TWindowHandle): TRectF;
 var
   LInsets: UIEdgeInsets;
@@ -197,16 +204,22 @@ begin
   end;
 end;
 
+class procedure TPlatformUIHelper.SetBrightness(const AValue: Single);
+begin
+  if (AValue >= 0) and (AValue <= 1) then
+    TiOSHelper.MainScreen.setBrightness(AValue);
+end;
+
 class function TPlatformUIHelper.GetScreenOrientation: TScreenOrientation;
 begin
-  case TiOSHelper.SharedApplication.keyWindow.rootViewController.interfaceOrientation of
-    UIInterfaceOrientationLandscapeLeft:
+  case TiOSHelper.CurrentDevice.orientation of
+    UIDeviceOrientationLandscapeRight:
       Result := TScreenOrientation.Landscape;
-    UIInterfaceOrientationLandscapeRight:
+    UIDeviceOrientationLandscapeLeft:
       Result := TScreenOrientation.InvertedLandscape;
-    UIInterfaceOrientationPortrait:
+    UIDeviceOrientationPortrait:
       Result := TScreenOrientation.Portrait;
-    UIInterfaceOrientationPortraitUpsideDown:
+    UIDeviceOrientationPortraitUpsideDown:
       Result := TScreenOrientation.InvertedPortrait;
   else
     Result := TScreenOrientation.Portrait

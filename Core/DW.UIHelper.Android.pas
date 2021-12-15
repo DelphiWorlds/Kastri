@@ -29,6 +29,7 @@ type
   /// </summary>
   TPlatformUIHelper = record
   public
+    class function GetBrightness: Single; static;
     /// <summary>
     ///   Special function for handling of "notch" based devices
     /// </summary>
@@ -38,6 +39,7 @@ type
     class function GetStatusBarOffset: Single; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
     class procedure Render(const AForm: TForm); static;
+    class procedure SetBrightness(const AValue: Single); static;
   end;
 
 implementation
@@ -46,7 +48,7 @@ uses
   // RTL
   System.SysUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App,
+  Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App, Androidapi.JNI.Provider,
   // FMX
   FMX.Platform.UI.Android;
 
@@ -56,6 +58,11 @@ class function TPlatformUIHelper.GetOffsetRect: TRectF;
 begin
   // Yet to be implemented. Work is in progress
   Result := TRectF.Empty;
+end;
+
+class function TPlatformUIHelper.GetBrightness: Single;
+begin
+  Result := TJSettings_System.JavaClass.getInt(TAndroidHelper.ContentResolver, TJSettings_System.JavaClass.SCREEN_BRIGHTNESS) / 255;
 end;
 
 class function TPlatformUIHelper.GetOffsetRect(const AHandle: TWindowHandle): TRectF;
@@ -93,6 +100,19 @@ end;
 class procedure TPlatformUIHelper.Render(const AForm: TForm);
 begin
   TAndroidWindowHandle(AForm.Handle).Render.Render;
+end;
+
+// https://stackoverflow.com/a/18312812/3164070
+class procedure TPlatformUIHelper.SetBrightness(const AValue: Single);
+var
+  LParams: JWindowManager_LayoutParams;
+begin
+  if (AValue >= 0) and (AValue <= 1) then
+  begin
+    LParams := TAndroidHelper.Activity.getWindow.getAttributes;
+    LParams.screenBrightness := AValue;
+    TAndroidHelper.Activity.getWindow.setAttributes(LParams);
+  end;
 end;
 
 end.
