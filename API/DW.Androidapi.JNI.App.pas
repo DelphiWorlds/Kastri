@@ -28,6 +28,7 @@ type
   JNotificationChannel = interface;
   JNotificationChannelGroup = interface;
   {$ENDIF}
+  JUiModeManager = interface;
 
   JKeyguardManagerClass = interface(JObjectClass)
     ['{44F9A483-0683-4391-94D1-F0BB6DB7340B}']
@@ -191,6 +192,49 @@ type
   TJNotificationManager = class(TJavaGenericImport<JNotificationManagerClass, JNotificationManager>)
   end;
   {$ENDIF}
+
+  JUiModeManagerClass = interface(JObjectClass)
+    ['{68E79491-08CD-4AEB-9540-D0642FA1BDB3}']
+    function _GetACTION_ENTER_CAR_MODE: JString; cdecl;
+    function _GetACTION_ENTER_DESK_MODE: JString; cdecl;
+    function _GetACTION_EXIT_CAR_MODE: JString; cdecl;
+    function _GetACTION_EXIT_DESK_MODE: JString; cdecl;
+    function _GetDISABLE_CAR_MODE_GO_HOME: Integer; cdecl;
+    function _GetENABLE_CAR_MODE_ALLOW_SLEEP: Integer; cdecl;
+    function _GetENABLE_CAR_MODE_GO_CAR_HOME: Integer; cdecl;
+    function _GetMODE_NIGHT_AUTO: Integer; cdecl;
+    function _GetMODE_NIGHT_CUSTOM: Integer; cdecl;
+    function _GetMODE_NIGHT_NO: Integer; cdecl;
+    function _GetMODE_NIGHT_YES: Integer; cdecl;
+    property ACTION_ENTER_CAR_MODE: JString read _GetACTION_ENTER_CAR_MODE;
+    property ACTION_ENTER_DESK_MODE: JString read _GetACTION_ENTER_DESK_MODE;
+    property ACTION_EXIT_CAR_MODE: JString read _GetACTION_EXIT_CAR_MODE;
+    property ACTION_EXIT_DESK_MODE: JString read _GetACTION_EXIT_DESK_MODE;
+    property DISABLE_CAR_MODE_GO_HOME: Integer read _GetDISABLE_CAR_MODE_GO_HOME;
+    property ENABLE_CAR_MODE_ALLOW_SLEEP: Integer read _GetENABLE_CAR_MODE_ALLOW_SLEEP;
+    property ENABLE_CAR_MODE_GO_CAR_HOME: Integer read _GetENABLE_CAR_MODE_GO_CAR_HOME;
+    property MODE_NIGHT_AUTO: Integer read _GetMODE_NIGHT_AUTO;
+    property MODE_NIGHT_CUSTOM: Integer read _GetMODE_NIGHT_CUSTOM;
+    property MODE_NIGHT_NO: Integer read _GetMODE_NIGHT_NO;
+    property MODE_NIGHT_YES: Integer read _GetMODE_NIGHT_YES;
+  end;
+
+  [JavaSignature('android/app/UiModeManager')]
+  JUiModeManager = interface(JObject)
+    ['{8BFF307B-DFE7-499C-95BD-4A3FE549BFDE}']
+    function getCurrentModeType: Integer; cdecl;
+    function getCustomNightModeEnd: JLocalTime; cdecl;
+    function getCustomNightModeStart: JLocalTime; cdecl;
+    function getNightMode: Integer; cdecl;
+    procedure disableCarMode(flags: Integer); cdecl;
+    procedure enableCarMode(flags: Integer); cdecl;
+    procedure setCustomNightModeEnd(time: JLocalTime); cdecl;
+    procedure setCustomNightModeStart(time: JLocalTime); cdecl;
+    procedure setNightMode(mode: Integer); cdecl;
+  end;
+
+  TJUiModeManager = class(TJavaGenericImport<JUiModeManagerClass, JUiModeManager>)
+  end;
 
 implementation
 
