@@ -31,6 +31,8 @@ type
     function Culture: string;
   end;
 
+  TUIMode = (Appliance, Car, Desk, Normal, Television, VRHeadset, Undefined, Watch);
+
   /// <summary>
   ///   Operating System specific functions that operate below FMX
   /// </summary>
@@ -39,6 +41,7 @@ type
   /// </remarks>
   TOSDevice = record
   public
+    class function CanWriteSettings: Boolean; static;
     /// <summary>
     ///   Turns the torch on/off, if available
     /// </summary>
@@ -80,6 +83,10 @@ type
     /// </summary>
     class function GetPackageVersion: string; static;
     /// <summary>
+    ///   Returns UI mode for an Android device, or Undefined
+    /// </summary>
+    class function GetUIMode: TUIMode; static;
+    /// <summary>
     ///   Returns the unique id for the device, if any exists
     /// </summary>
     class function GetUniqueDeviceID: string; static;
@@ -113,6 +120,7 @@ type
     /// </summary>
     class procedure OpenURL(const AURL: string); static;
     class procedure OpenAppSettings; static;
+    class function OpenWriteSettingsPermissions: Boolean; static;
     /// <summary>
     ///   Prevent the screen from locking (Android and iOS)
     /// </summary>
@@ -145,6 +153,16 @@ uses
   {$ENDIF}
 
 { TOSDevice }
+
+class function TOSDevice.CanWriteSettings: Boolean;
+begin
+  {$IF Defined(ANDROID)}
+  Result := TOSDevice.CanWriteSettings;
+  {$ELSE}
+  Result := True;
+  {$ENDIF}
+end;
+
 
 class function TOSDevice.EnableTorch(const AEnable: Boolean): Boolean;
 begin
@@ -274,6 +292,15 @@ begin
   Result := TPlatformOSDevice.IsTouchDevice;
 end;
 
+class function TOSDevice.GetUIMode: TUIMode;
+begin
+  {$IF Defined(ANDROID)}
+  Result := TPlatformOSDevice.GetUIMode;
+  {$ELSE}
+  Result := TUIMode.Undefined;
+  {$ENDIF}
+end;
+
 class procedure TOSDevice.OpenAppSettings;
 begin
   {$IF Defined(IOS) or Defined(ANDROID)}
@@ -285,6 +312,15 @@ class procedure TOSDevice.OpenURL(const AURL: string);
 begin
   {$IF Defined(MACOS) or Defined(ANDROID) or Defined(MSWINDOWS)}
   TPlatformOSDevice.OpenURL(AURL);
+  {$ENDIF}
+end;
+
+class function TOSDevice.OpenWriteSettingsPermissions: Boolean;
+begin
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  Result := TPlatformOSDevice.OpenWriteSettingsPermissions;
+  {$ELSE}
+  Result := False;
   {$ENDIF}
 end;
 

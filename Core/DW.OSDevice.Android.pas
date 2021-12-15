@@ -25,6 +25,7 @@ type
   /// </remarks>
   TPlatformOSDevice = record
   public
+    class function CanWriteSettings: Boolean; static;
     class function EnableTorch(const AEnable: Boolean): Boolean; static;
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     class function GetDeviceModel: string; static;
@@ -32,6 +33,7 @@ type
     class function GetManufacturer: string; static;
     class function GetPackageID: string; static;
     class function GetPackageVersion: string; static;
+    class function GetUIMode: TUIMode; static;
     class function GetUniqueDeviceID: string; static;
     class function HasHardwareKeyboard: Boolean; static;
     class function IsLocationServiceEnabled: Boolean; static;
@@ -39,6 +41,7 @@ type
     class function IsTouchDevice: Boolean; static;
     class procedure OpenAppSettings; static;
     class procedure OpenURL(const AURL: string); static;
+    class function OpenWriteSettingsPermissions: Boolean; static;
     class procedure SetPreventScreenLock(const AValue: Boolean); static;
   end;
 
@@ -51,7 +54,7 @@ uses
   Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.Provider, Androidapi.JNI.Os,  Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.Net, Androidapi.JNIBridge, Androidapi.JNI.App, Androidapi.JNI.Location,
   // DW
-  DW.Androidapi.JNI.Hardware.Camera2, DW.Android.Helpers;
+  DW.Androidapi.JNI.Hardware.Camera2, DW.Android.Helpers, DW.Androidapi.JNI.App;
 
 type
   [JavaSignature('android/location/LocationManager')]
@@ -62,6 +65,13 @@ type
   TJLocationManager = class(TJavaGenericImport<JLocationManagerClass, JLocationManager>) end;
 
 { TPlatformOSDevice }
+
+class function TPlatformOSDevice.CanWriteSettings: Boolean;
+begin
+  Result := True;
+  if TJBuild_Version.JavaClass.SDK_INT >= 23 then
+    Result :=  TJSettings_System.JavaClass.canWrite(TAndroidHelper.Context);
+end;
 
 class function TPlatformOSDevice.EnableTorch(const AEnable: Boolean): Boolean;
 var
@@ -177,6 +187,33 @@ begin
   Result := TAndroidHelper.Context.getPackageManager.hasSystemFeature(StringToJString('android.hardware.touchscreen'));
 end;
 
+class function TPlatformOSDevice.GetUIMode: TUIMode;
+var
+  LUiModeManager: JUiModeManager;
+  LMode: Integer;
+begin
+  Result := TUIMode.Undefined;
+  LUiModeManager := TJUiModeManager.Wrap(TAndroidHelper.Context.getSystemService(TJContext.JavaClass.UI_MODE_SERVICE));
+  if LUiModeManager <> nil then
+  begin
+    LMode := LUiModeManager.getCurrentModeType;
+    if LMode = TJConfiguration.JavaClass.UI_MODE_TYPE_APPLIANCE then
+      Result := TUIMode.Appliance
+    else if LMode = TJConfiguration.JavaClass.UI_MODE_TYPE_CAR then
+      Result := TUIMode.Car
+    else if LMode = TJConfiguration.JavaClass.UI_MODE_TYPE_DESK then
+      Result := TUIMode.Desk
+    else if LMode = TJConfiguration.JavaClass.UI_MODE_TYPE_NORMAL then
+      Result := TUIMode.Normal
+    else if LMode = TJConfiguration.JavaClass.UI_MODE_TYPE_TELEVISION then
+      Result := TUIMode.Television
+    else if LMode = TJConfiguration.JavaClass.UI_MODE_TYPE_VR_HEADSET then
+      Result := TUIMode.VRHeadset
+    else if LMode = TJConfiguration.JavaClass.UI_MODE_TYPE_WATCH then
+      Result := TUIMode.Watch;
+  end;
+end;
+
 class procedure TPlatformOSDevice.OpenAppSettings;
 var
   LIntent: JIntent;
@@ -195,6 +232,20 @@ begin
   LIntent := TJIntent.JavaClass.init(StringToJString('android.intent.action.VIEW'));
   LIntent.setData(TJnet_Uri.JavaClass.parse(StringToJString(AURL)));
   TAndroidHelper.Activity.startActivity(LIntent);
+end;
+
+class function TPlatformOSDevice.OpenWriteSettingsPermissions: Boolean;
+var
+  LIntent: JIntent;
+begin
+  Result := False;
+  if not CanWriteSettings then
+  begin
+    Result := True;
+    LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_MANAGE_WRITE_SETTINGS);
+    LIntent.setData(TJnet_Uri.JavaClass.parse(StringToJString('package:').concat(TAndroidHelper.Context.getPackageName)));
+    TAndroidHelper.Context.startActivity(LIntent);
+  end;
 end;
 
 class procedure TPlatformOSDevice.SetPreventScreenLock(const AValue: Boolean);
