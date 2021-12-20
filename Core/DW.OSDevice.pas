@@ -317,7 +317,7 @@ end;
 
 class function TOSDevice.OpenWriteSettingsPermissions: Boolean;
 begin
-  {$IF Defined(IOS) or Defined(ANDROID)}
+  {$IF Defined(ANDROID)}
   Result := TPlatformOSDevice.OpenWriteSettingsPermissions;
   {$ELSE}
   Result := False;
