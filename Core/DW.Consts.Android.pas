@@ -53,9 +53,13 @@ const
 
   cDWBroadcastReceiverName = 'com.delphiworlds.kastri.DWMultiBroadcastReceiver';
   cDWBroadcastReceiverActionAlarmTimer = cDWBroadcastReceiverName + '.ACTION_ALARM_TIMER';
+  cDWBroadcastReceiverActionStartAlarm = cDWBroadcastReceiverName + '.ACTION_START_ALARM';
   cDWBroadcastReceiverActionServiceAlarm = cDWBroadcastReceiverName + '.ACTION_SERVICE_ALARM';
   cDWBroadcastReceiverActionServiceRestart = cDWBroadcastReceiverName + '.ACTION_SERVICE_RESTART';
   cDWBroadcastReceiverExtraServiceRestart = cDWBroadcastReceiverName + '.EXTRA_SERVICE_RESTART';
+  cDWBroadcastReceiverExtraServiceName = cDWBroadcastReceiverName + '.EXTRA_SERVICE_NAME';
+  cDWBroadcastReceiverExtraServiceJobId = cDWBroadcastReceiverName + '.EXTRA_SERVICE_JOBID';
+  cDWBroadcastReceiverExtraStartUnlock = cDWBroadcastReceiverName + '.EXTRA_START_UNLOCK';
 
   cServiceCommandAction = 'com.delphiworlds.action.SERVICE_COMMAND';
   cServiceMessageAction = 'com.delphiworlds.action.SERVICE_MESSAGE';
