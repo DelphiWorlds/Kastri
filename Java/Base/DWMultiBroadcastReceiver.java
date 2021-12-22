@@ -61,11 +61,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+
 // Delphi 10.4.2 and earlier
+// import android.support.v4.app.JobIntentService;
 // import android.support.v4.app.NotificationCompat;
 // import android.support.v4.content.LocalBroadcastManager;
+
 // Delphi 11 and later
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.JobIntentService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.os.Build;
@@ -94,6 +98,8 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
   public static final String EXTRA_NOTIFICATION_NAME = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_NAME";
   public static final String EXTRA_NOTIFICATION_REPEATINTERVAL = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_REPEATINTERVAL";
   public static final String EXTRA_SERVICE_RESTART = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_RESTART";
+  public static final String EXTRA_SERVICE_NAME = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_NAME";
+  public static final String EXTRA_SERVICE_JOBID = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_JOBID";
   public static final String EXTRA_START_UNLOCK = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_START_UNLOCK";
 
 	private DWMultiBroadcastReceiverDelegate mDelegate;
@@ -188,17 +194,28 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
     // Starting a service from an alarm or restart. The intent should already have the class name set in the intent
     if (intent.getAction().equals(ACTION_SERVICE_ALARM) || intent.getAction().equals(ACTION_SERVICE_RESTART)) {
       Log.d(TAG, "Attempting to restart service or start service from alarm");
-      intent.setClassName(context.getPackageName(), intent.getStringExtra("ServiceName"));
+      // Start a job service
+      int jobId = intent.getIntExtra(EXTRA_SERVICE_JOBID, 0);
+      String serviceClassName = intent.getStringExtra(EXTRA_SERVICE_NAME);
+      if (jobId == 0)
+        intent.setClassName(context.getPackageName(), intent.getStringExtra(serviceClassName));
       // Some restart cases require the service not to be started in foreground mode
       boolean startNormal = intent.getIntExtra("MustStartNormal", 0) == 1;
       if (intent.getAction().equals(ACTION_SERVICE_RESTART))
         intent.putExtra(EXTRA_SERVICE_RESTART, 1);
-      if (!startNormal && checkBuildAndTarget(context, 26) && !isAppForeground()) 
+      if (jobId != 0) {
+        try {
+          JobIntentService.enqueueWork(context, Class.forName(serviceClassName), jobId, intent);
+        } catch (ClassNotFoundException e) {
+          Log.e(TAG, "Could not find service: " + serviceClassName);
+        }
+      } 
+      else if (!startNormal && checkBuildAndTarget(context, 26) && !isAppForeground()) 
         context.startForegroundService(intent); // Service MUST call startForeground when it starts if the app is in the background or not running
       else if (isAppForeground() || !checkBuildAndTarget(context, 26))
         context.startService(intent); // Can only start the service "normally" if the app is in the foreground or lower than Android 8
       else
-        Log.d(TAG, "Cannot start service in any mode");
+        Log.w(TAG, "Cannot start service in any mode");
       return true;
     }
 
