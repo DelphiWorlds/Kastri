@@ -43,6 +43,21 @@ const
   kCGImageStatusReadingHeader = -2;
   kCGImageStatusIncomplete = -1;
   kCGImageStatusComplete = 0;
+  kCGImagePropertyOrientationUp = 1;
+  kCGImagePropertyOrientationUpMirrored = 2;
+  kCGImagePropertyOrientationDown = 3;
+  kCGImagePropertyOrientationDownMirrored = 4;
+  kCGImagePropertyOrientationLeftMirrored = 5;
+  kCGImagePropertyOrientationRight = 6;
+  kCGImagePropertyOrientationRightMirrored = 7;
+  kCGImagePropertyOrientationLeft = 8;
+  kCGImageTGACompressionNone = 0;
+  kCGImageTGACompressionRLE = 1;
+  kCGImageAnimationStatus_ParameterError = -22140;
+  kCGImageAnimationStatus_CorruptInputImage = -22141;
+  kCGImageAnimationStatus_UnsupportedFormat = -22142;
+  kCGImageAnimationStatus_IncompleteInputImage = -22143;
+  kCGImageAnimationStatus_AllocationFailure = -22144;
 
 type
   CGImageDestinationRef = Pointer;
