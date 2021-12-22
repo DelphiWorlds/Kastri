@@ -24,10 +24,6 @@ uses
   // DW
   DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes;
 
-const
-  cMultiBroadcastReceiverClassName = 'DWMultiBroadcastReceiver';
-  cMultiBroadcastReceiverName = 'com.delphiworlds.kastri.' + cMultiBroadcastReceiverClassName;
-
 type
   JDWUtility = interface;
 
@@ -57,6 +53,9 @@ type
     class var FPowerManager: JPowerManager;
     class var FUncaughtExceptionHandler: JThread_UncaughtExceptionHandler;
     class var FWakeLock: JPowerManager_WakeLock;
+  private
+    class function InternalSetAlarm(const AAction: string; const AAlarm: TDateTime; const AFromLock: Boolean; const ARequestCodeOrJobID: Integer;
+      const AServiceName: string = ''): JPendingIntent; static;
   public
     const
       ICE_CREAM_SANDWICH = 14;
@@ -171,12 +170,19 @@ type
     /// </remarks>
     class procedure RestartIfNotIgnoringBatteryOptimizations; static;
     /// <summary>
-    ///   Call this to start an activity from an alarm
+    ///   Call this to start an activity from an alarm. Returns the PendingIntent used for the alarm
     /// </summary>
     /// <remarks>
-    ///   Used in conjunction with dw-multireceiver.jar
+    ///   Used in conjunction with dw-multireceiver.jar. To stop the alarm, use:
+    ///     TAndroidHelper.AlarmManager.cancel(AlarmIntent);
+    ///   Where AlarmIntent is the original PendingIntent returned by this function
     /// </remarks>
-    class procedure SetStartAlarm(const AAlarm: TDateTime; const AStartFromLock: Boolean); static;
+    class function SetStartAlarm(const AAlarm: TDateTime; const AFromLock: Boolean; const ARequestCode: Integer = 0): JPendingIntent; static;
+    /// <summary>
+    ///   Same as SetStartAlarm, but starts the service specified by AServiceName. If it is an IntentService, use a value for JobID > 0
+    /// </summary>
+    class function SetServiceAlarm(const AServiceName: string; const AAlarm: TDateTime; const AFromLock: Boolean;
+      const AJobId: Integer = 0): JPendingIntent; static;
     class function ShowAllFilesAccessPermissionSettings: Boolean; static;
     class procedure ShowLocationPermissionSettings; static;
     /// <summary>
@@ -264,11 +270,8 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI,
   // DW
-  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.AndroidX.FileProvider, {$ENDIF} DW.Androidapi.JNI.Util;
-
-const
-  cActionStartAlarm = cMultiBroadcastReceiverName + '.ACTION_START_ALARM';
-  cExtraStartUnlock = cMultiBroadcastReceiverClassName + '.EXTRA_START_UNLOCK';
+  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.AndroidX.FileProvider, {$ENDIF}
+  DW.Consts.Android, DW.Androidapi.JNI.Util;
 
 { TUncaughtExceptionHandler }
 
@@ -552,22 +555,43 @@ begin
   Result := LCalendar.getTimeInMillis;
 end;
 
-class procedure TAndroidHelperEx.SetStartAlarm(const AAlarm: TDateTime; const AStartFromLock: Boolean);
+class function TAndroidHelperEx.InternalSetAlarm(const AAction: string; const AAlarm: TDateTime; const AFromLock: Boolean;
+  const ARequestCodeOrJobID: Integer; const AServiceName: string = ''): JPendingIntent;
 var
   LActionIntent: JIntent;
-  LAlarmIntent: JPendingIntent;
   LStartAt: Int64;
+  LRequestCode: Integer;
 begin
-  LActionIntent := TJIntent.JavaClass.init(StringToJString(cActionStartAlarm));
-  LActionIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cMultiBroadcastReceiverName));
-  LActionIntent.putExtra(StringToJString(cExtraStartUnlock), AStartFromLock);
-  LAlarmIntent := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, 0, LActionIntent, TJPendingIntent.JavaClass.FLAG_CANCEL_CURRENT);
+  LActionIntent := TJIntent.JavaClass.init(StringToJString(AAction));
+  LActionIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cDWBroadcastReceiverName));
+  if AFromLock = True then
+    LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraStartUnlock), AFromLock);
+  LRequestCode := ARequestCodeOrJobID;
+  if not AServiceName.IsEmpty then
+  begin
+    LRequestCode := 0;
+    LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceName), StringToJString(AServiceName));
+    if ARequestCodeOrJobID > 0 then
+      LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceJobId), ARequestCodeOrJobID);
+  end;
+  Result := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, LRequestCode, LActionIntent, TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT);
   LStartAt := GetTimeFromNowInMillis(SecondsBetween(Now, AAlarm));
   // Allow for alarms while in "doze" mode
   if TOSVersion.Check(6) then
-    TAndroidHelper.AlarmManager.setExactAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, LAlarmIntent)
+    TAndroidHelper.AlarmManager.setExactAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result)
   else
-    TAndroidHelper.AlarmManager.&set(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, LAlarmIntent);
+    TAndroidHelper.AlarmManager.&set(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result);
+end;
+
+class function TAndroidHelperEx.SetServiceAlarm(const AServiceName: string; const AAlarm: TDateTime; const AFromLock: Boolean;
+  const AJobId: Integer = 0): JPendingIntent;
+begin
+  Result := InternalSetAlarm(cDWBroadcastReceiverActionServiceAlarm, AAlarm, AFromLock, AJobId, AServiceName);
+end;
+
+class function TAndroidHelperEx.SetStartAlarm(const AAlarm: TDateTime; const AFromLock: Boolean; const ARequestCode: Integer = 0): JPendingIntent;
+begin
+  Result := InternalSetAlarm(cDWBroadcastReceiverActionStartAlarm, AAlarm, AFromLock, ARequestCode);
 end;
 
 class function TAndroidHelperEx.ShowAllFilesAccessPermissionSettings: Boolean;
