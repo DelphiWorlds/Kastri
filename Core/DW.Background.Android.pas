@@ -209,7 +209,7 @@ begin
   LIntent := TJIntent.JavaClass.init(StringToJString(AAction));
   LIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cDWBroadcastReceiverName));
   // The broadcast receiver that monitors for alarms needs to know whether it was requested by a service
-  LIntent.putExtra(StringToJString('ServiceName'), StringToJString(FServiceName));
+  LIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceName), StringToJString(FServiceName));
   FDozeAlarmIntent := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, 0, LIntent, TJPendingIntent.JavaClass.FLAG_CANCEL_CURRENT);
   if FDozeAlarmIntent <> nil then
   begin
