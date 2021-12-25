@@ -35,7 +35,6 @@ type
     { JDWFusedLocationClientDelegate }
     procedure onLocation(location: JLocation); cdecl;
     procedure onLocationUpdatesChange(active: Boolean); cdecl;
-    procedure onLocationSettingsChange(success: Boolean); cdecl;
     procedure onSetMockLocationResult(location: JLocation); cdecl;
     procedure onSetMockModeResult(success: Boolean); cdecl;
   public
@@ -87,7 +86,6 @@ type
     procedure LocationChange(const ALocation: JLocation);
     procedure NmeaMessage(const AMsg: JString; const ATimestamp: Int64);
     procedure SetIsPaused(const AValue: Boolean);
-    procedure SettingsChange(const ASuccess: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -159,12 +157,6 @@ end;
 procedure TFusedLocationClientDelegate.onLocation(location: JLocation);
 begin
   FLocation.LocationChange(location);
-end;
-
-
-procedure TFusedLocationClientDelegate.onLocationSettingsChange(success: Boolean);
-begin
-  FLocation.SettingsChange(success);
 end;
 
 procedure TFusedLocationClientDelegate.onLocationUpdatesChange(active: Boolean);
@@ -291,11 +283,6 @@ procedure TLocation.SetPriority(const Value: Integer);
 begin
   if Value <> Priority then
     FClient.setPriority(Value);
-end;
-
-procedure TLocation.SettingsChange(const ASuccess: Boolean);
-begin
-  // This means it failed to create updates
 end;
 
 procedure TLocation.SetIsPaused(const AValue: Boolean);
