@@ -135,6 +135,10 @@ type
     /// </summary>
     class function IsPackageInstalled(const APackageName: string): Boolean; static;
     /// <summary>
+    ///   Returns whether or not this is a service
+    /// </summary>
+    class function IsService: Boolean; static;
+    /// <summary>
     ///   Returns whether a service is running foreground
     /// </summary>
     class function IsServiceForeground(const AServiceName: string): Boolean; static;
@@ -469,6 +473,12 @@ begin
   TJActivityManager.JavaClass.getMyMemoryState(LAppInfo);
   Result := (LAppInfo.importance = TJActivityManager_RunningAppProcessInfo.JavaClass.IMPORTANCE_FOREGROUND) or
     (LAppInfo.importance = TJActivityManager_RunningAppProcessInfo.JavaClass.IMPORTANCE_VISIBLE);
+end;
+
+class function TAndroidHelperEx.IsService: Boolean;
+begin
+  // Comparing DelphiActivity to nil should be safe enough to determine whether this is a service
+  Result := DelphiActivity = nil;
 end;
 
 class function TAndroidHelperEx.IsServiceForeground(const AServiceName: string): Boolean;
