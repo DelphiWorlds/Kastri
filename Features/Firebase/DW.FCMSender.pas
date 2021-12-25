@@ -434,7 +434,7 @@ begin
     if FBadgeCount >= 0 then
       LAPS.AddPair('badge', TJSONNumber.Create(FBadgeCount));
     if TFCMMessageOption.ContentAvailable in FOptions then
-      LAPS.AddPair('content-available', TJSONBool.Create(True));
+      LAPS.AddPair('content-available', TJSONNumber.Create(1));
     // Add this LAST
     if LAPS.Count > 0 then
       LAPS.AddPair('mutable-content', TJSONNumber.Create(1));
