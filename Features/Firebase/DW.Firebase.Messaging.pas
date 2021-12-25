@@ -40,7 +40,7 @@ type
     procedure DoMessageReceived(const APayload: TStrings);
     procedure DoTokenReceived(const AToken: string);
     function GetDeviceToken: string; virtual;
-    procedure RequestAuthorization; virtual; abstract;
+    procedure RequestPermissions; virtual; abstract;
     procedure SubscribeToTopic(const ATopicName: string); virtual; abstract;
     function Start: Boolean; virtual;
     procedure UnsubscribeFromTopic(const ATopicName: string); virtual; abstract;
@@ -65,9 +65,9 @@ type
     FOnTokenReceived: TFirebaseTokenReceivedEvent;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     function GetDeviceToken: string;
+    function GetShowBannerWhenForeground: Boolean;
     procedure PushFailToRegisterMessageHandler(const Sender: TObject; const M: TMessage);
     procedure PushRemoteNotificationMessageHandler(const Sender: TObject; const M: TMessage);
-    function GetShowBannerWhenForeground: Boolean;
     procedure SetShowBannerWhenForeground(const Value: Boolean);
   protected
     procedure DoAuthorizationResult(const AGranted: Boolean);
@@ -77,6 +77,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    procedure RequestPermissions;
     procedure SubscribeToTopic(const ATopicName: string);
     function Start: Boolean;
     procedure UnsubscribeFromTopic(const ATopicName: string);
@@ -269,6 +270,11 @@ begin
   end;
 end;
 
+procedure TFirebaseMessaging.RequestPermissions;
+begin
+  FPlatformFirebaseMessaging.RequestPermissions;
+end;
+
 procedure TFirebaseMessaging.SetShowBannerWhenForeground(const Value: Boolean);
 begin
   FPlatformFirebaseMessaging.ShowBannerWhenForeground := Value;
@@ -281,7 +287,7 @@ begin
     Result := FPlatformFirebaseMessaging.Start;
   FIsActive := Result;
   if Result then
-    FPlatformFirebaseMessaging.RequestAuthorization;
+    RequestPermissions;
 end;
 
 procedure TFirebaseMessaging.SubscribeToTopic(const ATopicName: string);

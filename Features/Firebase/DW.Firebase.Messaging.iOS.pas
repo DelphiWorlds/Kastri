@@ -61,7 +61,7 @@ type
     function GetDeviceToken: string; override;
     procedure MessageReceived(const AJSON: string);
     procedure TokenReceived(const AToken: string);
-    procedure RequestAuthorization; override;
+    procedure RequestPermissions; override;
     procedure SubscribeToTopic(const ATopicName: string); override;
     function Start: Boolean; override;
     procedure UnsubscribeFromTopic(const ATopicName: string); override;
@@ -218,7 +218,7 @@ begin
   DoAuthorizationResult(True);
 end;
 
-procedure TPlatformFirebaseMessaging.RequestAuthorization;
+procedure TPlatformFirebaseMessaging.RequestPermissions;
 begin
   TPlatformNotifications.UpdateDelegate;
   FAuthOptions := UNAuthorizationOptionSound or UNAuthorizationOptionAlert or UNAuthorizationOptionBadge;

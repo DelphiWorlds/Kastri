@@ -60,7 +60,7 @@ type
     procedure HandleMessageReceived(const data: JIntent; const AIsStartup: Boolean = False);
     procedure HandleNewToken(const data: JIntent);
     procedure PublishNotification(const data: JIntent);
-    procedure RequestAuthorization; override;
+    procedure RequestPermissions; override;
     procedure SubscribeToTopic(const ATopicName: string); override;
     function Start: Boolean; override;
     procedure UnsubscribeFromTopic(const ATopicName: string); override;
@@ -305,7 +305,7 @@ begin
   );
 end;
 
-procedure TPlatformFirebaseMessaging.RequestAuthorization;
+procedure TPlatformFirebaseMessaging.RequestPermissions;
 begin
   DoAuthorizationResult(True); // i.e. a NOP on Android
 end;
