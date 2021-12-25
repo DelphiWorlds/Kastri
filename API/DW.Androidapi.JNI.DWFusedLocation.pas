@@ -33,6 +33,7 @@ type
     ['{8C54A1DE-2B00-4C77-B1C5-6D07E1174076}']
     function getFastestInterval: Int64; cdecl;
     function getInterval: Int64; cdecl;
+    function getIsActive: Boolean; cdecl;
     function getIsMockMode: Boolean; cdecl;
     function getPriority: Integer; cdecl;
     function getSmallestDisplacement: Double; cdecl;
@@ -57,7 +58,6 @@ type
     ['{C8A0BF7F-0CC2-4D8E-A680-343345D6D187}']
     procedure onLocation(location: JLocation); cdecl;
     procedure onLocationUpdatesChange(active: Boolean); cdecl;
-    procedure onLocationSettingsChange(success: Boolean); cdecl;
     procedure onSetMockLocationResult(location: JLocation); cdecl;
     procedure onSetMockModeResult(success: Boolean); cdecl;
   end;
