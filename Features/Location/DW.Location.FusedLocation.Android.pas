@@ -23,7 +23,7 @@ uses
   // Android
   AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNIBridge, Androidapi.JNI.Location, Androidapi.JNI.JavaTypes,
   // DW
-  DW.Androidapi.JNI.DWFusedLocation, DW.Location;
+  DW.Androidapi.JNI.DWFusedLocation, DW.Location, DW.Location.Types;
 
 type
   TLocation = class;

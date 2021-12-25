@@ -19,28 +19,9 @@ uses
   // RTL
   System.Sensors,
   // DW
-  DW.Sensors;
-
-const
-  cInvalidLatitude = 91;
-  cInvalidLongitude = 181;
+  DW.Sensors, DW.Location.Types;
 
 type
-  TLocationDataFlag = (Accuracy, Altitude, Bearing, Speed);
-
-  TLocationDataFlags = set of TLocationDataFlag;
-
-  TLocationData = record
-    Accuracy: Double;
-    Altitude: Double;
-    Bearing: Double;
-    DateTime: TDateTime;
-    Flags: TLocationDataFlags;
-    // BearingAccuracy: Double;
-    Location: TLocationCoord2D;
-    Speed: Double;
-  end;
-
   TLocation = class;
 
   TCustomPlatformLocation = class(TObject)

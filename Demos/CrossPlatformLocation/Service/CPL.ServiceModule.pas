@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.Android.Service, System.Sensors,
   AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App,
-  DW.Location, DW.Background.Android, DW.MultiReceiver.Android, DW.JsonConfig,
+  DW.Location, DW.Background.Android, DW.MultiReceiver.Android, DW.JsonConfig, DW.Location.Types,
   {$IF Defined(USE_FUSED_LOCATION)}
   DW.Location.FusedLocation.Android,
   {$ELSE}
@@ -407,7 +407,7 @@ end;
 procedure TServiceModule.LocationNmeaMessageHandler(Sender: TObject; const AMsg: string; const ATimestamp: Int64);
 begin
   // There can be a lot of these, so use logging wisely
-  TOSLog.d('TServiceModule.LocationNmeaMessageHandler > %s: %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', UnixToDateTime(ATimestamp div 1000, False)), AMsg]);
+  // TOSLog.d('TServiceModule.LocationNmeaMessageHandler > %s: %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', UnixToDateTime(ATimestamp div 1000, False)), AMsg]);
 end;
 {$ENDIF}
 
