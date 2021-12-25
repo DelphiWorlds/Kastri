@@ -16,8 +16,6 @@ public interface DWFusedLocationClientDelegate {
 
   public void onLocationUpdatesChange(boolean active);
 
-  public void onLocationSettingsChange(boolean success);
-
   public void onSetMockLocationResult(Location location);
 
   public void onSetMockModeResult(boolean success);
