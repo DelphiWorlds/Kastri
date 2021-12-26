@@ -35,6 +35,7 @@ const
   cPermissionWriteExternalStorage = 'android.permission.WRITE_EXTERNAL_STORAGE';
 
   cMetadataFCMDefaultChannelId = 'com.google.firebase.messaging.default_notification_channel_id';
+  cMetadataFCMDefaultIcon = 'com.google.firebase.messaging.default_notification_icon';
 
   cLocationPriorityBalancedPowerAccuracy = 102;
   cLocationPriorityHighAccuracy = 100;
