@@ -26,6 +26,7 @@ type
   JNotificationCompat_Action = interface;
   JNotificationCompat_BubbleMetadata = interface;
   JNotificationCompat_Builder = interface;
+  JNotificationCompat_DecoratedCustomViewStyle = interface;
   JNotificationCompat_Extender = interface;
   JNotificationCompat_Style = interface;
   JRemoteInput = interface;
@@ -281,6 +282,20 @@ type
     procedure setBuilder(builder: JNotificationCompat_Builder); cdecl;
   end;
   TJNotificationCompat_Style = class(TJavaGenericImport<JNotificationCompat_StyleClass, JNotificationCompat_Style>) end;
+
+  // API 24+
+  JNotificationCompat_DecoratedCustomViewStyleClass = interface(JNotificationCompat_StyleClass)
+    ['{136C847E-D749-437D-8EE1-06D6DB9B856F}']
+    function init: JNotificationCompat_DecoratedCustomViewStyle; cdecl; overload;
+  end;
+
+  [JavaSignature('androidx/core/app/NotificationCompat$DecoratedCustomViewStyle')]
+  JNotificationCompat_DecoratedCustomViewStyle = interface(JNotificationCompat_Style)
+    ['{50371CBC-753D-4C0C-9D87-9F178AA42F06}']
+  end;
+  TJNotificationCompat_DecoratedCustomViewStyle = class(TJavaGenericImport<JNotificationCompat_DecoratedCustomViewStyleClass,
+    JNotificationCompat_DecoratedCustomViewStyle>)
+  end;
 
 implementation
 
