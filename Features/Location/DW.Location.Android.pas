@@ -22,7 +22,7 @@ uses
   Androidapi.JNI.App, AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNIBridge, Androidapi.JNI.Location,
   AndroidApi.JNI.JavaTypes,
   // DW
-  DW.Location, DW.TimerTask.Android;
+  DW.Location, DW.Location.Types, DW.TimerTask.Android;
 
 type
   TLocation = class;
