@@ -52,7 +52,7 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.JavaTypes,
   // DW
-  DW.Consts.Android;
+  DW.Consts.Android, DW.Location.Types;
 
 { TLocationReceiver }
 
