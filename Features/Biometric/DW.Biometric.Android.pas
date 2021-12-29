@@ -248,54 +248,49 @@ procedure TPlatformBiometric.Verify(const AMessage: string; const ASuccessResult
 begin
   FVerifySuccessResultMethod := ASuccessResultMethod;
   FVerifyFailResultMethod := AFailResultMethod;
-
-  PromptDescription:=AMessage;
-
-  var res:=ShowPrompt;
-  if not res and Assigned(FVerifyFailResultMethod) then
+  PromptDescription := AMessage;
+  if not ShowPrompt and Assigned(FVerifyFailResultMethod) then
     FVerifyFailResultMethod(TBiometricFailResult.Error, 'Biometry not available');
 end;
 
 procedure TPlatformBiometric.HandleAuthenticationResult(const AIntent: JIntent);
-  var
-    AuthRes: Integer;
-    ErrorCode: Integer;
-    ErrorMsg: String;
+var
+  LAuthRes, LErrorCode: Integer;
+  LErrorMsg: String;
 begin
-  if not AIntent.hasExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT) then
-    Exit;
-
-  AuthRes:=AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT, 2);
-
-  if AuthRes = cAUTHENTICATION_RESULT_SUCCESS then
+  if AIntent.hasExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT) then
   begin
-    if Assigned(FVerifySuccessResultMethod) then
-      FVerifySuccessResultMethod;
-  end
-  // Called when a biometric (e.g. fingerprint, face, etc.) is presented but not recognized as belonging to the user.
-  // No error code or message will be returned but the UI will display the failure reason anyway.
-  else if AuthRes = cAUTHENTICATION_RESULT_ERROR then
-  begin
-    // See https://developer.android.com/reference/androidx/biometric/BiometricPrompt for error codes
-    ErrorCode:=AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_CODE, 0);
-    ErrorMsg:=JStringToString(AIntent.getStringExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_MESSAGE));
+    LAuthRes := AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT, 2);
+    if LAuthRes = cAUTHENTICATION_RESULT_SUCCESS then
+    begin
+      if Assigned(FVerifySuccessResultMethod) then
+        FVerifySuccessResultMethod;
+    end
+    // Called when a biometric (e.g. fingerprint, face, etc.) is presented but not recognized as belonging to the user.
+    // No error code or message will be returned but the UI will display the failure reason anyway.
+    else if LAuthRes = cAUTHENTICATION_RESULT_ERROR then
+    begin
+      // See https://developer.android.com/reference/androidx/biometric/BiometricPrompt for error codes
+      LErrorCode := AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_CODE, 0);
+      LErrorMsg := JStringToString(AIntent.getStringExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_MESSAGE));
 
-    if Assigned(FVerifyFailResultMethod) then
-      FVerifyFailResultMethod(TBiometricFailResult.Error, ErrorMsg)
-  end
-  // Failed will happen if auth is working but the user couldn't be autheticated.
-  // E.g. couldn't match the finger or face. The UI will tell the user what's wrong
-  // so the error message and code will always be empty.
-  else if AuthRes = cAUTHENTICATION_RESULT_FAILED then
-  begin
-    if Assigned(FVerifyFailResultMethod) then
-      FVerifyFailResultMethod(TBiometricFailResult.Denied, '');
+      if Assigned(FVerifyFailResultMethod) then
+        FVerifyFailResultMethod(TBiometricFailResult.Error, Format('Code: %d, Message: %s', [LErrorCode, LErrorMsg]));
+    end
+    // Failed will happen if auth is working but the user couldn't be autheticated.
+    // E.g. couldn't match the finger or face. The UI will tell the user what's wrong
+    // so the error message and code will always be empty.
+    else if LAuthRes = cAUTHENTICATION_RESULT_FAILED then
+    begin
+      if Assigned(FVerifyFailResultMethod) then
+        FVerifyFailResultMethod(TBiometricFailResult.Denied, '');
+    end;
   end;
 end;
 
 function TPlatformBiometric.HasUserInterface: Boolean;
 begin
-  Result:=True;
+  Result := True;
 end;
 
 end.
