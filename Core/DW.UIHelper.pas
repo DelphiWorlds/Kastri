@@ -110,7 +110,9 @@ end;
 
 class procedure TUIHelper.SetBrightness(const AValue: Single);
 begin
+  {$IF Defined(IOS) or Defined(Android)}
   TPlatformUIHelper.SetBrightness(AValue);
+  {$ENDIF}
 end;
 
 class function TUIHelper.GetTextColor(const ABackgroundColor: TAlphaColor): TAlphaColor;
