@@ -24,6 +24,8 @@ const
   cInvalidLongitude = 181;
 
 type
+  TLocationApplicationState = (Normal, Background, Doze, Hidden);
+
   TLocationDataFlag = (Accuracy, Altitude, Bearing, Speed);
 
   TLocationDataFlags = set of TLocationDataFlag;
@@ -34,10 +36,10 @@ type
   public
     Accuracy: Double;
     Altitude: Double;
+    ApplicationState: TLocationApplicationState;
     Bearing: Double;
     DateTime: TDateTime;
     Flags: TLocationDataFlags;
-    // BearingAccuracy: Double;
     Location: TLocationCoord2D;
     Speed: Double;
     procedure FromJSON(const AValue: string);
