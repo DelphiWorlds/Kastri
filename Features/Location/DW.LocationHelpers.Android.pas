@@ -46,7 +46,7 @@ uses
   {$ELSE}
   DW.Androidapi.JNI.AndroidX.LocalBroadcastManager,
   {$ENDIF}
-  DW.Geodetic;
+  DW.Geodetic, DW.Android.Helpers;
 
 procedure TLocationHelper.BroadcastLocationData(const ALocation: JLocation);
 var
@@ -62,6 +62,10 @@ end;
 function TLocationHelper.GetLocationData(const ALocation: JLocation): TLocationData;
 begin
   FillChar(Result, SizeOf(Result), 0);
+  if not TAndroidHelperEx.IsActivityForeground then
+    Result.ApplicationState := TLocationApplicationState.Background;
+  if TAndroidHelperEx.PowerManager.isDeviceIdleMode then
+    Result.ApplicationState := TLocationApplicationState.Doze;
   Result.Location := TLocationCoord2D.Create(ALocation.getLatitude, ALocation.getLongitude);
   if ALocation.hasAccuracy then
   begin
@@ -88,6 +92,7 @@ begin
     Include(Result.Flags, TLocationDataFlag.Speed);
     Result.Speed := TGeodetic.DistanceBetween(Data.Location, Result.Location) / SecondsBetween(Now, Data.DateTime);
   end;
+  Result.DateTime := UnixToDateTime(ALocation.getTime);
   Data := Result;
 end;
 
