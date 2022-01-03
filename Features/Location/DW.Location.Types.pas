@@ -40,6 +40,8 @@ type
     Bearing: Double;
     DateTime: TDateTime;
     Flags: TLocationDataFlags;
+    IsCached: Boolean;
+    IsMocked: Boolean;
     Location: TLocationCoord2D;
     Speed: Double;
     procedure FromJSON(const AValue: string);
@@ -61,36 +63,38 @@ begin
   Altitude := 0;
   Bearing := 0;
   DateTime := 0;
+  IsCached := False;
+  IsMocked := False;
   Speed := 0;
+  ApplicationState := TLocationApplicationState.Normal;
 end;
 
 procedure TLocationData.FromJSON(const AValue: string);
 var
   LValue, LLocationValue: TJSONValue;
-  LJSON: TJSONObject;
-  LLatitude, LLongitude: Double;
+  LLatitude, LLongitude, LDouble: Double;
 begin
   Reset;
   LValue := TJSONObject.ParseJSONValue(AValue);
   if LValue <> nil then
   try
-    if LValue is TJSONObject then
+    if LValue.TryGetValue('Location', LLocationValue) then
     begin
-      LJSON := TJSONObject(LValue);
-      if LJSON.TryGetValue('Location', LLocationValue) then
-      begin
-        if LLocationValue.TryGetValue('Latitude', LLatitude) and LLocationValue.TryGetValue('Longitude', LLongitude) then
-          Location := TLocationCoord2D.Create(LLatitude, LLongitude);
-      end;
-      if LJSON.TryGetValue('Accuracy', Accuracy) then
-        Include(Flags, TLocationDataFlag.Accuracy);
-      if LJSON.TryGetValue('Altitude', Altitude) then
-        Include(Flags, TLocationDataFlag.Altitude);
-      if LJSON.TryGetValue('Bearing', Bearing) then
-        Include(Flags, TLocationDataFlag.Bearing);
-      if LJSON.TryGetValue('Speed', Speed) then
-        Include(Flags, TLocationDataFlag.Speed);
+      if LLocationValue.TryGetValue('Latitude', LLatitude) and LLocationValue.TryGetValue('Longitude', LLongitude) then
+        Location := TLocationCoord2D.Create(LLatitude, LLongitude);
     end;
+    if LValue.TryGetValue('Accuracy', Accuracy) then
+      Include(Flags, TLocationDataFlag.Accuracy);
+    if LValue.TryGetValue('Altitude', Altitude) then
+      Include(Flags, TLocationDataFlag.Altitude);
+    if LValue.TryGetValue('Bearing', Bearing) then
+      Include(Flags, TLocationDataFlag.Bearing);
+    if LValue.TryGetValue('Speed', Speed) then
+      Include(Flags, TLocationDataFlag.Speed);
+    if LValue.TryGetValue('DateTime', LDouble) then
+      DateTime := LDouble;
+    LValue.TryGetValue('IsCached', IsCached);
+    LValue.TryGetValue('IsMocked', IsMocked);
   finally
     LValue.Free;
   end;
@@ -121,6 +125,8 @@ begin
     if TLocationDataFlag.Speed in Flags then
       LJSON.AddPair('Speed', TJSONNumber.Create(Speed));
     LJSON.AddPair('DateTime', TJSONNumber.Create(DateTime));
+    LJSON.AddPair('IsCached', TJSONBool.Create(IsCached));
+    LJSON.AddPair('IsMocked', TJSONBool.Create(IsMocked));
     LJSON.AddPair('Location', GetLocationJSON);
     Result := LJSON.ToString;
   finally
