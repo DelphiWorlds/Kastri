@@ -29,8 +29,8 @@ type
   TLocationHelper = record
   public
     Data: TLocationData;
-    procedure BroadcastLocationData(const ALocation: JLocation);
-    function GetLocationData(const ALocation: JLocation): TLocationData;
+    procedure BroadcastLocationData(const ALocation: JLocation; const AIsCached: Boolean = False);
+    function GetLocationData(const ALocation: JLocation; const AIsCached: Boolean = False): TLocationData;
   end;
 
 implementation
@@ -48,25 +48,28 @@ uses
   {$ENDIF}
   DW.Geodetic, DW.Android.Helpers;
 
-procedure TLocationHelper.BroadcastLocationData(const ALocation: JLocation);
+procedure TLocationHelper.BroadcastLocationData(const ALocation: JLocation; const AIsCached: Boolean = False);
 var
   LIntent: JIntent;
   LData: TLocationData;
 begin
-  LData := GetLocationData(ALocation);
+  LData := GetLocationData(ALocation, AIsCached);
+  LData.IsCached := AIsCached;
   LIntent := TJIntent.JavaClass.init(StringToJString(cActionLocation));
   LIntent.putExtra(StringToJString(cExtraLocationData), StringToJString(LData.ToJSON));
   TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).sendBroadcast(LIntent);
 end;
 
-function TLocationHelper.GetLocationData(const ALocation: JLocation): TLocationData;
+function TLocationHelper.GetLocationData(const ALocation: JLocation; const AIsCached: Boolean = False): TLocationData;
 begin
-  FillChar(Result, SizeOf(Result), 0);
+  Result.Reset;
   if not TAndroidHelperEx.IsActivityForeground then
     Result.ApplicationState := TLocationApplicationState.Background;
   if TAndroidHelperEx.PowerManager.isDeviceIdleMode then
     Result.ApplicationState := TLocationApplicationState.Doze;
   Result.Location := TLocationCoord2D.Create(ALocation.getLatitude, ALocation.getLongitude);
+  Result.IsMocked := ALocation.isFromMockProvider;
+  Result.IsCached := AIsCached;
   if ALocation.hasAccuracy then
   begin
     Include(Result.Flags, TLocationDataFlag.Accuracy);
@@ -92,7 +95,7 @@ begin
     Include(Result.Flags, TLocationDataFlag.Speed);
     Result.Speed := TGeodetic.DistanceBetween(Data.Location, Result.Location) / SecondsBetween(Now, Data.DateTime);
   end;
-  Result.DateTime := UnixToDateTime(ALocation.getTime);
+  Result.DateTime := UnixToDateTime(Round(ALocation.getTime / 1000));
   Data := Result;
 end;
 
