@@ -314,6 +314,7 @@ function TLocation.GetLocationData(const ALocation: JLocation): TLocationData;
 begin
   FillChar(Result, SizeOf(Result), 0);
   Result.Location := TLocationCoord2D.Create(ALocation.getLatitude, ALocation.getLongitude);
+  Result.IsMocked := ALocation.isFromMockProvider;
   if ALocation.hasAccuracy then
   begin
     Include(Result.Flags, TLocationDataFlag.Accuracy);
