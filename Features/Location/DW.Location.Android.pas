@@ -61,7 +61,6 @@ type
     procedure CreateListeners;
     function GetLastKnownLocation: JLocation;
     function GetLocationData(const ALocation: JLocation): TLocationData;
-    function GetLocationMode: Integer;
     function HasPermissions: Boolean;
     procedure RemoveListeners;
     procedure InternalRequestLastKnownLocation(const ASource: TLocationSource);
@@ -175,6 +174,7 @@ function TLocation.GetLocationData(const ALocation: JLocation): TLocationData;
 begin
   FillChar(Result, SizeOf(Result), 0);
   Result.Location := TLocationCoord2D.Create(ALocation.getLatitude, ALocation.getLongitude);
+  Result.IsMocked := ALocation.isFromMockProvider;
   if ALocation.hasAccuracy then
   begin
     Include(Result.Flags, TLocationDataFlag.Accuracy);
@@ -200,11 +200,6 @@ begin
     Include(Result.Flags, TLocationDataFlag.Speed);
     Result.Speed := TGeodetic.DistanceBetween(FLastData.Location, Result.Location) / SecondsBetween(Now, FLastData.DateTime);
   end;
-end;
-
-function TLocation.GetLocationMode: Integer;
-begin
-  Result := TJSettings_Secure.JavaClass.getInt(TAndroidHelper.ContentResolver, TJSettings_Secure.JavaClass.LOCATION_MODE);
 end;
 
 procedure TLocation.CreateListeners;
