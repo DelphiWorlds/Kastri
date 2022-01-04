@@ -83,13 +83,14 @@ implementation
 {$IF Defined(IOS)}
 uses
   DW.AudioPlayer.iOS;
-{$ENDIF}
-{$IF Defined(ANDROID)}
+{$ELSEIF Defined(ANDROID)}
 uses
   DW.AudioPlayer.Android;
-{$ENDIF}
+{$ELSEIF Defined(MSWINDOWS)}
+uses
+  DW.AudioPlayer.Win;
+{$ELSE}
 
-{$IF Defined(MSWINDOWS)}
 type
   TPlatformAudioPlayer = class(TCustomPlatformAudioPlayer);
 {$ENDIF}
