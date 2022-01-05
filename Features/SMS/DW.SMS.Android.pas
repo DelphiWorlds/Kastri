@@ -55,11 +55,11 @@ implementation
 
 uses
   // RTL
-  System.Permissions,
+  System.Permissions, System.SysUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNI.Support,
   // DW
-  DW.Consts.Android, DW.Permissions.Helpers;
+  DW.OSLog, DW.Consts.Android, DW.Permissions.Helpers;
 
 const
   cACTION_MESSAGE_SENT = 'ACTION_MESSAGE_SENT';
@@ -137,7 +137,10 @@ begin
   if AResultCode = TJActivity.JavaClass.RESULT_OK then
     DoMessageResult([LDestination], TMessageResult.Sent)
   else
+  begin
+    TOSLog.d('Send to %s failed, result code: %d', [LDestination, AResultCode]);
     DoMessageResult([LDestination], TMessageResult.Failed);
+  end;
 //  else if AResultCode = TJSmsManager.JavaClass.RESULT_ERROR_GENERIC_FAILURE then
 //  else if AResultCode = TJSmsManager.JavaClass.RESULT_ERROR_NO_SERVICE then
 //  else if AResultCode = TJSmsManager.JavaClass.RESULT_ERROR_NULL_PDU then
@@ -156,15 +159,19 @@ end;
 
 procedure TPlatformSMS.SendTextMessage(const AText: string; const ADestinations: TArray<string>);
 var
-  LSentIntent, LDeliveryIntent: JPendingIntent;
+  LSentIntent: JPendingIntent;
   LDestination: string;
+  LParts, LSentIntents, LDeliveryIntents: JArrayList;
 begin
   for LDestination in ADestinations do
   begin
     LSentIntent := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, GetNextIntentID, GetMessageIntent(LDestination),
       TJPendingIntent.JavaClass.FLAG_CANCEL_CURRENT);
-    LDeliveryIntent := nil; // TODO
-    FSMSManager.sendTextMessage(StringToJString(LDestination), nil, StringToJString(AText), LSentIntent, LDeliveryIntent);
+    LParts := FSMSManager.divideMessage(StringToJString(AText));
+    LSentIntents := TJArrayList.JavaClass.init(1);
+    LSentIntents.add(LSentIntent);
+    LDeliveryIntents := nil; // TODO?
+    FSMSManager.sendMultipartTextMessage(StringToJString(LDestination), nil, LParts, LSentIntents, LDeliveryIntents);
   end;
 end;
 
