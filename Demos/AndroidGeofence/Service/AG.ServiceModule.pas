@@ -25,7 +25,8 @@ implementation
 {$R *.dfm}
 
 uses
-  Androidapi.Helpers,
+  System.Sensors,
+  Androidapi.Helpers, Androidapi.JNI.JavaTypes,
   DW.OSLog, DW.Geofence, DW.Geofence.Android, DW.Androidapi.JNI.DWGeofence;
 
 const
@@ -35,9 +36,12 @@ procedure TServiceModule.AndroidIntentServiceHandleIntent(const Sender: TObject;
 var
   LRegionIds: string;
   LTransition: TGeofenceTransition;
+  LCoords: TLocationCoord2D;
 begin
   LRegionIds := JStringToString(AnIntent.getStringExtra(TJGeofenceIntentReceiver.JavaClass.EXTRA_TRANSITION_IDS));
   LTransition := TPlatformGeofenceManager.GetTransition(AnIntent.getIntExtra(TJGeofenceIntentReceiver.JavaClass.EXTRA_TRANSITION_TYPE, 1));
+  LCoords.Latitude := AnIntent.getDoubleExtra(TJGeofenceIntentReceiver.JavaClass.EXTRA_TRANSITION_LATITUDE, 91);
+  LCoords.Longitude := AnIntent.getDoubleExtra(TJGeofenceIntentReceiver.JavaClass.EXTRA_TRANSITION_LONGITUDE, 181);
   TOSLog.d('AGDemoSrvice - %s: %s', [cGeofenceTransitionCaptions[LTransition], LRegionIds]);
   // Here you can handle the transition information in Delphi code, even if the app is not running
 end;
