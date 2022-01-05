@@ -89,9 +89,13 @@ type
     ['{EED166F3-8368-4D5A-B238-6277F4A10F8D}']
     {class} function _GetACTION_GEOFENCE_TRANSITION: JString; cdecl;
     {class} function _GetEXTRA_TRANSITION_IDS: JString; cdecl;
+    {class} function _GetEXTRA_TRANSITION_LATITUDE: JString; cdecl;
+    {class} function _GetEXTRA_TRANSITION_LONGITUDE: JString; cdecl;
     {class} function _GetEXTRA_TRANSITION_TYPE: JString; cdecl;
     {class} property ACTION_GEOFENCE_TRANSITION: JString read _GetACTION_GEOFENCE_TRANSITION;
     {class} property EXTRA_TRANSITION_IDS: JString read _GetEXTRA_TRANSITION_IDS;
+    {class} property EXTRA_TRANSITION_LATITUDE: JString read _GetEXTRA_TRANSITION_LATITUDE;
+    {class} property EXTRA_TRANSITION_LONGITUDE: JString read _GetEXTRA_TRANSITION_LONGITUDE;
     {class} property EXTRA_TRANSITION_TYPE: JString read _GetEXTRA_TRANSITION_TYPE;
   end;
 
