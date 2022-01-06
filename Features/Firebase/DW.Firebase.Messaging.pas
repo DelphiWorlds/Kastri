@@ -78,12 +78,30 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure RequestPermissions;
+    /// <summary>
+    ///   Allows the device to receive messages targeting the specified topic
+    /// </summary>
     procedure SubscribeToTopic(const ATopicName: string);
+    /// <summary>
+    ///   Call this method after assigning event handlers
+    /// </summary>
     function Start: Boolean;
+    /// <summary>
+    ///   Removes the device from receiving messages for the specified topic
+    /// </summary>
     procedure UnsubscribeFromTopic(const ATopicName: string);
+    /// <summary>
+    ///   Token associated with the device. On iOS, this is the APNs token
+    /// </summary>
     property DeviceToken: string read GetDeviceToken;
     property IsActive: Boolean read FIsActive;
+    /// <summary>
+    ///   [Android only] A banner will be shown when a notification is received if the app is in the foreground
+    /// </summary>
     property ShowBannerWhenForeground: Boolean read GetShowBannerWhenForeground write SetShowBannerWhenForeground;
+    /// <summary>
+    ///   FCM token
+    /// </summary>
     property Token: string read FToken;
     property OnAuthorizationResult: TAuthorizationResultEvent read FOnAuthorizationResult write FOnAuthorizationResult;
     property OnFailedToRegister: TFailedToRegisterEvent read FOnFailedToRegister write FOnFailedToRegister;
