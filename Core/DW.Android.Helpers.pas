@@ -91,6 +91,10 @@ type
     /// </summary>
     class function GetClass(const APackageClassName: string): Jlang_Class; static;
     /// <summary>
+    ///   Retrieves the stack trace for when a crash occurs, when HookUncaughtExceptionHandler is used
+    /// </summary>
+    class function GetCrashTrace: string; static;
+    /// <summary>
     ///   Returns the application default icon ID
     /// </summary>
     class function GetDefaultIconID: Integer; static;
@@ -114,6 +118,12 @@ type
     ///   Returns information about a running service, if the service is running
     /// </summary>
     class function GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo; static;
+    /// <summary>
+    ///   Sets an exception handler for any uncaught exceptions that occur in Java code
+    /// </summary>
+    /// <remarks>
+    ///   See also GetCrashTrace
+    /// </remarks>
     class procedure HookUncaughtExceptionHandler; static;
     /// <summary>
     ///   Imports a file that can be accessed only via ContentResolver
@@ -256,7 +266,7 @@ type
     constructor Create;
   end;
 
-  TRunnable = class(TCustomRunnable)
+  TRunnable = class(TCustomRunnable, JRunnable)
   private
     FRunHandler: TThreadProcedure;
     FSync: Boolean;
@@ -264,6 +274,24 @@ type
     procedure DoRun; override;
   public
     constructor Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
+  end;
+
+  TBundlePair = record
+    Key: JObject;
+    Value: JObject;
+    constructor Create(const AKey, AValue: JObject);
+    function KeyAsString: string;
+    function ValueAsString: string;
+  end;
+
+  TBundlePairs = TArray<TBundlePair>;
+
+  TBundleParser = record
+    Pairs: TBundlePairs;
+    function Count: Integer;
+    procedure Parse(const ABundle: JBundle);
+    procedure ToStrings(const AStrings: TStrings);
+    function ToStringArray: TArray<string>;
   end;
 
 implementation
@@ -362,6 +390,19 @@ end;
 class function TAndroidHelperEx.GetClass(const APackageClassName: string): Jlang_Class;
 begin
   Result := TJLang_Class.JavaClass.forName(StringToJString(APackageClassName), True, TAndroidHelper.Context.getClassLoader);
+end;
+
+class function TAndroidHelperEx.GetCrashTrace: string;
+var
+  LIntent: JIntent;
+begin
+  Result := '';
+  if DelphiActivity <> nil then
+  begin
+    LIntent := TAndroidHelper.Activity.getIntent;
+    if LIntent.getBooleanExtra(StringToJString('CRASHED'), False) then
+      Result := JStringToString(LIntent.getStringExtra(StringToJString('TRACE')));
+  end;
 end;
 
 class function TAndroidHelperEx.GetDefaultIconID: Integer;
@@ -792,6 +833,73 @@ begin
     TThread.ForceQueue(nil, FRunHandler)
   else
     FRunHandler;
+end;
+
+{ TBundlePair }
+
+constructor TBundlePair.Create(const AKey, AValue: JObject);
+begin
+  Key := AKey;
+  Value := AValue;
+end;
+
+function TBundlePair.KeyAsString: string;
+begin
+  if Key <> nil then
+    Result := JStringToString(Key.toString)
+  else
+    Result := '';
+end;
+
+function TBundlePair.ValueAsString: string;
+begin
+  if Value <> nil then
+    Result := JStringToString(Value.toString)
+  else
+    Result := '';
+end;
+
+{ TBundleParser }
+
+function TBundleParser.Count: Integer;
+begin
+  Result := Length(Pairs);
+end;
+
+procedure TBundleParser.Parse(const ABundle: JBundle);
+var
+  LIterator: JIterator;
+  LKeyObject: JObject;
+begin
+  if ABundle <> nil then
+  begin
+    Pairs := [];
+    LIterator := ABundle.keySet.iterator;
+    while LIterator.hasNext do
+    begin
+      LKeyObject := LIterator.next;
+      if LKeyObject <> nil then
+        Pairs := Pairs + [TBundlePair.Create(LKeyObject, ABundle.&get(LKeyObject.toString))];
+    end;
+  end;
+end;
+
+function TBundleParser.ToStringArray: TArray<string>;
+var
+  LPair: TBundlePair;
+begin
+  Result := [];
+  for LPair in Pairs do
+    Result := Result + [Format('%s=%s', [LPair.KeyAsString, LPair.ValueAsString])];
+end;
+
+procedure TBundleParser.ToStrings(const AStrings: TStrings);
+var
+  LPair: TBundlePair;
+begin
+  AStrings.Clear;
+  for LPair in Pairs do
+    AStrings.Values[LPair.KeyAsString] := LPair.ValueAsString;
 end;
 
 end.
