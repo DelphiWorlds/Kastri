@@ -34,7 +34,6 @@ type
     class var FConnectivityManager: JConnectivityManager;
   private
     FCallback: JDWNetworkCallback;
-    FConnectedNetworks: TNetworks;
     FIsPendingAvailable: Boolean;
     FPlatformConnectivity: TPlatformConnectivity;
     procedure ConnectivityChange;
