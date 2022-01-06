@@ -53,6 +53,7 @@ type
     FIntent: JIntent;
     FStartupIntentHandled: Boolean;
     FTokenTaskCompleteListener: JOnCompleteListener;
+    procedure CreateChannel;
     procedure MessageReceivedNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
   protected
     procedure DoApplicationBecameActive; override;
@@ -75,87 +76,14 @@ uses
   // RTL
   System.SysUtils, System.Classes,
   // Android
-  Androidapi.JNI.Os, Androidapi.Helpers,
+  Androidapi.JNI.Os, Androidapi.Helpers, Androidapi.JNI.App,
   // FMX
   FMX.Platform.Android,
   // DW
   DW.OSLog,
-  DW.Classes.Helpers, DW.Androidapi.JNI.DWFirebaseServiceHelpers, DW.FirebaseApp.Android,
+  DW.Classes.Helpers, DW.Androidapi.JNI.DWFirebaseServiceHelpers, DW.FirebaseApp.Android, DW.Consts.Android, DW.OSMetadata,
   {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.Androidx.LocalBroadcastManager, {$ENDIF}
   DW.Androidapi.JNI.Firebase, DW.Androidapi.JNI.Content;
-
-type
-  TBundlePair = record
-    Key: JObject;
-    Value: JObject;
-    constructor Create(const AKey, AValue: JObject);
-    function KeyAsString: string;
-    function ValueAsString: string;
-  end;
-
-  TBundlePairs = TArray<TBundlePair>;
-
-  TBundleParser = record
-    Pairs: TBundlePairs;
-    function Count: Integer;
-    procedure Parse(const ABundle: JBundle);
-    procedure ToStrings(const AStrings: TStrings);
-  end;
-
-{ TBundlePair }
-
-constructor TBundlePair.Create(const AKey, AValue: JObject);
-begin
-  Key := AKey;
-  Value := AValue;
-end;
-
-function TBundlePair.KeyAsString: string;
-begin
-  if Key <> nil then
-    Result := JStringToString(Key.toString)
-  else
-    Result := '';
-end;
-
-function TBundlePair.ValueAsString: string;
-begin
-  if Value <> nil then
-    Result := JStringToString(Value.toString)
-  else
-    Result := '';
-end;
-
-{ TBundleParser }
-
-function TBundleParser.Count: Integer;
-begin
-  Result := Length(Pairs);
-end;
-
-procedure TBundleParser.Parse(const ABundle: JBundle);
-var
-  LIterator: JIterator;
-  LKeyObject: JObject;
-begin
-  Pairs := [];
-  LIterator := ABundle.keySet.iterator;
-  while LIterator.hasNext do
-  begin
-    LKeyObject := LIterator.next;
-    if LKeyObject <> nil then
-      Pairs := Pairs + [TBundlePair.Create(LKeyObject, ABundle.&get(LKeyObject.toString))];
-  end;
-end;
-
-procedure TBundleParser.ToStrings(const AStrings: TStrings);
-var
-  LPair: TBundlePair;
-begin
-  AStrings.Clear;
-  for LPair in Pairs do
-    AStrings.Values[LPair.KeyAsString] := LPair.ValueAsString;
-end;
 
 { TTokenTaskCompleteListener }
 
@@ -214,6 +142,24 @@ begin
   inherited;
 end;
 
+procedure TPlatformFirebaseMessaging.CreateChannel;
+var
+  LChannelId: string;
+  LChannel: JNotificationChannel;
+begin
+  // Creates a channel only if one is named in the project options
+  if TOSMetadata.GetValue(cMetadataFCMDefaultChannelId, LChannelId) then
+  begin
+    LChannel := TJNotificationChannel.JavaClass.init(StringToJString(LChannelId), StrToJCharSequence(LChannelId),
+      TJNotificationManager.JavaClass.IMPORTANCE_HIGH);
+    LChannel.enableLights(True);
+    LChannel.enableVibration(True);
+    // Conceal info only on secure lock screens
+    LChannel.setLockscreenVisibility(TJNotification.JavaClass.VISIBILITY_PRIVATE);
+    TAndroidHelperEx.NotificationManager.createNotificationChannel(LChannel);
+  end;
+end;
+
 procedure TPlatformFirebaseMessaging.MessageReceivedNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
 begin
   // "App switching" intent
@@ -222,6 +168,8 @@ end;
 
 function TPlatformFirebaseMessaging.Start: Boolean;
 begin
+  if TOSVersion.Check(8) then
+    CreateChannel;
   TPlatformFirebaseApp.Start;
   {$IF CompilerVersion < 35}
   TJDWFirebaseMessagingService.JavaClass.queryToken(TAndroidHelper.Context);
