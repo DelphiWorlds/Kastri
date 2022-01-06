@@ -38,6 +38,10 @@ type
 
 implementation
 
+uses
+  // RTL
+  System.Classes;
+
 { TPlatformAudioPlayer }
 
 constructor TPlatformAudioPlayer.Create(const AAudioPlayer: TAudioPlayer);
@@ -54,7 +58,11 @@ end;
 
 procedure TPlatformAudioPlayer.LoadFromFile(const AFileName: string);
 begin
-  FPlayer.FileName := AFileName;
+  // Ensure load is called on the main thread
+  if TThread.Current.ThreadID <> MainThreadID then
+    TThread.Synchronize(nil, procedure begin FPlayer.FileName := AFileName end)
+  else
+    FPlayer.FileName := AFileName;
   DoAudioStateChange(TAudioState.Ready);
 end;
 
