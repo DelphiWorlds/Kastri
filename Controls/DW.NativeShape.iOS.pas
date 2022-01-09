@@ -42,7 +42,7 @@ type
     function GetView: UIView;
     function GetModel: TCustomNativeShapeModel; overload;
     procedure MMFillChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_FILL_CHANGED;
-    procedure MMSetOpacity(var AMessage: TDispatchMessageWithValue<Single>); message MM_NATIVESHAPE_SET_OPACITY;
+    procedure MMOpacityChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_OPACITY_CHANGED;
     procedure MMStrokeChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_STROKE_CHANGED;
   protected
     procedure FillChanged; virtual;
@@ -163,10 +163,10 @@ begin
   FillChanged;
 end;
 
-procedure TiOSNativeShape.MMSetOpacity(var AMessage: TDispatchMessageWithValue<Single>);
+procedure TiOSNativeShape.MMOpacityChanged(var AMessage: TDispatchMessage);
 begin
-  FFillLayer.setOpacity(AMessage.Value);
-  FShapeLayer.setOpacity(AMessage.Value);
+  FFillLayer.setOpacity(Model.Opacity);
+  FShapeLayer.setOpacity(Model.Opacity);
 end;
 
 procedure TiOSNativeShape.MMStrokeChanged(var AMessage: TDispatchMessage);
@@ -285,20 +285,13 @@ begin
 end;
 
 procedure TiOSNativeRectangle.UpdatePath;
-var
-  LXR, LYR: Single;
 begin
-  LXR := Model.XRadius;
-  LYR := Model.YRadius;
   ShapePath.removeAllPoints;
   FillPath := TUIBezierPath.Wrap(TUIBezierPath.OCClass.bezierPathWithRect(CGRectMake(0, 0, Size.cx, Size.cy)));
-  // FillPath := TUIBezierPath.Wrap(TUIBezierPath.OCClass.bezierPathWithRoundedRect(CGRectMake(0, 0, Size.cx, Size.cy), LCorners, LRadii));
   if TSide.Top in Model.Sides then
   begin
     ShapePath.moveToPoint(CGPointMake(0, 0));
     ShapePath.addLineToPoint(CGPointMake(Size.cx, 0));
-    // Top Right corner
-    // ShapePath.addArcWithCenter(CGPointMake(Size.cx - LXR, LYR), - cPI / 2, 0, True);
   end;
   if TSide.Left in Model.Sides then
   begin
