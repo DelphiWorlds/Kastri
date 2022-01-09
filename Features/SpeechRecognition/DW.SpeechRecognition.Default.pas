@@ -22,6 +22,7 @@ type
   TPlatformSpeechRecognition = class(TCustomPlatformSpeechRecognition)
   protected
     function IsRecording: Boolean; override;
+    procedure RequestPermission; override;
     procedure StartRecording; override;
     procedure StopRecording; override;
   public
@@ -40,6 +41,11 @@ end;
 class function TPlatformSpeechRecognition.IsSupported: Boolean;
 begin
   Result := False;
+end;
+
+procedure TPlatformSpeechRecognition.RequestPermission;
+begin
+  //
 end;
 
 procedure TPlatformSpeechRecognition.StartRecording;
