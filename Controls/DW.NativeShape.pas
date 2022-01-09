@@ -165,7 +165,11 @@ type
     property YRadius: Single read GetYRadius write SetYRadius;
   end;
 
+  {$IF CompilerVersion < 35}
   [ComponentPlatformsAttribute(pfidiOS or pidAndroid32Arm or pidAndroid64Arm or pidWin32 or pidWin64)]
+  {$ELSE}
+  [ComponentPlatformsAttribute(pfidiOS or pidAndroidArm32 or pidAndroidArm64 or pidWin32 or pidWin64)]
+  {$ENDIF}
   TNativeRectangle = class(TCustomNativeRectangle)
   published
     property Align;
