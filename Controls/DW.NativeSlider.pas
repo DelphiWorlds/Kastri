@@ -93,7 +93,11 @@ type
     property OnValueChange: TNotifyEvent read GetOnValueChange write SetOnValueChange;
   end;
 
+  {$IF CompilerVersion < 35}
   [ComponentPlatformsAttribute(pfidiOS or pidAndroid32Arm or pidAndroid64Arm)]
+  {$ELSE}
+  [ComponentPlatformsAttribute(pfidiOS or pidAndroidArm32 or pidAndroidArm64)]
+  {$ENDIF}
   TNativeSlider = class(TCustomNativeSlider)
   published
     property Align;
