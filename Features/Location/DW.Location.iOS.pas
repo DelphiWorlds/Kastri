@@ -19,7 +19,7 @@ uses
   // RTL
   System.Sensors, System.Sensors.Components, System.Messaging,
   // DW
-  DW.Location, DW.Sensors;
+  DW.Location, DW.Sensors, DW.Location.Types;
 
 type
   TPlatformLocation = class(TCustomPlatformLocation)
