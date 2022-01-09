@@ -21,6 +21,7 @@ uses
 
 type
   JProcess = interface;
+  JProcessBuilder = interface;
   JRuntime = interface;
 
   JProcessClass = interface(JObjectClass)
@@ -39,6 +40,25 @@ type
     function waitFor: Integer; cdecl;
   end;
   TJProcess = class(TJavaGenericImport<JProcessClass, JProcess>) end;
+
+  JProcessBuilderClass = interface(JObjectClass)
+    ['{88477143-F53C-4766-84AB-76685EDD3C13}']
+    {class} function init(command: JList): JProcessBuilder; cdecl;
+  end;
+
+  [JavaSignature('java/lang/ProcessBuilder')]
+  JProcessBuilder = interface(JObject)
+    ['{0C076D6C-E2E5-49DD-859E-D50E7C04A9C6}']
+    function command: JList; cdecl; overload;
+    function command(command: JList): JProcessBuilder; cdecl; overload;
+    function directory: JFile; cdecl; overload;
+    function directory(directory: JFile): JProcessBuilder; cdecl; overload;
+    function environment: JMap; cdecl;
+    function redirectErrorStream: Boolean; cdecl; overload;
+    function redirectErrorStream(redirectErrorStream: Boolean): JProcessBuilder; cdecl; overload;
+    function start: JProcess; cdecl;
+  end;
+  TJProcessBuilder = class(TJavaGenericImport<JProcessBuilderClass, JProcessBuilder>) end;
 
   JRuntimeClass = interface(JObjectClass)
     ['{5F789EE2-7243-47D9-B950-F8B638DD3076}']
