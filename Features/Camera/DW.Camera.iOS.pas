@@ -44,7 +44,7 @@ type
     FDetectionRequest: VNDetectFaceLandmarksRequest;
     FFaces: TFaces;
     FImage: CIImage;
-    FRequestHandler: VNImageRequestHandler;
+    // FRequestHandler: VNImageRequestHandler;
     FOnDetectComplete: TNotifyEvent;
     procedure DetectionRequestCompletionHandler(request: VNRequest; error: NSError);
     procedure DoDetectComplete;
@@ -293,7 +293,6 @@ end;
 function TPlatformCamera.GetCorrectedImage(const AImage: CIImage): CIImage;
 var
   LRotation: Double;
-  LOrientation: CGImagePropertyOrientation;
 begin
   Result := AImage;
   // NOTE: The following will work ONLY on iOS 11+. If you need support for lower, please find an alternate algorithm
@@ -316,8 +315,6 @@ end;
 
 procedure TPlatformCamera.CaptureStillImageCompletionHandler(buffer: CMSampleBufferRef; error: NSError);
 var
-  LMetadata: CFDictionaryRef;
-  LMetadataMutable: CFMutableDictionaryRef;
   LImageBuffer: CVPixelBufferRef;
   LCIImage: CIImage;
   LStream: TMemoryStream;

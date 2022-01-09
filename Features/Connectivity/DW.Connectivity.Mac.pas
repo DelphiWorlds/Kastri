@@ -115,8 +115,10 @@ begin
     LSet := TNSCountedSet.Create;
     LAddrInfo := LAddrList;
     repeat
+      {$WARN SYMBOL_PLATFORM OFF}
       if (LAddrInfo.ifa_flags and IFF_UP) = IFF_UP then
         LSet.addObject(TNSString.OCClass.stringWithUTF8String(LAddrInfo.ifa_name));
+      {$WARN SYMBOL_PLATFORM ON}
       LAddrInfo := LAddrInfo^.ifa_next;
     until LAddrInfo = nil;
     Result := LSet.countForObject(StringToID(cWifiInterfaceName)) > 1;

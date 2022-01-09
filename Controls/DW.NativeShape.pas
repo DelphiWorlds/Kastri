@@ -89,7 +89,11 @@ type
     property Model: TCustomNativeEllipseModel read GetModel;
   end;
 
+  {$IF CompilerVersion < 35}
   [ComponentPlatformsAttribute(pfidiOS or pidAndroid32Arm or pidAndroid64Arm or pidWin32 or pidWin64)]
+  {$ELSE}
+  [ComponentPlatformsAttribute(pfidiOS or pidAndroidArm32 or pidAndroidArm64 or pidWin32 or pidWin64)]
+  {$ENDIF}
   TNativeEllipse = class(TCustomNativeEllipse)
   published
     property Align;

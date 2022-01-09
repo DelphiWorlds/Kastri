@@ -29,7 +29,7 @@ uses
 type
   TWinNativeImage = class(TWinStyledPresentation)
   private
-    [Weak] FModel: TCustomNativeImageModel;
+    // [Weak] FModel: TCustomNativeImageModel;
     procedure MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_LOADFROMFILE;
     procedure MMLoadFromStream(var AMessage: TDispatchMessageWithValue<TStream>); message MM_NATIVEIMAGE_LOADFROMSTREAM;
   protected

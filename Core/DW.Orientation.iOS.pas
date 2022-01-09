@@ -91,4 +91,7 @@ end;
 initialization
   OrientationListener := TOrientationNotificationListener.Create;
 
+finalization
+  OrientationListener.Free;
+
 end.
