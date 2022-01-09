@@ -10,7 +10,7 @@ uses
   Androidapi.JNI.GraphicsContentViewText,
   DW.MultiReceiver.Android,
   {$ENDIF}
-  DW.Location;
+  DW.Location, DW.Location.Types;
 
 type
   TMessageReceivedEvent = procedure(Sender: TObject; const Msg: string) of object;
