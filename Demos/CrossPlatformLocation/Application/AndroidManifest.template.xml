@@ -25,7 +25,7 @@
 <%provider%>
 <%application-meta-data%>
         <!-- ***** Adding metadata to allow service to start at boot ***** -->
-        <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_SERVICE_ON_BOOT" android:value="CrossPlatformLocationServiceD11" />
+        <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_SERVICE_ON_BOOT" android:value="CrossPlatformLocationService" />
         <!-- ***** Google Play services version is required for Fused Location API ***** -->
         <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
 <%uses-libraries%>
