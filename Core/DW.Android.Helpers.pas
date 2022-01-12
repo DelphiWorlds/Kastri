@@ -22,24 +22,9 @@ uses
   Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App, Androidapi.JNI.Media,
   Androidapi.JNIBridge,
   // DW
-  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes;
+  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes, DW.Androidapi.JNI.DWUtility;
 
 type
-  JDWUtility = interface;
-
-  JDWUtilityClass = interface(JObjectClass)
-    ['{CD282406-0D42-4EEE-B42E-24E79D058B30}']
-    {class} function isPackageInstalled(context: JContext; packageName: JString): Boolean; cdecl;
-    {class} procedure crashTest; cdecl;
-    {class} function createObjectMap: JMap; cdecl;
-  end;
-
-  [JavaSignature('com/delphiworlds/kastri/DWUtility')]
-  JDWUtility = interface(JObject)
-    ['{5C9753FA-7746-4DCE-A709-E68F1319CB97}']
-  end;
-  TJDWUtility = class(TJavaGenericImport<JDWUtilityClass, JDWUtility>) end;
-
   TUncaughtExceptionHandler = class(TJavaLocal, JThread_UncaughtExceptionHandler)
   public
     procedure uncaughtException(t: JThread; e: JThrowable); cdecl;
