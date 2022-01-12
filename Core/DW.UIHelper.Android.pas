@@ -50,7 +50,9 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App, Androidapi.JNI.Provider,
   // FMX
-  FMX.Platform.UI.Android;
+  FMX.Platform.UI.Android, FMX.Platform.Android,
+  // DW
+  DW.Androidapi.JNI.DWUtility;
 
 { TPlatformUIHelper }
 
@@ -62,7 +64,8 @@ end;
 
 class function TPlatformUIHelper.GetBrightness: Single;
 begin
-  Result := TJSettings_System.JavaClass.getInt(TAndroidHelper.ContentResolver, TJSettings_System.JavaClass.SCREEN_BRIGHTNESS) / 255;
+  // Result := TJSettings_System.JavaClass.getInt(TAndroidHelper.ContentResolver, TJSettings_System.JavaClass.SCREEN_BRIGHTNESS) / 255;
+  Result := TJDWUtility.JavaClass.getScreenBrightness(TAndroidHelper.Activity);
 end;
 
 class function TPlatformUIHelper.GetOffsetRect(const AHandle: TWindowHandle): TRectF;
@@ -104,14 +107,15 @@ end;
 
 // https://stackoverflow.com/a/18312812/3164070
 class procedure TPlatformUIHelper.SetBrightness(const AValue: Single);
-var
-  LParams: JWindowManager_LayoutParams;
+//var
+//  LParams: JWindowManager_LayoutParams;
 begin
   if (AValue >= 0) and (AValue <= 1) then
   begin
-    LParams := TAndroidHelper.Activity.getWindow.getAttributes;
-    LParams.screenBrightness := AValue;
-    TAndroidHelper.Activity.getWindow.setAttributes(LParams);
+    TJDWUtility.JavaClass.setScreenBrightness(TAndroidHelper.Activity, AValue);
+//    LParams := TAndroidHelper.Activity.getWindow.getAttributes;
+//    LParams.screenBrightness := AValue;
+//    TAndroidHelper.Activity.getWindow.setAttributes(LParams);
   end;
 end;
 
