@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Brug adgangskode"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Ukendt fejl"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Sæt finger på fingeraftrykslæser"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Hardwaren til fingeraftryk er ikke tilgængelig."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Denne enhed har ingen fingeraftrykslæser"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Der var for mange forsøg Prøv igen senere."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Der er ikke registreret nogen fingeraftryk."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Fingeraftrykshandlingen blev annulleret af brugeren."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Ikke genkendt"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Der er ikke angivet pinkode, mønster eller adgangskode."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Denne enhed understøtter ikke pinkode, mønster eller adgangskode."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Godkendelsen er annulleret af brugeren."</string>
+</resources>

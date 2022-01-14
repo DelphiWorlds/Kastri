@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"パスワードを使用"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"不明なエラーです"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"指紋認証センサーをタップ"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"指紋認証ハードウェアは使用できません。"</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"このデバイスには指紋認証センサーがありません"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"入力回数が上限を超えました。しばらくしてからもう一度お試しください。"</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"指紋が登録されていません。"</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"指紋認証操作がユーザーによりキャンセルされました。"</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"認識されませんでした"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"PIN、パターン、パスワードが設定されていません。"</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"このデバイスは PIN、パターン、パスワードをサポートしていません。"</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"認証はユーザーによりキャンセルされました。"</string>
+</resources>

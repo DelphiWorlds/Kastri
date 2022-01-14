@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Użyj hasła"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Nieznany błąd"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Dotknij czytnika linii papilarnych"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Czytnik linii papilarnych nie jest dostępny."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"To urządzenie nie jest wyposażone w czytnik linii papilarnych"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Zbyt wiele prób. Spróbuj ponownie później."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Nie zarejestrowano odcisków palców."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Odczyt odcisku palca został anulowany przez użytkownika."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Nie rozpoznano"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Nie ustawiono kodu PIN, wzoru ani hasła."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"To urządzenie nie obsługuje kodu PIN, wzoru ani hasła."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Użytkownik anulował uwierzytelnianie."</string>
+</resources>

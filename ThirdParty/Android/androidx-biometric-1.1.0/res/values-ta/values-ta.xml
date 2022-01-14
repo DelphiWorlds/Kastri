@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"கடவுச்சொல்லைப் பயன்படுத்து"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"அறியப்படாத பிழை"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"கைரேகை சென்சாரைத் தொடுக"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"கைரேகை வன்பொருள் இல்லை."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"இந்தச் சாதனத்தில் கைரேகை சென்சார் இல்லை"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"பலமுறை முயன்றுவிட்டீர்கள். பிறகு முயலவும்."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"கைரேகைப் பதிவுகள் எதுவுமில்லை."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"கைரேகைச் சரிபார்ப்பு பயனரால் ரத்துசெய்யப்பட்டது."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"பொருந்தவில்லை"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"பின்னோ பேட்டர்னோ கடவுச்சொல்லோ அமைக்கப்படவில்லை."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"பின், பேட்டர்ன், கடவுச்சொல் ஆகியவற்றை இந்தச் சாதனம் ஆதரிக்கவில்லை."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"பயனரால் அங்கீகரிப்பு ரத்துசெய்யப்பட்டது."</string>
+</resources>

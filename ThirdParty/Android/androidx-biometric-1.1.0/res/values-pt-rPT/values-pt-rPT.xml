@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Utilizar palavra-passe"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Erro desconhecido."</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Toque no sensor de impressões digitais"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Hardware de impressão digital não disponível."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Este dispositivo não tem sensor de impressões digitais."</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Demasiadas tentativas. Tente novamente mais tarde."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Nenhuma impressão digital registada."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Operação de impressão digital cancelada pelo utilizador."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Não reconhecida."</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Nenhum PIN, padrão ou palavra-passe definidos."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Este dispositivo não suporta o PIN, o padrão ou a palavra-passe."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Autenticação cancelada pelo utilizador."</string>
+</resources>

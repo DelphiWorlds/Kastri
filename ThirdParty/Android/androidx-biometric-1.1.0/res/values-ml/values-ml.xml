@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"പാസ്‌വേഡ് ഉപയോഗിക്കുക"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"അജ്ഞാത പിശക്"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"ഫിംഗർപ്രിന്റ് സെൻസർ സ്‌പർശിക്കുക"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"ഫിംഗർപ്രിന്റ് ഹാർഡ്‌വെയർ ലഭ്യമല്ല."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"ഈ ഉപകരണത്തിൽ ഫിംഗർപ്രിന്റ് സെൻസർ ഇല്ല"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"നിരവധി ശ്രമങ്ങൾ. പിന്നീട് വീണ്ടും ശ്രമിക്കുക."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"ഫിംഗർപ്രിന്റുകളൊന്നും എൻറോൾ ചെയ്‌തിട്ടില്ല."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"ഫിംഗർപ്രിന്റിന്റെ പ്രവർത്തനം ഉപയോക്താവ് റദ്ദാക്കി."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"തിരിച്ചറിഞ്ഞില്ല"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"പിൻ, പാറ്റേൺ, അല്ലെങ്കിൽ പാസ്‍വേഡ് ഇവയൊന്നും സജ്ജീകരിച്ചിട്ടില്ല."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"പിൻ, പാറ്റേൺ, പാസ്‌വേഡ് എന്നിവ ഈ ഉപകരണം പിന്തുണയ്ക്കുന്നില്ല."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"പരിശോധിച്ചുറപ്പിക്കൽ ഉപയോക്താവ് റദ്ദാക്കി."</string>
+</resources>

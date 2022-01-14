@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Tumia nenosiri"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Hitilafu isiyojulikana"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Gusa kitambua alama ya kidole"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Maunzi ya alama ya kidole hayapatikani."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Kifaa hiki hakina kitambua alama ya kidole"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Umejaribu mara nyingi mno. Tafadhali jaribu tena baadaye."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Hakuna alama za vidole zilizojumuishwa."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Mtumiaji ameghairi uthibitishaji wa alama ya kidole."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Haitambuliwi"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Hujaweka PIN, mchoro au nenosiri."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Kifaa hiki hakitumii PIN, mchoro au nenosiri."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Uthibitishaji umeghairiwa na mtumiaji."</string>
+</resources>

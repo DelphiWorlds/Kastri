@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Utiliser un mot de passe"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Erreur inconnue"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Appuyez sur lecteur d\'empreinte"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Matériel de lecture d\'empreinte digitale indisponible."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Aucun lecteur d\'empreinte digitale n\'est installé sur cet appareil"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Tentatives trop nombreuses. Veuillez réessayer plus tard."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Aucune empreinte digitale enregistrée."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Opération d\'authentification par empreinte digitale annulée par l\'utilisateur."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Non reconnue"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Aucun code, schéma ni mot de passe n\'est défini."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Cet appareil n\'est pas compatible avec les codes, schémas ni mots de passe."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Authentification annulée par l\'utilisateur."</string>
+</resources>

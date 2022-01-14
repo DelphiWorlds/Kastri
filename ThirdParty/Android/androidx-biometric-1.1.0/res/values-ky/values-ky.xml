@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Сырсөз колдонуу"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Белгисиз ката"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Манжа изинин сенсорун басыңыз"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Манжа изинин аппараттык камсыздоосу жеткиликтүү эмес."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Бул түзмөктө манжа изинин сенсору жок"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Өтө көп жолу аракет кылдыңыз. Кийинчерээк кайра кайталап көрүңүз."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Бир да манжа изи катталган эмес."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Манжа изи менен аныктыгын текшерүүнү колдонуучу жокко чыгарды."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Таанылган жок"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"PIN код, графикалык ачкыч же сырсөз коюлган жок."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Бул түзмөктө PIN кодду, графикалык ачкычты же сырсөздү колдонууга болбойт."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Аутентификацияны колдонуучу жокко чыгарды."</string>
+</resources>

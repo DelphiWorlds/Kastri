@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"পাছৱৰ্ড ব্যৱহাৰ কৰক"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"অজ্ঞাত আসোঁৱাহ"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"ফিংগাৰপ্ৰিণ্ট ছেন্সৰটো স্পৰ্শ কৰক"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"ফিংগাৰপ্ৰিণ্ট হাৰ্ডৱেৰ নাই।"</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"এই ডিভাইচটোত ফিংগাৰপ্ৰিণ্ট ছেন্সৰ নাই"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"অতি বেছি চেষ্টা অনুগ্ৰহ কৰি পিছত আকৌ চেষ্টা কৰক।"</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"কোনো ফিংগাৰপ্ৰিণ্ট যোগ কৰা নহ\'ল।"</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"ব্যৱহাৰকাৰীয়ে ফিংগাৰপ্ৰিণ্টৰ দ্বাৰা বিশ্বাসযোগ্যতা প্ৰমাণীকৰণ কাৰ্য বাতিল কৰিছে।"</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"চিনাক্ত কৰিব পৰা নাই"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"কোনো পিন, আৰ্হি অথবা পাছৱৰ্ড ছেট কৰা হোৱা নাই।"</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"এই ডিভাইচটোত পিন, আৰ্হি অথবা পাছৱৰ্ড ব্যৱহাৰ কৰিব নোৱাৰি।"</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"বিশ্বাসযোগ্যতা প্ৰমাণীকৰণ ব্যৱহাৰকাৰীয়ে বাতিল কৰিছে।"</string>
+</resources>

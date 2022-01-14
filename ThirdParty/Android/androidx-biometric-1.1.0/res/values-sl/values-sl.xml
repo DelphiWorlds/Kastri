@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Uporaba gesla"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Neznana napaka"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Dotaknite se tipala prst. odt."</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Strojna oprema za prstne odtise ni na voljo."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Ta naprava nima tipala prstnih odtisov"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Preveč poskusov. Poskusite znova pozneje."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Ni prijavljenih prstnih odtisov."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Dejanje s prstnim odtisom je preklical uporabnik."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Ni prepoznano"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Nastavljena ni nobena koda PIN, vzorec ali geslo."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Ta naprava ne podpira kode PIN, vzorca ali gesla."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Preverjanje pristnosti je preklical uporabnik."</string>
+</resources>

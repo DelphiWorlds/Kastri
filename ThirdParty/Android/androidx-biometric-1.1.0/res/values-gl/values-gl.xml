@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Usar contrasinal"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Produciuse un erro descoñecido"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Toca o sensor de impresión dixital"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"O hardware de impresión dixital non está dispoñible."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Este dispositivo non ten sensor de impresión dixital"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Tentáchelo demasiadas veces. Proba de novo máis tarde."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Non se rexistraron impresións dixitais."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"O usuario cancelou a operación da impresión dixital."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Non se recoñeceu"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Non se estableceu ningún PIN, padrón nin contrasinal."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Este dispositivo non permite usar un PIN, padrón ou contrasinal."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"O usuario cancelou a autenticación."</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Përdor fjalëkalimin"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Gabim i panjohur"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Prek sensorin e gjurmës së gishtit"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Hardueri i gjurmës së gishtit nuk mundësohet."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Kjo pajisje nuk ka një sensor të gjurmës së gishtit"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Janë bërë shumë përpjekje. Provo përsëri më vonë."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Nuk ka asnjë gjurmë gishti të regjistruar."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Veprimi i gjurmës së gishtit u anulua nga përdoruesi."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Nuk njihet"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Nuk është vendosur kod PIN, motiv ose fjalëkalim."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Kjo pajisje nuk e mbështet kodin PIN, motivin ose fjalëkalimin."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Vërtetimi u anulua nga përdoruesi."</string>
+</resources>

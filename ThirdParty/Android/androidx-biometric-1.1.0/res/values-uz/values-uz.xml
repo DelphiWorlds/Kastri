@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Paroldan foydalanish"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Notanish xato"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Barmoq izi skaneriga tegining"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Barmoq izi skaneri ish holatida emas."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Bu qurilmada barmoq izi skaneri yo‘q"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Juda koʻp urinish amalga oshirildi. Keyinroq qaytadan urining."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Hech qanday barmoq izi qayd qilinmagan."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Barmoq izi amali foydalanuvchi tomonidan bekor qilindi"</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Aniqlanmadi"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"PIN kod, grafik kalit yoki parol sozlanmagan."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Bu qurilmada PIN kod, grafik kalit va parol ishlamaydi."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Autentifikatsiya foydalanuvchi tomonidan bekor qilindi"</string>
+</resources>

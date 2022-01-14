@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="assume_strong_biometrics_models">
+        <item>Pixel 4</item>
+        <item>Pixel 4 XL</item>
+    </string-array>
+    <string-array name="crypto_fingerprint_fallback_prefixes">
+    </string-array>
+    <string-array name="crypto_fingerprint_fallback_vendors">
+        <item>samsung</item>
+    </string-array>
+    <string-array name="delay_showing_prompt_models">
+        <item>Pixel 4</item>
+        <item>Pixel 4 XL</item>
+    </string-array>
+    <string-array name="hide_fingerprint_instantly_prefixes">
+        <item>SM-A50</item> <!-- Samsung Galaxy A50 -->
+        <item>SM-G973</item> <!-- Samsung Galaxy S10 -->
+        <item>SM-G975</item> <!-- Samsung Galaxy S10+ -->
+        <item>SM-G977</item> <!-- Samsung Galaxy S10 5G -->
+        <item>SM-G770</item> <!-- Samsung Galaxy S10 Lite -->
+        <item>SM-N970</item> <!-- Samsung Galaxy Note10 -->
+        <item>SM-N971</item> <!-- Samsung Galaxy Note10 5G -->
+        <item>SM-N975</item> <!-- Samsung Galaxy Note10+ -->
+        <item>SM-N976</item> <!-- Samsung Galaxy Note10+ 5G -->
+        <item>SM-N770</item> <!-- Samsung Galaxy Note10 Lite -->
+        <item>SC-03L</item> <!-- Samsung Galaxy S10 (NTT Docomo) -->
+        <item>SC-04L</item> <!-- Samsung Galaxy S10+ (NTT Docomo) -->
+        <item>SC-05L</item> <!-- Samsung Galaxy S10+ (NTT Docomo, Olympic Games Edition) -->
+        <item>SC-01M</item> <!-- Samsung Galaxy Note10+ (NTT Docomo) -->
+        <item>SCV41</item> <!-- Samsung Galaxy S10 (au) -->
+        <item>SCV42</item> <!-- Samsung Galaxy S10+ (au) -->
+        <item>SCV45</item> <!-- Samsung Galaxy Note10+ (au) -->
+    </string-array>
+    <color name="biometric_error_color">#ff5722</color>
+    <dimen name="fingerprint_icon_size">64dp</dimen>
+    <string name="confirm_device_credential_password">Use password</string>
+    <string name="default_error_msg">Unknown error</string>
+    <string name="fingerprint_dialog_touch_sensor">Touch the fingerprint sensor</string>
+    <string name="fingerprint_error_hw_not_available">Fingerprint hardware not available.</string>
+    <string name="fingerprint_error_hw_not_present">This device does not have a fingerprint sensor</string>
+    <string name="fingerprint_error_lockout">Too many attempts. Please try again later.</string>
+    <string name="fingerprint_error_no_fingerprints">No fingerprints enrolled.</string>
+    <string name="fingerprint_error_user_canceled">Fingerprint operation canceled by user.</string>
+    <string name="fingerprint_not_recognized">Not recognized</string>
+    <string name="generic_error_no_device_credential">No PIN, pattern, or password set.</string>
+    <string name="generic_error_no_keyguard">This device does not support PIN, pattern, or password.</string>
+    <string name="generic_error_user_canceled">Authentication canceled by user.</string>
+</resources>

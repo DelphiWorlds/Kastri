@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Χρήση κωδικού πρόσβασης"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Άγνωστο σφάλμα"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Αγγίξτε τον αισθ. δακτ. αποτ."</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Ο εξοπλισμός δακτυλικού αποτυπώματος δεν είναι διαθέσιμος."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"Αυτή η συσκευή δεν διαθέτει αισθητήρα δακτυλικού αποτυπώματος"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Υπερβολικά πολλές προσπάθειες. Δοκιμάστε ξανά αργότερα."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Δεν έχουν καταχωριστεί δακτυλικά αποτυπώματα."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Η λειτουργία δακτυλικού αποτυπώματος ακυρώθηκε από τον χρήστη."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Δεν αναγνωρίστηκε"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Δεν έχει οριστεί PIN, μοτίβο ή κωδικός πρόσβασης."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Αυτή η συσκευή δεν υποστηρίζει PIN, μοτίβο ή κωδικό πρόσβασης."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Ο έλεγχος ταυτότητας ακυρώθηκε από τον χρήστη."</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"Ввести пароль"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"Невідома помилка"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"Торкніться сканера відбитків пальців"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"Сканер відбитків пальців недоступний."</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"На цьому пристрої немає сканера відбитків пальців"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"Забагато спроб. Зачекайте."</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"Відбитки пальців не зареєстровано."</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"Користувач скасував дію з відбитком пальця."</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"Не розпізнано"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"Не вказано PIN-код, ключ або пароль."</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"Пристрій не підтримує PIN-код, ключ або пароль."</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"Автентифікацію скасовано користувачем."</string>
+</resources>

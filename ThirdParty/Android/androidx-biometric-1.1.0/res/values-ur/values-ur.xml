@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string msgid="5912733858573823945" name="confirm_device_credential_password">"پاس ورڈ استعمال کریں"</string>
+    <string msgid="4776854077120974966" name="default_error_msg">"نامعلوم خرابی"</string>
+    <string msgid="1072308044213194243" name="fingerprint_dialog_touch_sensor">"فنگر پرنٹ سینسر کو ٹچ کریں"</string>
+    <string msgid="8216738333501875566" name="fingerprint_error_hw_not_available">"فنگر پرنٹ ہارڈ ویئر دستیاب نہیں ہے۔"</string>
+    <string msgid="6306988885793029438" name="fingerprint_error_hw_not_present">"اس آلہ میں فنگر پرنٹ سینسر نہیں ہے"</string>
+    <string msgid="7291787166416782245" name="fingerprint_error_lockout">"کافی زیادہ کوششیں۔ براہ کرم بعد میں دوبارہ کوشش کریں۔"</string>
+    <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"کوئی فنگر پرنٹ مندرج نہیں ہے۔"</string>
+    <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"صارف نے فنگر پرنٹ کی کارروائی منسوخ کر دی۔"</string>
+    <string msgid="3873359464293253009" name="fingerprint_not_recognized">"شناخت نہیں ہو سکی"</string>
+    <string msgid="3791785319221634505" name="generic_error_no_device_credential">"کوئی پن، پیٹرن، یا پاس ورڈ سیٹ نہیں ہے۔"</string>
+    <string msgid="1807436368654974044" name="generic_error_no_keyguard">"‏یہ آلہ PIN، پیٹرن یا پاس ورڈ کو سپورٹ نہیں کرتا ہے۔"</string>
+    <string msgid="7309881387583143581" name="generic_error_user_canceled">"صارف نے تصدیق کو منسوخ کر دیا۔"</string>
+</resources>
