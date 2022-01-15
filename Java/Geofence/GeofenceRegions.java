@@ -13,116 +13,117 @@ package com.delphiworlds.kastri;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
-
 // gson.jar (2.8.6)
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
 public class GeofenceRegions {
 
-    public class Region {
-        private String mId;
-        private LatLng mCoords;
-        private double mRadius;
-        private int mTransitionTypes;
+  public class Region {
+    private String mId;
+    private LatLng mCoords;
+    private double mRadius;
+    private int mTransitionTypes;
 
-        public Region(String id, LatLng coords, double radius, int transitionTypes) {
-            mId = id;
-            mCoords = coords;
-            mRadius = radius;
-            mTransitionTypes = transitionTypes;
-        }
-
-        public String getId() {
-            return mId;
-        }
-
-        public LatLng getCoords() {
-            return mCoords;
-        }
-
-        public double getRadius() {
-            return mRadius;
-        }
-
-        public int getTransitionTypes() {
-            return mTransitionTypes;
-        }
+    public Region(String id, LatLng coords, double radius, int transitionTypes) {
+      mId = id;
+      mCoords = coords;
+      mRadius = radius;
+      mTransitionTypes = transitionTypes;
     }
 
-    private static GeofenceRegions instance = null;
-    private Context mContext;
-    private HashMap<String, Region> mItems = new HashMap<String, Region>();
-    private Type mType = new TypeToken<HashMap<String, Region>>(){}.getType();  
-
-    private void loadItems() {
-        SharedPreferences pref = mContext.getSharedPreferences("Geofence", Context.MODE_PRIVATE);
-        if (pref != null) {       
-            try {
-                Gson gson = new Gson();
-                String json = pref.getString("Regions", "");
-                if (json != null && !json.isEmpty())
-                    mItems = (HashMap<String, Region>) gson.fromJson(json, mType);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    public String getId() {
+        return mId;
     }
 
-    private void saveItems() {
-        if ((mItems == null) || mItems.isEmpty())
-            return;
-        SharedPreferences pref = mContext.getSharedPreferences("Geofence", Context.MODE_PRIVATE);
-        if (pref != null){
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString("Regions", toJson());
-            editor.commit();
-        } // else ????
+    public LatLng getCoords() {
+        return mCoords;
     }
 
-    public static GeofenceRegions getInstance(Context context) {
-        if (instance == null)
-            instance = new GeofenceRegions(context);
-        return instance;
+    public double getRadius() {
+        return mRadius;
     }
 
-    public GeofenceRegions(Context context) {
-        mContext = context;
+    public int getTransitionTypes() {
+        return mTransitionTypes;
     }
+  }
 
-    public HashMap<String, Region> getItems() {
-        return mItems;
+  private static final String TAG = "GeofenceRegions";
+  private static GeofenceRegions instance = null;
+  private Context mContext;
+  private HashMap<String, Region> mItems = new HashMap<String, Region>();
+  private Type mType = new TypeToken<HashMap<String, Region>>(){}.getType();  
+
+  private void loadItems() {
+    SharedPreferences pref = mContext.getSharedPreferences("Geofence", Context.MODE_PRIVATE);
+    if (pref != null) {       
+      try {
+        Gson gson = new Gson();
+        String json = pref.getString("Regions", "");
+        // if (json != null)
+        //   Log.d(TAG, "loadItems > json: " + json);
+        if (json != null && !json.isEmpty())
+          mItems = (HashMap<String, Region>) gson.fromJson(json, mType);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
+  }
 
-    public void add(String id, double latitude, double longitude, double radius, int transitionTypes) {
-        mItems.put(id, new Region(id, new LatLng(latitude, longitude), radius, transitionTypes));
-        saveItems();
-    }
+  private void saveItems() {
+    if ((mItems == null) || mItems.isEmpty())
+      return;
+    SharedPreferences pref = mContext.getSharedPreferences("Geofence", Context.MODE_PRIVATE);
+    if (pref != null){
+      SharedPreferences.Editor editor = pref.edit();
+      editor.putString("Regions", toJson());
+      editor.commit();
+    } // else ????
+  }
 
-    public void clear() {
-        mItems.clear();
-        saveItems();
-    }
+  public static GeofenceRegions getInstance(Context context) {
+    if (instance == null)
+      instance = new GeofenceRegions(context);
+    return instance;
+  }
 
-    public Region get(String id) {
-        return mItems.get(id);
-    }
+  public GeofenceRegions(Context context) {
+    mContext = context;
+  }
 
-    public void load() {
-        loadItems();
-    }
+  public HashMap<String, Region> getItems() {
+    return mItems;
+  }
 
-    public void remove(String id) {
-        mItems.remove(id);
-        saveItems();
-    }
+  public void add(String id, double latitude, double longitude, double radius, int transitionTypes) {
+    mItems.put(id, new Region(id, new LatLng(latitude, longitude), radius, transitionTypes));
+    saveItems();
+  }
 
-    public String toJson() {
-        return new Gson().toJson(mItems, mType);     
-    }
+  public void clear() {
+    mItems.clear();
+    saveItems();
+  }
 
+  public Region get(String id) {
+    return mItems.get(id);
+  }
+
+  public void load() {
+    loadItems();
+  }
+
+  public void remove(String id) {
+    mItems.remove(id);
+    saveItems();
+  }
+
+  public String toJson() {
+    return new Gson().toJson(mItems, mType);     
+  }
 }
