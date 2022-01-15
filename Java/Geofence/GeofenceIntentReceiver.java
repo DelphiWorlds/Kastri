@@ -120,13 +120,14 @@ public class GeofenceIntentReceiver extends BroadcastReceiver {
       if (mGeofenceManager == null)
         mGeofenceManager = new GeofenceManager(context, null);
       GeofenceRegions regions = mGeofenceManager.getRegions();
+      regions.load();
       // Get the geofences that were triggered. A single event can trigger multiple geofences.
-      List<Geofence> geofences = geofencingEvent.getTriggeringGeofences();
+      List<Geofence> geofenceßs = geofencingEvent.getTriggeringGeofences();
       ArrayList<String> idsList = new ArrayList<>();
       for (Geofence geofence : geofences) {
-          GeofenceRegions.Region region = regions.get(geofence.getRequestId());
-          if ((region != null) && ((region.getTransitionTypes() & geofenceTransition) > 0))
-            idsList.add(geofence.getRequestId()); // same as id in regions
+        GeofenceRegions.Region region = regions.get(geofence.getRequestId());
+        if ((region != null) && ((region.getTransitionTypes() & geofenceTransition) > 0))
+          idsList.add(geofence.getRequestId()); // same as id in regions
       }
       String ids = TextUtils.join(", ", idsList);
       Log.i(TAG, "Transition type: " + Integer.toString(geofenceTransition) + " for: " + ids);
