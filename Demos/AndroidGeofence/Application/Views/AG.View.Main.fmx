@@ -2,8 +2,8 @@ object MainView: TMainView
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 522
-  ClientWidth = 517
+  ClientHeight = 670
+  ClientWidth = 447
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -12,12 +12,12 @@ object MainView: TMainView
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
     Align = Client
-    Size.Width = 517.000000000000000000
-    Size.Height = 478.000000000000000000
+    Size.Width = 447.000000000000000000
+    Size.Height = 626.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
-    Viewport.Width = 513.000000000000000000
-    Viewport.Height = 474.000000000000000000
+    Viewport.Width = 443.000000000000000000
+    Viewport.Height = 622.000000000000000000
   end
   object Layout1: TLayout
     Align = Bottom
@@ -25,8 +25,8 @@ object MainView: TMainView
     Padding.Top = 4.000000000000000000
     Padding.Right = 4.000000000000000000
     Padding.Bottom = 4.000000000000000000
-    Position.Y = 478.000000000000000000
-    Size.Width = 517.000000000000000000
+    Position.Y = 626.000000000000000000
+    Size.Width = 447.000000000000000000
     Size.Height = 44.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
@@ -38,7 +38,7 @@ object MainView: TMainView
       Size.Width = 109.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 3
+      TabOrder = 4
       Text = 'To Json'
       Visible = False
       OnClick = ToJsonButtonClick
@@ -48,36 +48,49 @@ object MainView: TMainView
       Margins.Right = 8.000000000000000000
       Position.X = 4.000000000000000000
       Position.Y = 4.000000000000000000
-      Size.Width = 109.000000000000000000
+      Size.Width = 80.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 2
+      TabOrder = 3
       Text = 'Start'
       OnClick = StartButtonClick
     end
     object StopButton: TButton
       Align = Left
       Margins.Right = 8.000000000000000000
-      Position.X = 121.000000000000000000
+      Position.X = 92.000000000000000000
       Position.Y = 4.000000000000000000
-      Size.Width = 109.000000000000000000
+      Size.Width = 80.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 1
+      TabOrder = 2
       Text = 'Stop'
       OnClick = StopButtonClick
     end
     object ClearButton: TButton
       Align = Left
       Margins.Right = 8.000000000000000000
-      Position.X = 238.000000000000000000
+      Position.X = 180.000000000000000000
       Position.Y = 4.000000000000000000
-      Size.Width = 109.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Clear'
+      OnClick = ClearButtonClick
+    end
+    object RemoveAppleButton: TButton
+      Align = Left
+      Margins.Left = 4.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 272.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 126.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
-      Text = 'Clear'
-      OnClick = ClearButtonClick
+      Text = 'Remove Apple'
+      OnClick = RemoveAppleButtonClick
     end
   end
 end

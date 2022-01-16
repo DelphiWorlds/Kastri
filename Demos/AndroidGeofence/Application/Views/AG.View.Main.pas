@@ -16,13 +16,16 @@ type
     StartButton: TButton;
     StopButton: TButton;
     ClearButton: TButton;
+    RemoveAppleButton: TButton;
     procedure LoadButtonClick(Sender: TObject);
     procedure ToJsonButtonClick(Sender: TObject);
     procedure StartButtonClick(Sender: TObject);
     procedure StopButtonClick(Sender: TObject);
     procedure ClearButtonClick(Sender: TObject);
+    procedure RemoveAppleButtonClick(Sender: TObject);
   private
     FGeofence: TGeofenceManager;
+    FNeedsRestart: Boolean;
     procedure AddRegions;
     procedure LoadJson;
     procedure GeofenceActionCompleteHandler(Sender: TObject; const AAction: Integer; const AResult: Integer; const AErrorMessage: string);
@@ -46,9 +49,8 @@ uses
   System.Permissions,
   Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers, Androidapi.JNI.Net, Androidapi.JNI.Provider,
   FMX.Platform, FMX.DialogService.Async,
-  REST.Json,
   DW.OSLog,
-  DW.REST.Json.Helpers, DW.Consts.Android;
+  DW.Json, DW.Consts.Android;
 
 const
   cGeofenceRadius = 100; // metres
@@ -95,6 +97,17 @@ end;
 procedure TMainView.GeofenceActionCompleteHandler(Sender: TObject; const AAction, AResult: Integer; const AErrorMessage: string);
 begin
   Memo1.Lines.Add(Format('Action: %d, Result: %d, Message: %s', [AAction, AResult, AErrorMessage]));
+  if (AAction = 2) and FNeedsRestart then
+  begin
+    if AResult = 0 then
+    begin
+      Memo1.Lines.Add('Restarting..');
+      FGeofence.Start;
+    end
+    else
+      Memo1.Lines.Add('Stop failed, not restarting');
+    FNeedsRestart := False;
+  end;
   UpdateButtons;
 end;
 
@@ -143,7 +156,7 @@ end;
 
 procedure TMainView.LoadJson;
 begin
-  Memo1.Text := TJson.Tidy(FGeofence.Regions.ToJson);
+  Memo1.Text := TJsonHelper.Tidy(FGeofence.Regions.ToJson);
 end;
 
 procedure TMainView.StartButtonClick(Sender: TObject);
@@ -154,6 +167,14 @@ end;
 
 procedure TMainView.StopButtonClick(Sender: TObject);
 begin
+  FGeofence.Stop;
+end;
+
+procedure TMainView.RemoveAppleButtonClick(Sender: TObject);
+begin
+  FNeedsRestart := True;
+  Memo1.Lines.Add('Removing Apple');
+  FGeofence.Regions.RemoveRegion('Apple');
   FGeofence.Stop;
 end;
 
@@ -171,11 +192,11 @@ end;
 procedure TMainView.AddRegions;
 begin
   // Make sure the first parameter in each region is a unique value
-  FGeofence.Regions.AddRegion('Home', -34.887860, 138.585340, cGeofenceRadius); // Redact this before committing // Your address
   FGeofence.Regions.AddRegion('Embarcadero', 30.3976551, -97.7298056, cGeofenceRadius); // 1, 10801 N Mopac Expy #100, Austin, TX 78759, United States
   FGeofence.Regions.AddRegion('Google', 37.4220656, -122.0840897, cGeofenceRadius); // 1600 Amphitheatre Pkwy, Mountain View, CA 94043, United States
   FGeofence.Regions.AddRegion('Apple', 37.3318641, -122.0302537, cGeofenceRadius); // 1 Infinite Loop, Cupertino, CA 95014, USA
   FGeofence.Regions.AddRegion('Microsoft', 47.6422308, -122.1369332, cGeofenceRadius); // One Microsoft Way, Redmond, WA 98052, United States
+  FGeofence.Regions.AddRegion('Home', -34.887860, 138.585340, cGeofenceRadius); // Redact this before committing // Your address
 end;
 
 end.
