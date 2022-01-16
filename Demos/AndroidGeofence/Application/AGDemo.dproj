@@ -308,7 +308,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <JavaReference Include="..\Service\Android\Debug\AGDemoService.jar">
             <Disabled/>
         </JavaReference>
-        <JavaReference Include="..\..\..\Lib\dw-geofence-1.0.0..jar">
+        <JavaReference Include="..\..\..\Lib\dw-geofence-1.0.0.jar">
             <Disabled/>
         </JavaReference>
         <BuildConfiguration Include="Release">
