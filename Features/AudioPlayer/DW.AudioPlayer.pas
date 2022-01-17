@@ -29,22 +29,26 @@ type
   ///   Playing:    Audio has actually started to play (may be a slight delay after Play is called)
   ///   Stopped:    Audio has finished playing (to be implemented)
   /// </remarks>
-  TAudioState = (Ready, PlayStart, Playing, Stopped);
+  TAudioState = (Ready, PlayStart, Playing, Paused, Stopped);
 
   TAudioStateChangeEvent = procedure(Sender: TObject; const State: TAudioState) of object;
 
   TCustomPlatformAudioPlayer = class(TObject)
   private
     FAudioPlayer: TAudioPlayer;
+    FAudioState: TAudioState;
     FIsReady: Boolean;
   protected
     procedure DoAudioStateChange(const AState: TAudioState); virtual;
+    procedure DoPlay;
     function GetDelay: Integer; virtual;
     procedure LoadFromFile(const AFileName: string); virtual;
     procedure SetIsReady(const AValue: Boolean);
     procedure Pause; virtual;
     procedure Play; virtual;
+    procedure Stop; virtual;
     property AudioPlayer: TAudioPlayer read FAudioPlayer;
+    property AudioState: TAudioState read FAudioState;
     property IsReady: Boolean read FIsReady;
   public
     constructor Create(const AAudioPlayer: TAudioPlayer); virtual;
@@ -53,20 +57,21 @@ type
 
   TAudioPlayer = class(TObject)
   private
-    FAudioState: TAudioState;
     FFileName: string;
     FPlatformAudioPlayer: TCustomPlatformAudioPlayer;
     FOnAudioStateChange: TAudioStateChangeEvent;
     function GetDelay: Integer;
+    function GetAudioState: TAudioState;
   protected
-    procedure DoAudioStateChange(const AState: TAudioState);
+    procedure DoAudioStateChange;
   public
     constructor Create;
     destructor Destroy; override;
     procedure LoadFromFile(const AFileName: string);
     procedure Pause;
     procedure Play;
-    property AudioState: TAudioState read FAudioState;
+    procedure Stop;
+    property AudioState: TAudioState read GetAudioState;
     /// <summary>
     ///   Represents the delay in milliseconds between the call to Play, and when the audio actually starts playing
     /// </summary>
@@ -100,6 +105,7 @@ type
 constructor TCustomPlatformAudioPlayer.Create(const AAudioPlayer: TAudioPlayer);
 begin
   inherited Create;
+  FAudioState := TAudioState.Stopped;
   FAudioPlayer := AAudioPlayer;
 end;
 
@@ -111,7 +117,14 @@ end;
 
 procedure TCustomPlatformAudioPlayer.DoAudioStateChange(const AState: TAudioState);
 begin
-  FAudioPlayer.DoAudioStateChange(AState);
+  FAudioState := AState;
+  FAudioPlayer.DoAudioStateChange;
+end;
+
+procedure TCustomPlatformAudioPlayer.DoPlay;
+begin
+  DoAudioStateChange(TAudioState.PlayStart);
+  Play;
 end;
 
 function TCustomPlatformAudioPlayer.GetDelay: Integer;
@@ -143,12 +156,16 @@ begin
   end;
 end;
 
+procedure TCustomPlatformAudioPlayer.Stop;
+begin
+  //
+end;
+
 { TAudioPlayer }
 
 constructor TAudioPlayer.Create;
 begin
   inherited;
-  FAudioState := TAudioState.Stopped;
   FPlatformAudioPlayer := TPlatformAudioPlayer.Create(Self);
 end;
 
@@ -158,11 +175,15 @@ begin
   inherited;
 end;
 
-procedure TAudioPlayer.DoAudioStateChange(const AState: TAudioState);
+procedure TAudioPlayer.DoAudioStateChange;
 begin
-  FAudioState := AState;
   if Assigned(FOnAudioStateChange) then
-    FOnAudioStateChange(Self, AState);
+    FOnAudioStateChange(Self, AudioState);
+end;
+
+function TAudioPlayer.GetAudioState: TAudioState;
+begin
+  Result := FPlatformAudioPlayer.AudioState;
 end;
 
 function TAudioPlayer.GetDelay: Integer;
@@ -183,8 +204,12 @@ end;
 
 procedure TAudioPlayer.Play;
 begin
-  DoAudioStateChange(TAudioState.PlayStart);
-  FPlatformAudioPlayer.Play;
+  FPlatformAudioPlayer.DoPlay;
+end;
+
+procedure TAudioPlayer.Stop;
+begin
+  FPlatformAudioPlayer.Stop;
 end;
 
 end.
