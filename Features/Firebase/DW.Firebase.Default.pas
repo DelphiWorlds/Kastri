@@ -21,7 +21,7 @@ uses
 type
   TPlatformFirebaseMessaging = class(TCustomPlatformFirebaseMessaging)
   protected
-    procedure RequestAuthorization; override;
+    procedure RequestPermissions; override;
     procedure SubscribeToTopic(const ATopicName: string); override;
     procedure UnsubscribeFromTopic(const ATopicName: string); override;
   end;
@@ -30,7 +30,7 @@ implementation
 
 { TPlatformFirebaseMessaging }
 
-procedure TPlatformFirebaseMessaging.RequestAuthorization;
+procedure TPlatformFirebaseMessaging.RequestPermissions;
 begin
   //
 end;
