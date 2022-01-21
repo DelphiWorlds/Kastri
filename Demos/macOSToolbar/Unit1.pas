@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo,
+  FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, FMX.Memo.Types, FMX.StdCtrls,
   DW.Toolbar.Mac;
 
 type
@@ -14,6 +14,7 @@ type
     OpenDialog: TOpenDialog;
   private
     FToolbar: TMacOSToolbar;
+    procedure CreateToolbar;
     procedure ItemFileOpenClickHandler(Sender: TObject);
     procedure ItemEditCopyClickHandler(Sender: TObject);
     procedure ItemEditCopyValidateHandler(Sender: TObject; var AEnable: Boolean);
@@ -31,7 +32,7 @@ implementation
 {$R *.fmx}
 
 uses
-  Macapi.AppKit, Macapi.ObjectiveC, Macapi.CocoaTypes, Macapi.Helpers,
+  Macapi.AppKit, Macapi.ObjectiveC, Macapi.CocoaTypes, Macapi.Helpers, Macapi.Foundation,
   FMX.Platform.Mac;
 
 const
@@ -50,10 +51,21 @@ type
 { TForm1 }
 
 constructor TForm1.Create(AOwner: TComponent);
+begin
+  inherited;
+  CreateToolbar;
+end;
+
+destructor TForm1.Destroy;
+begin
+  FToolbar.Free;
+  inherited;
+end;
+
+procedure TForm1.CreateToolbar;
 var
   LItem: TMacOSToolbarItem;
 begin
-  inherited;
   FToolbar := TMacOSToolbar.Create(ClassName);
   LItem := FToolbar.AddItem('FileOpen');
   LItem.Caption := 'Open';
@@ -66,9 +78,9 @@ begin
   LItem.Hint := 'Copy selected text';
   LItem.OnClick := ItemEditCopyClickHandler;
   LItem.OnValidate := ItemEditCopyValidateHandler;
-  //add a flexible spacer to right align the remaining button
+  // Add a flexible spacer to right align the remaining button
   FToolbar.AddFlexibleSpaceItem;
-  //add a button onto the end of the toolbar
+  // Add a button onto the end of the toolbar
   LItem := FToolbar.AddItem('Info');
   LItem.Caption := 'Info';
   LItem.ImageName := 'Info.png';
@@ -76,12 +88,6 @@ begin
   LItem.OnClick := ItemInfoClickHandler;
   FToolbar.Form := Self;
   TNSWindow.Wrap(NSObjectToID(WindowHandleToPlatform(Handle).Wnd)).setTitleVisibility(NSWindowTitleHidden);
-end;
-
-destructor TForm1.Destroy;
-begin
-  FToolbar.Free;
-  inherited;
 end;
 
 procedure TForm1.ItemEditCopyClickHandler(Sender: TObject);
