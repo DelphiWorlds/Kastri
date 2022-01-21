@@ -6,10 +6,16 @@ interface
 
 uses
   System.Classes, System.Generics.Collections,
-  Macapi.AppKit, Macapi.Foundation,
+  Macapi.AppKit, Macapi.Foundation, Macapi.ObjectiveC, Macapi.CocoaTypes,
   FMX.Forms;
 
 type
+  NSToolbarDisplayMode = NSInteger;
+  NSToolbarSizeMode = NSInteger;
+  NSToolbarIdentifier = NSString;
+  NSToolbarItemIdentifier = NSString;
+  NSWindowToolbarStyle = NSInteger;
+
   TItemValidateEvent = procedure(Sender: TObject; var Enable: Boolean) of object;
 
   TMacOSToolbarItem = class(TObject)
@@ -50,9 +56,92 @@ type
   TMacOSToolbarOption = (AllowUserCustomization, AutosavesConfiguration);
   TMacOSToolbarOptions = set of TMacOSToolbarOption;
 
+  TMacOSToolbar = class;
+
+  NSToolbarClass = interface(NSObjectClass)
+    ['{3F24E2B5-712C-4F81-8F5C-A5989E8871DC}']
+  end;
+
+  NSToolbar = interface(NSObject)
+    ['{C6C070F9-170F-45C9-9804-78A4D0F9340C}']
+    function allowsExtensionItems: Boolean; cdecl;
+    function allowsUserCustomization: Boolean; cdecl;
+    function autosavesConfiguration: Boolean; cdecl;
+    function centeredItemIdentifier: NSToolbarItemIdentifier; cdecl;
+    function configurationDictionary: NSDictionary; cdecl;
+    function customizationPaletteIsRunning: Boolean; cdecl;
+    function delegate: Pointer; cdecl;
+    function displayMode: NSToolbarDisplayMode; cdecl;
+    function fullScreenAccessoryView: NSView; cdecl;
+    function fullScreenAccessoryViewMaxHeight: CGFloat; cdecl;
+    function fullScreenAccessoryViewMinHeight: CGFloat; cdecl;
+    function identifier: NSToolbarIdentifier; cdecl;
+    function initWithIdentifier(identifier: NSToolbarIdentifier): Pointer; cdecl;
+    procedure insertItemWithItemIdentifier(itemIdentifier: NSToolbarItemIdentifier; atIndex: NSInteger); cdecl;
+    function isVisible: Boolean; cdecl;
+    function items: NSArray; cdecl;
+    procedure removeItemAtIndex(index: NSInteger); cdecl;
+    procedure runCustomizationPalette(sender: Pointer); cdecl;
+    function selectedItemIdentifier: NSToolbarItemIdentifier; cdecl;
+    procedure setAllowsExtensionItems(allowsExtensionItems: Boolean); cdecl;
+    procedure setAllowsUserCustomization(allowsUserCustomization: Boolean); cdecl;
+    procedure setAutosavesConfiguration(autosavesConfiguration: Boolean); cdecl;
+    procedure setCenteredItemIdentifier(centeredItemIdentifier: NSToolbarItemIdentifier); cdecl;
+    procedure setConfigurationFromDictionary(configDict: NSDictionary); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setDisplayMode(displayMode: NSToolbarDisplayMode); cdecl;
+    procedure setFullScreenAccessoryView(fullScreenAccessoryView: NSView); cdecl;
+    procedure setFullScreenAccessoryViewMaxHeight(fullScreenAccessoryViewMaxHeight: CGFloat); cdecl;
+    procedure setFullScreenAccessoryViewMinHeight(fullScreenAccessoryViewMinHeight: CGFloat); cdecl;
+    procedure setSelectedItemIdentifier(selectedItemIdentifier: NSToolbarItemIdentifier); cdecl;
+    procedure setShowsBaselineSeparator(showsBaselineSeparator: Boolean); cdecl;
+    procedure setSizeMode(sizeMode: NSToolbarSizeMode); cdecl;
+    procedure setVisible(visible: Boolean); cdecl;
+    function showsBaselineSeparator: Boolean; cdecl;
+    function sizeMode: NSToolbarSizeMode; cdecl;
+    procedure validateVisibleItems; cdecl;
+    function visibleItems: NSArray; cdecl;
+  end;
+  TNSToolbar = class(TOCGenericImport<NSToolbarClass, NSToolbar>) end;
+
+  // Declaration here just for reference
+  NSToolbarDelegate = interface(IObjectiveC)
+    ['{02D35995-BDF8-4BEA-889A-40C0D079F6BB}']
+    function toolbar(toolbar: NSToolbar; itemForItemIdentifier: NSToolbarItemIdentifier; willBeInsertedIntoToolbar: Boolean): NSToolbarItem; cdecl;
+    function toolbarAllowedItemIdentifiers(toolbar: NSToolbar): NSArray; cdecl;
+    function toolbarDefaultItemIdentifiers(toolbar: NSToolbar): NSArray; cdecl;
+    procedure toolbarDidRemoveItem(notification: NSNotification); cdecl;
+    function toolbarSelectableItemIdentifiers(toolbar: NSToolbar): NSArray; cdecl;
+    procedure toolbarWillAddItem(notification: NSNotification); cdecl;
+  end;
+
+  IToolbarDelegate = interface(IObjectiveC)
+    ['{648C11BD-D306-4168-9F7C-2C078C5B293F}']
+    { IToolbarDelegate }
+    procedure itemClicked(item: NSToolbarItem); cdecl;
+    { NSToolbarDelegate }
+    function toolbar(toolbar: NSToolbar; itemForItemIdentifier: NSToolbarItemIdentifier; willBeInsertedIntoToolbar: Boolean): NSToolbarItem; cdecl;
+    function toolbarAllowedItemIdentifiers(toolbar: NSToolbar): NSArray; cdecl;
+    function toolbarDefaultItemIdentifiers(toolbar: NSToolbar): NSArray; cdecl;
+  end;
+
+  TToolbarDelegate = class(TOCLocal, IToolbarDelegate)
+  private
+    FToolbar: TMacOSToolbar;
+  public
+    { IToolbarDelegate }
+    procedure itemClicked(item: NSToolbarItem); cdecl;
+    { NSToolbarDelegate }
+    function toolbar(toolbar: NSToolbar; itemForItemIdentifier: NSToolbarItemIdentifier; willBeInsertedIntoToolbar: Boolean): NSToolbarItem; cdecl;
+    function toolbarAllowedItemIdentifiers(toolbar: NSToolbar): NSArray; cdecl;
+    function toolbarDefaultItemIdentifiers(toolbar: NSToolbar): NSArray; cdecl;
+  public
+    constructor Create(const AToolbar: TMacOSToolbar); reintroduce;
+  end;
+
   TMacOSToolbar = class(TObject)
   private
-    FDelegate: NSToolbarDelegate;
+    FDelegate: TToolbarDelegate;
     FForm: TCommonCustomForm;
     FItemMap: TMacOSToolbarItemMap;
     FItems: TMacOSToolbarItems;
@@ -86,73 +175,50 @@ implementation
 
 uses
   System.TypInfo, System.SysUtils,
-  Macapi.ObjectiveC, Macapi.ObjCRuntime, Macapi.CoreFoundation, Macapi.Helpers,
-  FMX.Platform.Mac;
+  Macapi.ObjCRuntime, Macapi.CoreFoundation, Macapi.Helpers,
+  FMX.Platform.Mac,
+  DW.Macapi.Helpers;
 
 type
-  IToolbarDelegate = interface(NSObject)
-    ['{648C11BD-D306-4168-9F7C-2C078C5B293F}']
-    procedure itemClicked(item: NSToolbarItem); cdecl;
-    function toolbarAllowedItemIdentifiers(toolbar: Pointer): NSArray; cdecl;
-    function toolbarDefaultItemIdentifiers(toolbar: Pointer): NSArray; cdecl;
-    function toolbar(toolbar: Pointer; itemForItemIdentifier: CFStringRef; willBeInsertedIntoToolbar: Boolean): NSToolbarItem; cdecl;
-    function validateToolbarItem(theItem: NSToolbarItem): Boolean; cdecl;
+  NSWindowClass = interface(NSResponderClass)
+    ['{6E25AAEE-B1B7-4185-85FA-AA6FEBF87294}']
   end;
 
-  TNSToolbarDelegate = class(TOCLocal, NSToolbarDelegate)
-  private
-    FToolbar: TMacOSToolbar;
-  protected
-    function GetObjectiveCClass: PTypeInfo; override;
-  public
-    { IToolbarDelegate }
-    procedure itemClicked(item: NSToolbarItem); cdecl;
-    function toolbarAllowedItemIdentifiers(toolbar: Pointer): NSArray; cdecl;
-    function toolbarDefaultItemIdentifiers(toolbar: Pointer): NSArray; cdecl;
-    function toolbar(toolbar: Pointer; itemForItemIdentifier: CFStringRef; willBeInsertedIntoToolbar: Boolean): NSToolbarItem; cdecl;
-    function validateToolbarItem(theItem: NSToolbarItem): Boolean; cdecl;
-  public
-    constructor Create(const AToolbar: TMacOSToolbar); reintroduce;
+  NSWindow = interface(NSResponder)
+    ['{110F8D27-1D2C-480F-84C4-0FAD931FA44E}']
+    procedure setToolbar(toolbar: NSToolbar); cdecl;
+    procedure setToolbarStyle(toolbarStyle: NSWindowToolbarStyle); cdecl;
   end;
+  TNSWindow = class(TOCGenericImport<NSWindowClass, NSWindow>) end;
 
-{ TNSToolbarDelegate }
+{ TToolbarDelegate }
 
-constructor TNSToolbarDelegate.Create(const AToolbar: TMacOSToolbar);
+constructor TToolbarDelegate.Create(const AToolbar: TMacOSToolbar);
 begin
   inherited Create;
   FToolbar := AToolbar;
 end;
 
-function TNSToolbarDelegate.GetObjectiveCClass: PTypeInfo;
-begin
-  Result := TypeInfo(IToolbarDelegate);
-end;
-
-procedure TNSToolbarDelegate.itemClicked(item: NSToolbarItem);
+procedure TToolbarDelegate.itemClicked(item: NSToolbarItem);
 begin
   FToolbar.Items[NSStrToStr(item.itemIdentifier)].DoClick;
 end;
 
-function TNSToolbarDelegate.toolbar(toolbar: Pointer; itemForItemIdentifier: CFStringRef; willBeInsertedIntoToolbar: Boolean): NSToolbarItem;
+function TToolbarDelegate.toolbar(toolbar: NSToolbar; itemForItemIdentifier: NSToolbarItemIdentifier; willBeInsertedIntoToolbar: Boolean): NSToolbarItem;
 begin
-  Result := FToolbar.Items[CFStringRefToStr(itemForItemIdentifier)].ToolbarItem;
+  Result := FToolbar.Items[NSStrToStr(itemForItemIdentifier)].ToolbarItem;
   Result.setTarget(GetObjectID);
   Result.setAction(sel_getUid('itemClicked:'));
 end;
 
-function TNSToolbarDelegate.toolbarAllowedItemIdentifiers(toolbar: Pointer): NSArray;
+function TToolbarDelegate.toolbarAllowedItemIdentifiers(toolbar: NSToolbar): NSArray;
 begin
   Result := FToolbar.ItemIdentifiers(False);
 end;
 
-function TNSToolbarDelegate.toolbarDefaultItemIdentifiers(toolbar: Pointer): NSArray;
+function TToolbarDelegate.toolbarDefaultItemIdentifiers(toolbar: NSToolbar): NSArray;
 begin
   Result := FToolbar.ItemIdentifiers(True);
-end;
-
-function TNSToolbarDelegate.validateToolbarItem(theItem: NSToolbarItem): Boolean;
-begin
-  Result := FToolbar.Items[NSStrToStr(theItem.itemIdentifier)].DoValidate;
 end;
 
 { TMacOSToolbarItem }
@@ -211,10 +277,10 @@ begin
   inherited Create;
   FItemMap := TMacOSToolbarItemMap.Create;
   FItems := TMacOSToolbarItems.Create;
-  FDelegate := TNSToolbarDelegate.Create(Self);
+  FDelegate := TToolbarDelegate.Create(Self);
   FToolbar := TNSToolbar.Wrap(TNSToolbar.OCClass.alloc);
   FToolbar := TNSToolbar.Wrap(FToolbar.initWithIdentifier(StrToNSStr(AToolbarID)));
-  FToolbar.setDelegate(FDelegate);
+  FToolbar.setDelegate(FDelegate.GetObjectID);
   SetOptions([TMacOSToolbarOption.AllowUserCustomization, TMacOSToolbarOption.AutosavesConfiguration]);
   SetSizeMode(TMacOSToolbarSizeMode.Small);
 end;
@@ -230,30 +296,33 @@ end;
 function TMacOSToolbar.ItemIdentifiers(const ADefaultOnly: Boolean): NSArray;
 var
   LItem: TMacOSToolbarItem;
-  LIdents: TArray<CFStringRef>;
-  I: Integer;
-  LLength: Integer;
+  LIdents: TArray<string>;
 begin
+  LIdents := [];
   for LItem in FItems do
   begin
     if not ADefaultOnly or LItem.IsDefault then
-      LIdents := LIdents + [CFStringCreateWithCharacters(nil, PChar(LItem.ID), Length(LItem.ID))];
+      LIdents := LIdents + [LItem.ID];
   end;
-  LLength := Length(LIdents);
-  Result := TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@LIdents[0], LLength)); // Length(LIdents)));
-  for I := 0 to Length(LIdents) do
-    CFRelease(LIdents[I]);
+  Result := StringArrayToNSArray(LIdents);
 end;
 
 procedure TMacOSToolbar.SetForm(const Value: TCommonCustomForm);
+
+  // Wrap the NSWindow reference so the one declared here can be used
+  function GetWindow(const AForm: TCommonCustomForm): NSWindow;
+  begin
+    Result := TNSWindow.Wrap(NSObjectToID(WindowHandleToPlatform(FForm.Handle).Wnd));
+  end;
+
 begin
   if Value <> FForm then
   begin
     if FForm <> nil then
-      WindowHandleToPlatform(FForm.Handle).Wnd.setToolbar(nil);
+      GetWindow(FForm).setToolbar(nil);
     FForm := Value;
     if FForm <> nil then
-      WindowHandleToPlatform(FForm.Handle).Wnd.setToolbar(FToolbar);
+      GetWindow(FForm).setToolbar(FToolbar);
   end;
 end;
 
