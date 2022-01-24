@@ -33,10 +33,9 @@ In order to use this demo, you will need to:
 **Note that these configuration instructions were changed on Sept 30th, 2021 to support a more recent Firebase SDK**
 
 * Go to [this link](https://github.com/firebase/firebase-ios-sdk/releases/tag/8.7.0), download Firebase.zip, and extract it somewhere convenient
-* In the IDE Options > Environment Variables, create a user override called Firebase_8_7 which points to the unzipped SDK, **or** modify the search paths in the Project Options for iOS Device 64-bit to point to the unzipped SDK
+* In the IDE Options > Environment Variables, create a user override called Firebase_8_7 which points to the unzipped SDK, **or** modify `Framework search path` in the Project Options for iOS Device 64-bit to point to the unzipped SDK
 * In the Project Options for iOS Device 64-bit, modify the CFBundleIndentifier value  in the Version Info section to use the identifier that corresponds to your App ID
 * Put your Google-Services.info.plist file from Firebase Console into the Resources folder of the demo
-* Unzip the Firebase-6.18.zip file in the Kastri\ThirdParty\Firebase\iOS folder in-place
 
 #### Android (32 bit and 64 bit where required)
 
@@ -47,22 +46,7 @@ In the Project Options:
 
 ## Sending messages
 
-### [PushIt](https://github.com/DelphiWorlds/PushIt)
-
-PushIt is a crossplatform (macOS and Windows) app developed for testing FCM. It supports a number of features, including sending 'notification', 'data' or both types of messages, as well as specifying notification channel name (Android), 'content-available' flag, and more!
-
-### Android
-
-In this implementation of FCM, it is recommended that you send **only** 'data' messages to Android devices. This is because of how FCM behaves in the following scenarios:
-
-App is:
-
-* In the foreground: 'notification' messages are received, however there is no usable information. 'data' messages are received, and the code will present a banner if ShowBannerWhenForeground is True (default)
-* In the background, or not running: 'notification' messages will result in a banner, however there is no message event triggered. 'data' messages will trigger a message event, and a banner will be presented. Messages with **both** 'notification' **and** 'data' are treated as 'notification' only messages, so no message event
-
-### iOS
-
-Send only 'notification' messages to iOS devices. From testing recently carried out, including 'data' in a message has no use.
+[PushIt](https://github.com/DelphiWorlds/PushIt) is a crossplatform (macOS and Windows) app developed for testing FCM. It supports a number of features, including sending 'notification', 'data' or both types of messages, as well as specifying notification channel name (Android), 'content-available' flag, and more!
 
 ### PushItServer
 
