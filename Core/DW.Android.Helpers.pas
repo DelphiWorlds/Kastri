@@ -606,9 +606,9 @@ begin
   if not AServiceName.IsEmpty then
   begin
     LRequestCode := 0;
-    LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceName), StringToJString(AServiceName));
+    LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceClassName), StringToJString(AServiceName));
     if ARequestCodeOrJobID > 0 then
-      LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceJobId), ARequestCodeOrJobID);
+      LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraJobId), ARequestCodeOrJobID);
   end;
   Result := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, LRequestCode, LActionIntent, TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT);
   LStartAt := GetTimeFromNowInMillis(SecondsBetween(Now, AAlarm));

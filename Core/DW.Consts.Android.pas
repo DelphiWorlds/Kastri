@@ -57,10 +57,15 @@ const
   cDWBroadcastReceiverActionStartAlarm = cDWBroadcastReceiverName + '.ACTION_START_ALARM';
   cDWBroadcastReceiverActionServiceAlarm = cDWBroadcastReceiverName + '.ACTION_SERVICE_ALARM';
   cDWBroadcastReceiverActionServiceRestart = cDWBroadcastReceiverName + '.ACTION_SERVICE_RESTART';
+  cDWBroadcastReceiverExtraJobId = cDWBroadcastReceiverName + '.EXTRA_JOB_ID';
   cDWBroadcastReceiverExtraServiceRestart = cDWBroadcastReceiverName + '.EXTRA_SERVICE_RESTART';
-  cDWBroadcastReceiverExtraServiceName = cDWBroadcastReceiverName + '.EXTRA_SERVICE_NAME';
-  cDWBroadcastReceiverExtraServiceJobId = cDWBroadcastReceiverName + '.EXTRA_SERVICE_JOBID';
+  cDWBroadcastReceiverExtraServiceClassName = cDWBroadcastReceiverName + '.EXTRA_SERVICE_CLASS_NAME';
   cDWBroadcastReceiverExtraStartUnlock = cDWBroadcastReceiverName + '.EXTRA_START_UNLOCK';
+
+  cDWFusedLocationClientName = 'com.delphiworlds.kastri.DWFusedLocationClient';
+  cDWFusedLocationClientActionAlarm = cDWFusedLocationClientName + '.ACTION_ALARM';
+  cDWFusedLocationClientExtraAlarmInterval = cDWFusedLocationClientName + '.EXTRA_ALARM_INTERVAL';
+  cDWFusedLocationClientExtraAlarmTimestamp = cDWFusedLocationClientName + '.EXTRA_ALARM_TIMESTAMP';
 
   cServiceCommandAction = 'com.delphiworlds.action.SERVICE_COMMAND';
   cServiceMessageAction = 'com.delphiworlds.action.SERVICE_MESSAGE';
