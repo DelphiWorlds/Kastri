@@ -16,6 +16,8 @@ unit DW.SMS.Android;
 interface
 
 uses
+  // RTL
+  System.Messaging,
   // Android
   Androidapi.JNI.Telephony, Androidapi.JNI.GraphicsContentViewText,
   // DW
@@ -36,11 +38,17 @@ type
 
   TPlatformSMS = class(TCustomPlatformSMS)
   private
+    FDestinations: TArray<string>;
     FIntentID: Integer;
+    FMessage: string;
     FSMSIntentReceiver: TSMSIntentReceiver;
     FSMSManager: JSmsManager;
+    procedure DoCannotSend;
     function GetMessageIntent(const ADestination: string): JIntent;
     function GetNextIntentID: Integer;
+    procedure MessageResultNotificationHandler(const Sender: TObject; const AMsg: TMessage);
+    procedure SendTextMessageViaAPI(const AText: string; const ADestinations: TArray<string>);
+    procedure SendTextMessageViaIntent;
   protected
     function GetAuthorizationStatus: TAuthorizationStatus; override;
     procedure IntentReceived(const AIntent: JIntent; const AResultCode: Integer);
@@ -57,13 +65,16 @@ uses
   // RTL
   System.Permissions, System.SysUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNI.Support,
+  Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNI.Support, Androidapi.JNI.Net, Androidapi.JNI.Provider,
+  // FMX
+  FMX.Platform,
   // DW
   DW.OSLog, DW.Consts.Android, DW.Permissions.Helpers;
 
 const
   cACTION_MESSAGE_SENT = 'ACTION_MESSAGE_SENT';
   cEXTRA_DESTINATION = 'EXTRA_DESTINATION';
+  cSMSRequestCode = 98765;
 
 {$IF CompilerVersion < 35}
 type
@@ -93,12 +104,14 @@ end;
 constructor TPlatformSMS.Create(const ASMS: TSMS);
 begin
   inherited;
+  TMessageManager.DefaultManager.SubscribeToMessage(TMessageResultNotification, MessageResultNotificationHandler);
   FSMSManager := TJSmsManager.JavaClass.getDefault;
   FSMSIntentReceiver := TSMSIntentReceiver.Create(Self);
 end;
 
 destructor TPlatformSMS.Destroy;
 begin
+  TMessageManager.DefaultManager.Unsubscribe(TMessageResultNotification, MessageResultNotificationHandler);
   FSMSIntentReceiver.Free;
   inherited;
 end;
@@ -158,6 +171,18 @@ begin
 end;
 
 procedure TPlatformSMS.SendTextMessage(const AText: string; const ADestinations: TArray<string>);
+begin
+  if UseIntents then
+  begin
+    FDestinations := ADestinations;
+    FMessage := AText;
+    SendTextMessageViaIntent;
+  end
+  else
+    SendTextMessageViaAPI(AText, ADestinations);
+end;
+
+procedure TPlatformSMS.SendTextMessageViaAPI(const AText: string; const ADestinations: TArray<string>);
 var
   LSentIntent: JPendingIntent;
   LDestination: string;
@@ -173,6 +198,58 @@ begin
     LDeliveryIntents := nil; // TODO?
     FSMSManager.sendMultipartTextMessage(StringToJString(LDestination), nil, LParts, LSentIntents, LDeliveryIntents);
   end;
+end;
+
+procedure TPlatformSMS.SendTextMessageViaIntent;
+var
+  LIntent: JIntent;
+  LUri: Jnet_Uri;
+  LSMSPackage: JString;
+begin
+  if Length(FDestinations) > 0 then
+  begin
+    LUri := TJnet_Uri.JavaClass.parse(StringToJString('smsto:' + string.Join(';', FDestinations[0])));
+    LIntent := TJIntent.JavaClass.init(TJIntent.JavaClass.ACTION_SENDTO, LUri);
+    LIntent.putExtra(StringToJString('sms_body'), StringToJString(FMessage));
+    LIntent.putExtra(StringToJString('exit_on_sent'), True); // May not work on most devices
+    LSMSPackage := TJTelephony_Sms.JavaClass.getDefaultSmsPackage(TAndroidHelper.Context);
+    if LSMSPackage <> nil then
+      LIntent.setPackage(LSMSPackage);
+    if LIntent.resolveActivity(TAndroidHelper.Context.getPackageManager) <> nil then
+      TAndroidHelper.Activity.startActivityForResult(LIntent, cSMSRequestCode)
+    else
+      DoCannotSend;
+  end;
+end;
+
+procedure TPlatformSMS.MessageResultNotificationHandler(const Sender: TObject; const AMsg: TMessage);
+var
+  LMsg: TMessageResultNotification;
+  LDestination: string;
+begin
+  LMsg := TMessageResultNotification(AMsg);
+  if LMsg.RequestCode = cSMSRequestCode then
+  begin
+    if Length(FDestinations) > 0 then
+    begin
+      LDestination := FDestinations[0];
+      Delete(FDestinations, 0, 1);
+      if LMsg.ResultCode = TJActivity.JavaClass.RESULT_OK then
+        DoMessageResult([LDestination], TMessageResult.Sent)
+      else if LMsg.ResultCode = TJActivity.JavaClass.RESULT_CANCELED then
+        DoMessageResult([LDestination], TMessageResult.Cancelled)
+      else
+        DoMessageResult([LDestination], TMessageResult.Failed);
+      SendTextMessageViaIntent;
+    end;
+  end;
+end;
+
+procedure TPlatformSMS.DoCannotSend;
+begin
+  DoMessageResult(FDestinations, TMessageResult.CannotSend);
+  FDestinations := [];
+  FMessage := '';
 end;
 
 end.

@@ -22,11 +22,12 @@ uses
 type
   TSMS = class;
 
-  TMessageResult = (Cancelled, Failed, Sent);
+  TMessageResult = (Cancelled, Failed, Sent, CannotSend);
 
   TCustomPlatformSMS = class(TObject)
   private
     FSMS: TSMS;
+    FUseIntents: Boolean;
   protected
     function GetAuthorizationStatus: TAuthorizationStatus; virtual;
     procedure DoMessageResult(const ADestinations: TArray<string>; const AMessageResult: TMessageResult);
@@ -34,6 +35,7 @@ type
     procedure RequestPermission; virtual;
     procedure SendTextMessage(const AText: string; const ADestinations: TArray<string>); virtual;
     property SMS: TSMS read FSMS;
+    property UseIntents: Boolean read FUseIntents write FUseIntents;
   public
     constructor Create(const ASMS: TSMS); virtual;
     destructor Destroy; override;
@@ -47,6 +49,8 @@ type
     FPlatformSMS: TCustomPlatformSMS;
     FOnMessageResult: TMessageResultEvent;
     FOnPermissionRequestResult: TPermissionRequestResultEvent;
+    function GetUseIntents: Boolean;
+    procedure SetUseIntents(const Value: Boolean);
   protected
     procedure DoMessageResult(const ADestinations: TArray<string>; const AMessageResult: TMessageResult);
     procedure DoPermissionRequestResult(const AIsGranted: Boolean);
@@ -56,6 +60,7 @@ type
     function GetAuthorizationStatus: TAuthorizationStatus;
     procedure RequestPermission;
     procedure SendTextMessage(const AText: string; const ADestinations: TArray<string>);
+    property UseIntents: Boolean read GetUseIntents write SetUseIntents;
     property OnMessageResult: TMessageResultEvent read FOnMessageResult write FOnMessageResult;
     property OnPermissionRequestResult: TPermissionRequestResultEvent read FOnPermissionRequestResult write FOnPermissionRequestResult;
   end;
@@ -135,6 +140,11 @@ begin
   Result := FPlatformSMS.GetAuthorizationStatus;
 end;
 
+function TSMS.GetUseIntents: Boolean;
+begin
+  Result := FPlatformSMS.UseIntents;
+end;
+
 procedure TSMS.DoMessageResult(const ADestinations: TArray<string>; const AMessageResult: TMessageResult);
 begin
   if Assigned(FOnMessageResult) then
@@ -155,6 +165,11 @@ end;
 procedure TSMS.SendTextMessage(const AText: string; const ADestinations: TArray<string>);
 begin
   FPlatformSMS.SendTextMessage(AText, ADestinations);
+end;
+
+procedure TSMS.SetUseIntents(const Value: Boolean);
+begin
+  FPlatformSMS.UseIntents := Value;
 end;
 
 end.
