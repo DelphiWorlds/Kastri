@@ -64,6 +64,7 @@ type
     {$ELSE}
     procedure LocationChangeHandler(Sender: TObject; const AData: TLocationData; const ASource: TLocationSource);
     {$ENDIF}
+    procedure ReceivedMessage(const AText: string);
     procedure RestartService;
     procedure SendState;
     procedure StartForeground(const AMustStartForeground: Boolean);
@@ -138,6 +139,7 @@ end;
 procedure TLocalReceiver.ConfigureActions;
 begin
   IntentFilter.addAction(StringToJString(cServiceCommandAction));
+  IntentFilter.addAction(StringToJString(cServiceMessageAction));
   // IntentFilter.addAction(StringToJString(cDWBroadcastReceiverActionAlarmTimer));
 end;
 
@@ -254,6 +256,11 @@ begin
   TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).sendBroadcast(LIntent);
 end;
 
+procedure TServiceModule.ReceivedMessage(const AText: string);
+begin
+  // Do whatever is needed with the message, here
+end;
+
 procedure TServiceModule.RestartService;
 var
   LIntent: JIntent;
@@ -297,6 +304,7 @@ end;
 procedure TServiceModule.LocalReceiverReceive(intent: JIntent);
 var
   LCommand: Integer;
+  LMessage: string;
 begin
   if intent.getAction.equals(StringToJString(cServiceCommandAction)) then
   begin
@@ -316,6 +324,11 @@ begin
       cServiceCommandCheckState:
         SendState;
     end;
+  end
+  else if intent.getAction.equals(StringToJString(cServiceMessageAction)) then
+  begin
+    LMessage := JStringToString(intent.getStringExtra(StringToJString(cServiceBroadcastParamMessage)));
+    ReceivedMessage(LMessage);
   end;
 end;
 
