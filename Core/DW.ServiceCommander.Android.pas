@@ -31,6 +31,7 @@ type
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
   public
     class procedure SendCommand(const ACommand: Integer);
+    class procedure SendMessage(const AText: string);
     /// <summary>
     ///   Attempts to start the service if it is not already running
     /// </summary>
@@ -104,6 +105,15 @@ var
 begin
   LIntent := TJIntent.JavaClass.init(StringToJString(cServiceCommandAction));
   LIntent.putExtra(StringToJString(cServiceBroadcastParamCommand), ACommand);
+  TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).sendBroadcast(LIntent);
+end;
+
+class procedure TServiceCommander.SendMessage(const AText: string);
+var
+  LIntent: JIntent;
+begin
+  LIntent := TJIntent.JavaClass.init(StringToJString(cServiceMessageAction));
+  LIntent.putExtra(StringToJString(cServiceBroadcastParamMessage), StringToJString(AText));
   TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).sendBroadcast(LIntent);
 end;
 
