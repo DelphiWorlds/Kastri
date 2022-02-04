@@ -35,7 +35,7 @@ implementation
 
 uses
   // RTL
-  System.SysUtils,
+  System.SysUtils, System.Classes,
   // Windows
   Winapi.ActiveX, Winapi.Windows, Winapi.IpTypes, Winapi.IpHlpApi,
   // DW
@@ -51,6 +51,8 @@ type
     FCookie: Longint;
     FNetworkListManager: INetworkListManager;
     FIsConnectedToInternet: Boolean;
+    function CoInitBegin: Boolean;
+    procedure CoInitEnd(const ACoInit: Boolean);
     function GetWifiAdapterNames: TArray<string>;
     procedure Start;
     procedure Stop;
@@ -162,36 +164,62 @@ var
   LWifiAdapterNames: TArray<string>;
   LAdapterName: string;
   LAdapterID: string;
+  LCoInit: Boolean;
 begin
   Result := False;
   LWifiAdapterNames := GetWifiAdapterNames;
   if Length(LWifiAdapterNames) > 0 then
   begin
-    LConnections := FNetworkListManager.GetNetworkConnections;
-    repeat
-      LConnections.Next(1, LConnection, LFetched);
-      if LFetched > 0 then
-      begin
-        if LConnection.IsConnectedToInternet then
+    LCoInit := CoInitBegin;
+    try
+      LConnections := FNetworkListManager.GetNetworkConnections;
+      repeat
+        LConnections.Next(1, LConnection, LFetched);
+        if LFetched > 0 then
         begin
-          LAdapterID := LConnection.GetAdapterId.ToString;
-          for LAdapterName in LWifiAdapterNames do
+          if LConnection.IsConnectedToInternet then
           begin
-            if LAdapterName.Equals(LAdapterID) then
+            LAdapterID := LConnection.GetAdapterId.ToString;
+            for LAdapterName in LWifiAdapterNames do
             begin
-              Result := True;
-              Break;
+              if LAdapterName.Equals(LAdapterID) then
+              begin
+                Result := True;
+                Break;
+              end;
             end;
           end;
         end;
-      end;
-    until Result or (LFetched = 0);
+      until Result or (LFetched = 0);
+    finally
+      CoInitEnd(LCoInit);
+    end;
   end;
 end;
 
-function TNetwork.GetIsConnectedToInternet: Boolean;
+function TNetwork.CoInitBegin: Boolean;
 begin
-  Result := FNetworkListManager.IsConnectedToInternet;
+  Result := TThread.CurrentThread.ThreadID <> MainThreadID;
+  if Result then
+    CoInitialize(nil);
+end;
+
+procedure TNetwork.CoInitEnd(const ACoInit: Boolean);
+begin
+  if ACoInit then
+    CoUninitialize;
+end;
+
+function TNetwork.GetIsConnectedToInternet: Boolean;
+var
+  LCoInit: Boolean;
+begin
+  LCoInit := CoInitBegin;
+  try
+    Result := FNetworkListManager.IsConnectedToInternet;
+  finally
+    CoInitEnd(LCoInit);
+  end;
 end;
 
 function TNetwork.NetworkAdded(networkId: TGUID): HResult;
