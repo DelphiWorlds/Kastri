@@ -165,6 +165,7 @@ var
   LAdapterName: string;
   LAdapterID: string;
   LCoInit: Boolean;
+  LManager: INetworkListManager;
 begin
   Result := False;
   LWifiAdapterNames := GetWifiAdapterNames;
@@ -172,7 +173,8 @@ begin
   begin
     LCoInit := CoInitBegin;
     try
-      LConnections := FNetworkListManager.GetNetworkConnections;
+      LManager := CoNetworkListManager.Create;
+      LConnections := LManager.GetNetworkConnections;
       repeat
         LConnections.Next(1, LConnection, LFetched);
         if LFetched > 0 then
@@ -213,10 +215,12 @@ end;
 function TNetwork.GetIsConnectedToInternet: Boolean;
 var
   LCoInit: Boolean;
+  LManager: INetworkListManager;
 begin
   LCoInit := CoInitBegin;
   try
-    Result := FNetworkListManager.IsConnectedToInternet;
+    LManager := CoNetworkListManager.Create;
+    Result := LManager.IsConnectedToInternet;
   finally
     CoInitEnd(LCoInit);
   end;
