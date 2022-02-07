@@ -70,7 +70,7 @@ uses
   {$IF Declared(RTLVersion1042)} // i.e. Delphi 10.4.2 or later
   FMX.PushNotification.FCM.iOS,
   {$ELSE}
-  DW.PushNotification.iOS;
+  DW.PushNotification.iOS,
   {$ENDIF}
   {$ENDIF}
   {$IF Defined(ANDROID)}
