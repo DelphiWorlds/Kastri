@@ -50,6 +50,9 @@ const
   UNAuthorizationOptionSound = (1 shl 1);
   UNAuthorizationOptionAlert = (1 shl 2);
   UNAuthorizationOptionCarPlay = (1 shl 3);
+  UNAuthorizationOptionCriticalAlert = (1 shl 4);
+  UNAuthorizationOptionProvidesAppNotificationSettings = (1 shl 5);
+  UNAuthorizationOptionProvisional = (1 shl 6);
   UNNotificationPresentationOptionBadge = (1 shl 0);
   UNNotificationPresentationOptionSound = (1 shl 1);
   UNNotificationPresentationOptionAlert = (1 shl 2);
