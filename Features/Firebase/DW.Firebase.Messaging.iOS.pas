@@ -61,7 +61,7 @@ type
     function GetDeviceToken: string; override;
     procedure MessageReceived(const AJSON: string);
     procedure TokenReceived(const AToken: string);
-    procedure RequestPermissions; override;
+    procedure RequestPermissions(ACriticalAlerts: Boolean); override;
     procedure SubscribeToTopic(const ATopicName: string); override;
     function Start: Boolean; override;
     procedure UnsubscribeFromTopic(const ATopicName: string); override;
@@ -218,10 +218,13 @@ begin
   DoAuthorizationResult(True);
 end;
 
-procedure TPlatformFirebaseMessaging.RequestPermissions;
+procedure TPlatformFirebaseMessaging.RequestPermissions(ACriticalAlerts: Boolean);
 begin
   TPlatformNotifications.UpdateDelegate;
+
   FAuthOptions := UNAuthorizationOptionSound or UNAuthorizationOptionAlert or UNAuthorizationOptionBadge;
+  if ACriticalAlerts then
+    FAuthOptions := FAuthOptions or UNAuthorizationOptionCriticalAlert;
   if TOSVersion.Check(10) then
     RegisterRemoteNotificationsIOS10OrLater
   else if TOSVersion.Check(8) then

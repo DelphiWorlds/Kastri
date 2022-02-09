@@ -40,7 +40,7 @@ type
     procedure DoMessageReceived(const APayload: TStrings);
     procedure DoTokenReceived(const AToken: string);
     function GetDeviceToken: string; virtual;
-    procedure RequestPermissions; virtual; abstract;
+    procedure RequestPermissions(ACriticalAlerts: Boolean); virtual; abstract;
     procedure SubscribeToTopic(const ATopicName: string); virtual; abstract;
     function Start: Boolean; virtual;
     procedure UnsubscribeFromTopic(const ATopicName: string); virtual; abstract;
@@ -63,12 +63,16 @@ type
     FOnFailedToRegister: TFailedToRegisterEvent;
     FOnMessageReceived: TFirebaseMessageReceivedEvent;
     FOnTokenReceived: TFirebaseTokenReceivedEvent;
+    {$IFDEF IOS}
+    FCriticalAlerts: Boolean;
+    {$ENDIF}
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     function GetDeviceToken: string;
     function GetShowBannerWhenForeground: Boolean;
     procedure PushFailToRegisterMessageHandler(const Sender: TObject; const M: TMessage);
     procedure PushRemoteNotificationMessageHandler(const Sender: TObject; const M: TMessage);
     procedure SetShowBannerWhenForeground(const Value: Boolean);
+
   protected
     procedure DoAuthorizationResult(const AGranted: Boolean);
     procedure DoFailedToRegister(const AErrorMessage: string);
@@ -103,6 +107,9 @@ type
     ///   FCM token
     /// </summary>
     property Token: string read FToken;
+    {$IFDEF IOS}
+    property CriticalAlerts: Boolean read FCriticalAlerts write FCriticalAlerts default False;
+    {$ENDIF}
     property OnAuthorizationResult: TAuthorizationResultEvent read FOnAuthorizationResult write FOnAuthorizationResult;
     property OnFailedToRegister: TFailedToRegisterEvent read FOnFailedToRegister write FOnFailedToRegister;
     property OnMessageReceived: TFirebaseMessageReceivedEvent read FOnMessageReceived write FOnMessageReceived;
@@ -200,6 +207,9 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TPushFailToRegisterMessage, PushFailToRegisterMessageHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TPushRemoteNotificationMessage, PushRemoteNotificationMessageHandler);
+  {$IFDEF IOS}
+  FCriticalAlerts := False;
+  {$ENDIF}
 end;
 
 destructor TFirebaseMessaging.Destroy;
@@ -290,7 +300,7 @@ end;
 
 procedure TFirebaseMessaging.RequestPermissions;
 begin
-  FPlatformFirebaseMessaging.RequestPermissions;
+  FPlatformFirebaseMessaging.RequestPermissions({$IFDEF IOS} FCriticalAlerts {$ELSE} False {$ENDIF});
 end;
 
 procedure TFirebaseMessaging.SetShowBannerWhenForeground(const Value: Boolean);
