@@ -708,7 +708,7 @@ begin
     LHTTP.Accept := CONTENTTYPE_APPLICATION_JSON;
     LHTTP.ContentType := CONTENTTYPE_APPLICATION_JSON;
     LHTTP.CustomHeaders['Authorization'] := 'Bearer ' + BearerToken.access_token;
-    LRequest := TStringStream.Create(AJSON);
+    LRequest := TStringStream.Create(AJSON, TEncoding.UTF8);
     try
       LResponse := LHTTP.Post(Format(cFCMHTTPv1SendURLTemplate, [ServiceAccount.ProjectID]), LRequest);
     finally
