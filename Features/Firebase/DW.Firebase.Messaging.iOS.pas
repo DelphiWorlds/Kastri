@@ -219,9 +219,21 @@ begin
 end;
 
 procedure TPlatformFirebaseMessaging.RequestPermissions;
+const
+  cAuthorizationOptions: array[TAuthorizationOption] of UNAuthorizationOptions = (
+    UNAuthorizationOptionBadge, UNAuthorizationOptionSound, UNAuthorizationOptionAlert, UNAuthorizationOptionCarPlay,
+    UNAuthorizationOptionCriticalAlert, UNAuthorizationOptionProvidesAppNotificationSettings, UNAuthorizationOptionProvisional
+  );
+var
+  LOption: TAuthorizationOption;
 begin
   TPlatformNotifications.UpdateDelegate;
-  FAuthOptions := UNAuthorizationOptionSound or UNAuthorizationOptionAlert or UNAuthorizationOptionBadge;
+  FAuthOptions := 0;
+  for LOption := Low(TAuthorizationOption) to High(TAuthorizationOption) do
+  begin
+    if LOption in AuthorizationOptions then
+      FAuthOptions := FAuthOptions or cAuthorizationOptions[LOption];
+  end;
   if TOSVersion.Check(10) then
     RegisterRemoteNotificationsIOS10OrLater
   else if TOSVersion.Check(8) then

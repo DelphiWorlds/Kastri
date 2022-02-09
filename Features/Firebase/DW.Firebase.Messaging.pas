@@ -23,10 +23,14 @@ type
   TFirebaseMessageReceivedEvent = procedure(Sender: TObject; const APayload: TStrings) of object;
   TFirebaseTokenReceivedEvent = procedure(Sender: TObject; const AToken: string) of object;
 
+  TAuthorizationOption = (Badge, Sound, Alert, CarPlay, CriticalAlert, ProvidesAppNotificationSettings, Provisional);
+  TAuthorizationOptions = set of TAuthorizationOption;
+
   TFirebaseMessaging = class;
 
   TCustomPlatformFirebaseMessaging = class(TObject)
   private
+    FAuthorizationOptions: TAuthorizationOptions;
     FFirebaseMessaging: TFirebaseMessaging;
     FIsForeground: Boolean;
     FShowBannerWhenForeground: Boolean;
@@ -44,6 +48,7 @@ type
     procedure SubscribeToTopic(const ATopicName: string); virtual; abstract;
     function Start: Boolean; virtual;
     procedure UnsubscribeFromTopic(const ATopicName: string); virtual; abstract;
+    property AuthorizationOptions: TAuthorizationOptions read FAuthorizationOptions write FAuthorizationOptions;
     property IsForeground: Boolean read FIsForeground write FIsForeground;
     property ShowBannerWhenForeground: Boolean read FShowBannerWhenForeground write FShowBannerWhenForeground;
   public
@@ -64,10 +69,12 @@ type
     FOnMessageReceived: TFirebaseMessageReceivedEvent;
     FOnTokenReceived: TFirebaseTokenReceivedEvent;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
+    function GetAuthorizationOptions: TAuthorizationOptions;
     function GetDeviceToken: string;
     function GetShowBannerWhenForeground: Boolean;
     procedure PushFailToRegisterMessageHandler(const Sender: TObject; const M: TMessage);
     procedure PushRemoteNotificationMessageHandler(const Sender: TObject; const M: TMessage);
+    procedure SetAuthorizationOptions(const Value: TAuthorizationOptions);
     procedure SetShowBannerWhenForeground(const Value: Boolean);
   protected
     procedure DoAuthorizationResult(const AGranted: Boolean);
@@ -90,6 +97,10 @@ type
     ///   Removes the device from receiving messages for the specified topic
     /// </summary>
     procedure UnsubscribeFromTopic(const ATopicName: string);
+    /// <summary>
+    ///   Options for when a notification is displayed (iOS only)
+    /// </summary>
+    property AuthorizationOptions: TAuthorizationOptions read GetAuthorizationOptions write SetAuthorizationOptions;
     /// <summary>
     ///   Token associated with the device. On iOS, this is the APNs token
     /// </summary>
@@ -131,6 +142,7 @@ begin
   inherited Create;
   FFirebaseMessaging := AFirebaseMessaging;
   FShowBannerWhenForeground := True;
+  FAuthorizationOptions := [TAuthorizationOption.Badge, TAuthorizationOption.Sound, TAuthorizationOption.Alert];
 end;
 
 destructor TCustomPlatformFirebaseMessaging.Destroy;
@@ -291,6 +303,16 @@ end;
 procedure TFirebaseMessaging.RequestPermissions;
 begin
   FPlatformFirebaseMessaging.RequestPermissions;
+end;
+
+function TFirebaseMessaging.GetAuthorizationOptions: TAuthorizationOptions;
+begin
+  Result := FPlatformFirebaseMessaging.AuthorizationOptions;
+end;
+
+procedure TFirebaseMessaging.SetAuthorizationOptions(const Value: TAuthorizationOptions);
+begin
+  FPlatformFirebaseMessaging.AuthorizationOptions := Value;
 end;
 
 procedure TFirebaseMessaging.SetShowBannerWhenForeground(const Value: Boolean);
