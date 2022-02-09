@@ -23,6 +23,7 @@ type
   TPlatformConnectivity = class(TObject)
   private
     FConnectivity: TConnectivity;
+    FNetwork: TObject;
   public
     class function IsConnectedToInternet: Boolean;
     class function IsWifiInternetConnection: Boolean;
@@ -44,23 +45,18 @@ uses
 type
   TNetwork = class(TInterfacedObject, INetworkEvents)
   private
-    class var FCurrent: TNetwork;
-    class constructor CreateClass;
-    class destructor DestroyClass;
+    class function CoInitBegin: Boolean;
+    class procedure CoInitEnd(const ACoInit: Boolean);
+    class function GetWifiAdapterNames: TArray<string>;
   private
     FCookie: Longint;
     FNetworkListManager: INetworkListManager;
     FIsConnectedToInternet: Boolean;
-    function CoInitBegin: Boolean;
-    procedure CoInitEnd(const ACoInit: Boolean);
-    function GetWifiAdapterNames: TArray<string>;
     procedure Start;
     procedure Stop;
   protected
-    function GetIsConnectedToInternet: Boolean;
-    function GetHasWifiInternetConnection: Boolean;
-  public
-    class property Current: TNetwork read FCurrent;
+    class function GetIsConnectedToInternet: Boolean;
+    class function GetHasWifiInternetConnection: Boolean;
   public
     { INetworkEvents }
     function NetworkAdded(networkId: TGUID): HResult; stdcall;
@@ -86,6 +82,7 @@ var
 constructor TPlatformConnectivity.Create(const AConnectivity: TConnectivity);
 begin
   inherited Create;
+  FNetwork := TNetwork.Create;
   FConnectivity := AConnectivity;
   Connectivity := FConnectivity;
 end;
@@ -93,25 +90,22 @@ end;
 destructor TPlatformConnectivity.Destroy;
 begin
   Connectivity := nil;
+  TNetwork(FNetwork).Stop;
+  FNetwork := nil;
   inherited;
 end;
 
 class function TPlatformConnectivity.IsConnectedToInternet: Boolean;
 begin
-  Result := TNetwork.Current.GetIsConnectedToInternet;
+  Result := TNetwork.GetIsConnectedToInternet;
 end;
 
 class function TPlatformConnectivity.IsWifiInternetConnection: Boolean;
 begin
-  Result := TNetwork.Current.GetHasWifiInternetConnection;
+  Result := TNetwork.GetHasWifiInternetConnection;
 end;
 
 { TNetwork }
-
-class constructor TNetwork.CreateClass;
-begin
-  FCurrent := TNetwork.Create;
-end;
 
 constructor TNetwork.Create;
 begin
@@ -119,22 +113,17 @@ begin
   CoInitialize(nil);
   FNetworkListManager := CoNetworkListManager.Create;
   FIsConnectedToInternet := GetIsConnectedToInternet;
+  Start;
 end;
 
 destructor TNetwork.Destroy;
 begin
-  Stop;
   FNetworkListManager := nil;
   CoUninitialize;
   inherited;
 end;
 
-class destructor TNetwork.DestroyClass;
-begin
-  FCurrent.Free;
-end;
-
-function TNetwork.GetWifiAdapterNames: TArray<string>;
+class function TNetwork.GetWifiAdapterNames: TArray<string>;
 var
   LRes: DWORD;
   LBufLen: ULONG;
@@ -156,7 +145,7 @@ begin
   end;
 end;
 
-function TNetwork.GetHasWifiInternetConnection: Boolean;
+class function TNetwork.GetHasWifiInternetConnection: Boolean;
 var
   LConnections: IEnumNetworkConnections;
   LConnection: INetworkConnection;
@@ -199,20 +188,20 @@ begin
   end;
 end;
 
-function TNetwork.CoInitBegin: Boolean;
+class function TNetwork.CoInitBegin: Boolean;
 begin
   Result := TThread.CurrentThread.ThreadID <> MainThreadID;
   if Result then
     CoInitialize(nil);
 end;
 
-procedure TNetwork.CoInitEnd(const ACoInit: Boolean);
+class procedure TNetwork.CoInitEnd(const ACoInit: Boolean);
 begin
   if ACoInit then
     CoUninitialize;
 end;
 
-function TNetwork.GetIsConnectedToInternet: Boolean;
+class function TNetwork.GetIsConnectedToInternet: Boolean;
 var
   LCoInit: Boolean;
   LManager: INetworkListManager;
