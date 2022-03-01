@@ -149,6 +149,7 @@ type
     ///   Returns the keyguard manager
     /// </summary>
     class function KeyguardManager: JKeyguardManager; static;
+    class function NeedsAllFilesAccessPermission: Boolean; static;
     /// <summary>
     ///   Returns the notification manager
     /// </summary>
@@ -244,11 +245,12 @@ type
 
   THandlerRunnable = class(TCustomRunnable)
   private
+    FDelay: Cardinal;
     FHandler: JHandler;
   protected
     procedure Execute; virtual;
   public
-    constructor Create;
+    constructor Create(const ADelay: Cardinal = 0);
   end;
 
   TRunnable = class(TCustomRunnable, JRunnable)
@@ -630,6 +632,11 @@ begin
   Result := InternalSetAlarm(cDWBroadcastReceiverActionStartAlarm, AAlarm, AFromLock, ARequestCode);
 end;
 
+class function TAndroidHelperEx.NeedsAllFilesAccessPermission: Boolean;
+begin
+  Result := TOSVersion.Check(11) and not TJEnvironment.JavaClass.isExternalStorageManager;
+end;
+
 class function TAndroidHelperEx.ShowAllFilesAccessPermissionSettings: Boolean;
 var
   LIntent: JIntent;
@@ -637,7 +644,7 @@ var
   LAction: JString;
 begin
   Result := False;
-  if TOSVersion.Check(11) and not TJEnvironment.JavaClass.isExternalStorageManager then
+  if NeedsAllFilesAccessPermission then
   begin
     LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
     LAction := StringToJString('android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION'); // TJSettings.JavaClass.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
@@ -792,15 +799,19 @@ end;
 
 { THandlerRunnable }
 
-constructor THandlerRunnable.Create;
+constructor THandlerRunnable.Create(const ADelay: Cardinal = 0);
 begin
-  inherited;
+  inherited Create;
+  FDelay := ADelay;
   FHandler := TJHandler.JavaClass.init;
 end;
 
 procedure THandlerRunnable.Execute;
 begin
-  FHandler.post(Self);
+  if FDelay = 0 then
+    FHandler.post(Self)
+  else
+    FHandler.postDelayed(Self, FDelay);
 end;
 
 { TRunnable }
