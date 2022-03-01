@@ -149,6 +149,12 @@ type
     ///   Returns the keyguard manager
     /// </summary>
     class function KeyguardManager: JKeyguardManager; static;
+    /// <summary>
+    ///   Checks whether the application needs the manage external storage feature enabled
+    /// </summary>
+    /// <remarks>
+    ///   See also ShowAllFilesAccessPermissionSettings
+    /// </remarks>
     class function NeedsAllFilesAccessPermission: Boolean; static;
     /// <summary>
     ///   Returns the notification manager
@@ -183,6 +189,15 @@ type
     /// </summary>
     class function SetServiceAlarm(const AServiceName: string; const AAlarm: TDateTime; const AFromLock: Boolean;
       const AJobId: Integer = 0): JPendingIntent; static;
+    /// <summary>
+    ///   Shows the manage files access activity if they are yet to be enabled
+    /// </summary>
+    /// <remarks>
+    ///   NOTE: As at Delphi 11.0, you will need to add a permission to the manifest (e.g. modify AndroidManifest.template.xml)
+    ///   The entry is:
+    ///     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    ///   See also NeedsAllFilesAccessPermission
+    /// </remarks>
     class function ShowAllFilesAccessPermissionSettings: Boolean; static;
     class procedure ShowLocationPermissionSettings; static;
     /// <summary>
@@ -647,7 +662,7 @@ begin
   if NeedsAllFilesAccessPermission then
   begin
     LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
-    LAction := StringToJString('android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION'); // TJSettings.JavaClass.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+    LAction := StringToJString('android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION');
     LIntent := TJIntent.JavaClass.init(LAction, LUri);
     TAndroidHelper.Context.startActivity(LIntent);
     Result := True;
