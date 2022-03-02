@@ -285,6 +285,7 @@ uses
   // DW.RunProcess,  // JCL/JVCL
   DW.Sensors,
   DW.Services,
+  DW.ShareItems,
   DW.SpeechRecognition,
   DW.SysUtils.Helpers,
   DW.ThreadedTimer,
