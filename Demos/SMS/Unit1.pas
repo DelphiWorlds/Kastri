@@ -38,11 +38,12 @@ implementation
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
-  SendButton.Enabled := False;
+  // SendButton.Enabled := False;
   FSMS := TSMS.Create;
   FSMS.OnMessageResult := SMSMessageResultHandler;
   FSMS.OnPermissionRequestResult := SMSPermissionRequestResultHandler;
-  FSMS.RequestPermission;
+  FSMS.UseIntents := True;
+  // FSMS.RequestPermission;
 end;
 
 destructor TForm1.Destroy;
@@ -53,7 +54,7 @@ end;
 
 procedure TForm1.SMSMessageResultHandler(Sender: TObject; const ADestinations: TArray<string>; const AMessageResult: TMessageResult);
 const
-  cMessageResultCaptions: array[TMessageResult] of string = ('cancelled', 'failed', 'sent');
+  cMessageResultCaptions: array[TMessageResult] of string = ('cancelled', 'failed', 'sent', 'could not send');
 begin
   MessagesMemo.Lines.Add(Format('Message to %s: %s', [string.Join(', ', ADestinations), cMessageResultCaptions[AMessageResult]]));
 end;
