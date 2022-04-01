@@ -24,8 +24,8 @@ type
   private
     class var FFileVersionInfo: TFileVersionInfo;
     class destructor DestroyClass;
-    class function GetFileVersionInfo: TFileVersionInfo; static;
   public
+    class function GetFileVersionInfo: TFileVersionInfo; static;
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
     class function GetDeviceName: string; static;
     class function GetPackageBuild: string; static;

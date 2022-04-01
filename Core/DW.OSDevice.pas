@@ -83,6 +83,10 @@ type
     /// </summary>
     class function GetPackageVersion: string; static;
     /// <summary>
+    ///   Returns filename for the application package
+    /// </summary>
+    class function GetPackageFileName: string; static;
+    /// <summary>
     ///   Returns UI mode for an Android device, or Undefined
     /// </summary>
     class function GetUIMode: TUIMode; static;
@@ -221,6 +225,15 @@ class function TOSDevice.GetPackageBuild: string;
 begin
   {$IF Defined(MSWINDOWS)}
   Result := TPlatformOSDevice.GetPackageBuild;
+  {$ELSE}
+  Result := '';
+  {$ENDIF}
+end;
+
+class function TOSDevice.GetPackageFileName: string;
+begin
+  {$IF Defined(MSWINDOWS)}
+  Result := TPlatformOSDevice.GetFileVersionInfo.FileName;
   {$ELSE}
   Result := '';
   {$ENDIF}
