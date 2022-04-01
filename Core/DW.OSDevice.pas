@@ -75,6 +75,10 @@ type
     /// </summary>
     class function GetPackageBuild: string; static;
     /// <summary>
+    ///   Returns the filename of the binary
+    /// </summary>
+    class function GetPackageFileName: string; static;
+    /// <summary>
     ///   Returns id for the application package, if any exists
     /// </summary>
     class function GetPackageID: string; static;
@@ -224,6 +228,11 @@ begin
   {$ELSE}
   Result := '';
   {$ENDIF}
+end;
+
+class function TOSDevice.GetPackageFileName: string;
+begin
+  Result := GetModuleName(HInstance);
 end;
 
 class function TOSDevice.GetPackageID: string;
