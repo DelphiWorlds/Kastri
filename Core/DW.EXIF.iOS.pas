@@ -16,11 +16,19 @@ unit DW.EXIF.iOS;
 interface
 
 uses
+  // Mac
+  Macapi.CoreFoundation,
+  // iOS
+  iOSapi.Foundation,
   // DW
   DW.EXIF;
 
 type
   TPlatformEXIF = record
+  private
+    class function GetCoordRefOffset(const ACoordRef: string): Integer; static;
+    class function GetMetadata(const AFileName: NSString): CFDictionaryRef; static;
+    class function GetOrientation(const AValue: Integer): TEXIFOrientation; static;
   public
     class function GetEXIF(const AFileName: string; out AProperties: TEXIFProperties): Boolean; static;
   end;
@@ -31,13 +39,15 @@ uses
   // RTL
   System.SysUtils,
   // Mac
-  Macapi.CoreFoundation, Macapi.Helpers,
+  Macapi.Helpers,
   // iOS
-  iOSapi.Foundation, iOSapi.CoreGraphics,
+  iOSapi.CoreGraphics,
   // DW
   DW.iOSapi.ImageIO, DW.Macapi.Helpers;
 
-function GetCoordRefOffset(const ACoordRef: string): Integer;
+{ TPlatformEXIF }
+
+class function TPlatformEXIF.GetCoordRefOffset(const ACoordRef: string): Integer;
 begin
   if ACoordRef.Equals('E') or ACoordRef.Equals('S') then
     Result := -1
@@ -45,7 +55,7 @@ begin
     Result := 1;
 end;
 
-function GetMetadata(const AFileName: NSString): CFDictionaryRef;
+class function TPlatformEXIF.GetMetadata(const AFileName: NSString): CFDictionaryRef;
 var
   LDataRef: CFDataRef;
   LImageSourceRef: CGImageSourceRef;
@@ -64,7 +74,29 @@ begin
   end;
 end;
 
-{ TPlatformEXIF }
+class function TPlatformEXIF.GetOrientation(const AValue: Integer): TEXIFOrientation;
+begin
+  case AValue of
+    0, kCGImagePropertyOrientationUp:
+      Result := TEXIFOrientation.Normal;
+    kCGImagePropertyOrientationUpMirrored:
+      Result := TEXIFOrientation.FlipHorizontal;
+    kCGImagePropertyOrientationDown:
+      Result := TEXIFOrientation.Rotate180;
+    kCGImagePropertyOrientationDownMirrored:
+      Result := TEXIFOrientation.FlipVertical;
+    kCGImagePropertyOrientationRight:
+      Result := TEXIFOrientation.Rotate270;
+    kCGImagePropertyOrientationRightMirrored:
+      Result := TEXIFOrientation.Transpose;
+    kCGImagePropertyOrientationLeft:
+      Result := TEXIFOrientation.Rotate90;
+    kCGImagePropertyOrientationLeftMirrored:
+      Result := TEXIFOrientation.Transverse;
+  else
+    Result := TEXIFOrientation.Unknown;
+  end;
+end;
 
 class function TPlatformEXIF.GetEXIF(const AFileName: string; out AProperties: TEXIFProperties): Boolean;
 var
@@ -80,12 +112,14 @@ begin
   try
     LMetadata := TNSDictionary.Wrap(LMetadataRef);
     Result := True;
+    AProperties.Orientation := GetOrientation(Round(GetDictionaryNumberValue(LMetadata, kCGImagePropertyOrientation)));
     LEXIF := TNSDictionary.Wrap(LMetadata.valueForKey(kCGImagePropertyExifDictionary));
     if LEXIF <> nil then
       AProperties.DateTaken := GetDictionaryStringValue(LEXIF, kCGImagePropertyExifDateTimeOriginal);
     LGPS := TNSDictionary.Wrap(LMetadata.valueForKey(kCGImagePropertyGPSDictionary));
     if LGPS <> nil then
     begin
+      AProperties.Altitude := GetDictionaryNumberValue(LGPS, kCGImagePropertyGPSAltitude);
       LCoordValue := GetDictionaryNumberValue(LGPS, kCGImagePropertyGPSLatitude);
       LCoordRef := GetDictionaryStringValue(LGPS, kCGImagePropertyGPSLatitudeRef);
       if not LCoordRef.IsEmpty then

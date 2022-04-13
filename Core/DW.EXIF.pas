@@ -16,12 +16,16 @@ unit DW.EXIF;
 interface
 
 type
+  TEXIFOrientation = (Unknown, Normal, FlipHorizontal, Rotate180, FlipVertical, Transpose, Rotate90, Transverse, Rotate270);
+
   TEXIFProperties = record
-    DateTaken: string;
+    Altitude: Double;
     CameraMake: string;
     CameraModel: string;
+    DateTaken: string;
     Longitude: Double;
     Latitude: Double;
+    Orientation: TEXIFOrientation;
   end;
 
   /// <summary>
