@@ -21,6 +21,7 @@ uses
 
 type
   TJsonHelper = record
+    class function IsJson(const AJson: string): Boolean; static;
     class function JsonEncode(const AJsonValue: TJSONValue): string; overload; static;
     class function JsonEncode(const AJsonString: string): string; overload; static;
     class function Tidy(const AJsonValue: TJsonValue; const AIndentSize: Integer = 2): string; overload; static;
@@ -32,6 +33,20 @@ implementation
 uses
   // RTL
   System.Character, System.SysUtils;
+
+class function TJsonHelper.IsJson(const AJson: string): Boolean;
+var
+  LJsonValue: TJSONValue;
+begin
+  Result := False;
+  LJsonValue := TJSONObject.ParseJSONValue(AJson);
+  if LJsonValue <> nil then
+  try
+    Result := True;
+  finally
+    LJsonValue.Free;
+  end;
+end;
 
 class function TJsonHelper.JsonEncode(const AJsonValue: TJSONValue): string;
 begin
