@@ -143,7 +143,7 @@ A more feature-rich alternative for the Share Sheet implementation provided with
 
 Android and iOS implementations for speech-to-text services. On Android, the actual speech API is used, rather than via Intents
 
-#### Universal Links (iOS only)
+#### Universal Links
 
 Allows users to follow links to content inside your app from your website.
 
@@ -151,13 +151,13 @@ Allows users to follow links to content inside your app from your website.
 
 In addition to the features listed above, several other features are [planned for Kastri](https://github.com/DelphiWorlds/Kastri/milestones), namely:
 
-#### Assets Manager
-
-For accessing photos/videos stored on the device via the albums on Android and iOS
-
 #### Google SignIn
 
-A (hopefully) simplified variation on [Grijjy's excellent Google SignIn](https://github.com/grijjy/DelphiGoogleSignIn) implementation, **with added support for iOS**
+A simplified variation on [Grijjy's excellent Google SignIn](https://github.com/grijjy/DelphiGoogleSignIn) implementation, **with added support for iOS**
+
+#### Media Manager
+
+For accessing photos/videos stored on the device via the albums on Android and iOS
 
 #### Simple backend framework for managing push tokens
 
