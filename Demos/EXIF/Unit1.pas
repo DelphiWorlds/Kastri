@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, FMX.Memo.Types, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo,
-  FMX.StdCtrls, FMX.Layouts, System.Actions, FMX.ActnList;
+  FMX.StdCtrls, FMX.Layouts, System.Actions, FMX.ActnList, FMX.Advertising.Firebase;
 
 type
   TForm1 = class(TForm)
@@ -33,7 +33,7 @@ implementation
 {$R *.fmx}
 
 uses
-  System.IOUtils,
+  System.IOUtils, System.TypInfo,
   DW.EXIF, DW.UIHelper;
 
 { TForm1 }
@@ -90,6 +90,7 @@ begin
     Memo1.Lines.Add('Camera Model: ' + LProperties.CameraModel);
     Memo1.Lines.Add('Date Taken: ' + LProperties.DateTaken);
     Memo1.Lines.Add(Format('GPS : %.5f, %.5f', [LProperties.Latitude, LProperties.Longitude]));
+    Memo1.Lines.Add('Orientation: ' + GetEnumName(TypeInfo(TEXIFOrientation), Ord(LProperties.Orientation)));
   end
   else
     Memo1.Lines.Add('Unable to obtain EXIF data');
