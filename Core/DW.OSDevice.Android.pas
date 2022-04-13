@@ -51,7 +51,7 @@ uses
   // RTL
   System.SysUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.Provider, Androidapi.JNI.Os,  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.Provider, Androidapi.JNI.Os, Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.Net, Androidapi.JNIBridge, Androidapi.JNI.App, Androidapi.JNI.Location,
   // DW
   DW.Androidapi.JNI.Hardware.Camera2, DW.Android.Helpers, DW.Androidapi.JNI.App;
