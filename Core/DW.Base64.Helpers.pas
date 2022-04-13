@@ -37,7 +37,7 @@ type
     /// <summary>
     ///   Decodes a Base64 string to a stream
     /// </summary>
-    class function Decode(const ASource: string; const AStream: TStream): string; static;
+    class procedure Decode(const ASource: string; const AStream: TStream); static;
     /// <summary>
     ///   Takes a string, Base64 decodes it, then decompresses it
     /// </summary>
@@ -119,7 +119,7 @@ begin
   end;
 end;
 
-class function TBase64Helper.Decode(const ASource: string; const AStream: TStream): string;
+class procedure TBase64Helper.Decode(const ASource: string; const AStream: TStream);
 var
   LBase64Stream: TStream;
 begin
@@ -196,10 +196,17 @@ end;
 class function TBase64Helper.Encode(const AStream: TStream): string;
 var
   LBase64Stream: TStringStream;
+  LBase64: TBase64Encoding;
 begin
+  AStream.Position := 0;
   LBase64Stream := TStringStream.Create;
   try
-    TNetEncoding.Base64.Encode(AStream, LBase64Stream);
+    LBase64 := TBase64Encoding.Create(0, '');
+    try
+      LBase64.Encode(AStream, LBase64Stream);
+    finally
+      LBase64.Free;
+    end;
     Result := LBase64Stream.DataString;
   finally
     LBase64Stream.Free;
