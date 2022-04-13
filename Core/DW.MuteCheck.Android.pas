@@ -34,7 +34,7 @@ uses
   // RTL
   System.SysUtils,
   // Android
-  Androidapi.JNI.JavaTypes, Androidapi.JNI.Media, Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers, Androidapi.JNI.App;
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.Media, Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers, Androidapi.JNI.App;
 
 { TPlatformMuteCheck }
 
