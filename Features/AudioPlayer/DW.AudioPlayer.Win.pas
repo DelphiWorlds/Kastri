@@ -35,6 +35,7 @@ type
     FHandle: THandle;
     FMediaControl: IMediaControl;
     FMediaEventEx: IMediaEventEx;
+    FMediaSeeking: IMediaSeeking;
     FPlayStartTime: TDateTime;
     procedure DoSetup;
     function RenderFile: Boolean;
@@ -116,6 +117,7 @@ begin
   Result := Succeeded(CoCreateInstance(CLSID_FilterGraph, nil, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, FGraphBuilder)) and
     Succeeded(FGraphBuilder.QueryInterface(IID_IMediaControl, FMediaControl)) and
     Succeeded(FGraphBuilder.QueryInterface(IID_IMediaEventEx, FMediaEventEx)) and
+    Succeeded(FGraphBuilder.QueryInterface(IID_IMediaSeeking, FMediaSeeking)) and
     Succeeded(FMediaEventEx.SetNotifyWindow(FHandle, WM_GRAPH_EVENT, 0));
 end;
 
