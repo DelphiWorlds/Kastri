@@ -167,7 +167,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function Run: Boolean; override;
-    function RunAndWait(const ATimeout: Integer = 0): Boolean; override;
+    function RunAndWait(const ATimeout: Cardinal = 0): Integer; override;
     procedure Terminate; override;
     property CommandLine: string read FCmdLine write FCmdLine;
     property IsTerminated: Boolean read FIsTerminated;
@@ -280,6 +280,7 @@ function TRunProcess.Run: Boolean;
 var
   LError: Pointer;
 begin
+  Result := False;
   FIsTerminated := False;
   if TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager).isExecutableFileAtPath(StrToNSStr(FCmdLine)) then
   begin
@@ -297,9 +298,9 @@ begin
     TOSLog.d('isExecutableFileAtPath is FALSE');
 end;
 
-function TRunProcess.RunAndWait(const ATimeout: Integer = 0): Boolean;
+function TRunProcess.RunAndWait(const ATimeout: Cardinal = 0): Integer;
 begin
-  Result := False; // Has problems on macOS - use TRunProcessSynch
+  Result := -1; // Has problems on macOS - use TRunProcessSynch
 end;
 
 procedure TRunProcess.TaskTerminationHandler(task: NSTask);
