@@ -34,6 +34,8 @@ const
   cPermissionUseFingerprint = 'android.permission.USE_FINGERPRINT';
   cPermissionWriteContacts = 'android.permission.WRITE_CONTACTS';
   cPermissionWriteExternalStorage = 'android.permission.WRITE_EXTERNAL_STORAGE';
+  cPermissionAccessNetworkState = 'android.permission.ACCESS_NETWORK_STATE';
+  cPermissionAccessWifiState = 'android.permission.ACCESS_WIFI_STATE';
 
   cMetadataFCMDefaultChannelId = 'com.google.firebase.messaging.default_notification_channel_id';
   cMetadataFCMDefaultIcon = 'com.google.firebase.messaging.default_notification_icon';
