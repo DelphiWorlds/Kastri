@@ -1,0 +1,50 @@
+object LogView: TLogView
+  Left = 0
+  Top = 0
+  Caption = 'Log'
+  ClientHeight = 545
+  ClientWidth = 1624
+  Position = ScreenCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Memo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    StyledSettings = [Style, FontColor]
+    TextSettings.Font.Family = 'Consolas'
+    Align = Client
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Size.Width = 1616.000000000000000000
+    Size.Height = 496.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Viewport.Width = 1612.000000000000000000
+    Viewport.Height = 492.000000000000000000
+  end
+  object BottomLayout: TLayout
+    Align = Bottom
+    Padding.Top = 4.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Position.Y = 504.000000000000000000
+    Size.Width = 1624.000000000000000000
+    Size.Height = 41.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    object ClearButton: TButton
+      Align = HorzCenter
+      Position.X = 762.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Clear'
+      OnClick = ClearButtonClick
+    end
+  end
+end
