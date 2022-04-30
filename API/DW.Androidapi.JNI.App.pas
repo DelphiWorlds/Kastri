@@ -25,10 +25,24 @@ type
   JKeyguardManager_KeyguardLock = interface;
   JKeyguardManager_OnKeyguardExitResult = interface;
   {$IF CompilerVersion < 33}
+  JLocalTime = interface;
   JNotificationChannel = interface;
   JNotificationChannelGroup = interface;
   {$ENDIF}
   JUiModeManager = interface;
+
+  // Placeholder import to support compiling with Delphi 10.2.x
+  {$IF CompilerVersion < 33}
+  JLocalTimeClass = interface(JObjectClass)
+    ['{4540274D-F993-4054-A204-B71C90237913}']
+  end;
+
+  [JavaSignature('java/time/LocalTime')]
+  JLocalTime = interface(JObject)
+    ['{B73384F1-C48B-4785-AAE6-C5D0FA12E104}']
+  end;
+  TJLocalTime = class(TJavaGenericImport<JLocalTimeClass, JLocalTime>) end;
+  {$ENDIF}
 
   JKeyguardManagerClass = interface(JObjectClass)
     ['{44F9A483-0683-4391-94D1-F0BB6DB7340B}']
