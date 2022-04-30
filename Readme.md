@@ -31,6 +31,8 @@ If you're looking to [learn Delphi, please visit this link](https://learndelphi.
 
 With the introduction of Delphi 11, there have been some changes related to Android. You may notice new jar files in the `Lib` folder where the name is the same as an existing jar, with a suffix of `2.0.0` (or greater) e.g. `dw-kastri-base-2.0.0.jar`. Jars with a `2.0.0` suffix will work **only with Delphi 11** (and possibly later). If a jar does not have a corresponding jar with a `2.0.0` (or greater) suffix, it should also work with Delphi 11. Please also see the Demos section below.
 
+**Due to the above changes to Delphi 11, the existing demos that were created with Delphi 10.4 or earlier may require the [Android Libraries fix](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AndroidLibraries)** 
+
 ## Intro video
 
 [This is a link to an intro video for Kastri](https://delphiworlds.s3-us-west-2.amazonaws.com/kastri-sponsor-video.mp4)
@@ -40,6 +42,12 @@ With the introduction of Delphi 11, there have been some changes related to Andr
 For the most part, with Kastri there are no components to install. Simply clone the repo ([Fork](https://git-fork.com/) is a highly recommended Git client), or download/unzip and ensure that your Project (recommended) or IDE paths point to the folders of the units that you use.
 
 The [Native Controls suite (Kastri FMX)](./Controls) is a set of components that can be [installed into Delphi](./Packages) and used at design-time
+
+## Pull Requests
+
+Pull requests are welcome, however before making any, please read the [Coding Standards readme](https://github.com/DelphiWorlds/Kastri/blob/master/CodingStandards.md) and ensure that the change adheres to the standards, and that the **Description** section of the request is filled out, noting the purpose and reasoning for the change.
+
+In regards to coding standards, in particular observe things like naming, ensuring fields/methods are kept in alphabetical order (which makes them easier to find as the number of methods grow), and that structured statements follow the standard.
 
 ## Support
 
