@@ -29,7 +29,7 @@ If you're looking to [learn Delphi, please visit this link](https://learndelphi.
 
 ## Delphi 11 changes
 
-With the introduction of Delphi 11, there have been some changes related to Android. You may notice new jar files in the `Lib` folder where the name is the same as an existing jar, with a suffix of `2.0.0` (or greater) e.g. `dw-kastri-base-2.0.0.jar`. Jars with a `2.0.0` suffix will work **only with Delphi 11** (and possibly later). If a jar does not have a corresponding jar with a `2.0.0` (or greater) suffix, it should also work with Delphi 11. Please also see the Demos section below.
+With the introduction of Delphi 11, there have been some changes related to Android. You may notice new jar files in the `Lib` folder where the name is the same as an existing jar, with a suffix of `2.0.0` (or greater) e.g. `dw-kastri-base-2.0.0.jar`. Jars with a `2.0.0` suffix will work **only with Delphi 11** (and possibly later). If a jar does not have a corresponding jar with a `2.0.0` (or greater) suffix, it should also work with Delphi 11. Please also see the Demos section below.Maybe need [![Android Libraries Fix](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AndroidLibraries)
 
 ## Intro video
 
