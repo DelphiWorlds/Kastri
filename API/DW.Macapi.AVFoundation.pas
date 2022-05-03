@@ -67,15 +67,13 @@ type
   AVAudioSessionRecordPermission = NSInteger;
   AVAudioSessionRouteSharingPolicy = NSInteger;
   AVAudioSessionSetActiveOptions = NSInteger;
+  AVAudioStereoOrientation = NSInteger;
 
   PNSError = ^NSError;
 
   PermissionBlock = procedure(granted: Boolean) of object;
-  TAVAudioSessionBlockMethod1 = procedure(activated: Boolean; error: NSError) of object;
-
-  AVAudioPCMBufferClass = interface(AVAudioBufferClass)
-    ['{C7781F91-4332-4117-A543-D906AA271F01}']
-  end;
+  TAVAudioSessionBlockMethod1 = procedure(granted: Boolean) of object;
+  TAVAudioSessionBlockMethod2 = procedure(activated: Boolean; error: NSError) of object;
 
   AVPlayerItemOutputClass = interface(NSObjectClass)
     ['{3D89BA95-B673-402D-8046-BEE1763D9FF3}']
@@ -152,8 +150,7 @@ type
     function orientation: AVAudioSessionOrientation; cdecl;
     function preferredPolarPattern: AVAudioSessionPolarPattern; cdecl;
     function selectedPolarPattern: AVAudioSessionPolarPattern; cdecl;
-    [MethodName('setPreferredPolarPattern:error:')]
-    function setPreferredPolarPattern(pattern: AVAudioSessionPolarPattern; outError: PNSError): Boolean; cdecl;
+    function setPreferredPolarPattern(pattern: AVAudioSessionPolarPattern; error: PPointer): Boolean; cdecl;
     function supportedPolarPatterns: NSArray; cdecl;
   end;
   TAVAudioSessionDataSourceDescription = class(TOCGenericImport<AVAudioSessionDataSourceDescriptionClass, AVAudioSessionDataSourceDescription>) end;
@@ -165,26 +162,26 @@ type
 
   AVAudioSession = interface(NSObject)
     ['{22D61823-9B35-4834-A6B4-C70256017E88}']
-    [MethodName('activateWithOptions:completionHandler:')]
-    procedure activateWithOptions(options: AVAudioSessionActivationOptions; handler: TAVAudioSessionBlockMethod1); cdecl;
+    procedure activateWithOptions(options: AVAudioSessionActivationOptions; completionHandler: TAVAudioSessionBlockMethod2); cdecl;
     function allowHapticsAndSystemSoundsDuringRecording: Boolean; cdecl;
     function availableCategories: NSArray; cdecl;
     function availableInputs: NSArray; cdecl;
     function availableModes: NSArray; cdecl;
     function category: AVAudioSessionCategory; cdecl;
     function categoryOptions: AVAudioSessionCategoryOptions; cdecl;
-    function currentHardwareInputNumberOfChannels: NSInteger; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("inputNumberOfChannels", ios(3.0, 6.0))
-    function currentHardwareOutputNumberOfChannels: NSInteger; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("outputNumberOfChannels", ios(3.0, 6.0))
-    function currentHardwareSampleRate: Double; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("sampleRate", ios(3.0, 6.0))
+    function currentHardwareInputNumberOfChannels: NSInteger; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("inputNumberOfChannels", ios(3.0, 6.0), macCatalyst(14.0, 14.0))
+    function currentHardwareOutputNumberOfChannels: NSInteger; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("outputNumberOfChannels", ios(3.0, 6.0), macCatalyst(14.0, 14.0))
+    function currentHardwareSampleRate: Double; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("sampleRate", ios(3.0, 6.0), macCatalyst(14.0, 14.0))
     function currentRoute: AVAudioSessionRouteDescription; cdecl;
-    function delegate: Pointer; cdecl; // API_DEPRECATED("No longer supported", ios(4.0, 6.0))
-    function init: Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+sharedInstance", ios(3.0, 10.0))
+    function delegate: Pointer; cdecl; // API_DEPRECATED("No longer supported", ios(4.0, 6.0), macCatalyst(14.0, 14.0))
+    function init: Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+sharedInstance", ios(3.0, 10.0), macCatalyst(14.0, 14.0))
     function inputDataSource: AVAudioSessionDataSourceDescription; cdecl;
     function inputDataSources: NSArray; cdecl;
     function inputGain: Single; cdecl;
-    function inputIsAvailable: Boolean; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("isInputAvailable", ios(3.0, 6.0))
+    function inputIsAvailable: Boolean; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("isInputAvailable", ios(3.0, 6.0), macCatalyst(14.0, 14.0))
     function inputLatency: NSTimeInterval; cdecl;
     function inputNumberOfChannels: NSInteger; cdecl;
+    function inputOrientation: AVAudioStereoOrientation; cdecl;
     function IOBufferDuration: NSTimeInterval; cdecl;
     function isInputAvailable: Boolean; cdecl;
     function isInputGainSettable: Boolean; cdecl;
@@ -197,61 +194,46 @@ type
     function outputLatency: NSTimeInterval; cdecl;
     function outputNumberOfChannels: NSInteger; cdecl;
     function outputVolume: Single; cdecl;
-    [MethodName('overrideOutputAudioPort:error:')]
-    function overrideOutputAudioPort(portOverride: AVAudioSessionPortOverride; outError: PNSError): Boolean; cdecl;
-    function preferredHardwareSampleRate: Double; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("preferredSampleRate", ios(3.0, 6.0))
+    function overrideOutputAudioPort(portOverride: AVAudioSessionPortOverride; error: PPointer): Boolean; cdecl;
+    function preferredHardwareSampleRate: Double; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("preferredSampleRate", ios(3.0, 6.0), macCatalyst(14.0, 14.0))
     function preferredInput: AVAudioSessionPortDescription; cdecl;
     function preferredInputNumberOfChannels: NSInteger; cdecl;
+    function preferredInputOrientation: AVAudioStereoOrientation; cdecl;
     function preferredIOBufferDuration: NSTimeInterval; cdecl;
     function preferredOutputNumberOfChannels: NSInteger; cdecl;
     function preferredSampleRate: Double; cdecl;
+    function prefersNoInterruptionsFromSystemAlerts: Boolean; cdecl;
     function promptStyle: AVAudioSessionPromptStyle; cdecl;
     function recordPermission: AVAudioSessionRecordPermission; cdecl;
-    procedure requestRecordPermission(response: PermissionBlock); cdecl;
+    procedure requestRecordPermission(response: TAVAudioSessionBlockMethod1); cdecl;
     function routeSharingPolicy: AVAudioSessionRouteSharingPolicy; cdecl;
     function sampleRate: Double; cdecl;
     function secondaryAudioShouldBeSilencedHint: Boolean; cdecl;
-    [MethodName('setActive:withFlags:error:')]
-    function setActive(active: Boolean; flags: NSInteger; outError: PNSError): Boolean; overload; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("-setActive:withOptions:error:", ios(4.0, 6.0))
-    [MethodName('setActive:withOptions:error:')]
-    function setActiveWithOptions(active: Boolean; options: AVAudioSessionSetActiveOptions; outError: PNSError): Boolean; cdecl;
-    [MethodName('setActive:error:')]
-    function setActive(active: Boolean; outError: PNSError): Boolean; overload; cdecl;
-    [MethodName('setAggregatedIOPreference:error:')]
-    function setAggregatedIOPreference(inIOType: AVAudioSessionIOType; outError: PNSError): Boolean; cdecl;
-    [MethodName('setAllowHapticsAndSystemSoundsDuringRecording:error:')]
-    function setAllowHapticsAndSystemSoundsDuringRecording(inValue: Boolean; outError: PNSError): Boolean; cdecl;
-    [MethodName('setCategory:mode:routeSharingPolicy:options:error:')]
-    function setCategory(category: AVAudioSessionCategory; mode: AVAudioSessionMode; policy: AVAudioSessionRouteSharingPolicy;
-      options: AVAudioSessionCategoryOptions; outError: PNSError): Boolean; overload; cdecl;
-    [MethodName('setCategory:mode:options:error:')]
+    function setActive(active: Boolean; error: PPointer): Boolean; overload; cdecl;
+    function setActive(active: Boolean; withOptions: AVAudioSessionSetActiveOptions; error: PPointer): Boolean; overload; cdecl;
+    function setAggregatedIOPreference(inIOType: AVAudioSessionIOType; error: PPointer): Boolean; cdecl;
+    function setAllowHapticsAndSystemSoundsDuringRecording(inValue: Boolean; error: PPointer): Boolean; cdecl;
+    function setCategory(category: AVAudioSessionCategory; error: PPointer): Boolean; overload; cdecl;
+    function setCategory(category: AVAudioSessionCategory; withOptions: AVAudioSessionCategoryOptions; error: PPointer): Boolean; overload; cdecl;
     function setCategory(category: AVAudioSessionCategory; mode: AVAudioSessionMode; options: AVAudioSessionCategoryOptions;
-      outError: PNSError): Boolean; overload; cdecl;
-    [MethodName('setCategory:withOptions:error:')]
-    function setCategory(category: AVAudioSessionCategory; options: AVAudioSessionCategoryOptions; outError: PNSError): Boolean; overload; cdecl;
-    [MethodName('setCategory:error:')]
-    function setCategoryError(category: AVAudioSessionCategory; outError: PNSError): Boolean; cdecl;
-    procedure setDelegate(delegate: Pointer); cdecl; // API_DEPRECATED("No longer supported", ios(4.0, 6.0))
-    [MethodName('setInputDataSource:error:')]
-    function setInputDataSource(dataSource: AVAudioSessionDataSourceDescription; outError: PNSError): Boolean; cdecl;
-    [MethodName('setInputGain:error:')]
-    function setInputGain(gain: Single; outError: PNSError): Boolean; cdecl;
-    [MethodName('setMode:error:')]
-    function setMode(mode: AVAudioSessionMode; outError: PNSError): Boolean; cdecl;
-    [MethodName('setOutputDataSource:error:')]
-    function setOutputDataSource(dataSource: AVAudioSessionDataSourceDescription; outError: PNSError): Boolean; cdecl;
-    [MethodName('setPreferredHardwareSampleRate:error:')]
-    function setPreferredHardwareSampleRate(sampleRate: Double; outError: PNSError): Boolean; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("setPreferredSampleRate:error:", ios(3.0, 6.0))
-    [MethodName('setPreferredInput:error:')]
-    function setPreferredInput(inPort: AVAudioSessionPortDescription; outError: PNSError): Boolean; cdecl;
-    [MethodName('setPreferredInputNumberOfChannels:error:')]
-    function setPreferredInputNumberOfChannels(count: NSInteger; outError: PNSError): Boolean; cdecl;
-    [MethodName('setPreferredIOBufferDuration:error:')]
-    function setPreferredIOBufferDuration(duration: NSTimeInterval; outError: PNSError): Boolean; cdecl;
-    [MethodName('setPreferredOutputNumberOfChannels:error:')]
-    function setPreferredOutputNumberOfChannels(count: NSInteger; outError: PNSError): Boolean; cdecl;
-    [MethodName('setPreferredSampleRate:error:')]
-    function setPreferredSampleRate(sampleRate: Double; outError: PNSError): Boolean; cdecl;
+      error: PPointer): Boolean; overload; cdecl;
+    function setCategory(category: AVAudioSessionCategory; mode: AVAudioSessionMode; routeSharingPolicy: AVAudioSessionRouteSharingPolicy;
+      options: AVAudioSessionCategoryOptions; error: PPointer): Boolean; overload; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl; // API_DEPRECATED("No longer supported", ios(4.0, 6.0), macCatalyst(14.0, 14.0))
+    function setInputDataSource(dataSource: AVAudioSessionDataSourceDescription; error: PPointer): Boolean; cdecl;
+    function setInputGain(gain: Single; error: PPointer): Boolean; cdecl;
+    function setMode(mode: AVAudioSessionMode; error: PPointer): Boolean; cdecl;
+    function setOutputDataSource(dataSource: AVAudioSessionDataSourceDescription; error: PPointer): Boolean; cdecl;
+    function setPreferredHardwareSampleRate(sampleRate: Double; error: PPointer): Boolean; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("setPreferredSampleRate:error:", ios(3.0, 6.0), macCatalyst(14.0, 14.0))
+    function setPreferredInput(inPort: AVAudioSessionPortDescription; error: PPointer): Boolean; cdecl;
+    function setPreferredInputNumberOfChannels(count: NSInteger; error: PPointer): Boolean; cdecl;
+    function setPreferredInputOrientation(orientation: AVAudioStereoOrientation; error: PPointer): Boolean; cdecl;
+    function setPreferredIOBufferDuration(duration: NSTimeInterval; error: PPointer): Boolean; cdecl;
+    function setPreferredOutputNumberOfChannels(count: NSInteger; error: PPointer): Boolean; cdecl;
+    function setPreferredSampleRate(sampleRate: Double; error: PPointer): Boolean; cdecl;
+    function setPrefersNoInterruptionsFromSystemAlerts(inValue: Boolean; error: PPointer): Boolean; cdecl;
+    function setSupportsMultichannelContent(inValue: Boolean; error: PPointer): Boolean; cdecl;
+    function supportsMultichannelContent: Boolean; cdecl;
   end;
   TAVAudioSession = class(TOCGenericImport<AVAudioSessionClass, AVAudioSession>) end;
 
