@@ -46,6 +46,7 @@ begin
   FSpeech.OnRecording := SpeechRecordingHandler;
   FSpeech.OnStopped := SpeechStoppedHandler;
   FSpeech.OnText := SpeechTextHandler;
+  // FSpeech.Language := 'es-MX'; // For example, if you are expecting Spanish (Mexican)
   DoStopped;
 end;
 
@@ -57,7 +58,7 @@ end;
 
 procedure TfrmMain.DoStopped;
 begin
-  MessageLabel.Text := 'Click the button, and say something!';
+  MessageLabel.Text := 'Tap/click the button, and say something!';
 end;
 
 procedure TfrmMain.SpeechAuthorizationHandler(Sender: TObject; const AStatus: TAuthorizationStatus);
