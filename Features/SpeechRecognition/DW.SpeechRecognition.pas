@@ -48,6 +48,7 @@ type
   TSpeechRecognition = class(TObject)
   private
     FAuthorizationStatus: TAuthorizationStatus;
+    FLanguage: string;
     FPlatformSpeech: TCustomPlatformSpeechRecognition;
     FPrompt: string;
     FStopInterval: Integer;
@@ -93,6 +94,10 @@ type
     /// </summary>
     property IsRecording: Boolean read GetIsRecording;
     /// <summary>
+    ///   Determines which language is used
+    /// </summary>
+    property Language: string read FLanguage write FLanguage;
+    /// <summary>
     ///   Prompt that is displayed when recording (Android only at present)
     /// </summary>
     property Prompt: string read FPrompt write FPrompt;
@@ -132,9 +137,9 @@ type
 implementation
 
 uses
-  DW.OSLog,
   // RTL
   System.SysUtils,
+  // DW
   {$IF Defined(IOS)}
   DW.SpeechRecognition.iOS;
   {$ELSEIF Defined(MACOS)}

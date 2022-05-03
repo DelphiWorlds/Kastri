@@ -127,18 +127,24 @@ end;
 procedure TPlatformSpeechRecognition.DoStartRecording;
 var
   LAudioSession: AVAudioSession;
+  LLocale: NSLocale;
   LPointer: Pointer;
 begin
   LPointer := nil;
   if FRecognizer = nil then
   begin
     FRecognizer := TSFSpeechRecognizer.Create;
-    FRecognizer.initWithLocale(TNSLocale.Wrap(TNSLocale.OCClass.currentLocale));
+    LLocale := nil;
+    if not Speech.Language.IsEmpty then
+      LLocale := TNSLocale.Wrap(TNSLocale.OCClass.localeWithLocaleIdentifier(StrToNSStr(Speech.Language)));
+    if LLocale = nil then
+      LLocale := TNSLocale.Wrap(TNSLocale.OCClass.currentLocale);
+    FRecognizer.initWithLocale(LLocale);
   end;
   if FAudioEngine = nil then
     FAudioEngine := TAVAudioEngine.Create;
-  LAudioSession := TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance);
-  LAudioSession.setCategoryError(AVAudioSessionCategoryRecord, @LPointer);
+  LAudioSession := TAVAudioSession.OCClass.sharedInstance;
+  LAudioSession.setCategory(AVAudioSessionCategoryRecord,  @LPointer);
   // LAudioSession.setMode(AVAudioSessionModeMeasurement, @LPointer);
   // LAudioSession.setActiveWithOptionsError(True, AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation, @LPointer);
   FRequest := TSFSpeechAudioBufferRecognitionRequest.Create;
@@ -148,7 +154,7 @@ begin
   FTask := FRecognizer.recognitionTaskWithRequest(FRequest, RecognitionRequestSpeechResultHandler);
   FInputNode.installTapOnBus(0, 4096, FInputNode.outputFormatForBus(0), InputNodeInstallTapOnBusHandler);
   FAudioEngine.prepare;
-  FAudioEngine.startAndReturnError(@LPointer);
+  FAudioEngine.startAndReturnError;
   StartedRecording;
 end;
 

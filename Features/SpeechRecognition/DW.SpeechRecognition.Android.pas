@@ -188,7 +188,10 @@ var
 begin
   LIntent := TJIntent.JavaClass.init(TJRecognizerIntent.JavaClass.ACTION_RECOGNIZE_SPEECH);
   LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_LANGUAGE_MODEL, TJRecognizerIntent.JavaClass.LANGUAGE_MODEL_FREE_FORM);
-  LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_LANGUAGE, TJLocale.JavaClass.getDefault.toString);
+  if Speech.Language.IsEmpty then
+    LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_LANGUAGE, TJLocale.JavaClass.getDefault.toString)
+  else
+    LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_LANGUAGE, StringToJString(Speech.Language));
   LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_PROMPT, StringToJString(Speech.Prompt));
   FSpeechRecognizer.startListening(LIntent);
 end;
