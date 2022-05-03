@@ -16,6 +16,8 @@ unit DW.SpeechRecognition.iOS;
 interface
 
 uses
+  // RTL
+  System.Messaging,
   // iOS
   iOSapi.Foundation, iOSapi.AVFoundation,
   // DW
@@ -27,9 +29,12 @@ type
   private
     FAudioEngine: AVAudioEngine;
     FInputNode: AVAudioInputNode;
+    FIsBackground: Boolean;
+    FPendingAuthorizationStatus: TAuthorizationStatus;
     FRecognizer: SFSpeechRecognizer;
     FRequest: SFSpeechAudioBufferRecognitionRequest;
     FTask: SFSpeechRecognitionTask;
+    procedure ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
     function GetRecordAuthorizationStatus(const APlatformStatus: AVAuthorizationStatus): TAuthorizationStatus;
     function GetSpeechAuthorizationStatus(const APlatformStatus: SFSpeechRecognizerAuthorizationStatus): TAuthorizationStatus;
     procedure InputNodeInstallTapOnBusHandler(buffer: AVAudioPCMBuffer; when: AVAudioTime);
@@ -52,6 +57,8 @@ implementation
 uses
   // RTL
   System.Classes, System.SysUtils,
+  // FMX
+  FMX.Platform,
   // macOS
   Macapi.ObjCRuntime, Macapi.Helpers;
 
@@ -67,6 +74,7 @@ var
   LSpeechStatus, LRecordStatus: TAuthorizationStatus;
 begin
   inherited;
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   LRecordStatus := GetRecordAuthorizationStatus(TAVCaptureDevice.OCClass.authorizationStatusForMediaType(AVMediaTypeAudio));
   LSpeechStatus := GetSpeechAuthorizationStatus(TSFSpeechRecognizer.OCClass.authorizationStatus);
   if (LSpeechStatus = TAuthorizationStatus.Denied) or (LRecordStatus = TAuthorizationStatus.Denied) then
@@ -81,6 +89,7 @@ end;
 
 destructor TPlatformSpeechRecognition.Destroy;
 begin
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
   if FRecognizer <> nil then
     FRecognizer.release;
   FRecognizer := nil;
@@ -89,6 +98,24 @@ begin
   FAudioEngine := nil;
   inherited;
 end;
+
+procedure TPlatformSpeechRecognition.ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
+begin
+  case TApplicationEventMessage(AMsg).Value.Event of
+    TApplicationEvent.WillBecomeInactive:
+      FIsBackground := True;
+    TApplicationEvent.BecameActive:
+    begin
+      FIsBackground := False;
+      if FPendingAuthorizationStatus <> TAuthorizationStatus.NotDetermined then
+      begin
+        QueueAuthorizationStatus(FPendingAuthorizationStatus);
+        FPendingAuthorizationStatus := TAuthorizationStatus.NotDetermined;
+      end;
+    end;
+  end;
+end;
+
 
 function TPlatformSpeechRecognition.GetRecordAuthorizationStatus(const APlatformStatus: AVAuthorizationStatus): TAuthorizationStatus;
 begin
@@ -125,18 +152,24 @@ end;
 procedure TPlatformSpeechRecognition.DoStartRecording;
 var
   LAudioSession: AVAudioSession;
+  LLocale: NSLocale;
   LPointer: Pointer;
 begin
   LPointer := nil;
   if FRecognizer = nil then
   begin
     FRecognizer := TSFSpeechRecognizer.Create;
-    FRecognizer.initWithLocale(TNSLocale.Wrap(TNSLocale.OCClass.currentLocale));
+    LLocale := nil;
+    if not Speech.Language.IsEmpty then
+      LLocale := TNSLocale.Wrap(TNSLocale.OCClass.localeWithLocaleIdentifier(StrToNSStr(Speech.Language)));
+    if LLocale = nil then
+      LLocale := TNSLocale.Wrap(TNSLocale.OCClass.currentLocale);
+    FRecognizer.initWithLocale(LLocale);
   end;
   if FAudioEngine = nil then
     FAudioEngine := TAVAudioEngine.Create;
-  LAudioSession := TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance);
-  LAudioSession.setCategoryError(AVAudioSessionCategoryRecord, @LPointer);
+  LAudioSession := TAVAudioSession.OCClass.sharedInstance;
+  LAudioSession.setCategory(AVAudioSessionCategoryRecord, @LPointer);
   // LAudioSession.setMode(AVAudioSessionModeMeasurement, @LPointer);
   // LAudioSession.setActiveWithOptionsError(True, AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation, @LPointer);
   FRequest := TSFSpeechAudioBufferRecognitionRequest.Create;
@@ -217,7 +250,10 @@ var
   LStatus: TAuthorizationStatus;
 begin
   LStatus := GetSpeechAuthorizationStatus(status);
-  QueueAuthorizationStatus(LStatus);
+  if FIsBackground then
+    FPendingAuthorizationStatus := LStatus
+  else
+    QueueAuthorizationStatus(LStatus);
   if (LStatus = TAuthorizationStatus.Authorized) and IsRecordingPending then
     DoStartRecording;
 end;
