@@ -24,7 +24,7 @@ uses
 type
   TMethodKinds = set of TMethodType;
 
-  TRouteHandlerFunc = reference to function(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean;
+  TRouteHandlerFunc = reference to function: Boolean;
 
   TRouteHandler = record
     NeedsAuth: Boolean;
@@ -47,10 +47,13 @@ type
     FMethodKinds: TMethodKinds;
     FPath: string;
     FPathSections: TArray<string>;
+    FRequest: TWebRequest;
+    FResponse: TWebResponse;
     function CanHandleMethod(const AMethodKind: TMethodType): Boolean;
     function GetPathSection(const AIndex: Integer): string;
-    function HandleRoutes(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean;
-    procedure SetNotHandled(const AResponse: TWebResponse);
+    function GetPathSectionCount: Integer;
+    function HandleRoutes: Boolean;
+    procedure SetNotHandled;
     procedure SplitPath(const APath: string);
   protected
     /// <summary>
@@ -64,14 +67,14 @@ type
     /// <remarks>
     ///    As an example, TWebBrokerRESTHandler overrides this method to free the JSON object created in the BeforeHandle method
     /// </remarks>
-    procedure AfterHandle(const ARequest: TWebRequest; const AResponse: TWebResponse); virtual;
+    procedure AfterHandle; virtual;
     /// <summary>
     ///    Override this method to perform any processing before the request is handled
     /// </summary>
     /// <remarks>
     ///    As an example, TWebBrokerRESTHandler overrides this method to parse the content of the request into a JSON object
     /// </remarks>
-    procedure BeforeHandle(const ARequest: TWebRequest; const AResponse: TWebResponse); virtual;
+    procedure BeforeHandle; virtual;
     function CanHandlePath(const APath: string): Boolean; virtual;
     /// <summary>
     ///    Override this method to set the Path and MethodKinds properties, and to add any child route handlers
@@ -80,23 +83,23 @@ type
     /// <summary>
     ///    Override this method to handle the request. Return True if the request was valid for the path etc
     /// </summary>
-    function Handle(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean; virtual;
+    function Handle: Boolean; virtual;
     function HandleRequest(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean;
     /// <summary>
     ///    Override this method to check authentication, if necessary
     /// </summary>
-    function IsAuthorized(const ARequest: TWebRequest): Boolean; virtual;
+    function IsAuthorized: Boolean; virtual;
     /// <summary>
     ///    Sets the response to indicate that the content of the request is invalid (422)
     /// </summary>
-    procedure SetInvalidContent(const AResponse: TWebResponse);
+    procedure SetInvalidContent;
     /// <summary>
     ///    Sets the response to indicate that authorization details are missing or invalid (401)
     /// </summary>
     /// <remarks>
     ///    This will be called automatically if IsAuthorized returns False
     /// </remarks>
-    procedure SetNotAuthorized(const AResponse: TWebResponse);
+    procedure SetNotAuthorized;
     /// <summary>
     ///    Returns the section of the path indicated by Index
     /// </summary>
@@ -108,10 +111,13 @@ type
     /// <summary>
     ///    Override this method to perform any special processing if the route supplied is not handled
     /// </summary>
-    function UnhandledRoute(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean; virtual;
+    function UnhandledRoute: Boolean; virtual;
     property MethodKinds: TMethodKinds read FMethodKinds write FMethodKinds;
     property Path: string read FPath write FPath;
+    property PathSectionCount: Integer read GetPathSectionCount;
     property PathSections[const AIndex: Integer]: string read GetPathSection;
+    property Request: TWebRequest read FRequest;
+    property Response: TWebResponse read FResponse;
   public
     constructor Create;
     destructor Destroy; override;
@@ -170,6 +176,11 @@ begin
     Result := FPathSections[AIndex];
 end;
 
+function TWebBrokerHandler.GetPathSectionCount: Integer;
+begin
+  Result := Length(FPathSections);
+end;
+
 function TWebBrokerHandler.TryGetPathSection(const AIndex: Integer; out AValue: Integer): Boolean;
 var
   LValue: string;
@@ -177,7 +188,7 @@ begin
   Result := TryGetPathSection(AIndex, LValue) and TryStrToInt(LValue, AValue);
 end;
 
-function TWebBrokerHandler.UnhandledRoute(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean;
+function TWebBrokerHandler.UnhandledRoute: Boolean;
 begin
   Result := False;
 end;
@@ -199,12 +210,12 @@ begin
   FHandlers.Add(APath, LRouteHandler);
 end;
 
-procedure TWebBrokerHandler.AfterHandle(const ARequest: TWebRequest; const AResponse: TWebResponse);
+procedure TWebBrokerHandler.AfterHandle;
 begin
   //
 end;
 
-procedure TWebBrokerHandler.BeforeHandle(const ARequest: TWebRequest; const AResponse: TWebResponse);
+procedure TWebBrokerHandler.BeforeHandle;
 begin
   //
 end;
@@ -214,7 +225,7 @@ begin
   Result := (MethodKinds = [TMethodType.mtAny]) or (AMethodKind in MethodKinds);
 end;
 
-function TWebBrokerHandler.Handle(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean;
+function TWebBrokerHandler.Handle: Boolean;
 begin
   Result := False;
 end;
@@ -230,7 +241,7 @@ begin
   //
 end;
 
-function TWebBrokerHandler.HandleRoutes(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean;
+function TWebBrokerHandler.HandleRoutes: Boolean;
 var
   LAction: string;
   LRouteHandler: TRouteHandler;
@@ -238,23 +249,23 @@ begin
   Result := False;
   for LAction in FHandlers.Keys.ToArray do
   begin
-    if FixupPath(ARequest.PathInfo).StartsWith(FixupPath(Path + LAction)) and FHandlers.TryGetValue(LAction, LRouteHandler) then
+    if FixupPath(Request.PathInfo).StartsWith(FixupPath(Path + LAction)) and FHandlers.TryGetValue(LAction, LRouteHandler) then
     begin
       Result := True;
-      if LRouteHandler.CanHandle(ARequest.MethodType) then
+      if LRouteHandler.CanHandle(Request.MethodType) then
       begin
-        if not LRouteHandler.NeedsAuth or IsAuthorized(ARequest) then
-          Result := LRouteHandler.Handler(ARequest, AResponse)
+        if not LRouteHandler.NeedsAuth or IsAuthorized then
+          Result := LRouteHandler.Handler()
         else
-          SetNotAuthorized(AResponse);
+          SetNotAuthorized;
       end
       else
-        SetNotHandled(AResponse);
+        SetNotHandled;
       Break;
     end;
   end;
   if not Result then
-    Result := UnhandledRoute(ARequest, AResponse);
+    Result := UnhandledRoute;
 end;
 
 procedure TWebBrokerHandler.SplitPath(const APath: string);
@@ -275,54 +286,56 @@ end;
 function TWebBrokerHandler.HandleRequest(const ARequest: TWebRequest; const AResponse: TWebResponse): Boolean;
 begin
   Result := False;
+  FRequest := ARequest;
+  FResponse := AResponse;
   // Can this handler handle the specified path?
-  if CanHandlePath(ARequest.PathInfo) then
+  if CanHandlePath(FRequest.PathInfo) then
   begin
     SplitPath(ARequest.PathInfo);
     // Do any pre-processing
-    BeforeHandle(ARequest, AResponse);
+    BeforeHandle;
     try
       Result := True;
       // If there are no sub-routes configured..
-      if not HandleRoutes(ARequest, AResponse) then
+      if not HandleRoutes then
       begin
         // Check if this handler can handle the method
         if CanHandleMethod(ARequest.MethodType) then
         begin
           // Method is OK, check authorization
-          if IsAuthorized(ARequest) then
-            Result := Handle(ARequest, AResponse)
+          if IsAuthorized then
+            Result := Handle
           else
-            SetNotAuthorized(AResponse);
+            SetNotAuthorized;
         end
         else
-          SetNotHandled(AResponse);
+          SetNotHandled;
       end;
     finally
       // Perform any cleanup required
-      AfterHandle(ARequest, AResponse);
+      AfterHandle;
     end;
   end;
 end;
 
-function TWebBrokerHandler.IsAuthorized(const ARequest: TWebRequest): Boolean;
+function TWebBrokerHandler.IsAuthorized: Boolean;
 begin
   Result := False;
 end;
 
-procedure TWebBrokerHandler.SetInvalidContent(const AResponse: TWebResponse);
+procedure TWebBrokerHandler.SetInvalidContent;
 begin
-  AResponse.StatusCode := 422; // Valid path and authorization, but content has something missing
+  Response.StatusCode := 422; // Valid path and authorization, but content has something missing
 end;
 
-procedure TWebBrokerHandler.SetNotAuthorized(const AResponse: TWebResponse);
+procedure TWebBrokerHandler.SetNotAuthorized;
 begin
-  AResponse.StatusCode := 401; // Can handle the path and method, but not authorized
+  Response.StatusCode := 401; // Can handle the path and method, but not authorized
 end;
 
-procedure TWebBrokerHandler.SetNotHandled(const AResponse: TWebResponse);
+procedure TWebBrokerHandler.SetNotHandled;
 begin
-  AResponse.StatusCode := 403; // Can handle the path, but not the method
+  Response.StatusCode := 403; // Can handle the path, but not the method
 end;
 
 { TWebBrokerHandlerRegistry }
