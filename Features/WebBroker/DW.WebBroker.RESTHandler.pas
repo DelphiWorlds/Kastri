@@ -31,8 +31,8 @@ type
   private
     FContents: TJSONValue;
   protected
-    procedure AfterHandle(const ARequest: TWebRequest; const AResponse: TWebResponse); override;
-    procedure BeforeHandle(const ARequest: TWebRequest; const AResponse: TWebResponse); override;
+    procedure AfterHandle; override;
+    procedure BeforeHandle; override;
     property Contents: TJSONValue read FContents;
   end;
 
@@ -40,14 +40,14 @@ implementation
 
 { TWebBrokerRESTHandler }
 
-procedure TWebBrokerRESTHandler.BeforeHandle(const ARequest: TWebRequest; const AResponse: TWebResponse);
+procedure TWebBrokerRESTHandler.BeforeHandle;
 begin
-  FContents := TJSONObject.ParseJSONValue(ARequest.Content);
+  FContents := TJSONObject.ParseJSONValue(Request.Content);
   if FContents = nil then
     FContents := TJSONObject.Create;
 end;
 
-procedure TWebBrokerRESTHandler.AfterHandle(const ARequest: TWebRequest; const AResponse: TWebResponse);
+procedure TWebBrokerRESTHandler.AfterHandle;
 begin
   FContents.Free;
 end;
