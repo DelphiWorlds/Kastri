@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{4CB1D085-3178-435D-8EDE-C21DD70153A2}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Application\ForegroundServiceDemo.dproj">
+            <Dependencies>Service\ForegroundService.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Service\ForegroundService.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ForegroundServiceDemo" DependsOnTargets="ForegroundService">
+        <MSBuild Projects="Application\ForegroundServiceDemo.dproj"/>
+    </Target>
+    <Target Name="ForegroundServiceDemo:Clean" DependsOnTargets="ForegroundService:Clean">
+        <MSBuild Projects="Application\ForegroundServiceDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ForegroundServiceDemo:Make" DependsOnTargets="ForegroundService:Make">
+        <MSBuild Projects="Application\ForegroundServiceDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ForegroundService">
+        <MSBuild Projects="Service\ForegroundService.dproj"/>
+    </Target>
+    <Target Name="ForegroundService:Clean">
+        <MSBuild Projects="Service\ForegroundService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ForegroundService:Make">
+        <MSBuild Projects="Service\ForegroundService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ForegroundServiceDemo;ForegroundService"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ForegroundServiceDemo:Clean;ForegroundService:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ForegroundServiceDemo:Make;ForegroundService:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
