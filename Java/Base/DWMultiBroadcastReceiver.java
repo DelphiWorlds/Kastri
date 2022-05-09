@@ -98,8 +98,8 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
   public static final String EXTRA_NOTIFICATION_NAME = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_NAME";
   public static final String EXTRA_NOTIFICATION_REPEATINTERVAL = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_REPEATINTERVAL";
   public static final String EXTRA_SERVICE_RESTART = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_RESTART";
-  public static final String EXTRA_SERVICE_NAME = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_NAME";
-  public static final String EXTRA_SERVICE_JOBID = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_JOBID";
+  public static final String EXTRA_SERVICE_CLASS_NAME = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_CLASS_NAME";
+  public static final String EXTRA_JOB_ID = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_JOB_ID";
   public static final String EXTRA_START_UNLOCK = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_START_UNLOCK";
 
 	private DWMultiBroadcastReceiverDelegate mDelegate;
@@ -110,6 +110,19 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 
 	public DWMultiBroadcastReceiver(DWMultiBroadcastReceiverDelegate delegate) {
 		mDelegate = delegate;
+  }
+
+  private static void enqueueWork(Context context, Intent intent, String serviceClassName, int jobId) {
+    doEnqueueWork(context, intent, serviceClassName, jobId);
+  }
+
+  private static void doEnqueueWork(Context context, Intent intent, String serviceClassName, int jobId) {
+    try {
+      Log.d(TAG, "Calling enqueueWork for: " + serviceClassName + " with jobId: " + String.valueOf(jobId));
+      JobIntentService.enqueueWork(context, Class.forName(serviceClassName), jobId, intent);
+    } catch (ClassNotFoundException e) {
+      Log.e(TAG, "Could not find service: " + serviceClassName);
+    }
   }
 
   private boolean startApp(Context context) {
@@ -195,27 +208,31 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
     if (intent.getAction().equals(ACTION_SERVICE_ALARM) || intent.getAction().equals(ACTION_SERVICE_RESTART)) {
       Log.d(TAG, "Attempting to restart service or start service from alarm");
       // Start a job service
-      int jobId = intent.getIntExtra(EXTRA_SERVICE_JOBID, 0);
-      String serviceClassName = intent.getStringExtra(EXTRA_SERVICE_NAME);
-      if (jobId == 0)
-        intent.setClassName(context.getPackageName(), intent.getStringExtra(serviceClassName));
-      // Some restart cases require the service not to be started in foreground mode
-      boolean startNormal = intent.getIntExtra("MustStartNormal", 0) == 1;
-      if (intent.getAction().equals(ACTION_SERVICE_RESTART))
-        intent.putExtra(EXTRA_SERVICE_RESTART, 1);
-      if (jobId != 0) {
-        try {
-          JobIntentService.enqueueWork(context, Class.forName(serviceClassName), jobId, intent);
-        } catch (ClassNotFoundException e) {
-          Log.e(TAG, "Could not find service: " + serviceClassName);
+      int jobId = intent.getIntExtra(EXTRA_JOB_ID, 0);
+      String serviceClassName = intent.getStringExtra(EXTRA_SERVICE_CLASS_NAME);
+      if (serviceClassName != null) {
+        if (jobId == 0)
+          intent.setClassName(context.getPackageName(), serviceClassName);
+        // Some restart cases require the service not to be started in foreground mode
+        boolean startNormal = intent.getIntExtra("MustStartNormal", 0) == 1;
+        if (intent.getAction().equals(ACTION_SERVICE_RESTART))
+          intent.putExtra(EXTRA_SERVICE_RESTART, 1);
+        if (jobId != 0) {
+          enqueueWork(context, intent, serviceClassName, jobId);
+        } 
+        else if (!startNormal && checkBuildAndTarget(context, 26) && !isAppForeground()) {
+          Log.d(TAG, "Calling startForegroundService for: " + serviceClassName);
+          context.startForegroundService(intent); // Service MUST call startForeground when it starts if the app is in the background or not running
         }
-      } 
-      else if (!startNormal && checkBuildAndTarget(context, 26) && !isAppForeground()) 
-        context.startForegroundService(intent); // Service MUST call startForeground when it starts if the app is in the background or not running
-      else if (isAppForeground() || !checkBuildAndTarget(context, 26))
-        context.startService(intent); // Can only start the service "normally" if the app is in the foreground or lower than Android 8
+        else if (isAppForeground() || !checkBuildAndTarget(context, 26)) {
+          Log.d(TAG, "Calling startService for: " + serviceClassName);
+          context.startService(intent); // Can only start the service "normally" if the app is in the foreground or lower than Android 8
+        }
+        else
+          Log.w(TAG, "Cannot start service in any mode");
+      }
       else
-        Log.w(TAG, "Cannot start service in any mode");
+        Log.e(TAG, "Action is service related, but no service is specified (" + EXTRA_SERVICE_CLASS_NAME + " is missing)");
       return true;
     }
 
