@@ -11,11 +11,14 @@ package com.delphiworlds.kastri;
  *                                                     *
  *******************************************************/
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.WindowManager;
 import java.lang.Runnable;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +51,19 @@ public class DWUtility {
       Log.d(TAG, "Package " + packageName + " is not installed");
       return false;
     }        
+  }
+
+  public static float getScreenBrightness(Activity activity) throws Settings.SettingNotFoundException {
+    float value = activity.getWindow().getAttributes().screenBrightness;
+    if ((value < 0) || (value > 1))
+      value = Settings.System.getInt(activity.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) / 255f;
+    return value;
+  }
+
+  public static void setScreenBrightness(Activity activity, float brightness) {
+    WindowManager.LayoutParams params = activity.getWindow().getAttributes();
+    params.screenBrightness = brightness;
+    activity.getWindow().setAttributes(params);
   }
 
   public static Map<Object, Object> createObjectMap() {
