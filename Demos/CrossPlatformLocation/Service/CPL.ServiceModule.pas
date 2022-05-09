@@ -270,7 +270,7 @@ begin
   LMustStartNormal := Ord(not HasBackgroundPermission);
   LIntent := TJIntent.JavaClass.init(StringToJString(cDWBroadcastReceiverActionServiceRestart));
   LIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cDWBroadcastReceiverName));
-  LIntent.putExtra(StringToJString('ServiceName'), StringToJString(cServiceNameFull));
+  LIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceClassName), StringToJString(cServiceNameFull));
   LIntent.putExtra(StringToJString('MustStartNormal'), LMustStartNormal);
   TAndroidHelper.Context.sendBroadcast(LIntent);
 end;
