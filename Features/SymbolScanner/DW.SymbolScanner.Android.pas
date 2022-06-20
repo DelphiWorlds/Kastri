@@ -84,17 +84,18 @@ type
     function IsEnabled: Boolean;
     function ResetHardReading: Boolean;
   protected
-    function Activate(const AActivate: Boolean): Boolean; override;
+    procedure Activate(const AActivate: Boolean); override;
     procedure CancelScan; override;
     function CanScan: Boolean; override;
     function EnableScanner(const AEnable: Boolean): Boolean; override;
-    function IsEMDKInstalled: Boolean; override;
     procedure ManagerClosed;
     procedure ManagerOpened;
     function Scan: Boolean; override;
     procedure ScannerData(scanDataCollection: JScanDataCollection);
     procedure ScannerStatus(statusData: JStatusData);
     procedure ScannerTriggerChanged; override;
+  public
+    class function IsEMDKInstalled: Boolean;
   public
     constructor Create(const ASymbolScanner: TSymbolScanner); override;
     destructor Destroy; override;
@@ -156,7 +157,7 @@ begin
   FEMDKScanner := TJDWEMDKScanner.JavaClass.init(TAndroidHelper.Context, FDelegate);
 end;
 
-function TPlatformSymbolScanner.IsEMDKInstalled: Boolean;
+class function TPlatformSymbolScanner.IsEMDKInstalled: Boolean;
 begin
   Result := TJDWEMDKScanner.JavaClass.isEMDKInstalled(TAndroidHelper.Context);
 end;
@@ -186,15 +187,14 @@ begin
   FIsActive := IsEnabled;
 end;
 
-function TPlatformSymbolScanner.Activate(const AActivate: Boolean): Boolean;
+procedure TPlatformSymbolScanner.Activate(const AActivate: Boolean);
 begin
-  Result := False;
   if IsEMDKInstalled then
   begin
     if FEMDKScanner <> nil then
     begin
       if FIsOpen then
-        Result := DoActivate(AActivate);
+        DoActivate(AActivate);
     end
     else
       CreateEMDKScanner;

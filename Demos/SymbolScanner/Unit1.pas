@@ -16,7 +16,7 @@ type
     LabelTypeLabel: TLabel;
     LabelTypeEdit: TEdit;
   private
-    FScanner: TSymbolScanner;
+    FScanner: TBaseScanner;
     procedure ScannerDataReceivedHandler(Sender: TObject; const AData, ALabelType: string);
     procedure ScannerStatusChangeHandler(Sender: TObject; const AStatus: TScannerStatus);
   public
@@ -35,7 +35,10 @@ implementation
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
-  FScanner := TSymbolScanner.Create;
+  if TSymbolScanner.IsEMDKInstalled then
+    FScanner := TSymbolScanner.Create
+  else
+    FScanner := THoneywellScanner.Create;
   FScanner.OnDataReceived := ScannerDataReceivedHandler;
   FScanner.OnStatusChange := ScannerStatusChangeHandler;
   FScanner.IsActive := True;

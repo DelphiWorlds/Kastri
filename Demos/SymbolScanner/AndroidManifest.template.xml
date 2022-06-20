@@ -10,6 +10,7 @@
     <%uses-permission%>
     <!-- Needs this permission in order to work -->
     <uses-permission android:name="com.symbol.emdk.permission.EMDK" />
+    <uses-permission android:name="com.honeywell.decode.permission.DECODE" />
     <uses-feature android:glEsVersion="0x00020000" android:required="True"/>
     <application android:persistent="%persistent%" 
         android:restoreAnyVersion="%restoreAnyVersion%" 

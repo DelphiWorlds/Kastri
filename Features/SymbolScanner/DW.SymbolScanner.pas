@@ -31,23 +31,22 @@ type
   TScannerDataReceivedEvent = procedure(Sender: TObject; const Data, LabelType: string) of object;
   TScannerStatusEvent = procedure(Sender: TObject; const Status: TScannerStatus) of object;
 
-  TSymbolScanner = class;
+  TBaseScanner = class;
 
-  TCustomPlatformSymbolScanner = class(TObject)
+  TCustomPlatformBaseScanner = class(TObject)
   private
     FIsBackground: Boolean;
     FScannerTrigger: TScannerTrigger;
-    FSymbolScanner: TSymbolScanner;
+    FBaseScanner: TBaseScanner;
     procedure ApplicationEventMessageHandler(const ASender: TObject; const AMsg: TMessage);
   protected
     FIsActive: Boolean;
-    function Activate(const AActivate: Boolean): Boolean; virtual; abstract;
+    procedure Activate(const AActivate: Boolean); virtual; abstract;
     procedure CancelScan; virtual; abstract;
     function CanScan: Boolean; virtual; abstract;
     procedure DoDataReceived(const AData, ALabelType: string);
     procedure DoScannerStatus(const AStatus: TScannerStatus);
     function EnableScanner(const AEnable: Boolean): Boolean; virtual; abstract;
-    function IsEMDKInstalled: Boolean; virtual; abstract;
     function Scan: Boolean; virtual; abstract;
     procedure SetIsActive(const Value: Boolean);
     procedure SetScannerTrigger(const Value: TScannerTrigger);
@@ -55,26 +54,38 @@ type
     property IsActive: Boolean read FIsActive;
     property IsBackground: Boolean read FIsBackground;
     property ScannerTrigger: TScannerTrigger read FScannerTrigger write SetScannerTrigger;
-    property SymbolScanner: TSymbolScanner read FSymbolScanner;
+    property BaseScanner: TBaseScanner read FBaseScanner;
   public
-    constructor Create(const ASymbolScanner: TSymbolScanner); virtual;
+    constructor Create(const ABaseScanner: TBaseScanner); virtual;
     destructor Destroy; override;
   end;
 
-  TSymbolScanner = class(TObject)
+  TSymbolScanner = class;
+
+  TCustomPlatformSymbolScanner = class(TCustomPlatformBaseScanner)
+  public
+    constructor Create(const ASymbolScanner: TSymbolScanner); reintroduce; virtual;
+  end;
+
+  THoneywellScanner = class;
+
+  TCustomPlatformHoneywellScanner = class(TCustomPlatformBaseScanner)
+  public
+    constructor Create(const AHoneywellScanner: THoneywellScanner); reintroduce; virtual;
+  end;
+
+  TBaseScanner = class(TObject)
   private
-    FPlatformSymbolScanner: TCustomPlatformSymbolScanner;
     FOnDataReceived: TScannerDataReceivedEvent;
     FOnStatusChange: TScannerStatusEvent;
     function GetIsActive: Boolean;
     procedure SetIsActive(const Value: Boolean);
   protected
+    FPlatformBaseScanner: TCustomPlatformBaseScanner;
     procedure DoDataReceived(const AData, ALabelType: string);
     procedure DoScannerStatus(const AStatus: TScannerStatus);
   public
-    constructor Create;
     destructor Destroy; override;
-    function IsEMDKInstalled: Boolean;
     function CanScan: Boolean;
     function Scan: Boolean;
     property IsActive: Boolean read GetIsActive write SetIsActive;
@@ -82,52 +93,71 @@ type
     property OnStatusChange: TScannerStatusEvent read FOnStatusChange write FOnStatusChange;
   end;
 
+  TSymbolScanner = class(TBaseScanner)
+  public
+    class function IsEMDKInstalled: Boolean;
+  public
+    constructor Create;
+  end;
+
+  THoneywellScanner = class(TBaseScanner)
+  public
+    constructor Create;
+  end;
+
 implementation
 
 uses
   FMX.Platform,
   {$IF Defined(ANDROID)}
-  DW.SymbolScanner.Android;
+  DW.SymbolScanner.Android,
+  DW.HoneywellScanner.Android;
   {$ENDIF}
 
-{ TCustomPlatformSymbolScanner }
+type
+  TSymbolScannerHelper = class helper for TSymbolScanner
+  protected
+    function PlatformSymbolScanner: TPlatformSymbolScanner;
+  end;
 
-constructor TCustomPlatformSymbolScanner.Create(const ASymbolScanner: TSymbolScanner);
+{ TCustomPlatformBaseScanner }
+
+constructor TCustomPlatformBaseScanner.Create(const ABaseScanner: TBaseScanner);
 begin
   inherited Create;
-  FSymbolScanner := ASymbolScanner;
+  FBaseScanner := ABaseScanner;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
 end;
 
-destructor TCustomPlatformSymbolScanner.Destroy;
+destructor TCustomPlatformBaseScanner.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
   inherited;
 end;
 
-procedure TCustomPlatformSymbolScanner.DoDataReceived(const AData, ALabelType: string);
+procedure TCustomPlatformBaseScanner.DoDataReceived(const AData, ALabelType: string);
 begin
-  FSymbolScanner.DoDataReceived(AData, ALabelType);
+  FBaseScanner.DoDataReceived(AData, ALabelType);
 end;
 
-procedure TCustomPlatformSymbolScanner.DoScannerStatus(const AStatus: TScannerStatus);
+procedure TCustomPlatformBaseScanner.DoScannerStatus(const AStatus: TScannerStatus);
 begin
-  FSymbolScanner.DoScannerStatus(AStatus);
+  FBaseScanner.DoScannerStatus(AStatus);
 end;
 
-procedure TCustomPlatformSymbolScanner.SetIsActive(const Value: Boolean);
+procedure TCustomPlatformBaseScanner.SetIsActive(const Value: Boolean);
 begin
   if FIsActive <> Value then
     Activate(Value);
 end;
 
-procedure TCustomPlatformSymbolScanner.SetScannerTrigger(const Value: TScannerTrigger);
+procedure TCustomPlatformBaseScanner.SetScannerTrigger(const Value: TScannerTrigger);
 begin
   FScannerTrigger := Value;
   ScannerTriggerChanged;
 end;
 
-procedure TCustomPlatformSymbolScanner.ApplicationEventMessageHandler(const ASender: TObject; const AMsg: TMessage);
+procedure TCustomPlatformBaseScanner.ApplicationEventMessageHandler(const ASender: TObject; const AMsg: TMessage);
 begin
   case TApplicationEventMessage(AMsg).Value.Event of
     TApplicationEvent.WillBecomeInactive:
@@ -144,55 +174,86 @@ begin
   end;
 end;
 
-{ TSymbolScanner }
+{ TCustomPlatformSymbolScanner }
 
-constructor TSymbolScanner.Create;
+constructor TCustomPlatformSymbolScanner.Create(const ASymbolScanner: TSymbolScanner);
 begin
-  inherited;
-  FPlatformSymbolScanner := TPlatformSymbolScanner.Create(Self);
+  inherited Create(ASymbolScanner);
 end;
 
-destructor TSymbolScanner.Destroy;
+{ TCustomPlatformHoneywellScanner }
+
+constructor TCustomPlatformHoneywellScanner.Create(const AHoneywellScanner: THoneywellScanner);
 begin
-  FPlatformSymbolScanner.Free;
+  inherited Create(AHoneywellScanner);
+end;
+
+{ TBaseScanner }
+
+destructor TBaseScanner.Destroy;
+begin
+  FPlatformBaseScanner.Free;
   inherited;
 end;
 
-procedure TSymbolScanner.DoDataReceived(const AData, ALabelType: string);
+procedure TBaseScanner.DoDataReceived(const AData, ALabelType: string);
 begin
   if Assigned(FOnDataReceived) then
     FOnDataReceived(Self, AData, ALabelType);
 end;
 
-procedure TSymbolScanner.DoScannerStatus(const AStatus: TScannerStatus);
+procedure TBaseScanner.DoScannerStatus(const AStatus: TScannerStatus);
 begin
   if Assigned(FOnStatusChange) then
     FOnStatusChange(Self, AStatus);
 end;
 
-function TSymbolScanner.GetIsActive: Boolean;
+function TBaseScanner.GetIsActive: Boolean;
 begin
-  Result := FPlatformSymbolScanner.IsActive;
+  Result := FPlatformBaseScanner.IsActive;
 end;
 
-function TSymbolScanner.IsEMDKInstalled: Boolean;
+function TBaseScanner.CanScan: Boolean;
 begin
-  Result := FPlatformSymbolScanner.IsEMDKInstalled;
+  Result := FPlatformBaseScanner.CanScan;
 end;
 
-function TSymbolScanner.CanScan: Boolean;
+function TBaseScanner.Scan: Boolean;
 begin
-  Result := FPlatformSymbolScanner.CanScan;
+  Result := FPlatformBaseScanner.Scan;
 end;
 
-function TSymbolScanner.Scan: Boolean;
+procedure TBaseScanner.SetIsActive(const Value: Boolean);
 begin
-  Result := FPlatformSymbolScanner.Scan;
+  FPlatformBaseScanner.SetIsActive(Value);
 end;
 
-procedure TSymbolScanner.SetIsActive(const Value: Boolean);
+{ TSymbolScanner }
+
+constructor TSymbolScanner.Create;
 begin
-  FPlatformSymbolScanner.SetIsActive(Value);
+  inherited;
+  FPlatformBaseScanner := TPlatformSymbolScanner.Create(Self);
+end;
+
+class function TSymbolScanner.IsEMDKInstalled: Boolean;
+begin
+  Result := TPlatformSymbolScanner.IsEMDKInstalled;
+end;
+
+{ TSymbolScannerHelper }
+
+function TSymbolScannerHelper.PlatformSymbolScanner: TPlatformSymbolScanner;
+begin
+  Result := TPlatformSymbolScanner(FPlatformBaseScanner);
+end;
+
+{ THoneywellScanner }
+
+constructor THoneywellScanner.Create;
+begin
+  inherited;
+  FPlatformBaseScanner := TPlatformHoneywellScanner.Create(Self);
 end;
 
 end.
