@@ -396,6 +396,7 @@ type
     procedure adDidRecordClick(ad: Pointer); cdecl;
     procedure adDidRecordImpression(ad: Pointer); cdecl;
     procedure adWillDismissFullScreenContent(ad: Pointer); cdecl;
+    procedure adWillPresentFullScreenContent(ad: Pointer); cdecl;
   end;
 
   GADAdNetworkResponseInfoClass = interface(NSObjectClass)
