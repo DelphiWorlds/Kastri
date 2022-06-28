@@ -4,11 +4,11 @@
 
 This demonstrates using the Symbol Scanner feature of Kastri. I have used the name Symbol because the devices I develop with have this brand, although the library now supports Honeywell
 
-The feature applies to *Android only*, and only where devices have the EMDK installed. Please refer to [this list](https://www.zebra.com/us/en/support-downloads/software/developer-tools/emdk-for-android.html).
+The feature applies to *Android only*, and only where devices have the EMDK installed, or is a Honeywell device. For EMDK devices, please refer to [this list](https://www.zebra.com/us/en/support-downloads/software/developer-tools/emdk-for-android.html).
 
 ## Supported Delphi versions
 
-The demo should compile and work for at least versions 10.3.3 and 10.4.x
+The demo should compile and work for at least versions 10.3.3, 10.4.x and 11.x. When you load the demo, please ensure that the Android libraries are correct, as outlined by [these instructions](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AndroidLibraries).
 
 ## Configuration
 
