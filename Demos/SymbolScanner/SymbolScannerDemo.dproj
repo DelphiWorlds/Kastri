@@ -265,9 +265,6 @@
         <JavaReference Include="..\..\Lib\dw-emdk.jar">
             <Disabled/>
         </JavaReference>
-        <JavaReference Include="..\..\ThirdParty\Android\com.symbol.emdk.jar">
-            <Disabled/>
-        </JavaReference>
         <JavaReference Include="..\..\ThirdParty\Android\DataCollection.jar">
             <Disabled/>
         </JavaReference>
