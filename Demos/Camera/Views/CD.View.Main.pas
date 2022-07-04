@@ -68,7 +68,7 @@ begin
       FCameraView.CaptureImage.Enabled := False;
       FCameraView.Camera.Location := TLocationCoord2D.Create(91, 181);
       PermissionsService.RequestPermissions([cPermissionAccessCoarseLocation, cPermissionAccessFineLocation],
-        procedure(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>)
+        procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
         begin
           if AGrantResults.AreAllGranted then
             LocationSensor.Active := True
