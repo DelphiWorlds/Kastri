@@ -67,7 +67,7 @@ uses
   FMX.PushNotification.Android,
   {$ENDIF}
   {$IF Defined(IOS)}
-  {$IF Declared(RTLVersion1042)} // i.e. Delphi 10.4.2 or later
+  {$IF Declared(RTLVersion1042) or (RTLVersion > 34)} // i.e. Delphi 10.4.2 or later
   FMX.PushNotification.FCM.iOS,
   {$ELSE}
   DW.PushNotification.iOS,
