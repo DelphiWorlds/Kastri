@@ -6,7 +6,7 @@ unit DW.NFC;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -25,13 +25,32 @@ type
     TypeNameFormat: TNFCPayloadTypeNameFormat;
   end;
 
-  TNFCPayloads = array of TNFCPayload;
+  TNFCPayloads = TArray<TNFCPayload>;
 
   TNFCMessage = record
     Payloads: TNFCPayloads
   end;
 
-  TNFCMessages = array of TNFCMessage;
+  TNFCMessages = TArray<TNFCMessage>;
+
+  TNFCTechnologyKind = (NFCA, NFCB, NFCF, NFCV, NFCNDef, NFCIsoDep);
+
+  TNFCTechnology = record
+    Kind: TNFCTechnologyKind;
+    // Might expand this in the future
+  end;
+
+  TNFCTechnologies = TArray<TNFCTechnology>;
+
+  TTagInfo = record
+    ID: string;
+    Technologies: TNFCTechnologies;
+  end;
+
+  TNFCResult = record
+    TagInfo: TTagInfo;
+    Messages: TNFCMessages;
+  end;
 
   TNFCReader = class;
 
@@ -41,7 +60,7 @@ type
     FNFCReader: TNFCReader;
   protected
     procedure BeginSession; virtual; abstract;
-    procedure DoDetectedNDEFs(const AMessages: TNFCMessages);
+    procedure DoResult(const ANFCResult: TNFCResult);
     procedure DoError(const AError: string);
     procedure EndSession; virtual; abstract;
     property IsActive: Boolean read FIsActive write FIsActive;
@@ -53,18 +72,18 @@ type
     destructor Destroy; override;
   end;
 
-  TNFCDetectedNDEFsEvent = procedure(Sender: TObject; const Messages: TNFCMessages) of object;
+  TNFCResultEvent = procedure(Sender: TObject; const NFCResult: TNFCResult) of object;
   TNFCErrorEvent = procedure(Sender: TObject; const Error: string) of object;
 
   TNFCReader = class(TObject)
   private
     FAlertMessage: string;
     FPlatformNFCReader: TCustomPlatformNFCReader;
-    FOnDetectedNDEFs: TNFCDetectedNDEFsEvent;
+    FOnResult: TNFCResultEvent;
     FOnError: TNFCErrorEvent;
     function GetIsActive: Boolean;
   protected
-    procedure DoDetectedNDEFs(const AMessages: TNFCMessages);
+    procedure DoResult(const ANFCResult: TNFCResult);
     procedure DoError(const AError: string);
   public
     constructor Create;
@@ -73,7 +92,7 @@ type
     procedure EndSession;
     property AlertMessage: string read FAlertMessage write FAlertMessage;
     property IsActive: Boolean read GetIsActive;
-    property OnDetectedNDEFs: TNFCDetectedNDEFsEvent read FOnDetectedNDEFs write FOnDetectedNDEFs;
+    property OnResult: TNFCResultEvent read FOnResult write FOnResult;
     property OnError: TNFCErrorEvent read FOnError write FOnError;
   end;
 
@@ -122,9 +141,9 @@ begin
   inherited;
 end;
 
-procedure TCustomPlatformNFCReader.DoDetectedNDEFs(const AMessages: TNFCMessages);
+procedure TCustomPlatformNFCReader.DoResult(const ANFCResult: TNFCResult);
 begin
-  FNFCReader.DoDetectedNDEFs(AMessages);
+  FNFCReader.DoResult(ANFCResult);
 end;
 
 procedure TCustomPlatformNFCReader.DoError(const AError: string);
@@ -154,10 +173,10 @@ begin
   inherited;
 end;
 
-procedure TNFCReader.DoDetectedNDEFs(const AMessages: TNFCMessages);
+procedure TNFCReader.DoResult(const ANFCResult: TNFCResult);
 begin
-  if Assigned(FOnDetectedNDEFs) then
-    FOnDetectedNDEFs(Self, AMessages);
+  if Assigned(FOnResult) then
+    FOnResult(Self, ANFCResult);
 end;
 
 procedure TNFCReader.DoError(const AError: string);

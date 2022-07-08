@@ -6,29 +6,24 @@ unit DW.NFC.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
 {$I DW.GlobalDefines.inc}
 
-
 // ****** NOTE: This is a work in progress, so don't expect miracles :-) *****
-
-//
-
-// A very big thank you to Brian Long and his article:
-
+// A very big thank you to Brian Long and his articles:
 //   http://blong.com/Articles/DelphiXE7NFC/NFC.htm
-
+//   http://blong.com/Articles/Delphi10NFC/NFC.htm
 // On which a lot of the work in this unit is based
 
 interface
 
 uses
   // RTL
-  System.Messaging,
+  System.Messaging, System.Generics.Collections,
   // Android
   Androidapi.JNI.App, Androidapi.JNI.GraphicsContentViewText,
   // DW
@@ -42,6 +37,7 @@ type
     FPendingIntent: JPendingIntent;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     procedure EnableForegroundDispatch;
+    function FindTagTechnology(const ATag: JTag; const AName: string; out ATechnology: TNFCTechnology): Boolean;
     procedure HandleNfcIntent(const AIntent: JIntent);
     function IsNFCIntent(const AIntent: JIntent): Boolean;
     procedure MessageReceivedNotificationHandler(const Sender: TObject; const M: TMessage);
@@ -68,9 +64,31 @@ uses
   // DW
   DW.Toast.Android, DW.OSLog;
 
+const
+  cNFCAName = 'android.nfc.tech.NfcA';
+  cNFCBName = 'android.nfc.tech.NfcB';
+  cNFCFName = 'android.nfc.tech.NfcF';
+  cNFCVName = 'android.nfc.tech.NfcV';
+  cNFCNDefName = 'android.nfc.tech.Ndef';
+  cNFCIsoDepName = 'android.nfc.tech.IsoDep';
+
+  cNFCTechnologyNames: array[TNFCTechnologyKind] of string = (cNFCAName, cNFCBName, cNFCFName, cNFCVName, cNFCNDefName, cNFCIsoDepName);
+
 function JavaBytesToString(const ABytes: TJavaArray<Byte>): string;
+var
+  LBytes: TBytes;
 begin
-  Result := TEncoding.UTF8.GetString(TAndroidHelper.TJavaArrayToTBytes(ABytes));
+  LBytes := TAndroidHelper.TJavaArrayToTBytes(ABytes);
+  Result := TEncoding.UTF8.GetString(LBytes);
+end;
+
+function JavaBytesToHexString(const ABytes: TJavaArray<Byte>): string;
+var
+  LByte: Byte;
+begin
+  Result := '';
+  for LByte in TAndroidHelper.TJavaArrayToTBytes(ABytes) do
+    Result := Result + IntToHex(LByte, 2);
 end;
 
 { TPlatformNFCReader }
@@ -80,7 +98,6 @@ var
   LIntent: JIntent;
 begin
   inherited;
-  TOSLog.d('+TPlatformNFCReader.Create');
   TMessageManager.DefaultManager.SubscribeToMessage(TMessageReceivedNotification, MessageReceivedNotificationHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_NDEF_DISCOVERED);
@@ -88,7 +105,6 @@ begin
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_TAG_DISCOVERED);
   LIntent := TJIntent.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Activity.getClass);
   FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent.addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP), 0);
-  TOSLog.d('-TPlatformNFCReader.Create');
 end;
 
 destructor TPlatformNFCReader.Destroy;
@@ -107,10 +123,8 @@ end;
 
 class function TPlatformNFCReader.IsSupported: Boolean;
 begin
-  TOSLog.d('+TPlatformNFCReader.IsSupported');
   FNfcAdapter := TJNfcAdapter.JavaClass.getDefaultAdapter(TAndroidHelper.Context);
   Result := FNfcAdapter <> nil;
-  TOSLog.d('-TPlatformNFCReader.IsSupported');
 end;
 
 procedure TPlatformNFCReader.EnableForegroundDispatch;
@@ -121,7 +135,6 @@ var
   LMethodID: JNIMethodID;
   LJNIValues: TJNIValueArray;
 begin
-  TOSLog.d('+TPlatformNFCReader.EnableForegroundDispatch');
   LEnv := TJNIResolver.GetJNIEnv;
   LNfcAdapterObject := (FNfcAdapter as ILocalObject).GetObjectID;
   LPendingIntentObject := (FPendingIntent as ILocalObject).GetObjectID;
@@ -131,7 +144,6 @@ begin
   LEnv^.DeleteLocalRef(LEnv, LAdapterClass);
   LJNIValues := ArgsToJNIValues([JavaContext, LPendingIntentObject, nil, nil]);
   LEnv^.CallVoidMethodA(LEnv, LNfcAdapterObject, LMethodID, PJNIValue(LJNIValues));
-  TOSLog.d('-TPlatformNFCReader.EnableForegroundDispatch');
 end;
 
 procedure TPlatformNFCReader.BeginSession;
@@ -161,10 +173,7 @@ begin
     begin
       LIntent := TAndroidHelper.Activity.getIntent;
       if (LIntent <> nil) and IsNFCIntent(LIntent) then
-      begin
-        TOSLog.d('TPlatformNFCReader.ApplicationEventMessageHandler HandleNfcIntent');
         HandleNfcIntent(LIntent);
-      end;
     end;
   end;
 end;
@@ -177,10 +186,7 @@ begin
   if LIntent <> nil then
   begin
     if IsNFCIntent(LIntent) then
-    begin
-      TOSLog.d('TPlatformNFCReader.MessageReceivedNotificationHandler HandleNfcIntent');
       HandleNfcIntent(LIntent);
-    end;
   end;
 end;
 
@@ -193,21 +199,65 @@ begin
     TAndroidHelper.Activity.startActivity(TJIntent.JavaClass.init(StringToJString('android.settings.WIRELESS_SETTINGS')));
 end;
 
+function TPlatformNFCReader.FindTagTechnology(const ATag: JTag; const AName: string; out ATechnology: TNFCTechnology): Boolean;
+var
+  LKind: TNFCTechnologyKind;
+begin
+  Result := False;
+  for LKind := Low(TNFCTechnologyKind) to High(TNFCTechnologyKind) do
+  begin
+    if AName.Equals(cNFCTechnologyNames[LKind]) then
+    begin
+      ATechnology.Kind := LKind;
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
 procedure TPlatformNFCReader.HandleNfcIntent(const AIntent: JIntent);
 var
   LMessages: TJavaObjectArray<JParcelable>;
   LRecords: TJavaObjectArray<JNdefRecord>;
   LRecord: JNdefRecord;
   I, J: Integer;
+  LNFCResult: TNFCResult;
   LNFCMessages: TNFCMessages;
   LNFCPayload: TNFCPayload;
+  LTagParcel: JParcelable;
+  LTag: JTag;
+  LId: TJavaArray<Byte>;
+  LTechs: TJavaObjectArray<JString>;
+  LTechnology: TNFCTechnology;
 begin
   TOSLog.d('+TPlatformNFCReader.HandleNfcIntent');
+  LTagParcel := AIntent.getParcelableExtra(TJNfcAdapter.JavaClass.EXTRA_TAG);
+  if LTagParcel <> nil then
+  begin
+    LTag := TJTag.Wrap(LTagParcel);
+    LId :=  LTag.getId;
+    if LId <> nil then
+    try
+      LNFCResult.TagInfo.ID := JavaBytesToHexString(LTag.getId);
+    finally
+      LId.Free;
+    end;
+    LTechs := LTag.getTechList;
+    if LTechs <> nil then
+    try
+      for I := 0 to LTechs.Length - 1 do
+      begin
+        if FindTagTechnology(LTag, JStringToString(LTechs.Items[I]), LTechnology) then
+          LNFCResult.TagInfo.Technologies := LNFCResult.TagInfo.Technologies + [LTechnology];
+      end;
+    finally
+      LTechs.Free;
+    end;
+  end;
   LMessages := AIntent.getParcelableArrayExtra(TJNfcAdapter.JavaClass.EXTRA_NDEF_MESSAGES);
   if LMessages <> nil then
   begin
     SetLength(LNFCMessages, LMessages.Length);
-    TOSLog.d('Processing messages');
     for I := 0 to LMessages.Length - 1 do
     begin
       LRecords := TJNdefMessage.Wrap(LMessages.Items[I]).getRecords;
@@ -223,11 +273,9 @@ begin
         LNFCMessages[I].Payloads[J] := LNFCPayload;
       end;
     end;
-    if Length(LNFCMessages) > 0 then
-      DoDetectedNDEFs(LNFCMessages);
-  end
-  else
-    TOSLog.d('AIntent: %s', [JStringToString(AIntent.toUri(0))]);
+  end;
+  LNFCResult.Messages := LNFCMessages;
+  DoResult(LNFCResult);
   TOSLog.d('-TPlatformNFCReader.HandleNfcIntent');
 end;
 

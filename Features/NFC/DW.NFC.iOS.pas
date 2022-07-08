@@ -6,7 +6,7 @@ unit DW.NFC.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -14,6 +14,8 @@ unit DW.NFC.iOS;
 {$I DW.GlobalDefines.inc}
 
 // ****** NOTE: This is a work in progress, so don't expect miracles :-) *****
+// Tag ID reading might be added for iOS later - adding this URL as a possible reference
+//   https://github.com/hansemannn/iOS-NFC-Example/issues/16
 
 interface
 
@@ -120,6 +122,7 @@ var
   LNFCMessages: TNFCMessages;
   LNFCPayload: TNFCPayload;
   I, J: Integer;
+  LNFCResult: TNFCResult;
 begin
   SetLength(LNFCMessages, didDetectNDEFs.count);
   for I := 0 to didDetectNDEFs.count - 1 do
@@ -137,15 +140,13 @@ begin
       LNFCMessages[I].Payloads[J] := LNFCPayload;
     end;
   end;
-  if Length(LNFCMessages) > 0 then
-  begin
-    TThread.Synchronize(nil,
-      procedure
-      begin
-        DoDetectedNDEFs(LNFCMessages);
-      end
-    );
-  end;
+  LNFCResult.Messages := LNFCMessages;
+  TThread.Synchronize(nil,
+    procedure
+    begin
+      DoResult(LNFCResult);
+    end
+  );
 end;
 
 procedure TPlatformNFCReader.readerSessionDidInvalidateWithError(session: NFCNDEFReaderSession; didInvalidateWithError: NSError);
