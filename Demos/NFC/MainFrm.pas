@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  FMX.Layouts, FMX.Controls.Presentation, FMX.StdCtrls, FMX.ScrollBox, FMX.Memo,
+  FMX.Layouts, FMX.Controls.Presentation, FMX.StdCtrls, FMX.ScrollBox, FMX.Memo, FMX.Memo.Types,
   DW.NFC;
 
 type
@@ -16,7 +16,7 @@ type
     procedure StartButtonClick(Sender: TObject);
   private
     FNFCReader: TNFCReader;
-    procedure NFCReaderDetectedNDEFsHandler(Sender: TObject; const AMessages: TNFCMessages);
+    procedure NFCReaderResultHandler(Sender: TObject; const ANFCResult: TNFCResult);
     procedure NFCReaderErrorHandler(Sender: TObject; const AError: string);
   public
     constructor Create(AOwner: TComponent); override;
@@ -30,9 +30,11 @@ implementation
 {$R *.fmx}
 
 uses
+  System.TypInfo,
   DW.OSLog;
 
 const
+  cNFCTagId = 'Tag ID: %s';
   cNFCMessagePayload = 'Payload - id: %s, payload: %s';
 
 { TForm1 }
@@ -41,24 +43,36 @@ constructor TfrmMain.Create(AOwner: TComponent);
 begin
   inherited;
   FNFCReader := TNFCReader.Create;
-  FNFCReader.OnDetectedNDEFs := NFCReaderDetectedNDEFsHandler;
+  FNFCReader.OnResult := NFCReaderResultHandler;
   FNFCReader.OnError := NFCReaderErrorHandler;
   FNFCReader.AlertMessage := 'Hold an NFC tag near the phone..';
 end;
 
-procedure TfrmMain.NFCReaderDetectedNDEFsHandler(Sender: TObject; const AMessages: TNFCMessages);
+procedure TfrmMain.NFCReaderResultHandler(Sender: TObject; const ANFCResult: TNFCResult);
 var
   I, J: Integer;
   LPayload: TNFCPayload;
+  LTechnology: TNFCTechnology;
 begin
-  for I := 0 to Length(AMessages) - 1 do
+  LogMemo.Lines.Add(Format(cNFCTagId, [ANFCResult.TagInfo.ID]));
+  if Length(ANFCResult.TagInfo.Technologies) > 0 then
+    LogMemo.Lines.Add('Has the following techs:');
+  for LTechnology in ANFCResult.TagInfo.Technologies do
+    LogMemo.Lines.Add('> ' + GetEnumName(TypeInfo(TNFCTechnologyKind), Ord(LTechnology.Kind)));
+  if Length(ANFCResult.Messages) > 0 then
   begin
-    for J := 0 to Length(AMessages[I].Payloads) - 1 do
+    LogMemo.Lines.Add('Messages:');
+    for I := 0 to Length(ANFCResult.Messages) - 1 do
     begin
-      LPayload := AMessages[I].Payloads[J];
-      LogMemo.Lines.Add(Format(cNFCMessagePayload, [LPayload.Identifier, LPayload.Payload]))
+      for J := 0 to Length(ANFCResult.Messages[I].Payloads) - 1 do
+      begin
+        LPayload := ANFCResult.Messages[I].Payloads[J];
+        LogMemo.Lines.Add(Format(cNFCMessagePayload, [LPayload.Identifier, LPayload.Payload]));
+      end;
     end;
-  end;
+  end
+  else
+    LogMemo.Lines.Add('No messages');
 end;
 
 procedure TfrmMain.NFCReaderErrorHandler(Sender: TObject; const AError: string);
