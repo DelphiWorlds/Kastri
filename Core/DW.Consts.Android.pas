@@ -20,6 +20,8 @@ const
   cPermissionAccessCoarseLocation = 'android.permission.ACCESS_COARSE_LOCATION';
   cPermissionAccessFineLocation = 'android.permission.ACCESS_FINE_LOCATION';
   cPermissionBluetooth = 'android.permission.BLUETOOTH';
+  cPermissionBluetoothConnect = 'android.permission.BLUETOOTH_CONNECT';
+  cPermissionBluetoothScan = 'android.permission.BLUETOOTH_SCAN';
   cPermissionCamera = 'android.permission.CAMERA';
   cPermissionReadCallLog = 'android.permission.READ_CALL_LOG';
   cPermissionReadContacts = 'android.permission.READ_CONTACTS';
