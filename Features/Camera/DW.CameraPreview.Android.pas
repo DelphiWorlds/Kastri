@@ -39,6 +39,8 @@ type
 implementation
 
 uses
+  // RTL
+  System.SysUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.App,
   // FMX

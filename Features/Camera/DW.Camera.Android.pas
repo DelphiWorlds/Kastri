@@ -37,7 +37,7 @@ type
     FCaptureSessionCaptureCallbackDelegate: JDWCameraCaptureSessionCaptureCallbackDelegate;
     FCaptureSessionStateCallback: JDWCameraCaptureSessionStateCallback;
     FCaptureSessionStateCallbackDelegate: JDWCameraCaptureSessionStateCallbackDelegate;
-    FContinuousImageAvailableListener: JImageReader_OnImageAvailableListener;
+    // FContinuousImageAvailableListener: JImageReader_OnImageAvailableListener;
     FIsCapturing: Boolean;
     FIsStarting: Boolean;
     FHandler: JHandler;
@@ -50,7 +50,7 @@ type
     FSession: JCameraCaptureSession;
     FStillImageAvailableListener: JImageReader_OnImageAvailableListener;
     FStillImageReader: JImageReader;
-    FStillImageOrientation: Integer;
+    // FStillImageOrientation: Integer;
     FSurfaceTexture: JSurfaceTexture;
     FSurfaceTextureListener: JTextureView_SurfaceTextureListener;
     FThread: JHandlerThread;
@@ -59,7 +59,7 @@ type
     procedure CaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest; partialResult: JCaptureResult); virtual;
     procedure CaptureSessionConfigured(session: JCameraCaptureSession); virtual;
     procedure CaptureSessionConfigureFailed(session: JCameraCaptureSession); virtual;
-    procedure CheckFaces(const AHelper: JDWCaptureResultHelper);
+    // procedure CheckFaces(const AHelper: JDWCaptureResultHelper);
     procedure CreateStillReader;
     function GetSurfaceRotation(const ARotation: Integer): Integer;
     function GetOrientation(const ARotation: Integer): Integer;
@@ -117,7 +117,7 @@ type
     FSensorExposureTimeRange: TInt64Range;
     FSensorSensitivityRange: TIntegerRange;
     FViewSize: Jutil_Size;
-    procedure CheckBarcode(const frame: JBitmap);
+    // procedure CheckBarcode(const frame: JBitmap);
     procedure DoOpenCamera;
     function GetExposureTime: Int64;
     function GetISO: Integer;
@@ -341,9 +341,7 @@ end;
 
 procedure TDWCameraCaptureSessionStateCallbackDelegate.onConfigured(session: JCameraCaptureSession);
 begin
-  TOSLog.d('+TDWCameraCaptureSessionStateCallbackDelegate.onConfigured');
   FCaptureSession.CaptureSessionConfigured(session);
-  TOSLog.d('-TDWCameraCaptureSessionStateCallbackDelegate.onConfigured');
 end;
 
 procedure TDWCameraCaptureSessionStateCallbackDelegate.onConfigureFailed(session: JCameraCaptureSession);
@@ -502,7 +500,7 @@ end;
 
 procedure TCameraCaptureSession.UpdatePreview;
 var
-  LScale, LScreenScale: Single;
+  LScreenScale: Single;
   LSize: TSizeF;
   LViewSize, LPreviewSize: TSize;
   LIsPortrait: Boolean;
@@ -542,9 +540,7 @@ begin
   LOutputs := TJArrayList.JavaClass.init(2);
   LOutputs.add(FPreviewSurface);
   LOutputs.add(FStillImageReader.getSurface); // will not need this if GLSurfaceView can provide image via onFrameReady
-  TOSLog.d('Creating capture session');
   FPlatformCamera.CameraDevice.createCaptureSession(TJList.Wrap(LOutputs), FCaptureSessionStateCallback, FHandler);
-  TOSLog.d('Created capture session');
 end;
 
 procedure TCameraCaptureSession.StartSession;
@@ -674,6 +670,7 @@ begin
   end;
 end;
 
+{
 procedure TCameraCaptureSession.CheckFaces(const AHelper: JDWCaptureResultHelper);
 var
   LFaces: TJavaObjectArray<JFace>;
@@ -682,6 +679,7 @@ begin
   if (LFaces <> nil) and (LFaces.Length > 0) then
     PlatformCamera.DetectedFaces(LFaces);
 end;
+}
 
 procedure TCameraCaptureSession.CaptureCompleted(session: JCameraCaptureSession; request: JCaptureRequest; result: JTotalCaptureResult);
 var
@@ -884,7 +882,6 @@ begin
   FSensorExposureTimeRange.Upper := 0;
   InternalSetExposure(0.15);
   FCameraOrientation := 0;
-  LFaceDetectModes := nil;
   FViewSize := nil;
   LCameraIDList := FCameraManager.getCameraIdList;
   LCameraID := nil;
@@ -1059,6 +1056,7 @@ begin
   FCaptureSession.CameraSettingChanged;
 end;
 
+(*
 procedure TPlatformCamera.CheckBarcode(const frame: JBitmap);
 {
 var
@@ -1094,6 +1092,7 @@ begin
   // DoBarcodes(LBarcodes, LError);
 }
 end;
+*)
 
 procedure TPlatformCamera.FrameAvailable(frame: JBitmap);
 {
