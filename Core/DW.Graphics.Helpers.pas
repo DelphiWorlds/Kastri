@@ -26,7 +26,9 @@ type
   TBitmapHelper = class helper for TBitmap
   private
     function GetAsBase64: string;
-    procedure SetAsBase64(const ASource: string);
+    function GetAsCompressedBase64: string;
+    procedure SetAsBase64(const AValue: string);
+    procedure SetAsCompressedBase64(const AValue: string);
   public
     /// <summary>
     ///   Loads an image from a resource compiled into the application
@@ -36,13 +38,19 @@ type
     ///   Converts a bitmap to/from a base64 (character) representation
     /// </summary>
     property AsBase64: string read GetAsBase64 write SetAsBase64;
+    /// <summary>
+    ///   Converts a bitmap to/from a compressed (ZLib) base64 (character) representation
+    /// </summary>
+    property AsCompressedBase64: string read GetAsCompressedBase64 write SetAsCompressedBase64;
   end;
 
 implementation
 
 uses
   // RTL
-  System.Classes, System.SysUtils, System.NetEncoding, System.Types;
+  System.Classes, System.SysUtils, System.NetEncoding, System.Types,
+  // DW
+  DW.Base64.Helpers;
 
 { TBitmapHelper }
 
@@ -64,7 +72,6 @@ end;
 function TBitmapHelper.GetAsBase64: string;
 var
   LInputStream: TBytesStream;
-  LOutputStream: TStringStream;
 begin
   Result := '';
   if not IsEmpty then
@@ -72,38 +79,55 @@ begin
     LInputStream := TBytesStream.Create;
     try
       SaveToStream(LInputStream);
-      LInputStream.Position := 0;
-      LOutputStream := TStringStream.Create('');
-      try
-        TNetEncoding.Base64.Encode(LInputStream, LOutputStream);
-        Result := LOutputStream.DataString;
-      finally
-        LOutputStream.Free;
-      end;
+      Result := TBase64Helper.Encode(LInputStream);
     finally
       LInputStream.Free;
     end;
-   end;
+  end;
 end;
 
-procedure TBitmapHelper.SetAsBase64(const ASource: string);
+function TBitmapHelper.GetAsCompressedBase64: string;
 var
-  LInputStream: TStringStream;
+  LInputStream: TBytesStream;
+begin
+  Result := '';
+  if not IsEmpty then
+  begin
+    LInputStream := TBytesStream.Create;
+    try
+      SaveToStream(LInputStream);
+      Result := TBase64Helper.CompressEncode(LInputStream);
+    finally
+      LInputStream.Free;
+    end;
+  end;
+end;
+
+procedure TBitmapHelper.SetAsBase64(const AValue: string);
+var
   LOutputStream: TBytesStream;
 begin
-  LInputStream := TStringStream.Create(ASource);
+  LOutputStream := TBytesStream.Create;
   try
-    LInputStream.Position := 0;
-    LOutputStream := TBytesStream.Create;
-    try
-      TNetEncoding.Base64.Decode(LInputStream, LOutputStream);
-      LOutputStream.Position := 0;
-      LoadFromStream(LOutputStream);
-    finally
-      LOutputStream.Free;
-    end;
+    TBase64Helper.Decode(AValue, LOutputStream);
+    LOutputStream.Position := 0;
+    LoadFromStream(LOutputStream);
   finally
-    LInputStream.Free;
+    LOutputStream.Free;
+  end;
+end;
+
+procedure TBitmapHelper.SetAsCompressedBase64(const AValue: string);
+var
+  LOutputStream: TBytesStream;
+begin
+  LOutputStream := TBytesStream.Create;
+  try
+    TBase64Helper.DecodeDecompress(AValue, LOutputStream);
+    LOutputStream.Position := 0;
+    LoadFromStream(LOutputStream);
+  finally
+    LOutputStream.Free;
   end;
 end;
 
