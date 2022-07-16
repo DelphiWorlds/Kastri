@@ -55,6 +55,7 @@ end;
 
 function TLongClickListener.onLongClick(view: JView): Boolean;
 begin
+  Result := True;
   FNativeControl.DoLongPress;
 end;
 
