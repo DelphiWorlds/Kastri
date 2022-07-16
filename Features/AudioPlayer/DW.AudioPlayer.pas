@@ -13,8 +13,6 @@ unit DW.AudioPlayer;
 
 {$I DW.GlobalDefines.inc}
 
-// NOTE: This feature is a work in progress, so please expect changes
-
 interface
 
 type
@@ -27,9 +25,9 @@ type
   ///   Ready:      Audio has been preprared for playing
   ///   PlayStart:  Play has been called, but the audio has not necessarily started playing
   ///   Playing:    Audio has actually started to play (may be a slight delay after Play is called)
-  ///   Stopped:    Audio has finished playing (to be implemented)
+  ///   Stopped:    Audio has finished playing
   /// </remarks>
-  TAudioState = (Ready, PlayStart, Playing, Paused, Stopped);
+  TAudioState = (None, Ready, PlayStart, Playing, Paused, Stopped);
 
   TAudioStateChangeEvent = procedure(Sender: TObject; const State: TAudioState) of object;
 
@@ -43,9 +41,10 @@ type
     procedure DoPlay;
     function GetDelay: Integer; virtual;
     procedure LoadFromFile(const AFileName: string); virtual;
-    procedure SetIsReady(const AValue: Boolean);
     procedure Pause; virtual;
     procedure Play; virtual;
+    procedure SeekTo(const AMilliseconds: Int64); virtual;
+    procedure SetIsReady(const AValue: Boolean);
     procedure Stop; virtual;
     property AudioPlayer: TAudioPlayer read FAudioPlayer;
     property AudioState: TAudioState read FAudioState;
@@ -67,16 +66,20 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    function IsPaused: Boolean;
+    function IsPlaying: Boolean;
     procedure LoadFromFile(const AFileName: string);
     procedure Pause;
     procedure Play;
+    procedure SeekTo(const AMilliseconds: Int64);
     procedure Stop;
     property AudioState: TAudioState read GetAudioState;
     /// <summary>
     ///   Represents the delay in milliseconds between the call to Play, and when the audio actually starts playing
     /// </summary>
     /// <remarks>
-    ///   At present, implemented only on Android, since MediaPlayer seems to have a lag, even after having already called Prepare
+    ///   At present, implemented only on Android and Windows
+    ///   The Android MediaPlayer class seems to have a lag when calling the play method, even after having already called prepare
     /// </remarks>
     property Delay: Integer read GetDelay;
     property FileName: string read FFileName;
@@ -147,6 +150,11 @@ begin
   //
 end;
 
+procedure TCustomPlatformAudioPlayer.SeekTo(const AMilliseconds: Int64);
+begin
+  //
+end;
+
 procedure TCustomPlatformAudioPlayer.SetIsReady(const AValue: Boolean);
 begin
   if AValue <> FIsReady then
@@ -191,6 +199,16 @@ begin
   Result := FPlatformAudioPlayer.GetDelay;
 end;
 
+function TAudioPlayer.IsPaused: Boolean;
+begin
+  Result := AudioState = TAudioState.Paused;
+end;
+
+function TAudioPlayer.IsPlaying: Boolean;
+begin
+  Result := AudioState in [TAudioState.PlayStart, TAudioState.Playing];
+end;
+
 procedure TAudioPlayer.LoadFromFile(const AFileName: string);
 begin
   FFileName := AFileName;
@@ -207,9 +225,15 @@ begin
   FPlatformAudioPlayer.DoPlay;
 end;
 
+procedure TAudioPlayer.SeekTo(const AMilliseconds: Int64);
+begin
+  FPlatformAudioPlayer.SeekTo(AMilliseconds);
+end;
+
 procedure TAudioPlayer.Stop;
 begin
-  FPlatformAudioPlayer.Stop;
+  if IsPlaying or IsPaused then
+    FPlatformAudioPlayer.Stop;
 end;
 
 end.
