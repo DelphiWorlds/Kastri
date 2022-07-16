@@ -27,7 +27,7 @@ uses
   // FMX
   FMX.Platform,
   // DW
-  DW.iOSapi.Helpers, DW.iOSapi.Firebase, DW.iOSapi.UserNotifications, DW.Macapi.Helpers;
+  DW.iOSapi.Helpers, DW.iOSapi.FirebaseCore, DW.iOSapi.FirebaseMessaging, DW.iOSapi.UserNotifications, DW.Macapi.Helpers;
 
 type
   TFcmPushServiceNotification = class(TPushServiceNotification)
@@ -180,7 +180,7 @@ end;
 
 procedure TUserNotificationCenterDelegate.ProcessNotificationRequest(request: UNNotificationRequest);
 begin
-  if request.trigger.isKindOfClass(objc_getClass('UNPushNotificationTrigger')) then
+  if (request.trigger <> nil) and request.trigger.isKindOfClass(objc_getClass('UNPushNotificationTrigger')) then
     ProcessRemoteNotification(request)
   else
     ProcessLocalNotification(request);
@@ -446,6 +446,8 @@ begin
   else
     RegisterRemoteNotificationsIOS7OrEarlier;
 end;
+
+procedure FirebaseInstanceIDLoader; cdecl; external framework 'FirebaseInstanceID';
 
 initialization
   RegisterPushServices;
