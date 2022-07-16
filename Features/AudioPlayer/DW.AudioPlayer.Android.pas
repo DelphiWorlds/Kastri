@@ -48,12 +48,15 @@ type
     FPlayStartTime: TDateTime;
     FWatcher: TAudioPlayerWatcher;
   protected
+    procedure DoAudioStateChange(const AState: TAudioState); override;
     function GetDelay: Integer; override;
     procedure LoadFromFile(const AFileName: string); override;
     procedure MediaPlayerItemPrepared;
     procedure Pause; override;
     procedure Play; override;
     procedure PlayStarted;
+    procedure SeekTo(const AMilliseconds: Int64); override;
+    procedure Stop; override;
     property MediaPlayer: JMediaPlayer read FMediaPlayer;
   public
     constructor Create(const AAudioPlayer: TAudioPlayer); override;
@@ -67,7 +70,7 @@ uses
   // RTL
   System.Classes, System.SysUtils, System.DateUtils, System.Math,
   // Android
-  Androidapi.Helpers, Androidapi.JNIBridge;
+  Androidapi.Helpers, Androidapi.JNIBridge, Androidapi.JNI.App;
 
 type
   TOnPreparedListener = class(TJavaLocal, JMediaPlayer_OnPreparedListener)
@@ -76,6 +79,16 @@ type
   public
     { JMediaPlayer_OnPreparedListener }
     procedure onPrepared(mp: JMediaPlayer); cdecl;
+  public
+    constructor Create(const APlayer: TPlatformAudioPlayer);
+  end;
+
+  TOnCompletionListener = class(TJavaLocal, JMediaPlayer_OnCompletionListener)
+  private
+    FPlayer: TPlatformAudioPlayer;
+  public
+    { JMediaPlayer_OnCompletionListener }
+    procedure onCompletion(mp: JMediaPlayer); cdecl;
   public
     constructor Create(const APlayer: TPlatformAudioPlayer);
   end;
@@ -137,6 +150,19 @@ begin
   FPlayer.MediaPlayerItemPrepared;
 end;
 
+{ TOnCompletionListener }
+
+constructor TOnCompletionListener.Create(const APlayer: TPlatformAudioPlayer);
+begin
+  inherited Create;
+  FPlayer := APlayer;
+end;
+
+procedure TOnCompletionListener.onCompletion(mp: JMediaPlayer);
+begin
+  FPlayer.DoAudioStateChange(TAudioState.Stopped);
+end;
+
 { TPlatformAudioPlayer }
 
 constructor TPlatformAudioPlayer.Create(const AAudioPlayer: TAudioPlayer);
@@ -153,6 +179,11 @@ end;
 destructor TPlatformAudioPlayer.Destroy;
 begin
   //
+  inherited;
+end;
+
+procedure TPlatformAudioPlayer.DoAudioStateChange(const AState: TAudioState);
+begin
   inherited;
 end;
 
@@ -180,7 +211,10 @@ end;
 procedure TPlatformAudioPlayer.Pause;
 begin
   if (FMediaPlayer <> nil) and FMediaPlayer.isPlaying then
+  begin
     FMediaPlayer.pause;
+    DoAudioStateChange(TAudioState.Paused);
+  end;
 end;
 
 procedure TPlatformAudioPlayer.Play;
@@ -190,9 +224,13 @@ begin
     if IsReady then
     begin
       FIsPlayRequested := False;
-      FWatcher.Start;
-      FMediaPlayer.seekTo(0);
-      FPlayStartTime := Now;
+      if AudioState <> TAudioState.Paused then
+      begin
+        FWatcher.Start;
+        FMediaPlayer.seekTo(0);
+        FPlayStartTime := Now;
+        DoAudioStateChange(TAudioState.PlayStart);
+      end;
       FMediaPlayer.start;
     end
     else
@@ -205,6 +243,17 @@ begin
   FDelay := MilliSecondsBetween(Now, FPlayStartTime);
   // TOSLog.d('Delay: %dms', [FDelay]);
   DoAudioStateChange(TAudioState.Playing);
+end;
+
+procedure TPlatformAudioPlayer.SeekTo(const AMilliseconds: Int64);
+begin
+  FMediaPlayer.seekTo(AMilliseconds, TJMediaPlayer.JavaClass.SEEK_CLOSEST_SYNC);
+end;
+
+procedure TPlatformAudioPlayer.Stop;
+begin
+  FMediaPlayer.stop;
+  DoAudioStateChange(TAudioState.Stopped);
 end;
 
 end.
