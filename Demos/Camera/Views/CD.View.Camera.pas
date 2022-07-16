@@ -4,11 +4,17 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts, FMX.TabControl, FMX.Controls.Presentation, FMX.StdCtrls, FMX.Objects,
-  DW.NativeImage, DW.Camera, DW.Types,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts, FMX.TabControl, FMX.Controls.Presentation,
+  FMX.StdCtrls, FMX.Objects, FMX.Edit,
+  DW.NativeImage, DW.Camera, DW.Types, DW.NativeSlider, DW.NativeShape,
   CD.Types;
 
 type
+  TExposureProperties = record
+    IsSliderVisible: Boolean;
+    Value: Single;
+  end;
+
   TCameraView = class(TForm)
     RootLayout: TLayout;
     TabControl: TTabControl;
@@ -18,26 +24,28 @@ type
     CaptureButtonLayout: TLayout;
     PreviewLayout: TLayout;
     TopLayout: TLayout;
+    MidLayout: TLayout;
+    AcceptImage: TNativeImage;
+    CancelImage: TNativeImage;
+    CaptureImage: TNativeImage;
+    Circle: TNativeEllipse;
+    CameraSwapImage: TNativeImage;
+    CameraImage: TNativeImage;
+    ExposureSlider: TNativeSlider;
     procedure RootLayoutResized(Sender: TObject);
+    procedure CameraImageClick(Sender: TObject);
+    procedure CameraSwapImageClick(Sender: TObject);
+    procedure CircleClick(Sender: TObject);
+    procedure ExposureSliderValueChange(Sender: TObject);
   private
-    FAcceptImage: TNativeImage;
     FCamera: TCamera;
-    FCancelImage: TNativeImage;
-    FCameraImage: TNativeImage;
-    FCameraSwapImage: TNativeImage;
-    FCaptureImage: TNativeImage;
+    FExposureProps: TExposureProperties;
     FImageStream: TMemoryStream;
+    FWasActive: Boolean;
     procedure CameraAuthorizationStatusHandler(Sender: TObject; const AStatus: TAuthorizationStatus);
     procedure CameraImageCapturedHandler(Sender: TObject; const AImageStream: TStream);
-    procedure CameraImageClickHandler(Sender: TObject);
     procedure CameraStatusChange(Sender: TObject);
-    procedure CameraSwapImageClickHandler(Sender: TObject);
-    procedure CreateAcceptImage;
     procedure CreateCamera;
-    procedure CreateCancelImage;
-    procedure CreateCameraImage;
-    procedure CreateCameraSwapImage;
-    procedure CreateCaptureImage;
     procedure EnableButtons(const AEnable: Boolean);
     procedure InternalShowPreview;
   public
@@ -45,9 +53,6 @@ type
     destructor Destroy; override;
     procedure ShowPreview(const AShow: Boolean);
     property Camera: TCamera read FCamera;
-    property AcceptImage: TNativeImage read FAcceptImage;
-    property CancelImage: TNativeImage read FCancelImage;
-    property CaptureImage: TNativeImage read FCaptureImage;
     property ImageStream: TMemoryStream read FImageStream;
   end;
 
@@ -60,7 +65,23 @@ implementation
 
 uses
   FMX.Media,
+  DW.OSLog,
   DW.UIHelper;
+
+procedure LoadBitmapFromResource(const ABitmap: TBitmap; const AName: string);
+var
+  LStream: TStream;
+begin
+  if FindResource(HInstance, PChar(AName), RT_RCDATA) > 0 then
+  begin
+    LStream := TResourceStream.Create(HInstance, AName, RT_RCDATA);
+    try
+      ABitmap.LoadFromStream(LStream);
+    finally
+      LStream.Free;
+    end;
+  end;
+end;
 
 { TCameraView }
 
@@ -68,14 +89,11 @@ constructor TCameraView.Create(AOwner: TComponent);
 begin
   inherited Create(Application);
   FImageStream := TMemoryStream.Create;
-  CreateAcceptImage;
-  CreateCancelImage;
-  CreateCaptureImage;
-  CreateCameraImage;
-  CreateCameraSwapImage;
   CreateCamera;
   RootLayout.Visible := False;
   RootLayout.Parent := TFmxObject(AOwner);
+  // ExposureSlider.Margins.Rect := RectF(0, MidLayout.Height * 0.3, 2, MidLayout.Height * 0.3);
+  ExposureSlider.Visible := False;
 end;
 
 destructor TCameraView.Destroy;
@@ -89,57 +107,6 @@ begin
   TopLayout.Margins.Top := TUIHelper.GetOffsetRect.Top;
 end;
 
-procedure TCameraView.CreateAcceptImage;
-begin
-  FAcceptImage := TNativeImage.Create(Self);
-  FAcceptImage.Height := 64;
-  FAcceptImage.Width := 64;
-  FAcceptImage.Align := TAlignLayout.Right;
-  FAcceptImage.LoadFromResource('AcceptPlainGreen64');
-  FAcceptImage.Visible := False;
-  FAcceptImage.Parent := TopLayout;
-end;
-
-procedure TCameraView.CreateCancelImage;
-begin
-  FCancelImage := TNativeImage.Create(Self);
-  FCancelImage.Height := 64;
-  FCancelImage.Width := 64;
-  FCancelImage.Align := TAlignLayout.Left;
-  FCancelImage.LoadFromResource('CancelPlainRed64');
-  FCancelImage.Parent := TopLayout;
-end;
-
-procedure TCameraView.CreateCaptureImage;
-begin
-  FCaptureImage := TNativeImage.Create(Self);
-  FCaptureImage.Align := TAlignLayout.Contents;
-  FCaptureImage.Parent := CaptureTab;
-end;
-
-procedure TCameraView.CreateCameraImage;
-begin
-  FCameraImage := TNativeImage.Create(Self);
-  FCameraImage.OnClick := CameraImageClickHandler;
-  FCameraImage.Height := 64;
-  FCameraImage.Width := 64;
-  FCameraImage.Align := TAlignLayout.Center;
-  FCameraImage.LoadFromResource('CameraPlainBlue64');
-  FCameraImage.Parent := CaptureButtonLayout;
-end;
-
-procedure TCameraView.CreateCameraSwapImage;
-begin
-  FCameraSwapImage := TNativeImage.Create(Self);
-  FCameraSwapImage.OnClick := CameraSwapImageClickHandler;
-  FCameraSwapImage.Height := 64;
-  FCameraSwapImage.Width := 64;
-  FCameraSwapImage.Margins.Right := 4;
-  FCameraSwapImage.Align := TAlignLayout.Right;
-  FCameraSwapImage.LoadFromResource('CameraSwapPlainPurple64');
-  FCameraSwapImage.Parent := BottomLayout;
-end;
-
 procedure TCameraView.CreateCamera;
 begin
   FCamera := TCamera.Create;
@@ -150,15 +117,18 @@ begin
   FCamera.PreviewControl.Parent := PreviewLayout;
 end;
 
-procedure TCameraView.CameraImageClickHandler(Sender: TObject);
+procedure TCameraView.CameraImageClick(Sender: TObject);
 begin
-  if not FAcceptImage.Visible then
+  if not AcceptImage.Visible then
   begin
     EnableButtons(False);
     FCamera.CaptureImage;
   end
   else
+  begin
+    ExposureSlider.Visible := FExposureProps.IsSliderVisible;
     ShowPreview(True);
+  end;
 end;
 
 procedure TCameraView.CameraAuthorizationStatusHandler(Sender: TObject; const AStatus: TAuthorizationStatus);
@@ -171,19 +141,31 @@ procedure TCameraView.CameraImageCapturedHandler(Sender: TObject; const AImageSt
 begin
   FImageStream.Clear;
   FImageStream.CopyFrom(AImageStream, AImageStream.Size);
-  FCaptureImage.LoadFromStream(FImageStream);
+  CaptureImage.LoadFromStream(FImageStream);
   TabControl.ActiveTab := CaptureTab;
   EnableButtons(True);
-  FAcceptImage.Visible := True;
-  FCameraSwapImage.Visible := False;
+  AcceptImage.Visible := True;
+  CameraSwapImage.Visible := False;
+  FExposureProps.IsSliderVisible := ExposureSlider.Visible;
+  ExposureSlider.Visible := False;
 end;
 
 procedure TCameraView.CameraStatusChange(Sender: TObject);
 begin
-  //
+  if FCamera.IsCapturing then
+  begin
+    ExposureSlider.Value := FCamera.Exposure;
+    if not FWasActive then
+    begin
+      FExposureProps.Value := FCamera.Exposure;
+      if not ExposureSlider.Visible then
+        FCamera.Exposure := -1;
+    end;
+    FWasActive := FCamera.IsActive;
+  end;
 end;
 
-procedure TCameraView.CameraSwapImageClickHandler(Sender: TObject);
+procedure TCameraView.CameraSwapImageClick(Sender: TObject);
 begin
   if FCamera.CameraPosition = TDevicePosition.Front then
     FCamera.CameraPosition := TDevicePosition.Back
@@ -191,11 +173,37 @@ begin
     FCamera.CameraPosition := TDevicePosition.Front;
 end;
 
+procedure TCameraView.CircleClick(Sender: TObject);
+begin
+  if ExposureSlider.Visible then
+  begin
+    // Save the current value
+    FExposureProps.Value := ExposureSlider.Value;
+    FCamera.Exposure := -1; // Auto
+    ExposureSlider.Visible := False;
+  end
+  else
+  begin
+    ExposureSlider.Visible := True;
+    if FExposureProps.Value > -1 then
+    begin
+      FCamera.Exposure := FExposureProps.Value;
+      ExposureSlider.Value := FExposureProps.Value;
+    end;
+  end;
+  FExposureProps.IsSliderVisible := ExposureSlider.Visible;
+end;
+
 procedure TCameraView.EnableButtons(const AEnable: Boolean);
 begin
-  FCameraImage.Enabled := AEnable;
-  FCameraSwapImage.Enabled := AEnable;
-  FCancelImage.Enabled := AEnable;
+  CameraImage.Enabled := AEnable;
+  CameraSwapImage.Enabled := AEnable;
+  CancelImage.Enabled := AEnable;
+end;
+
+procedure TCameraView.ExposureSliderValueChange(Sender: TObject);
+begin
+  FCamera.Exposure := ExposureSlider.Value;
 end;
 
 procedure TCameraView.ShowPreview(const AShow: Boolean);
@@ -211,10 +219,12 @@ end;
 
 procedure TCameraView.InternalShowPreview;
 begin
-  FAcceptImage.Visible := False;
+  FWasActive := FCamera.IsActive;
+  AcceptImage.Visible := False;
   TabControl.ActiveTab := PreviewTab;
-  FCameraSwapImage.Visible := True;
+  CameraSwapImage.Visible := True;
   RootLayout.Visible := True;
+  Circle.BringToFront;
   FCamera.IsActive := True;
 end;
 
