@@ -43,6 +43,8 @@ uses
   Androidapi.Helpers, Androidapi.JNI.App,
   // FMX
   FMX.Presentation.Factory, FMX.Controls,
+  // RTL
+  System.SysUtils,
   // DW
   DW.CameraPreview;
 

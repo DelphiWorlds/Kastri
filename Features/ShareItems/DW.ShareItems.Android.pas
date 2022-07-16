@@ -42,7 +42,7 @@ implementation
 
 uses
   // RTL
-  System.Classes, System.IOUtils, System.Net.Mime,
+  System.SysUtils, System.Classes, System.IOUtils, System.Net.Mime,
   // Android
   Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.App, Androidapi.JNI.Os;
 
@@ -67,7 +67,6 @@ end;
 function TPlatformShareItems.SaveFile(const AFileName: string): Jnet_Uri;
 var
   LFileName: string;
-  LFile: JFile;
 begin
   LFileName := TPath.Combine(JStringToString(TAndroidHelper.Context.getExternalCacheDir.getAbsolutePath), TPath.GetFileName(AFileName));
   if TFile.Exists(LFileName) then
