@@ -6,7 +6,7 @@ unit DW.Androidapi.JNI.DWCameraHelpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -18,6 +18,7 @@ interface
 uses
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.JNI.Os, Androidapi.JNI.Util,
+  Androidapi.JNI.OpenGL,
   // DW
   DW.Androidapi.JNI.Hardware.Camera2, DW.Androidapi.JNI.View;
 
@@ -33,6 +34,8 @@ type
   JDWCameraCaptureSessionCaptureCallbackDelegate = interface;
   JDWCameraView = interface;
   JDWCameraView_StateDelegate = interface;
+  JDWGLCameraView = interface;
+  JDWGLCameraView_ViewDelegate = interface;
 
   JDWCameraCharacteristicsHelperClass = interface(JObjectClass)
     ['{546D0D05-92AF-4D33-8AC5-0EC46022E85D}']
@@ -45,7 +48,11 @@ type
     function getFaceDetectModes: TJavaArray<Integer>; cdecl;
     function getLensFacing: Integer; cdecl;
     function getMap: JStreamConfigurationMap; cdecl;
+    function getSensorExposureTimeLower: Int64; cdecl;
+    function getSensorExposureTimeUpper: Int64; cdecl;
     function getSensorOrientation: Integer; cdecl;
+    function getSensorSensitivityLower: Integer; cdecl;
+    function getSensorSensitivityUpper: Integer; cdecl;
     procedure setCameraCharacteristics(characteristics: JCameraCharacteristics); cdecl;
   end;
   TJDWCameraCharacteristicsHelper = class(TJavaGenericImport<JDWCameraCharacteristicsHelperClass, JDWCameraCharacteristicsHelper>) end;
@@ -62,6 +69,8 @@ type
     procedure setCaptureRequestBuilder(builder: JCaptureRequest_Builder); cdecl;
     procedure setFaceDetectMode(mode: Integer); cdecl;
     procedure setIntegerValue(key: JCaptureRequest_Key; value: Integer); cdecl;
+    procedure setLongValue(key: JCaptureRequest_Key; value: Int64); cdecl;
+    procedure setOrientation(orientation: Integer); cdecl;
   end;
   TJDWCaptureRequestBuilderHelper = class(TJavaGenericImport<JDWCaptureRequestBuilderHelperClass, JDWCaptureRequestBuilderHelper>) end;
 
@@ -100,8 +109,8 @@ type
   [JavaSignature('com/delphiworlds/kastri/DWCameraCaptureSessionStateCallbackDelegate')]
   JDWCameraCaptureSessionStateCallbackDelegate = interface(IJavaInstance)
     ['{29110A8F-CD76-443F-9311-BBF17EB82C8A}']
-    procedure Configured(session: JCameraCaptureSession); cdecl;
-    procedure ConfigureFailed(session: JCameraCaptureSession); cdecl;
+    procedure onConfigured(session: JCameraCaptureSession); cdecl;
+    procedure onConfigureFailed(session: JCameraCaptureSession); cdecl;
   end;
   TJDWCameraCaptureSessionStateCallbackDelegate = class(TJavaGenericImport<JDWCameraCaptureSessionStateCallbackDelegateClass,
     JDWCameraCaptureSessionStateCallbackDelegate>) end;
@@ -127,8 +136,8 @@ type
   [JavaSignature('com/delphiworlds/kastri/DWCameraCaptureSessionCaptureCallbackDelegate')]
   JDWCameraCaptureSessionCaptureCallbackDelegate = interface(IJavaInstance)
     ['{A4783EF9-ABEB-4342-9453-1C6AF15C7E2A}']
-    procedure CaptureCompleted(session: JCameraCaptureSession; request: JCaptureRequest; result: JTotalCaptureResult); cdecl;
-    procedure CaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest; partialResult: JCaptureResult); cdecl;
+    procedure onCaptureCompleted(session: JCameraCaptureSession; request: JCaptureRequest; result: JTotalCaptureResult); cdecl;
+    procedure onCaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest; partialResult: JCaptureResult); cdecl;
   end;
   TJDWCameraCaptureSessionCaptureCallbackDelegate = class(TJavaGenericImport<JDWCameraCaptureSessionCaptureCallbackDelegateClass,
     JDWCameraCaptureSessionCaptureCallbackDelegate>) end;
@@ -154,9 +163,9 @@ type
   [JavaSignature('com/delphiworlds/kastri/DWCameraDeviceStateCallbackDelegate')]
   JDWCameraDeviceStateCallbackDelegate = interface(IJavaInstance)
     ['{CF9CD6DA-55B3-4EC6-9DC3-84FB2F73722E}']
-    procedure Disconnected(camera: JCameraDevice); cdecl;
-    procedure Error(camera: JCameraDevice; error: Integer); cdecl;
-    procedure Opened(camera: JCameraDevice); cdecl;
+    procedure onDisconnected(camera: JCameraDevice); cdecl;
+    procedure onError(camera: JCameraDevice; error: Integer); cdecl;
+    procedure onOpened(camera: JCameraDevice); cdecl;
   end;
   TJDWCameraDeviceStateCallbackDelegate = class(TJavaGenericImport<JDWCameraDeviceStateCallbackDelegateClass,
     JDWCameraDeviceStateCallbackDelegate>) end;
@@ -191,6 +200,33 @@ type
     procedure onReady(view: JDWCameraView); cdecl;
   end;
   TJDWCameraView_StateDelegate = class(TJavaGenericImport<JDWCameraView_StateDelegateClass, JDWCameraView_StateDelegate>) end;
+
+  JDWGLCameraViewClass = interface(JGLSurfaceViewClass)
+    ['{7F9B7F01-079E-4F57-8CBC-FE9FA003A344}']
+    {class} function init(context: JContext): JDWGLCameraView; cdecl;
+  end;
+
+  [JavaSignature('com/delphiworlds/kastri/DWGLCameraView')]
+  JDWGLCameraView = interface(JGLSurfaceView)
+    ['{9BC9F706-03DF-4427-A09D-A40E88FD425D}']
+    // procedure setDefaultSize(defaultSize: Jutil_Size); cdecl;
+    procedure setViewDelegate(delegate: JDWGLCameraView_ViewDelegate); cdecl;
+    procedure setCameraRotation(rotation: Integer); cdecl;
+    procedure setCaptureFPS(fps: Integer); cdecl;
+  end;
+  TJDWGLCameraView = class(TJavaGenericImport<JDWGLCameraViewClass, JDWGLCameraView>) end;
+
+  JDWGLCameraView_ViewDelegateClass = interface(IJavaClass)
+    ['{7464C525-5E2E-4CA8-AAD8-4B4E2B2298C7}']
+  end;
+
+  [JavaSignature('com/delphiworlds/kastri/DWGLCameraView$ViewDelegate')]
+  JDWGLCameraView_ViewDelegate = interface(IJavaInstance)
+    ['{8BD270FF-0D3A-4F66-A2C0-6A2D0903F559}']
+    procedure onFrameAvailable(frame: JBitmap); cdecl;
+    procedure onSurfaceTextureAvailable(texture: JSurfaceTexture); cdecl;
+  end;
+  TJGLDWCameraView_ViewDelegate = class(TJavaGenericImport<JDWGLCameraView_ViewDelegateClass, JDWGLCameraView_ViewDelegate>) end;
 
 implementation
 
