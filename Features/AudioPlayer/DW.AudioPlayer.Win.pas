@@ -123,7 +123,7 @@ end;
 
 procedure TPlatformAudioPlayer.Stop;
 begin
-  if (AudioState <> TAudioState.Stopped) and (FMediaControl <> nil) then
+  if FMediaControl <> nil then
   begin
     if Succeeded(FMediaControl.StopWhenReady) then
       Stopped;
