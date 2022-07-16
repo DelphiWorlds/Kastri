@@ -536,9 +536,9 @@ begin
     LMessage := TJSONObject.Create;
     LJSON.AddPair('message', LMessage);
     if AIsTopic then
-      LMessage.AddPair('topic', ATo)
+      LMessage.AddPair('topic', TJSONString.Create(ATo))
     else
-      LMessage.AddPair('token', ATo);
+      LMessage.AddPair('token', TJSONString.Create(ATo));
     LData := GetDataJSONValue;
     if LData <> nil then
       LMessage.AddPair('data', LData);
