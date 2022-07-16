@@ -22,6 +22,10 @@ uses
   FMX.Types, FMX.Controls, FMX.Layouts;
 
 type
+  TElasticDimension = (Width, Height);
+
+  TElasticDimensions = set of TElasticDimension;
+
   /// <summary>
   ///   Layout that adjusts its size to accomodate the controls within it
   /// </summary>
@@ -30,35 +34,50 @@ type
   /// </remarks>
   TLayout = class(FMX.Layouts.TLayout)
   private
+    FElasticDimensions: TElasticDimensions;
     FIsElastic: Boolean;
     procedure SetIsElastic(const Value: Boolean);
+    procedure SetElasticDimensions(const Value: TElasticDimensions);
   protected
     procedure DoRealign; override;
   public
     /// <summary>
     ///   Set this property to True when you want the layout to adjust its size automatically
     /// </summary>
+    /// <remarks>
+    ///   This property has been DEPRECATED and may be removed later. Please use ElasticDimensions instead
+    /// </remarks>
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
+    /// <summary>
+    ///   Use this property to indicate which dimensions of the layout should have the size adjusted automatically
+    /// </summary>
+    property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
   end;
 
   TFlowLayout = class(FMX.Layouts.TFlowLayout)
   private
+    FElasticDimensions: TElasticDimensions;
     FIsElastic: Boolean;
     procedure SetIsElastic(const Value: Boolean);
+    procedure SetElasticDimensions(const Value: TElasticDimensions);
   protected
     procedure DoRealign; override;
   public
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
-  end;
+    property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
+   end;
 
   TGridPanelLayout = class(FMX.Layouts.TGridPanelLayout)
   private
+    FElasticDimensions: TElasticDimensions;
     FIsElastic: Boolean;
     procedure SetIsElastic(const Value: Boolean);
+    procedure SetElasticDimensions(const Value: TElasticDimensions);
   protected
     procedure DoRealign; override;
   public
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
+    property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
   end;
 
   TElasticLayoutHelper = record
@@ -66,6 +85,7 @@ type
     class function GetChildrenOnlyRect(const AControl: TControl): TRectF; static;
   public
     class procedure ElasticRealign(const ALayout: TGridPanelLayout); overload; static;
+    class procedure ElasticRealign(const AControl: TControl; const ADimensions: TElasticDimensions); overload; static;
     class procedure ElasticRealign(const AControl: TControl); overload; static;
   end;
 
@@ -122,6 +142,11 @@ begin
 end;
 
 class procedure TElasticLayoutHelper.ElasticRealign(const AControl: TControl);
+begin
+  ElasticRealign(AControl, [TElasticDimension.Width, TElasticDimension.Height]);
+end;
+
+class procedure TElasticLayoutHelper.ElasticRealign(const AControl: TControl; const ADimensions: TElasticDimensions);
 var
   LRect: TRectF;
 begin
@@ -129,9 +154,9 @@ begin
   LRect.Inflate(AControl.Padding.Left, AControl.Padding.Top, AControl.Padding.Right, AControl.Padding.Bottom);
   TOpenControl(AControl).FDisableAlign := True;
   try
-    if not (AControl.Align in [TAlignLayout.Top, TAlignLayout.MostTop, TAlignLayout.Bottom, TAlignLayout.MostBottom]) then
+    if (TElasticDimension.Width in ADimensions) and not (AControl.Align in [TAlignLayout.Top, TAlignLayout.MostTop, TAlignLayout.Bottom, TAlignLayout.MostBottom]) then
       AControl.Width := LRect.Width;
-    if not (AControl.Align in [TAlignLayout.Left, TAlignLayout.MostLeft, TAlignLayout.Right, TAlignLayout.MostRight]) then
+    if (TElasticDimension.Height in ADimensions) and not (AControl.Align in [TAlignLayout.Left, TAlignLayout.MostLeft, TAlignLayout.Right, TAlignLayout.MostRight]) then
       AControl.Height := LRect.Height;
   finally
     TOpenControl(AControl).FDisableAlign := False;
@@ -143,8 +168,13 @@ end;
 procedure TLayout.DoRealign;
 begin
   inherited;
-  if FIsElastic then
-    TElasticLayoutHelper.ElasticRealign(Self);
+  TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
+end;
+
+procedure TLayout.SetElasticDimensions(const Value: TElasticDimensions);
+begin
+  FElasticDimensions := Value;
+  Realign;
 end;
 
 procedure TLayout.SetIsElastic(const Value: Boolean);
@@ -152,6 +182,10 @@ begin
   if Value <> FIsElastic then
   begin
     FIsElastic := Value;
+    if FIsElastic then
+      FElasticDimensions := [TElasticDimension.Width, TElasticDimension.Height]
+    else
+      FElasticDimensions := [];
     Realign;
   end;
 end;
@@ -161,8 +195,14 @@ end;
 procedure TFlowLayout.DoRealign;
 begin
   inherited;
-  if FIsElastic then
-    TElasticLayoutHelper.ElasticRealign(Self);
+  if FElasticDimensions <> [] then
+    TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
+end;
+
+procedure TFlowLayout.SetElasticDimensions(const Value: TElasticDimensions);
+begin
+  FElasticDimensions := Value;
+  Realign;
 end;
 
 procedure TFlowLayout.SetIsElastic(const Value: Boolean);
@@ -170,6 +210,10 @@ begin
   if Value <> FIsElastic then
   begin
     FIsElastic := Value;
+    if FIsElastic then
+      FElasticDimensions := [TElasticDimension.Width, TElasticDimension.Height]
+    else
+      FElasticDimensions := [];
     Realign;
   end;
 end;
@@ -179,8 +223,14 @@ end;
 procedure TGridPanelLayout.DoRealign;
 begin
   inherited;
-  if FIsElastic then
-    TElasticLayoutHelper.ElasticRealign(Self);
+  if FElasticDimensions <> [] then
+    TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
+end;
+
+procedure TGridPanelLayout.SetElasticDimensions(const Value: TElasticDimensions);
+begin
+  FElasticDimensions := Value;
+  Realign;
 end;
 
 procedure TGridPanelLayout.SetIsElastic(const Value: Boolean);
@@ -188,6 +238,10 @@ begin
   if Value <> FIsElastic then
   begin
     FIsElastic := Value;
+    if FIsElastic then
+      FElasticDimensions := [TElasticDimension.Width, TElasticDimension.Height]
+    else
+      FElasticDimensions := [];
     Realign;
   end;
 end;
