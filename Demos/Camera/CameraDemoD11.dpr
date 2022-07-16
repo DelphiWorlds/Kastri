@@ -1,6 +1,6 @@
 program CameraDemoD11;
 
-{$R 'Data.res' 'Data.rc'}
+
 
 uses
   System.StartUpCopy,

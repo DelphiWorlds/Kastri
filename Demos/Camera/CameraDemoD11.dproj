@@ -271,9 +271,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <RcCompile Include="Data.rc">
-            <Form>Data.res</Form>
-        </RcCompile>
         <DCCReference Include="Views\CD.View.Main.pas">
             <Form>MainView</Form>
             <FormType>fmx</FormType>
