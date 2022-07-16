@@ -48,9 +48,12 @@ type
     FDelegate: TAVAudioPlayerDelegate;
     FPlayer: AVAudioPlayer;
   protected
+    procedure DoAudioStateChange(const AState: TAudioState); override;
     procedure LoadFromFile(const AFileName: string); override;
     procedure Pause; override;
     procedure Play; override;
+    procedure SeekTo(const AMilliseconds: Int64); override;
+    procedure Stop; override;
   public
     constructor Create(const AAudioPlayer: TAudioPlayer); override;
     destructor Destroy; override;
@@ -77,7 +80,7 @@ end;
 
 procedure TAVAudioPlayerDelegate.audioPlayerDidFinishPlaying(player: AVAudioPlayer; successfully: Boolean);
 begin
-  //
+  FPlatformAudioPlayer.DoAudioStateChange(TAudioState.Stopped);
 end;
 
 { TPlatformAudioPlayer }
@@ -91,6 +94,11 @@ end;
 destructor TPlatformAudioPlayer.Destroy;
 begin
   FDelegate.Free;
+  inherited;
+end;
+
+procedure TPlatformAudioPlayer.DoAudioStateChange(const AState: TAudioState);
+begin
   inherited;
 end;
 
@@ -110,8 +118,11 @@ end;
 
 procedure TPlatformAudioPlayer.Pause;
 begin
-  if (FPlayer <> nil) and (FPlayer.Rate > 0) then
+  if (FPlayer <> nil) and (FPlayer.rate > 0) then
+  begin
     FPlayer.pause;
+    DoAudioStateChange(TAudioState.Paused);
+  end;
 end;
 
 procedure TPlatformAudioPlayer.Play;
@@ -120,6 +131,21 @@ begin
   begin
     FPlayer.play;
     DoAudioStateChange(TAudioState.Playing);
+  end;
+end;
+
+procedure TPlatformAudioPlayer.SeekTo(const AMilliseconds: Int64);
+begin
+  if FPlayer <> nil then
+    FPlayer.setCurrentTime(AMilliseconds / 1000);
+end;
+
+procedure TPlatformAudioPlayer.Stop;
+begin
+  if (FPlayer <> nil) and (FPlayer.rate > 0) then
+  begin
+    FPlayer.stop;
+    DoAudioStateChange(TAudioState.Stopped);
   end;
 end;
 
