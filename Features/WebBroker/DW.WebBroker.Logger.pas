@@ -30,6 +30,7 @@ type
   private
     class var FListeners: TLogListeners;
   public
+    class var IsEnabled: Boolean;
     class procedure AddListener(const AListener: ILogListener); static;
     class procedure Log(const AMsg: string); static;
     class procedure RemoveListener(const AListener: ILogListener); static;
@@ -62,8 +63,11 @@ class procedure TLogger.Log(const AMsg: string);
 var
   AListener: ILogListener;
 begin
-  for AListener in FListeners do
-    AListener.Log(AMsg);
+  if IsEnabled then
+  begin
+    for AListener in FListeners do
+      AListener.Log(AMsg);
+  end;
 end;
 
 end.
