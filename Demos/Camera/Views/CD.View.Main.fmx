@@ -2,25 +2,26 @@ object MainView: TMainView
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 607
-  ClientWidth = 519
+  ClientHeight = 900
+  ClientWidth = 600
+  SystemStatusBar.Visibility = VisibleAndOverlap
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
   object TabControl: TTabControl
     Align = Client
-    Size.Width = 519.000000000000000000
-    Size.Height = 607.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 900.000000000000000000
     Size.PlatformDefault = False
     TabIndex = 0
     TabOrder = 0
     TabPosition = None
     Sizes = (
-      519s
-      607s
-      519s
-      607s)
+      600s
+      900s
+      600s
+      900s)
     object StartTab: TTabItem
       CustomIcon = <
         item
@@ -37,8 +38,8 @@ object MainView: TMainView
       object StartLayout: TLayout
         Align = Client
         Margins.Bottom = 12.000000000000000000
-        Size.Width = 519.000000000000000000
-        Size.Height = 595.000000000000000000
+        Size.Width = 600.000000000000000000
+        Size.Height = 888.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         object StartImage: TImage
@@ -49,8 +50,8 @@ object MainView: TMainView
           Margins.Left = 4.000000000000000000
           Margins.Top = 4.000000000000000000
           Margins.Right = 4.000000000000000000
-          Size.Width = 511.000000000000000000
-          Size.Height = 497.000000000000000000
+          Size.Width = 592.000000000000000000
+          Size.Height = 790.000000000000000000
           Size.PlatformDefault = False
         end
         object StartButton: TButton
@@ -60,8 +61,8 @@ object MainView: TMainView
           Margins.Right = 4.000000000000000000
           Margins.Bottom = 4.000000000000000000
           Position.X = 4.000000000000000000
-          Position.Y = 544.000000000000000000
-          Size.Width = 511.000000000000000000
+          Position.Y = 837.000000000000000000
+          Size.Width = 592.000000000000000000
           Size.Height = 47.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 0
@@ -75,15 +76,15 @@ object MainView: TMainView
           Padding.Right = 2.000000000000000000
           Padding.Bottom = 2.000000000000000000
           Margins.Bottom = 4.000000000000000000
-          Position.Y = 501.000000000000000000
-          Size.Width = 519.000000000000000000
+          Position.Y = 794.000000000000000000
+          Size.Width = 600.000000000000000000
           Size.Height = 35.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 2
           object IncludeLocationSwitch: TSwitch
             Align = Right
             IsChecked = False
-            Position.X = 420.000000000000000000
+            Position.X = 501.000000000000000000
             Position.Y = 2.000000000000000000
             Size.Width = 97.000000000000000000
             Size.Height = 31.000000000000000000
@@ -94,12 +95,27 @@ object MainView: TMainView
           object IncludeLocationLabel: TLabel
             Align = Client
             Margins.Right = 8.000000000000000000
-            Size.Width = 410.000000000000000000
+            Size.Width = 328.000000000000000000
             Size.Height = 31.000000000000000000
             Size.PlatformDefault = False
             TextSettings.HorzAlign = Trailing
             Text = 'Include Location'
             TabOrder = 1
+          end
+          object FlashComboBox: TComboBox
+            Align = Left
+            Items.Strings = (
+              'Flash Auto'
+              'Flash Off'
+              'Flash On')
+            ItemIndex = 0
+            Position.X = 2.000000000000000000
+            Position.Y = 2.000000000000000000
+            Size.Width = 163.000000000000000000
+            Size.Height = 31.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            OnChange = FlashComboBoxChange
           end
         end
       end

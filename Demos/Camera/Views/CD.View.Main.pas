@@ -4,7 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, System.Sensors, System.Sensors.Components,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.TabControl, FMX.Controls.Presentation, FMX.StdCtrls, FMX.Objects, FMX.Layouts,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.TabControl, FMX.Controls.Presentation, FMX.StdCtrls, FMX.Objects,
+  FMX.Layouts, FMX.ListBox,
   CD.View.Camera;
 
 type
@@ -19,6 +20,8 @@ type
     SwitchLayout: TLayout;
     IncludeLocationLabel: TLabel;
     StartLayout: TLayout;
+    FlashComboBox: TComboBox;
+    procedure FlashComboBoxChange(Sender: TObject);
     procedure StartButtonClick(Sender: TObject);
     procedure IncludeLocationSwitchSwitch(Sender: TObject);
     procedure LocationSensorLocationChanged(Sender: TObject; const OldLocation, NewLocation: TLocationCoord2D);
@@ -40,6 +43,7 @@ implementation
 
 uses
   System.Permissions,
+  FMX.Media,
   DW.Consts.Android, DW.Permissions.Helpers;
 
 { TMainView }
@@ -111,6 +115,11 @@ end;
 procedure TMainView.CameraViewCancelImageClickHandler(Sender: TObject);
 begin
   HideCamera;
+end;
+
+procedure TMainView.FlashComboBoxChange(Sender: TObject);
+begin
+  FCameraView.Camera.FlashMode := TFlashMode(FlashComboBox.ItemIndex);
 end;
 
 end.
