@@ -278,6 +278,13 @@ type
     constructor Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
   end;
 
+  TAndroidFileStream = class(TBytesStream)
+  public
+    constructor Create(const AFile: JFile); overload;
+    constructor Create(const AURI: string); overload;
+    constructor Create(const AJURI: Jnet_Uri); overload;
+  end;
+
   TBundlePair = record
     Key: JObject;
     Value: JObject;
@@ -302,7 +309,7 @@ uses
   // RTL
   System.DateUtils, System.IOUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI,
+  Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI, Androidapi.JNI.Support,
   // DW
   {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.AndroidX.FileProvider, {$ENDIF}
   DW.Consts.Android, DW.Androidapi.JNI.Util;
@@ -844,6 +851,42 @@ begin
     TThread.ForceQueue(nil, FRunHandler)
   else
     FRunHandler;
+end;
+
+{ TAndroidFileStream }
+
+constructor TAndroidFileStream.Create(const AFile: JFile);
+var
+  LURI: Jnet_Uri;
+begin
+  LURI := TAndroidHelper.JFileToJURI(AFile);
+  Create(LURI);
+end;
+
+constructor TAndroidFileStream.Create(const AURI: string);
+var
+  LURI: Jnet_Uri;
+begin
+  LURI := TJnet_Uri.JavaClass.parse(StringToJString(AURI));
+  Create(LURI);
+end;
+
+constructor TAndroidFileStream.Create(const AJURI: Jnet_Uri);
+var
+  LInput: JInputStream;
+  LJavaBytes: TJavaArray<Byte>;
+  LBytes: TBytes;
+begin
+  LInput := TAndroidHelper.Context.getContentResolver.openInputStream(AJURI);
+  LJavaBytes := TJavaArray<Byte>.Create(LInput.available);
+  try
+    LInput.read(LJavaBytes, 0, LJavaBytes.Length);
+    SetLength(LBytes, LJavaBytes.Length);
+    Move(LJavaBytes.Data^, LBytes[0], LJavaBytes.Length);
+  finally
+    LJavaBytes.Free;
+  end;
+  inherited Create(LBytes);
 end;
 
 { TBundlePair }
