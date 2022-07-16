@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Classes,
+  System.Classes, System.SysUtils,
   // macOS
   {$IF Defined(MACOS)}
   Macapi.CoreFoundation,
@@ -55,6 +55,11 @@ type
   TNSArrayHelper = record
   public
     class function FromNSObjects(const AArray: array of NSObject): NSArray; static;
+  end;
+
+  TNSDataHelper = record
+  public
+    class function ToBytes(const AData: NSData): TBytes; static;
   end;
 
   TMacHelperEx = record
@@ -112,7 +117,7 @@ implementation
 
 uses
   // RTL
-  System.DateUtils, System.SysUtils,
+  System.DateUtils,
   // macOS
   Macapi.ObjectiveC, Macapi.Helpers;
 
@@ -324,6 +329,14 @@ end;
 class function TMacHelperEx.StandardUserDefaults: NSUserDefaults;
 begin
   Result := TNSUserDefaults.Wrap(TNSUserDefaults.OCClass.standardUserDefaults);
+end;
+
+{ TNSDataHelper }
+
+class function TNSDataHelper.ToBytes(const AData: NSData): TBytes;
+begin
+  SetLength(Result, AData.length);
+  Move(AData.bytes^, Result[0], AData.length);
 end;
 
 end.
