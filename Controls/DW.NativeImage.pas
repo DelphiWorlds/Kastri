@@ -19,7 +19,9 @@ uses
   // RTL
   System.Classes, System.Types, System.UITypes,
   // FMX
-  FMX.Controls.Presentation, FMX.Controls.Model, FMX.Controls, FMX.Graphics, FMX.Types;
+  FMX.Controls.Presentation, FMX.Controls.Model, FMX.Controls, FMX.Graphics, FMX.Types,
+  //
+  DW.NativeControlModel;
 
 const
   MM_NATIVEIMAGE_LOADFROMFILE = MM_USER + 1;
@@ -31,7 +33,7 @@ const
   MM_NATIVEIMAGE_BACKGROUNDCOLORCHANGED = MM_USER + 7;
 
 type
-  TCustomNativeImageModel = class(TDataModel)
+  TCustomNativeImageModel = class(TNativeControlModel)
   private
     FBackgroundColor: TAlphaColor;
     FImage: TBitmap;
@@ -62,6 +64,7 @@ type
   private
     function GetBackgroundColor: TAlphaColor;
     function GetImage: TBitmap;
+    function GetOnLongPress: TNotifyEvent;
     function GetModel: TCustomNativeImageModel; overload;
     function GetStyledSettings: TStyledSettings;
     function GetText: string;
@@ -69,6 +72,7 @@ type
     procedure ModelTextSettingsChangedHandler(Sender: TObject);
     procedure SetBackgroundColor(const Value: TAlphaColor);
     procedure SetImage(const Value: TBitmap);
+    procedure SetOnLongPress(const Value: TNotifyEvent);
     procedure SetStyledSettings(const Value: TStyledSettings);
     procedure SetText(const Value: string);
     procedure SetTextSettings(const Value: TTextSettings);
@@ -90,6 +94,7 @@ type
     property StyledSettings: TStyledSettings read GetStyledSettings write SetStyledSettings stored StyledSettingsStored nodefault;
     property Text: string read GetText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property OnLongPress: TNotifyEvent read GetOnLongPress write SetOnLongPress;
   end;
 
   {$IF CompilerVersion >= 35}
@@ -114,6 +119,7 @@ type
     property Width;
     property OnClick;
     property OnDblClick;
+    property OnLongPress;
     property OnMouseDown;
     property OnMouseMove;
     property OnMouseUp;
@@ -311,6 +317,11 @@ begin
   Result := inherited GetModel<TCustomNativeImageModel>;
 end;
 
+function TCustomNativeImage.GetOnLongPress: TNotifyEvent;
+begin
+  Result := Model.OnLongPress;
+end;
+
 function TCustomNativeImage.GetStyledSettings: TStyledSettings;
 begin
   Result := Model.TextSettingsInfo.StyledSettings;
@@ -391,6 +402,11 @@ end;
 procedure TCustomNativeImage.SetImage(const Value: TBitmap);
 begin
   Model.Image := Value;
+end;
+
+procedure TCustomNativeImage.SetOnLongPress(const Value: TNotifyEvent);
+begin
+  Model.OnLongPress := Value;
 end;
 
 procedure TCustomNativeImage.SetStyledSettings(const Value: TStyledSettings);

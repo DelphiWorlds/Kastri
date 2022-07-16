@@ -50,6 +50,13 @@ type
     property OnLongPress: TNotifyEvent read GetOnLongPress write SetOnLongPress;
   end;
 
+  TCustomButtonEx = class(FMX.StdCtrls.TCustomButton)
+  private
+    FOnLongPress: TNotifyEvent;
+  public
+    property OnLongPress: TNotifyEvent read FOnLongPress write FOnLongPress;
+  end;
+
   {$IF CompilerVersion < 35}
   [ComponentPlatformsAttribute(pfidiOS or pidAndroid32Arm or pidAndroid64Arm or pidWin32 or pidWin64)]
   {$ELSE}
@@ -58,7 +65,7 @@ type
   {$IF Defined(IOS) or Defined(ANDROID)}
   TNativeButton = class(TCustomNativeButton)
   {$ELSE}
-  TNativeButton = class(TCustomButton)
+  TNativeButton = class(TCustomButtonEx)
   {$ENDIF}
   published
     property Action;
