@@ -19,8 +19,21 @@ uses
   // macOS
   Macapi.Foundation, Macapi.ObjectiveC, Macapi.CocoaTypes;
 
+const
+  NSJSONReadingMutableContainers = 1 shl 0;
+  NSJSONReadingMutableLeaves = 1 shl 1;
+  NSJSONReadingFragmentsAllowed = 1 shl 2;
+  NSJSONReadingJSON5Allowed = 1 shl 3;
+  NSJSONReadingTopLevelDictionaryAssumed = 1 shl 4;
+  NSJSONReadingAllowFragments = NSJSONReadingFragmentsAllowed;
+  NSJSONWritingPrettyPrinted = 1 shl 0;
+  NSJSONWritingSortedKeys = 1 shl 1;
+  NSJSONWritingFragmentsAllowed = 1 shl 2;
+  NSJSONWritingWithoutEscapingSlashes = 1 shl 3;
+
 type
   NSData = interface;
+  NSJSONSerialization = interface;
   NSLocale = interface;
   NSNetService = interface;
   NSNetServiceBrowser = interface;
@@ -38,6 +51,8 @@ type
   PNSInputStream = ^NSInputStream;
   PNSOutputStream = ^NSOutputStream;
   NSRunLoopMode = NSString;
+  NSJSONReadingOptions = NSInteger;
+  NSJSONWritingOptions = NSInteger;
 
   TNSDataBlockMethod1 = procedure(bytes: Pointer; byteRange: NSRange; stop: PBoolean) of object;
   TNSDataBlockMethod2 = procedure(bytes: Pointer; length: NSUInteger) of object;
@@ -252,6 +267,20 @@ type
     procedure netServiceBrowserDidStopSearch(browser: NSNetServiceBrowser); cdecl;
     procedure netServiceBrowserWillSearch(browser: NSNetServiceBrowser); cdecl;
   end;
+
+  NSJSONSerializationClass = interface(NSObjectClass)
+    ['{5181AA58-9005-4CD1-B264-AA9DCFB00DF5}']
+    {class} function dataWithJSONObject(obj: Pointer; options: NSJSONWritingOptions; error: PPointer): Macapi.Foundation.NSData; cdecl;
+    {class} function isValidJSONObject(obj: Pointer): Boolean; cdecl;
+    {class} function JSONObjectWithData(data: Macapi.Foundation.NSData; options: NSJSONReadingOptions; error: PPointer): Pointer; cdecl;
+    {class} function JSONObjectWithStream(stream: NSInputStream; options: NSJSONReadingOptions; error: PPointer): Pointer; cdecl;
+    {class} function writeJSONObject(obj: Pointer; toStream: NSOutputStream; options: NSJSONWritingOptions; error: PPointer): NSInteger; cdecl;
+  end;
+
+  NSJSONSerialization = interface(NSObject)
+    ['{A65615A3-5578-4D4A-B7F3-17CDF5201312}']
+  end;
+  TNSJSONSerialization = class(TOCGenericImport<NSJSONSerializationClass, NSJSONSerialization>) end;
 
 implementation
 
