@@ -37,6 +37,7 @@ contains
   DW.NativeImage in '..\..\Controls\DW.NativeImage.pas',
   DW.NativeButton in '..\..\Controls\DW.NativeButton.pas',
   DW.NativeSlider in '..\..\Controls\DW.NativeSlider.pas',
-  DW.NativeShape in '..\..\Controls\DW.NativeShape.pas';
+  DW.NativeShape in '..\..\Controls\DW.NativeShape.pas',
+  DW.NativeControlModel in '..\..\Controls\DW.NativeControlModel.pas';
 
 end.
