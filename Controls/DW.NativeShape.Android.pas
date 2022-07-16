@@ -27,10 +27,10 @@ uses
   FMX.Presentation.Messages, FMX.Presentation.Android, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model,
   FMX.Graphics,
   // DW
-  DW.NativeShape;
+  DW.NativeShape, DW.NativeControl.Android;
 
 type
-  TAndroidNativeShape = class(TAndroidNativeView)
+  TAndroidNativeShape = class(TNativeControl)
   private
     FBackground: JGradientDrawable;
     FView: JImageView;

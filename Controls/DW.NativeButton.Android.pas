@@ -26,10 +26,10 @@ uses
   // FMX
   FMX.Presentation.Messages, FMX.Presentation.Android, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model,
   // DW
-  DW.NativeButton;
+  DW.NativeButton, DW.NativeControl.Android;
 
 type
-  TAndroidNativeButton = class(TAndroidNativeView)
+  TAndroidNativeButton = class(TNativeControl)
   private
     FView: JButton;
     function GetModel: TCustomNativeButtonModel;
@@ -37,6 +37,7 @@ type
   protected
     function CreateView: JView; override;
     function DefineModelClass: TDataModelClass; override;
+    procedure DoLongPress; override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -61,6 +62,11 @@ destructor TAndroidNativeButton.Destroy;
 begin
   //
   inherited;
+end;
+
+procedure TAndroidNativeButton.DoLongPress;
+begin
+  Model.DoLongPress;
 end;
 
 function TAndroidNativeButton.GetModel: TCustomNativeButtonModel;

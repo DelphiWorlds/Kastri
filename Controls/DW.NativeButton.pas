@@ -19,13 +19,15 @@ uses
   // RTL
   System.Classes, System.Types,
   // FMX
-  FMX.Controls.Presentation, FMX.Controls.Model, FMX.StdCtrls, FMX.Types;
+  FMX.Controls.Presentation, FMX.Controls.Model, FMX.StdCtrls, FMX.Types,
+  // DW
+  DW.NativeControlModel;
 
 const
   MM_SET_TEXT = MM_USER + 1;
 
 type
-  TCustomNativeButtonModel = class(TDataModel)
+  TCustomNativeButtonModel = class(TNativeControlModel)
   private
     FText: string;
     procedure SetText(const Value: string);
@@ -36,6 +38,8 @@ type
   TCustomNativeButton = class(TPresentedTextControl)
   private
     function GetModel: TCustomNativeButtonModel; overload;
+    function GetOnLongPress: TNotifyEvent;
+    procedure SetOnLongPress(const Value: TNotifyEvent);
   protected
     function DefineModelClass: TDataModelClass; override;
     function RecommendSize(const AWishedSize: TSizeF): TSizeF; override;
@@ -43,6 +47,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     property Model: TCustomNativeButtonModel read GetModel;
+    property OnLongPress: TNotifyEvent read GetOnLongPress write SetOnLongPress;
   end;
 
   {$IF CompilerVersion < 35}
@@ -61,6 +66,7 @@ type
     property Anchors;
     property Enabled;
     property Height;
+    property HitTest;
     property Margins;
     property Padding;
     property Position;
@@ -74,6 +80,7 @@ type
     property OnDblClick;
     property OnEnter;
     property OnExit;
+    property OnLongPress;
     property OnMouseDown;
     property OnMouseMove;
     property OnMouseUp;
@@ -134,6 +141,16 @@ procedure TCustomNativeButton.SetText(const Value: string);
 begin
   inherited;
   Model.Text := Value;
+end;
+
+function TCustomNativeButton.GetOnLongPress: TNotifyEvent;
+begin
+  Result := Model.OnLongPress;
+end;
+
+procedure TCustomNativeButton.SetOnLongPress(const Value: TNotifyEvent);
+begin
+  Model.OnLongPress := Value;
 end;
 
 end.

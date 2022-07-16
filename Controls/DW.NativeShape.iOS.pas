@@ -28,10 +28,22 @@ uses
   FMX.Presentation.Messages, FMX.Presentation.iOS, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model,
   FMX.Helpers.iOS, FMX.Types,
   // DW
-  DW.NativeShape;
+  DW.NativeShape, DW.NativeControl.iOS;
 
 type
-  TiOSNativeShape = class(TiOSNativeControl)
+  INativeShape = interface(UIView)
+    ['{BC29FC38-7022-4CDA-8F1C-51CB7B86A979}']
+    { Native methods }
+    function canBecomeFirstResponder: Boolean; cdecl;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
+    { Handlers }
+    procedure HandleLongPress(gestureRecognizer: UILongPressGestureRecognizer); cdecl;
+  end;
+
+  TiOSNativeShape = class(TNativeControl)
   private
     FFillPath: UIBezierPath;
     FFillLayer: CAShapeLayer;
@@ -45,6 +57,7 @@ type
     procedure MMOpacityChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_OPACITY_CHANGED;
     procedure MMStrokeChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_STROKE_CHANGED;
   protected
+    procedure DoLongPress; override;
     procedure FillChanged; virtual;
     procedure PathChanged;
     procedure StrokeChanged; virtual;
@@ -59,14 +72,6 @@ type
     property View: UIView read GetView;
   end;
 
-  INativeEllipse = interface(UIView)
-    ['{86101D06-0949-4ADF-961A-66D2ECB00CC0}']
-    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
-  end;
-
   TiOSNativeEllipse = class(TiOSNativeShape)
   private
     function GetModel: TCustomNativeEllipseModel; overload;
@@ -77,14 +82,6 @@ type
   public
     constructor Create; override;
     property Model: TCustomNativeEllipseModel read GetModel;
-  end;
-
-  INativeRectangle = interface(UIView)
-    ['{2E9C5100-8635-4EED-9EDC-CBE40347C926}']
-    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
   end;
 
   TiOSNativeRectangle = class(TiOSNativeShape)
@@ -133,6 +130,11 @@ destructor TiOSNativeShape.Destroy;
 begin
   //
   inherited;
+end;
+
+procedure TiOSNativeShape.DoLongPress;
+begin
+  Model.DoLongPress;
 end;
 
 function TiOSNativeShape.GetCGColorRef(const AColor: TAlphaColor): CGColorRef;
@@ -208,7 +210,7 @@ end;
 
 function TiOSNativeEllipse.GetObjectiveCClass: PTypeInfo;
 begin
-  Result := TypeInfo(INativeEllipse);
+  Result := TypeInfo(INativeShape);
 end;
 
 function TiOSNativeEllipse.DefineModelClass: TDataModelClass;
@@ -245,7 +247,7 @@ end;
 
 function TiOSNativeRectangle.GetObjectiveCClass: PTypeInfo;
 begin
-  Result := TypeInfo(INativeRectangle);
+  Result := TypeInfo(INativeShape);
 end;
 
 function TiOSNativeRectangle.DefineModelClass: TDataModelClass;

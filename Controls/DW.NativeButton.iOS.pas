@@ -27,25 +27,31 @@ uses
   // FMX
   FMX.Presentation.Messages, FMX.Presentation.iOS, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model,
   // DW
-  DW.NativeButton;
+  DW.NativeButton, DW.NativeControl.iOS;
 
 type
   INativeButton = interface(UIButton)
     ['{9A55BD8B-6C46-47DD-9647-0B957EDFAAA7}']
+    { Native methods }
+    function canBecomeFirstResponder: Boolean; cdecl;
     procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
     procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
     procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
     procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
+    { Handlers }
+    procedure HandleLongPress(gestureRecognizer: UILongPressGestureRecognizer); cdecl;
   end;
 
-  TiOSNativeButton = class(TiOSNativeControl)
+  TiOSNativeButton = class(TNativeControl)
   private
+    FLongPressRecognizer: UILongPressGestureRecognizer;
     function GetModel: TCustomNativeButtonModel;
     function GetView: UIButton;
     procedure MMSetText(var AMessage: TDispatchMessageWithValue<string>); message MM_SET_TEXT;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
     function DefineModelClass: TDataModelClass; override;
+    procedure DoLongPress; override;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -90,6 +96,11 @@ end;
 procedure TiOSNativeButton.MMSetText(var AMessage: TDispatchMessageWithValue<string>);
 begin
   View.setTitle(StrToNSStr(AMessage.Value), UIControlStateNormal);
+end;
+
+procedure TiOSNativeButton.DoLongPress;
+begin
+  Model.DoLongPress;
 end;
 
 initialization

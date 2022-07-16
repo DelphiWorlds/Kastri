@@ -19,7 +19,9 @@ uses
   // RTL
   System.Classes, System.Types,
   // FMX
-  FMX.Controls.Presentation, FMX.Controls.Model, FMX.Graphics, FMX.Types;
+  FMX.Controls.Presentation, FMX.Controls.Model, FMX.Graphics, FMX.Types,
+  // DW
+  DW.NativeControlModel;
 
 const
   MM_NATIVESHAPE_FILL_CHANGED = MM_USER + 1;
@@ -31,7 +33,7 @@ const
   MM_NATIVESHAPE_OPACITY_CHANGED = MM_USER + 7;
 
 type
-  TCustomNativeShapeModel = class(TDataModel)
+  TCustomNativeShapeModel = class(TNativeControlModel)
   private
     FFill: TBrush;
     FOpacity: Single;
@@ -57,9 +59,11 @@ type
   private
     function GetFill: TBrush;
     function GetModel: TCustomNativeShapeModel; overload;
+    function GetOnLongPress: TNotifyEvent;
     function GetStroke: TStrokeBrush;
     procedure ModelChangeHandler(Sender: TObject);
     procedure SetFill(const Value: TBrush);
+    procedure SetOnLongPress(const Value: TNotifyEvent);
     procedure SetStroke(const Value: TStrokeBrush);
   protected
     function CanPaint: Boolean; virtual;
@@ -74,6 +78,7 @@ type
     property Fill: TBrush read GetFill write SetFill;
     property Model: TCustomNativeShapeModel read GetModel;
     property Stroke: TStrokeBrush read GetStroke write SetStroke;
+    property OnLongPress: TNotifyEvent read GetOnLongPress write SetOnLongPress;
   end;
 
   TCustomNativeEllipseModel = class(TCustomNativeShapeModel);
@@ -100,6 +105,7 @@ type
     property Anchors;
     property Fill;
     property Height;
+    property HitTest;
     property Margins;
     property Opacity;
     property Position;
@@ -109,6 +115,7 @@ type
     property Width;
     property OnClick;
     property OnDblClick;
+    property OnLongPress;
     property OnMouseDown;
     property OnMouseMove;
     property OnMouseUp;
@@ -178,6 +185,7 @@ type
     property CornerType default TCornerType.Round;
     property Fill;
     property Height;
+    property HitTest;
     property Margins;
     property Opacity;
     property Position;
@@ -190,6 +198,7 @@ type
     property YRadius;
     property OnClick;
     property OnDblClick;
+    property OnLongPress;
     property OnMouseDown;
     property OnMouseMove;
     property OnMouseUp;
@@ -352,6 +361,11 @@ begin
   Result := inherited GetModel<TCustomNativeShapeModel>;
 end;
 
+function TCustomNativeShape.GetOnLongPress: TNotifyEvent;
+begin
+  Result := Model.OnLongPress;
+end;
+
 function TCustomNativeShape.GetStroke: TStrokeBrush;
 begin
   Result := Model.Stroke;
@@ -360,6 +374,11 @@ end;
 procedure TCustomNativeShape.SetFill(const Value: TBrush);
 begin
   Model.Fill := Value;
+end;
+
+procedure TCustomNativeShape.SetOnLongPress(const Value: TNotifyEvent);
+begin
+  Model.OnLongPress := Value;
 end;
 
 procedure TCustomNativeShape.SetStroke(const Value: TStrokeBrush);
