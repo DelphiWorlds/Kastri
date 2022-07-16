@@ -6,7 +6,7 @@ unit DW.Camera;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -24,6 +24,10 @@ uses
   DW.Types;
 
 type
+  TMetadataOption = (GPS, Orientation);
+
+  TMetadataOptions = set of TMetadataOption;
+
   TFaceDetectMode = (None, Simple, Full);
 
   TFaceDetectModes = set of TFaceDetectMode;
@@ -40,6 +44,7 @@ type
 
   TDetectedFacesEvent = procedure(Sender: TObject; const ImageStream: TStream; const Faces: TFaces) of object;
 
+  TFrameAvailableEvent = procedure(Sender: TObject; const Frame: TBitmap) of object;
   TImageAvailableEvent = procedure(Sender: TObject; const ImageStream: TStream) of object;
 
   TCamera = class;
@@ -48,16 +53,22 @@ type
   private
     FCamera: TCamera;
     FCameraPosition: TDevicePosition;
+    FContinuousCapture: Boolean;
+    FExposure: Single;
     FFaceDetectMode: TFaceDetectMode;
     FFlashMode: TFlashMode;
     FWasActive: Boolean;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
+    function GetExposure: Single;
     function GetIsActive: Boolean;
     function GetCameraPosition: TDevicePosition;
+    function GetMetadataOptions: TMetadataOptions;
     procedure ResetCamera;
     procedure ResignCamera;
     procedure RestoreCamera;
     procedure SetCameraPosition(const Value: TDevicePosition);
+    procedure SetContinuousCapture(const Value: Boolean);
+    procedure SetExposure(const Value: Single);
     procedure SetIsActive(const Value: Boolean);
   protected
     FAvailableFaceDetectModes: TFaceDetectModes;
@@ -65,6 +76,7 @@ type
     FIsCapturing: Boolean;
     FIsFaceDetectActive: Boolean;
     FIsSwapping: Boolean;
+    procedure CameraSettingChanged; virtual;
     procedure CaptureImage;
     procedure CloseCamera; virtual;
     procedure ContinuousCaptureChanged; virtual;
@@ -72,12 +84,15 @@ type
     procedure DoCaptureImage; virtual;
     procedure DoCapturedImage(const AImageStream: TStream);
     procedure DoDetectedFaces(const AImageStream: TStream; const AFaces: TFaces);
+    procedure DoFrameAvailable(const AFrame: TBitmap);
     procedure DoStatusChange;
+    function GetCameraOrientation: Integer; virtual; //!!!!
     function GetFlashMode: TFlashMode;
     function GetPreviewControl: TControl; virtual;
     function GetResolutionHeight: Integer; virtual;
     function GetResolutionWidth: Integer; virtual;
     procedure InternalSetActive(const AValue: Boolean);
+    procedure InternalSetExposure(const AValue: Single);
     procedure OpenCamera; virtual;
     procedure QueueAuthorizationStatus(const AStatus: TAuthorizationStatus);
     procedure RequestPermission; virtual; abstract;
@@ -88,8 +103,11 @@ type
     property IsActive: Boolean read GetIsActive write SetIsActive;
     property Camera: TCamera read FCamera;
     property CameraPosition: TDevicePosition read GetCameraPosition write SetCameraPosition;
+    property ContinuousCapture: Boolean read FContinuousCapture write SetContinuousCapture;
+    property Exposure: Single read GetExposure write SetExposure;
     property FaceDetectMode: TFaceDetectMode read FFaceDetectMode write SetFaceDetectMode;
     property FlashMode: TFlashMode read GetFlashMode write SetFlashMode;
+    property MetadataOptions: TMetadataOptions read GetMetadataOptions;
   public
     constructor Create(const ACamera: TCamera); virtual;
     destructor Destroy; override;
@@ -99,29 +117,39 @@ type
   TCamera = class(TObject)
   private
     FAuthorizationStatus: TAuthorizationStatus;
-    FIncludeLocation: Boolean;
     FLocation: TLocationCoord2D;
+    FMetadataOptions: TMetadataOptions;
     FPlatformCamera: TCustomPlatformCamera;
     FOnAuthorizationStatus: TAuthorizationStatusEvent;
     FOnDetectedFaces: TDetectedFacesEvent;
+    FOnFrameAvailable: TFrameAvailableEvent;
     FOnImageCaptured: TImageAvailableEvent;
     FOnStatusChange: TNotifyEvent;
     function GetIsActive: Boolean;
     function GetAvailableFaceDetectModes: TFaceDetectModes;
     function GetCameraPosition: TDevicePosition;
+    function GetContinuousCapture: Boolean;
+    function GetExposure: Single;
     function GetFaceDetectMode: TFaceDetectMode;
     function GetFlashMode: TFlashMode;
     function GetPreviewControl: TControl;
     function GetResolutionHeight: Integer;
     function GetResolutionWidth: Integer;
+    procedure SetContinuousCapture(const Value: Boolean);
     procedure SetIsActive(const Value: Boolean);
     procedure SetCameraPosition(const Value: TDevicePosition);
+    procedure SetExposure(const Value: Single);
     procedure SetFaceDetectMode(const Value: TFaceDetectMode);
     procedure SetFlashMode(const Value: TFlashMode);
+    function GetCameraOrientation: Integer; //!!!!
+    function GetIncludeLocation: Boolean;
+    procedure SetIncludeLocation(const Value: Boolean);
+    function GetIsCapturing: Boolean;
   protected
     procedure DoAuthorizationStatus(const AStatus: TAuthorizationStatus);
     procedure DoCapturedImage(const AImageStream: TStream);
     procedure DoDetectedFaces(const AImageStream: TStream; const AFaces: TFaces);
+    procedure DoFrameAvailable(const AFrame: TBitmap);
     procedure DoStatusChange;
   public
     constructor Create;
@@ -142,10 +170,16 @@ type
     ///   Current authorization status
     /// </summary>
     property AuthorizationStatus: TAuthorizationStatus read FAuthorizationStatus;
+    property CameraOrientation: Integer read GetCameraOrientation; //!!!!
     /// <summary>
     ///   Position of the currently selected camera, i.e. Front or Back
     /// </summary>
     property CameraPosition: TDevicePosition read GetCameraPosition write SetCameraPosition;
+    property ContinuousCapture: Boolean read GetContinuousCapture write SetContinuousCapture;
+    /// <summary>
+    ///   //
+    /// </summary>
+    property Exposure: Single read GetExposure write SetExposure;
     /// <summary>
     ///   Currently selected mode of face detection
     /// </summary>
@@ -156,19 +190,27 @@ type
     property FlashMode: TFlashMode read GetFlashMode write SetFlashMode;
     /// <summary>
     ///   Include location data with the captured image. See also Location property
-    /// </summary>    
-    property IncludeLocation: Boolean read FIncludeLocation write FIncludeLocation;
-    /// <summary>
-    ///   Location data to be included with the captured image.
-    /// </summary>      
-    /// <remarks>
-    ///   Set this value before calling CaptureImage
-    /// </remarks>  
-    property Location: TLocationCoord2D read FLocation write FLocation;
+    /// </summary>
+    property IncludeLocation: Boolean read GetIncludeLocation write SetIncludeLocation;
     /// <summary>
     ///   Signifies whether or not the camera is active
-    /// </summary>      
+    /// </summary>
     property IsActive: Boolean read GetIsActive write SetIsActive;
+    /// <summary>
+    ///   Signifies whether or not the camera is capturing video
+    /// </summary>
+    property IsCapturing: Boolean read GetIsCapturing;
+    /// <summary>
+    ///   Location data to be included with the captured image.
+    /// </summary>
+    /// <remarks>
+    ///   Set this value before calling CaptureImage
+    /// </remarks>
+    property Location: TLocationCoord2D read FLocation write FLocation;
+    /// <summary>
+    ///   Include location data with the captured image. See also Location property
+    /// </summary>
+    property MetadataOptions: TMetadataOptions read FMetadataOptions write FMetadataOptions;
     /// <summary>
     ///   The control in which to show the camera preview
     /// </summary>      
@@ -189,6 +231,10 @@ type
     ///   Event fired when faces are detected
     /// </summary>
     property OnDetectedFaces: TDetectedFacesEvent read FOnDetectedFaces write FOnDetectedFaces;
+    /// <summary>
+    ///   Event fired when a frame is available
+    /// </summary>
+    property OnFrameAvailable: TFrameAvailableEvent read FOnFrameAvailable write FOnFrameAvailable;
     /// <summary>
     ///   Event fired when a still image is captured
     /// </summary>
@@ -287,6 +333,11 @@ begin
   end;
 end;
 
+procedure TCustomPlatformCamera.CameraSettingChanged;
+begin
+  //
+end;
+
 procedure TCustomPlatformCamera.CaptureImage;
 begin
   DoCaptureImage;
@@ -324,6 +375,11 @@ begin
   FCamera.DoDetectedFaces(AImageStream, AFaces);
 end;
 
+procedure TCustomPlatformCamera.DoFrameAvailable(const AFrame: TBitmap);
+begin
+  FCamera.DoFrameAvailable(AFrame);
+end;
+
 procedure TCustomPlatformCamera.DoStatusChange;
 begin
   FCamera.DoStatusChange;
@@ -334,9 +390,24 @@ begin
   Result := FIsActive;
 end;
 
+function TCustomPlatformCamera.GetMetadataOptions: TMetadataOptions;
+begin
+  Result := FCamera.MetadataOptions;
+end;
+
+function TCustomPlatformCamera.GetCameraOrientation: Integer;
+begin
+  Result := -1;
+end;
+
 function TCustomPlatformCamera.GetCameraPosition: TDevicePosition;
 begin
   Result := FCameraPosition;
+end;
+
+function TCustomPlatformCamera.GetExposure: Single;
+begin
+  Result := FExposure;
 end;
 
 function TCustomPlatformCamera.GetFlashMode: TFlashMode;
@@ -418,6 +489,29 @@ begin
   end;
 end;
 
+procedure TCustomPlatformCamera.SetContinuousCapture(const Value: Boolean);
+begin
+  if FContinuousCapture <> Value then
+  begin
+    FContinuousCapture := Value;
+    ContinuousCaptureChanged;
+  end;
+end;
+
+procedure TCustomPlatformCamera.InternalSetExposure(const AValue: Single);
+begin
+  FExposure := AValue;
+end;
+
+procedure TCustomPlatformCamera.SetExposure(const Value: Single);
+begin
+  if FExposure <> Value then
+  begin
+    InternalSetExposure(Value);
+    CameraSettingChanged;
+  end;
+end;
+
 procedure TCustomPlatformCamera.SetFaceDetectMode(const Value: TFaceDetectMode);
 begin
   FFaceDetectMode := Value;
@@ -425,7 +519,11 @@ end;
 
 procedure TCustomPlatformCamera.SetFlashMode(const Value: TFlashMode);
 begin
-  FFlashMode := Value;
+  if FFlashMode <> Value then
+  begin
+    FFlashMode := Value;
+    CameraSettingChanged;
+  end;
 end;
 
 procedure TCustomPlatformCamera.StartCapture;
@@ -471,10 +569,21 @@ begin
     FOnDetectedFaces(Self, AImageStream, AFaces);
 end;
 
+procedure TCamera.DoFrameAvailable(const AFrame: TBitmap);
+begin
+  if Assigned(FOnFrameAvailable) then
+    FOnFrameAvailable(Self, AFrame);
+end;
+
 procedure TCamera.DoStatusChange;
 begin
   if Assigned(FOnStatusChange) then
     FOnStatusChange(Self);
+end;
+
+function TCamera.GetIncludeLocation: Boolean;
+begin
+  Result := TMetadataOption.GPS in FMetadataOptions;
 end;
 
 function TCamera.GetIsActive: Boolean;
@@ -482,14 +591,34 @@ begin
   Result := FPlatformCamera.IsActive;
 end;
 
+function TCamera.GetIsCapturing: Boolean;
+begin
+  Result := FPlatformCamera.FIsCapturing;
+end;
+
 function TCamera.GetAvailableFaceDetectModes: TFaceDetectModes;
 begin
   Result := FPlatformCamera.FAvailableFaceDetectModes;
 end;
 
+function TCamera.GetCameraOrientation: Integer;
+begin
+  Result := FPlatformCamera.GetCameraOrientation;
+end;
+
 function TCamera.GetCameraPosition: TDevicePosition;
 begin
   Result := FPlatformCamera.CameraPosition;
+end;
+
+function TCamera.GetContinuousCapture: Boolean;
+begin
+  Result := FPlatformCamera.ContinuousCapture;
+end;
+
+function TCamera.GetExposure: Single;
+begin
+  Result := FPlatformCamera.Exposure;
 end;
 
 function TCamera.GetFaceDetectMode: TFaceDetectMode;
@@ -522,6 +651,14 @@ begin
   FPlatformCamera.RequestPermission;
 end;
 
+procedure TCamera.SetIncludeLocation(const Value: Boolean);
+begin
+  if Value then
+    Include(FMetadataOptions, TMetadataOption.GPS)
+  else
+    Exclude(FMetadataOptions, TMetadataOption.GPS);
+end;
+
 procedure TCamera.SetIsActive(const Value: Boolean);
 begin
   FPlatformCamera.IsActive := Value;
@@ -530,6 +667,16 @@ end;
 procedure TCamera.SetCameraPosition(const Value: TDevicePosition);
 begin
   FPlatformCamera.CameraPosition := Value;
+end;
+
+procedure TCamera.SetContinuousCapture(const Value: Boolean);
+begin
+  FPlatformCamera.ContinuousCapture := Value;
+end;
+
+procedure TCamera.SetExposure(const Value: Single);
+begin
+  FPlatformCamera.Exposure := Value;
 end;
 
 procedure TCamera.SetFaceDetectMode(const Value: TFaceDetectMode);

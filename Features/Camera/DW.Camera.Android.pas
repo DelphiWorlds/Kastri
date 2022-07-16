@@ -6,7 +6,7 @@ unit DW.Camera.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -28,39 +28,40 @@ uses
 type
   TPlatformCamera = class;
 
-  TCaptureMode = (None, Still, Faces);
-
   TCameraCaptureSession = class(TObject)
   private
     FCameraView: JDWCameraView;
-    FCaptureRequest: TCaptureMode;
+    // FCameraView: JDWGLCameraView;
+    // FCameraViewDelegate: JDWGLCameraView_ViewDelegate;
     FCaptureSessionCaptureCallback: JDWCameraCaptureSessionCaptureCallback;
     FCaptureSessionCaptureCallbackDelegate: JDWCameraCaptureSessionCaptureCallbackDelegate;
     FCaptureSessionStateCallback: JDWCameraCaptureSessionStateCallback;
     FCaptureSessionStateCallbackDelegate: JDWCameraCaptureSessionStateCallbackDelegate;
+    FContinuousImageAvailableListener: JImageReader_OnImageAvailableListener;
     FIsCapturing: Boolean;
     FIsStarting: Boolean;
     FHandler: JHandler;
     FPlatformCamera: TPlatformCamera;
     FPreview: TCameraPreview;
+    FPreviewRequestBuilder: JCaptureRequest_Builder;
     FPreviewSurface: JSurface;
     FRequestedOrientation: Integer;
     FRequestHelper: JDWCaptureRequestBuilderHelper;
     FSession: JCameraCaptureSession;
     FStillImageAvailableListener: JImageReader_OnImageAvailableListener;
     FStillImageReader: JImageReader;
-    // FStillImageOrientation: Integer;
+    FStillImageOrientation: Integer;
     FSurfaceTexture: JSurfaceTexture;
     FSurfaceTextureListener: JTextureView_SurfaceTextureListener;
     FThread: JHandlerThread;
-    procedure AddLocation(const AStream: TMemoryStream);
+    procedure AddMetadata(const AStream: TMemoryStream);
     procedure CaptureCompleted(session: JCameraCaptureSession; request: JCaptureRequest; result: JTotalCaptureResult); virtual;
     procedure CaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest; partialResult: JCaptureResult); virtual;
     procedure CaptureSessionConfigured(session: JCameraCaptureSession); virtual;
     procedure CaptureSessionConfigureFailed(session: JCameraCaptureSession); virtual;
     procedure CheckFaces(const AHelper: JDWCaptureResultHelper);
-    procedure CreatePreviewSurface;
     procedure CreateStillReader;
+    function GetSurfaceRotation(const ARotation: Integer): Integer;
     function GetOrientation(const ARotation: Integer): Integer;
     function GetPreviewControl: TControl;
     procedure InternalStartSession;
@@ -68,23 +69,36 @@ type
     procedure SizeChangeHandler(Sender: TObject);
     procedure StartThread;
     procedure StopThread;
-    procedure UpdateFlashMode;
     procedure UpdatePreview;
+    procedure UpdatePreviewRequest;
   protected
-    procedure CaptureImage(const ACaptureRequest: TCaptureMode);
-    procedure ImageAvailable(reader: JImageReader);
+    procedure CameraSettingChanged;
+    procedure CaptureStillImage;
+    procedure ContinuousImageAvailableHandler(const reader: JImageReader);
     procedure StartSession;
+    procedure StillImageAvailableHandler(const reader: JImageReader);
     procedure StopSession;
-    procedure SurfaceTextureAvailable(surface: JSurfaceTexture; width: Integer; height: Integer);
-    procedure SurfaceTextureDestroyed(surface: JSurfaceTexture);
+    procedure SurfaceTextureAvailable(texture: JSurfaceTexture);
+    // procedure SurfaceTextureAvailable(texture: JSurfaceTexture; width: Integer; height: Integer);
+    procedure SurfaceTextureDestroyed(texture: JSurfaceTexture);
+    property Handler: JHandler read FHandler;
     property IsCapturing: Boolean read FIsCapturing;
     property PreviewControl: TControl read GetPreviewControl;
-    property Handler: JHandler read FHandler;
     property PlatformCamera: TPlatformCamera read FPlatformCamera;
     property Session: JCameraCaptureSession read FSession;
   public
     constructor Create(const APlatformCamera: TPlatformCamera);
     destructor Destroy; override;
+  end;
+
+  TIntegerRange = record
+    Lower: Integer;
+    Upper: Integer;
+  end;
+
+  TInt64Range = record
+    Lower: Int64;
+    Upper: Int64;
   end;
 
   TPlatformCamera = class(TCustomPlatformCamera)
@@ -100,18 +114,28 @@ type
     FDeviceStateCallback: JDWCameraDeviceStateCallback;
     FDeviceStateCallbackDelegate: JDWCameraDeviceStateCallbackDelegate;
     FHandler: JHandler;
+    FSensorExposureTimeRange: TInt64Range;
+    FSensorSensitivityRange: TIntegerRange;
     FViewSize: Jutil_Size;
+    procedure CheckBarcode(const frame: JBitmap);
     procedure DoOpenCamera;
-    procedure UpdateViewSize;
+    function GetExposureTime: Int64;
+    function GetISO: Integer;
     function GetIsSwapping: Boolean;
+    procedure UpdateViewSize;
   protected
     procedure CameraDisconnected(camera: JCameraDevice);
     procedure CameraError(camera: JCameraDevice; error: Integer);
     procedure CameraOpened(camera: JCameraDevice);
-    procedure CapturedStillImage(const AImageStream: TStream; const ACaptureRequest: TCaptureMode);
+    procedure CameraSettingChanged; override;
+    procedure CaptureStateChanged;
+    procedure CapturedStillImage(const AImageStream: TStream);
     procedure CloseCamera; override;
+    procedure ContinuousCaptureChanged; override;
     procedure DetectedFaces(const AFaces: TJavaObjectArray<JFace>);
     procedure DoCaptureImage; override;
+    procedure FrameAvailable(frame: JBitmap);
+    function GetCameraOrientation: Integer; override; //!!!!
     function GetHighestFaceDetectMode: TFaceDetectMode;
     function GetPreviewControl: TControl; override;
     function GetResolutionHeight: Integer; override;
@@ -124,6 +148,8 @@ type
     function SizeFitsInPreview(const ASize: Jutil_Size): Boolean;
     property CameraDevice: JCameraDevice read FCameraDevice;
     property CameraOrientation: Integer read FCameraOrientation;
+    property ExposureTime: Int64 read GetExposureTime;
+    property ISO: Integer read GetISO;
     property IsSwapping: Boolean read GetIsSwapping;
     property ViewSize: Jutil_Size read FViewSize;
   public
@@ -142,20 +168,29 @@ uses
   FMX.Forms, FMX.Media,
   // DW
   DW.OSLog,
-  DW.CameraPreview.Android, DW.Android.Helpers, DW.Consts.Android, DW.UIHelper, DW.Types, DW.Permissions.Helpers;
-
-const
-  cCaptureModeCaptions: array[TCaptureMode] of string = ('None', 'Still', 'Faces');
+  DW.CameraPreview.Android, DW.Android.Helpers, DW.Consts.Android, DW.UIHelper, DW.Types, DW.Permissions.Helpers, DW.Graphics.Helpers.Android; // ,
+  // DW.Barcode.Types, DW.BarcodeHelper.Android, DW.Androidapi.JNI.VisionBarcode;
 
 type
+  TDWGLCameraViewDelegate = class(TJavaLocal, JDWGLCameraView_ViewDelegate)
+  private
+    FCaptureSession: TCameraCaptureSession;
+  public
+    { JDWGLCameraView_ViewDelegate }
+    procedure onFrameAvailable(frame: JBitmap); cdecl;
+    procedure onSurfaceTextureAvailable(texture: JSurfaceTexture); cdecl;
+  public
+    constructor Create(const ACaptureSession: TCameraCaptureSession);
+  end;
+
   TDWCameraDeviceStateCallbackDelegate = class(TJavaLocal, JDWCameraDeviceStateCallbackDelegate)
   private
     FPlatformCamera: TPlatformCamera;
   public
     { JDWCameraDeviceStateCallbackDelegate }
-    procedure Disconnected(camera: JCameraDevice); cdecl;
-    procedure Error(camera: JCameraDevice; error: Integer); cdecl;
-    procedure Opened(camera: JCameraDevice); cdecl;
+    procedure onDisconnected(camera: JCameraDevice); cdecl;
+    procedure onError(camera: JCameraDevice; error: Integer); cdecl;
+    procedure onOpened(camera: JCameraDevice); cdecl;
   public
     constructor Create(const APlatformCamera: TPlatformCamera);
   end;
@@ -165,8 +200,8 @@ type
     FCaptureSession: TCameraCaptureSession;
   public
     { JDWCameraCaptureSessionCaptureCallbackDelegate }
-    procedure CaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest; partialResult: JCaptureResult); cdecl;
-    procedure CaptureCompleted(session: JCameraCaptureSession; request: JCaptureRequest; result: JTotalCaptureResult); cdecl;
+    procedure onCaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest; partialResult: JCaptureResult); cdecl;
+    procedure onCaptureCompleted(session: JCameraCaptureSession; request: JCaptureRequest; result: JTotalCaptureResult); cdecl;
   public
     constructor Create(const ACaptureSession: TCameraCaptureSession);
   end;
@@ -176,21 +211,22 @@ type
     FCaptureSession: TCameraCaptureSession;
   public
     { JDWCameraCaptureSessionStateCallbackDelegate }
-    procedure ConfigureFailed(session: JCameraCaptureSession); cdecl;
-    procedure Configured(session: JCameraCaptureSession); cdecl;
+    procedure onConfigureFailed(session: JCameraCaptureSession); cdecl;
+    procedure onConfigured(session: JCameraCaptureSession); cdecl;
   public
     constructor Create(const ACaptureSession: TCameraCaptureSession);
   end;
 
+  TImageAvailableProc = procedure(const reader: JImageReader) of object;
+
   TImageAvailableListener = class(TJavaLocal, JImageReader_OnImageAvailableListener)
   private
-    FCaptureSession: TCameraCaptureSession;
-    // FImageType: TImageType;
+    FImageAvailableProc: TImageAvailableProc;
   public
     { JImageReader_OnImageAvailableListener }
     procedure onImageAvailable(reader: JImageReader); cdecl;
   public
-    constructor Create(const ACaptureSession: TCameraCaptureSession);
+    constructor Create(const AProc: TImageAvailableProc);
   end;
 
   TSurfaceTextureListener = class(TJavaLocal, JTextureView_SurfaceTextureListener)
@@ -199,10 +235,10 @@ type
     // FImageType: TImageType;
   public
     { JTextureView_SurfaceTextureListener }
-    procedure onSurfaceTextureAvailable(surface: JSurfaceTexture; width: Integer; height: Integer); cdecl;
-    function onSurfaceTextureDestroyed(surface: JSurfaceTexture): Boolean; cdecl;
-    procedure onSurfaceTextureUpdated(surface: JSurfaceTexture); cdecl;
-    procedure onSurfaceTextureSizeChanged(surface: JSurfaceTexture; width: Integer; height: Integer); cdecl;
+    procedure onSurfaceTextureAvailable(texture: JSurfaceTexture; width, height: Integer); cdecl;
+    function onSurfaceTextureDestroyed(texture: JSurfaceTexture): Boolean; cdecl;
+    procedure onSurfaceTextureUpdated(texture: JSurfaceTexture); cdecl;
+    procedure onSurfaceTextureSizeChanged(texture: JSurfaceTexture; width: Integer; height: Integer); cdecl;
   public
     constructor Create(const ACaptureSession: TCameraCaptureSession);
   end;
@@ -234,6 +270,24 @@ begin
   Result := Format('%d/1,%d/1,%d/1000', [LDegrees, LMinutes, Round(LValue)]);
 end;
 
+{ TDWGLCameraViewDelegate }
+
+constructor TDWGLCameraViewDelegate.Create(const ACaptureSession: TCameraCaptureSession);
+begin
+  inherited Create;
+  FCaptureSession := ACaptureSession;
+end;
+
+procedure TDWGLCameraViewDelegate.onFrameAvailable(frame: JBitmap);
+begin
+  FCaptureSession.PlatformCamera.FrameAvailable(frame);
+end;
+
+procedure TDWGLCameraViewDelegate.onSurfaceTextureAvailable(texture: JSurfaceTexture);
+begin
+  FCaptureSession.SurfaceTextureAvailable(texture);
+end;
+
 { TDWCameraDeviceStateCallbackDelegate }
 
 constructor TDWCameraDeviceStateCallbackDelegate.Create(const APlatformCamera: TPlatformCamera);
@@ -242,17 +296,17 @@ begin
   FPlatformCamera := APlatformCamera;
 end;
 
-procedure TDWCameraDeviceStateCallbackDelegate.Disconnected(camera: JCameraDevice);
+procedure TDWCameraDeviceStateCallbackDelegate.onDisconnected(camera: JCameraDevice);
 begin
   FPlatformCamera.CameraDisconnected(camera);
 end;
 
-procedure TDWCameraDeviceStateCallbackDelegate.Error(camera: JCameraDevice; error: Integer);
+procedure TDWCameraDeviceStateCallbackDelegate.onError(camera: JCameraDevice; error: Integer);
 begin
   FPlatformCamera.CameraError(camera, error);
 end;
 
-procedure TDWCameraDeviceStateCallbackDelegate.Opened(camera: JCameraDevice);
+procedure TDWCameraDeviceStateCallbackDelegate.onOpened(camera: JCameraDevice);
 begin
   FPlatformCamera.CameraOpened(camera);
 end;
@@ -265,13 +319,13 @@ begin
   FCaptureSession := ACaptureSession;
 end;
 
-procedure TDWCameraCaptureSessionCaptureCallbackDelegate.CaptureCompleted(session: JCameraCaptureSession; request: JCaptureRequest;
+procedure TDWCameraCaptureSessionCaptureCallbackDelegate.onCaptureCompleted(session: JCameraCaptureSession; request: JCaptureRequest;
   result: JTotalCaptureResult);
 begin
   FCaptureSession.CaptureCompleted(session, request, result);
 end;
 
-procedure TDWCameraCaptureSessionCaptureCallbackDelegate.CaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest;
+procedure TDWCameraCaptureSessionCaptureCallbackDelegate.onCaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest;
   partialResult: JCaptureResult);
 begin
   FCaptureSession.CaptureProgressed(session, request, partialResult);
@@ -285,26 +339,29 @@ begin
   FCaptureSession := ACaptureSession;
 end;
 
-procedure TDWCameraCaptureSessionStateCallbackDelegate.Configured(session: JCameraCaptureSession);
+procedure TDWCameraCaptureSessionStateCallbackDelegate.onConfigured(session: JCameraCaptureSession);
 begin
+  TOSLog.d('+TDWCameraCaptureSessionStateCallbackDelegate.onConfigured');
   FCaptureSession.CaptureSessionConfigured(session);
+  TOSLog.d('-TDWCameraCaptureSessionStateCallbackDelegate.onConfigured');
 end;
 
-procedure TDWCameraCaptureSessionStateCallbackDelegate.ConfigureFailed(session: JCameraCaptureSession);
+procedure TDWCameraCaptureSessionStateCallbackDelegate.onConfigureFailed(session: JCameraCaptureSession);
 begin
   FCaptureSession.CaptureSessionConfigureFailed(session);
 end;
 
-constructor TImageAvailableListener.Create(const ACaptureSession: TCameraCaptureSession);
+{ TImageAvailableListener }
+
+constructor TImageAvailableListener.Create(const AProc: TImageAvailableProc);
 begin
   inherited Create;
-  FCaptureSession := ACaptureSession;
-  // FImageType := AImageType;
+  FImageAvailableProc := AProc;
 end;
 
 procedure TImageAvailableListener.onImageAvailable(reader: JImageReader);
 begin
-  FCaptureSession.ImageAvailable(reader);
+  FImageAvailableProc(reader);
 end;
 
 { TSurfaceTextureListener }
@@ -315,23 +372,23 @@ begin
   FCaptureSession := ACaptureSession;
 end;
 
-procedure TSurfaceTextureListener.onSurfaceTextureAvailable(surface: JSurfaceTexture; width, height: Integer);
+procedure TSurfaceTextureListener.onSurfaceTextureAvailable(texture: JSurfaceTexture; width, height: Integer);
 begin
-  FCaptureSession.SurfaceTextureAvailable(surface, width, height);
+  FCaptureSession.SurfaceTextureAvailable(texture);
 end;
 
-function TSurfaceTextureListener.onSurfaceTextureDestroyed(surface: JSurfaceTexture): Boolean;
+function TSurfaceTextureListener.onSurfaceTextureDestroyed(texture: JSurfaceTexture): Boolean;
 begin
-  FCaptureSession.SurfaceTextureDestroyed(surface);
+  FCaptureSession.SurfaceTextureDestroyed(texture);
   Result := True;
 end;
 
-procedure TSurfaceTextureListener.onSurfaceTextureSizeChanged(surface: JSurfaceTexture; width, height: Integer);
+procedure TSurfaceTextureListener.onSurfaceTextureSizeChanged(texture: JSurfaceTexture; width: Integer; height: Integer);
 begin
   //
 end;
 
-procedure TSurfaceTextureListener.onSurfaceTextureUpdated(surface: JSurfaceTexture);
+procedure TSurfaceTextureListener.onSurfaceTextureUpdated(texture: JSurfaceTexture);
 begin
   //
 end;
@@ -352,8 +409,13 @@ begin
   FPreview.OnOrientationChange := OrientationChangeHandler;
   FPreview.OnSizeChange := SizeChangeHandler;
   FSurfaceTextureListener := TSurfaceTextureListener.Create(Self);
+
+  // FCameraViewDelegate := TDWGLCameraViewDelegate.Create(Self);
   FCameraView := TAndroidCameraPreview(FPreview.Presentation).View;
   FCameraView.setSurfaceTextureListener(FSurfaceTextureListener);
+  // FCameraView.setCaptureFPS(1); // Needs to be controlled from FPlatformCamera
+  // FCameraView.setViewDelegate(FCameraViewDelegate);
+
   StartThread;
 end;
 
@@ -364,21 +426,30 @@ begin
   inherited;
 end;
 
+// Based on the question/answers, here:
+//   https://stackoverflow.com/questions/48406497/camera2-understanding-the-sensor-and-device-orientations
 function TCameraCaptureSession.GetOrientation(const ARotation: Integer): Integer;
 var
   LRotation: Integer;
 begin
-  if ARotation = TJSurface.JavaClass.ROTATION_90 then
-    LRotation := 0
-  else if ARotation = TJSurface.JavaClass.ROTATION_0 then
-    LRotation := 90
+  LRotation := GetSurfaceRotation(ARotation);
+  TOSLog.d('> Surface Rotation: %d', [LRotation]);
+  Result := (FPlatformCamera.CameraOrientation - LRotation + 360) mod 360;
+end;
+
+//   https://stackoverflow.com/questions/48406497/camera2-understanding-the-sensor-and-device-orientations
+function TCameraCaptureSession.GetSurfaceRotation(const ARotation: Integer): Integer;
+begin
+  if ARotation = TJSurface.JavaClass.ROTATION_0 then
+    Result := 0
+  else if ARotation = TJSurface.JavaClass.ROTATION_90 then
+    Result := 90
   else if ARotation = TJSurface.JavaClass.ROTATION_270 then
-    LRotation := 180
+    Result := 180
   else if ARotation = TJSurface.JavaClass.ROTATION_180 then
-    LRotation := 270
+    Result := 270
   else
-    LRotation := 0;
-  Result := (LRotation + FPlatformCamera.CameraOrientation + 270) mod 360;
+    Result := 0;
 end;
 
 function TCameraCaptureSession.GetPreviewControl: TControl;
@@ -401,23 +472,19 @@ begin
   FHandler := nil;
 end;
 
-procedure TCameraCaptureSession.CreatePreviewSurface;
+procedure TCameraCaptureSession.SurfaceTextureAvailable(texture: JSurfaceTexture); // ; width, height: Integer);
 begin
   FPreviewSurface := nil;
+  FSurfaceTexture := texture;
   FSurfaceTexture.setDefaultBufferSize(PlatformCamera.ViewSize.getWidth, PlatformCamera.ViewSize.getHeight);
   FPreviewSurface := TJSurface.JavaClass.init(FSurfaceTexture);
-  UpdatePreview;
+//  UpdatePreview;
+  TThread.Synchronize(nil, UpdatePreview); // SurfaceTextureAvailable is coming from the view's render thread
   if FIsStarting then
     InternalStartSession;
 end;
 
-procedure TCameraCaptureSession.SurfaceTextureAvailable(surface: JSurfaceTexture; width, height: Integer);
-begin
-  FSurfaceTexture := surface;
-  CreatePreviewSurface;
-end;
-
-procedure TCameraCaptureSession.SurfaceTextureDestroyed(surface: JSurfaceTexture);
+procedure TCameraCaptureSession.SurfaceTextureDestroyed(texture: JSurfaceTexture);
 begin
   FSurfaceTexture := nil;
 end;
@@ -435,7 +502,7 @@ end;
 
 procedure TCameraCaptureSession.UpdatePreview;
 var
-  LScreenScale: Single;
+  LScale, LScreenScale: Single;
   LSize: TSizeF;
   LViewSize, LPreviewSize: TSize;
   LIsPortrait: Boolean;
@@ -450,6 +517,7 @@ begin
   else
     LSize := TSizeF.Create(FPreview.ParentControl.Width, FPreview.ParentControl.Width * (LViewSize.cx / LViewSize.cy));
   FPreview.Size.Size := LSize;
+  // FCameraView.setCameraRotation(GetSurfaceRotation(TAndroidHelper.Activity.getWindowManager.getDefaultDisplay.getRotation));
   LScreenScale := TAndroidCameraPreview(FPreview.Presentation).ScreenScale;
   LPreviewSize := TSize.Create(Round(FPreview.Size.Size.cx * LScreenScale), Round(FPreview.Size.Size.cy * LScreenScale));
   FCameraView.setPreviewSize(TJutil_Size.JavaClass.init(LPreviewSize.cx, LPreviewSize.cy));
@@ -458,7 +526,7 @@ end;
 procedure TCameraCaptureSession.CreateStillReader;
 begin
   FStillImageAvailableListener := nil;
-  FStillImageAvailableListener := TImageAvailableListener.Create(Self);
+  FStillImageAvailableListener := TImageAvailableListener.Create(StillImageAvailableHandler);
   FStillImageReader := nil;
   TOSLog.d('Creating a still reader with dimensions of %d x %d', [PlatformCamera.ViewSize.getWidth, PlatformCamera.ViewSize.getHeight]);
   FStillImageReader := TJImageReader.JavaClass.newInstance(PlatformCamera.ViewSize.getWidth, PlatformCamera.ViewSize.getHeight,
@@ -473,8 +541,10 @@ begin
   FIsStarting := False;
   LOutputs := TJArrayList.JavaClass.init(2);
   LOutputs.add(FPreviewSurface);
-  LOutputs.add(FStillImageReader.getSurface);
-  FPlatformCamera.CameraDevice.createCaptureSession(TJList.Wrap(TAndroidHelper.JObjectToID(LOutputs)), FCaptureSessionStateCallback, FHandler);
+  LOutputs.add(FStillImageReader.getSurface); // will not need this if GLSurfaceView can provide image via onFrameReady
+  TOSLog.d('Creating capture session');
+  FPlatformCamera.CameraDevice.createCaptureSession(TJList.Wrap(LOutputs), FCaptureSessionStateCallback, FHandler);
+  TOSLog.d('Created capture session');
 end;
 
 procedure TCameraCaptureSession.StartSession;
@@ -497,39 +567,53 @@ begin
     FSession.close;
     FSession := nil;
   end;
+  FPreviewRequestBuilder := nil;
   if not FPlatformCamera.IsSwapping then
     FPreview.Visible := False;
   FIsCapturing := False;
+  FPlatformCamera.CaptureStateChanged;
 end;
 
-procedure TCameraCaptureSession.CaptureImage(const ACaptureRequest: TCaptureMode);
+procedure TCameraCaptureSession.CaptureStillImage;
 var
   LBuilder: JCaptureRequest_Builder;
+  LRequestHelper: JDWCaptureRequestBuilderHelper;
 begin
-  FCaptureRequest := ACaptureRequest;
   LBuilder := FPlatformCamera.CameraDevice.createCaptureRequest(TJCameraDevice.JavaClass.TEMPLATE_STILL_CAPTURE);
   LBuilder.addTarget(FStillImageReader.getSurface);
-  FRequestHelper.setCaptureRequestBuilder(LBuilder);
+  LRequestHelper := TJDWCaptureRequestBuilderHelper.JavaClass.init;
+  LRequestHelper.setCaptureRequestBuilder(LBuilder);
   FRequestedOrientation := GetOrientation(TAndroidHelper.Activity.getWindowManager.getDefaultDisplay.getRotation);
-  FRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.JPEG_ORIENTATION, FRequestedOrientation);
-  UpdateFlashMode;
+  LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.JPEG_ORIENTATION, FRequestedOrientation);
+  case FPlatformCamera.FlashMode of
+    TFlashMode.FlashOff:
+    begin
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON);
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.FLASH_MODE, TJCaptureRequest.JavaClass.FLASH_MODE_OFF);
+    end;
+    TFlashMode.FlashOn:
+    begin
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_MODE, TJCameraMetadata.JavaClass.CONTROL_MODE_AUTO);
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
+    end;
+    TFlashMode.AutoFlash:
+    begin
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_MODE, TJCameraMetadata.JavaClass.CONTROL_MODE_AUTO);
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON_AUTO_FLASH);
+    end;
+  end;
+  if FPlatformCamera.ISO > -1 then
+  begin
+    LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCaptureRequest.JavaClass.CONTROL_AE_MODE_OFF);
+    LRequestHelper.setLongValue(TJCaptureRequest.JavaClass.SENSOR_EXPOSURE_TIME, FPlatformCamera.ExposureTime);
+    LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.SENSOR_SENSITIVITY, FPlatformCamera.ISO);
+  end
+  else
+    LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCaptureRequest.JavaClass.CONTROL_AE_MODE_ON);
   FSession.capture(LBuilder.build, FCaptureSessionCaptureCallback, FHandler);
 end;
 
-procedure TCameraCaptureSession.UpdateFlashMode;
-begin
-  FRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_MODE, TJCameraMetadata.JavaClass.CONTROL_MODE_AUTO);
-  case FPlatformCamera.FlashMode of
-    TFlashMode.FlashOff:
-      FRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.FLASH_MODE, TJCaptureRequest.JavaClass.FLASH_MODE_OFF);
-    TFlashMode.FlashOn:
-      FRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
-    TFlashMode.AutoFlash:
-      FRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON_AUTO_FLASH);
-  end;
-end;
-
-procedure TCameraCaptureSession.AddLocation(const AStream: TMemoryStream);
+procedure TCameraCaptureSession.AddMetadata(const AStream: TMemoryStream);
 const
   cRefLatitude: array[Boolean] of string = ('N', 'S');
   cRefLongitude: array[Boolean] of string = ('W', 'E');
@@ -542,44 +626,51 @@ begin
   LFileName := TPath.GetTempFileName;
   AStream.SaveToFile(LFileName);
   LEXIF := TJExifInterface.JavaClass.init(StringToJString(LFileName));
-  LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LATITUDE, StringToJString(ValueToDegrees(LLocation.Latitude)));
-  LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LATITUDE_REF, StringToJString(cRefLatitude[LLocation.Latitude < 0]));
-  LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LONGITUDE, StringToJString(ValueToDegrees(LLocation.Longitude)));
-  LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LONGITUDE_REF, StringToJString(cRefLongitude[LLocation.Longitude < 0]));
+  if TMetadataOption.GPS in FPlatformCamera.MetadataOptions then
+  begin
+    LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LATITUDE, StringToJString(ValueToDegrees(LLocation.Latitude)));
+    LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LATITUDE_REF, StringToJString(cRefLatitude[LLocation.Latitude < 0]));
+    LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LONGITUDE, StringToJString(ValueToDegrees(LLocation.Longitude)));
+    LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_GPS_LONGITUDE_REF, StringToJString(cRefLongitude[LLocation.Longitude < 0]));
+  end;
+  if TMetadataOption.Orientation in FPlatformCamera.MetadataOptions then
+    LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_ORIENTATION, StringToJString(TJExifInterface.JavaClass.ORIENTATION_NORMAL.ToString));
   LEXIF.saveAttributes;
   AStream.LoadFromFile(LFileName);
   TFile.Delete(LFileName);
 end;
 
-procedure TCameraCaptureSession.ImageAvailable(reader: JImageReader);
+procedure TCameraCaptureSession.ContinuousImageAvailableHandler(const reader: JImageReader);
+begin
+  //
+end;
+
+procedure TCameraCaptureSession.StillImageAvailableHandler(const reader: JImageReader);
 var
   LImage: JImage;
-  LStream: TStream;
+  LStream: TMemoryStream;
   LRotation: Integer;
+  LBytes: TBytes;
 begin
   // From: http://stackoverflow.com/questions/41775968/how-to-convert-android-media-image-to-bitmap-object
-  if FCaptureRequest <> TCaptureMode.None then
+  LImage := reader.acquireNextImage;
   try
-    LImage := reader.acquireNextImage;
-    try
-      TOSLog.d('Image available for %s request in %s format, size: %d x %d',
-        [cCaptureModeCaptions[FCaptureRequest], GetImageFormat(LImage.getFormat), LImage.getWidth, LImage.getHeight]);
-      LRotation := 0;
-      if ((PlatformCamera.CameraOrientation mod 180) <> 0) and (PlatformCamera.ViewSize.getWidth <> LImage.getHeight) then
-        LRotation := FRequestedOrientation;
-      LStream := TJImageHelper.JImageToStream(LImage, LRotation);
-      try
-        if PlatformCamera.Camera.IncludeLocation then
-          AddLocation(TMemoryStream(LStream));
-        PlatformCamera.CapturedStillImage(LStream, FCaptureRequest);
-      finally
-        LStream.Free;
-      end;
-    finally
-      LImage.close;
-    end;
+    TOSLog.d('Image available for still request in %s format, size: %d x %d', [GetImageFormat(LImage.getFormat), LImage.getWidth, LImage.getHeight]);
+    LRotation := 0;
+//      if ((PlatformCamera.CameraOrientation mod 180) <> 0) and (PlatformCamera.ViewSize.getWidth <> LImage.getHeight) then
+//        LRotation := FRequestedOrientation;
+    LBytes := TJImageHelper.JImageToBytes(LImage, LRotation); // <---- This is where it can be slow, especially if it needs to rotate
   finally
-    FCaptureRequest := TCaptureMode.None;
+    LImage.close;
+  end;
+  LStream := TMemoryStream.Create;
+  try
+    LStream.Write(LBytes, Length(LBytes));
+    if PlatformCamera.Camera.MetadataOptions <> [] then
+      AddMetadata(LStream);
+    PlatformCamera.CapturedStillImage(LStream);
+  finally
+    LStream.Free;
   end;
 end;
 
@@ -598,10 +689,11 @@ var
 begin
   LHelper := TJDWCaptureResultHelper.JavaClass.init;
   LHelper.setCaptureResult(result);
-  case FCaptureRequest of
-    TCaptureMode.Faces:
-      CheckFaces(LHelper);
-  end;
+  // Check what kind of CaptureRequest from request (eg still or continuous)
+//  case FCaptureRequest of
+//    TCaptureMode.Faces:
+//      CheckFaces(LHelper);
+//  end;
 end;
 
 procedure TCameraCaptureSession.CaptureProgressed(session: JCameraCaptureSession; request: JCaptureRequest; partialResult: JCaptureResult);
@@ -610,22 +702,39 @@ begin
 end;
 
 procedure TCameraCaptureSession.CaptureSessionConfigured(session: JCameraCaptureSession);
-var
-  LBuilder: JCaptureRequest_Builder;
 begin
   FSession := session;
-  LBuilder := FPlatformCamera.CameraDevice.createCaptureRequest(TJCameraDevice.JavaClass.TEMPLATE_PREVIEW);
-  LBuilder.addTarget(FPreviewSurface);
-  FRequestHelper.setCaptureRequestBuilder(LBuilder);
-  FRequestHelper.setFaceDetectMode(Ord(FPlatformCamera.GetHighestFaceDetectMode));
-  UpdateFlashMode;
-  session.setRepeatingRequest(LBuilder.build, FCaptureSessionCaptureCallback, FHandler);
-  FIsCapturing := True;
+  FPreviewRequestBuilder := FPlatformCamera.CameraDevice.createCaptureRequest(TJCameraDevice.JavaClass.TEMPLATE_PREVIEW);
+  FPreviewRequestBuilder.addTarget(FPreviewSurface);
+  FRequestHelper.setCaptureRequestBuilder(FPreviewRequestBuilder);
+  UpdatePreviewRequest;
 end;
 
 procedure TCameraCaptureSession.CaptureSessionConfigureFailed(session: JCameraCaptureSession);
 begin
   //
+end;
+
+procedure TCameraCaptureSession.CameraSettingChanged;
+begin
+  if FIsCapturing then
+    UpdatePreviewRequest;
+end;
+
+procedure TCameraCaptureSession.UpdatePreviewRequest;
+begin
+  if FPlatformCamera.ISO > -1 then
+  begin
+    FRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_OFF);
+    FRequestHelper.setLongValue(TJCaptureRequest.JavaClass.SENSOR_EXPOSURE_TIME, FPlatformCamera.ExposureTime);
+    FRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.SENSOR_SENSITIVITY, FPlatformCamera.ISO);
+  end
+  else
+    FRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON);
+  FRequestHelper.setFaceDetectMode(Ord(FPlatformCamera.GetHighestFaceDetectMode));
+  FSession.setRepeatingRequest(FPreviewRequestBuilder.build, FCaptureSessionCaptureCallback, FHandler);
+  FIsCapturing := True;
+  FPlatformCamera.CaptureStateChanged;
 end;
 
 { TPlatformCamera }
@@ -677,13 +786,13 @@ begin
       if LPoint <> nil then
         FFaces[I].MouthPosition := TPointF.Create(LPoint.x, LPoint.y);
     end;
-    FCaptureSession.CaptureImage(TCaptureMode.Faces);
+    FCaptureSession.CaptureStillImage; //!!!!!
   end;
 end;
 
 procedure TPlatformCamera.DoCaptureImage;
 begin
-  FCaptureSession.CaptureImage(TCaptureMode.Still);
+  FCaptureSession.CaptureStillImage;
 end;
 
 procedure TPlatformCamera.StillCaptureFailed;
@@ -701,11 +810,36 @@ begin
     // Set the highest available mode, or none if none selected
     if (LMode in FAvailableFaceDetectModes) and (FaceDetectMode >= LMode) then
     begin
-      TOSLog.d('Highest face detect mode of: %d', [Ord(LMode)]);
+      // TOSLog.d('Highest face detect mode of: %d', [Ord(LMode)]);
       Result := LMode;
       Break;
     end;
   end;
+end;
+
+function TPlatformCamera.GetCameraOrientation: Integer;
+begin
+  Result := FCameraOrientation;
+end;
+
+function TPlatformCamera.GetExposureTime: Int64;
+begin
+  // Result := Round((0.2 * (FSensorExposureTimeRange.Upper - FSensorExposureTimeRange.Lower)) + FSensorExposureTimeRange.Lower);
+  Result := Round(FSensorExposureTimeRange.Lower * 25.0);
+  TOSLog.d('TPlatformCamera.GetExposureTime > Lower: %d, Upper: %d, Result: %d', [FSensorExposureTimeRange.Lower, FSensorExposureTimeRange.Upper, Result]);
+end;
+
+function TPlatformCamera.GetISO: Integer;
+var
+  LFactor: Single;
+begin
+  if Exposure > -1 then
+  begin
+    LFactor := Round(Exposure * 100) / 100;
+    Result := Round((LFactor * (FSensorSensitivityRange.Upper - FSensorSensitivityRange.Lower)) + FSensorSensitivityRange.Lower);
+  end
+  else
+    Result := -1;
 end;
 
 function TPlatformCamera.GetIsSwapping: Boolean;
@@ -737,8 +871,7 @@ end;
 procedure TPlatformCamera.DoOpenCamera;
 var
   LCameraIDList: TJavaObjectArray<JString>;
-  LItem: JString;
-  LCameraID: JString;
+  LItem, LCameraID: JString;
   LLensFacing: Integer;
   LCharacteristics: JCameraCharacteristics;
   LHelper: JDWCameraCharacteristicsHelper;
@@ -747,6 +880,9 @@ var
   I: Integer;
 begin
   TOSLog.d('+TPlatformCamera.DoOpenCamera');
+  FSensorExposureTimeRange.Lower := 0;
+  FSensorExposureTimeRange.Upper := 0;
+  InternalSetExposure(0.15);
   FCameraOrientation := 0;
   LFaceDetectModes := nil;
   FViewSize := nil;
@@ -760,7 +896,6 @@ begin
     LItem := LCameraIDList.Items[I];
 	  LCharacteristics := FCameraManager.getCameraCharacteristics(LItem);
     LHelper.setCameraCharacteristics(LCharacteristics);
-    LFaceDetectModes := LHelper.getFaceDetectModes;
     LLensFacing := LHelper.getLensFacing;
     case CameraPosition of
       TDevicePosition.Back:
@@ -783,6 +918,7 @@ begin
     if LCameraID <> nil then
     begin
       FCameraOrientation := LHelper.getSensorOrientation;
+      TOSLog.d('> Camera orientation: %d', [FCameraOrientation]);
       LMap := LHelper.getMap;
       Break;
     end;
@@ -793,7 +929,14 @@ begin
     Exit; // <======
   end;
   TOSLog.d('> Obtained ID and map');
+  LCharacteristics := FCameraManager.getCameraCharacteristics(LCameraID);
+  LHelper.setCameraCharacteristics(LCharacteristics);
+  FSensorExposureTimeRange.Lower := LHelper.getSensorExposureTimeLower;
+  FSensorExposureTimeRange.Upper := LHelper.getSensorExposureTimeUpper;
+  FSensorSensitivityRange.Lower := LHelper.getSensorSensitivityLower;
+  FSensorSensitivityRange.Upper := LHelper.getSensorSensitivityUpper;
   FAvailableFaceDetectModes := [];
+  LFaceDetectModes := LHelper.getFaceDetectModes;
   if LFaceDetectModes <> nil then
   begin
     for I := 0 to LFaceDetectModes.Length - 1 do
@@ -842,6 +985,15 @@ begin
   InternalSetActive(False);
 end;
 
+procedure TPlatformCamera.ContinuousCaptureChanged;
+begin
+  // Create/Free repeating capture request
+//  if IsActive and ContinuousCapture then
+//    FCaptureTimer.Enabled := True
+//  else
+//    FCaptureTimer.Enabled := False;
+end;
+
 procedure TPlatformCamera.UpdateViewSize;
 var
   I: Integer;
@@ -868,10 +1020,13 @@ end;
 procedure TPlatformCamera.StartCapture;
 begin
   if FCaptureSession <> nil then
-  begin
     FCaptureSession.StartSession;
-    FIsCapturing := FCaptureSession.IsCapturing;
-  end;
+end;
+
+procedure TPlatformCamera.CaptureStateChanged;
+begin
+  FIsCapturing := FCaptureSession.IsCapturing;
+  TThread.Synchronize(nil, DoStatusChange);
 end;
 
 procedure TPlatformCamera.StopCapture;
@@ -899,17 +1054,79 @@ begin
   StartCapture;
 end;
 
-procedure TPlatformCamera.CapturedStillImage(const AImageStream: TStream; const ACaptureRequest: TCaptureMode); 
+procedure TPlatformCamera.CameraSettingChanged;
+begin
+  FCaptureSession.CameraSettingChanged;
+end;
+
+procedure TPlatformCamera.CheckBarcode(const frame: JBitmap);
+{
+var
+  LDetectorBuilder: JBarcodeDetector_Builder;
+  LFrameBuilder: JFrame_Builder;
+  LResults: JSparseArray;
+  LJBarcode: JBarcode;
+  LObject: JObject;
+  I: Integer;
+  LBarcode: TBarcode;
+  LBarcodes: TBarcodes;
+  LError: string;
+}
+begin
+{
+  LDetectorBuilder := TJBarcodeDetector_Builder.JavaClass.init(TAndroidHelper.Context);
+  //!!!!!! Camera property: BarcodeFormats
+  LDetectorBuilder.setBarcodeFormats(TJBarcode.JavaClass.ALL_FORMATS);
+  LFrameBuilder := TJFrame_Builder.Create;
+  LFrameBuilder.setBitmap(frame);
+  LResults := LDetectorBuilder.build.detect(LFrameBuilder.build);
+  for I := 0 to LResults.size - 1 do
+  begin
+    LJBarcode := TJBarcode.Wrap(LResults.get(LResults.keyAt(0)));
+    LBarcode.Value := JStringToString(LJBarcode.displayValue);
+    LBarcode.Format := TAndroidBarcodeHelper.GetBarcodeFormat(LJBarcode.format);
+    LBarcodes := LBarcodes + [LBarcode];
+  end;
+  if LResults.size = 0 then
+    LError := 'No barcodes detected'
+  else
+    LError := '';
+  // DoBarcodes(LBarcodes, LError);
+}
+end;
+
+procedure TPlatformCamera.FrameAvailable(frame: JBitmap);
+{
+var
+  LBitmap: TBitmap;
+begin
+  // Could "build in" barcode detection?
+  LBitmap := TBitmap.Create;
+  try
+    LBitmap.FromJBitmap(frame);
+    DoFrameAvailable(LBitmap);
+  finally
+    LBitmap.Free;
+  end;
+end;
+}
+begin
+  // Have this as an option
+  // CheckBarcode(frame);
+end;
+
+procedure TPlatformCamera.CapturedStillImage(const AImageStream: TStream);
 begin
   TThread.Synchronize(nil,
     procedure
     begin
-      case ACaptureRequest of
-        TCaptureMode.Still:
+      // Change this into using Faces mode of the Camera object
+//      case ACaptureRequest of
+//        TCaptureMode.Still:
           DoCapturedImage(AImageStream);
-        TCaptureMode.Faces:
-          DoDetectedFaces(AImageStream, FFaces);
-      end;
+//        TCaptureMode.Faces:
+//          DoDetectedFaces(AImageStream, FFaces);
+//      end;
     end
   );
   FFacesDetected := False;

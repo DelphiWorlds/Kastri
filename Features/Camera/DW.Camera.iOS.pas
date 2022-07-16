@@ -6,7 +6,7 @@ unit DW.Camera.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -58,6 +58,7 @@ type
   TPlatformCamera = class(TCustomPlatformCamera)
   private
     FDevice: AVCaptureDevice;
+    FISODefault: Single;
     FPreview: TCameraPreview;
     FPreviewNative: TiOSCameraPreview;
     FSession: AVCaptureSession;
@@ -66,6 +67,7 @@ type
     procedure CheckFaces(const AImage: CIImage);
     procedure FaceDetectorDetectCompleteHandler(Sender: TObject);
     function GetCorrectedImage(const AImage: CIImage): CIImage;
+    function GetExifMetadata: NSDictionary;
     function GetImageData(const AImage: CIImage): NSData;
     function GetGPSMetadata: NSDictionary;
     function GetResolutionDimensions: CMVideoDimensions;
@@ -73,10 +75,14 @@ type
     procedure PreviewOrientationChangeHandler(Sender: TObject);
     procedure RequestRecordVideoHandler(granted: Boolean);
     procedure UpdateDeviceModes;
+    procedure UpdateExposureMode;
+    procedure UpdateExposureValue;
+    procedure UpdateFlashMode;
     procedure UpdateSession;
   protected
     class function GetDeviceRotation: Double;
   protected
+    procedure CameraSettingChanged; override;
     procedure CloseCamera; override;
     procedure DoCaptureImage; override;
     function GetPreviewControl: TControl; override;
@@ -101,6 +107,7 @@ uses
   // iOS
   iOSapi.CoreGraphics, iOSapi.Helpers, iOSapi.CocoaTypes,
   // DW
+  DW.OSLog,
   {$IF CompilerVersion < 34}
   DW.iOSapi.AVFoundation,
   {$ENDIF}
@@ -125,9 +132,9 @@ begin
   Result := CocoaPointerConst(libImageIO, 'kCGImageDestinationLossyCompressionQuality');
 end;
 
-function kCGImagePropertyExifDictionary: Pointer;
+function kCGImagePropertyExifDictionary: NSString;
 begin
-  Result := CocoaPointerConst(libImageIO, 'kCGImagePropertyExifDictionary');
+  Result := CocoaNSStringConst(libImageIO, 'kCGImagePropertyExifDictionary');
 end;
 
 function kCGImagePropertyGPSDictionary: NSString;
@@ -138,6 +145,11 @@ end;
 function kCGImagePropertyGPSLatitudeRef: NSString;
 begin
   Result := CocoaNSStringConst(libImageIO, 'kCGImagePropertyGPSLatitudeRef');
+end;
+
+function kCGImagePropertyOrientation: NSString;
+begin
+  Result := CocoaNSStringConst(libImageIO, 'kCGImagePropertyOrientation');
 end;
 
 function kCGImagePropertyGPSLatitude: NSString;
@@ -195,6 +207,23 @@ type
   end;
   TCIContextEx = class(TOCGenericImport<CIImageClass, CIContextEx>) end;
 
+  TExposureModeCompletionHandler = procedure(syncTime: CMTime) of object;
+
+  AVCaptureDeviceEx = interface(AVCaptureDevice)
+    ['{3219C149-9640-4E2F-8B78-22DD4D3EC953}']
+    function exposureDuration: CMTime; cdecl;
+    procedure setExposureModeCustomWithDuration(duration: CMTime; ISO: Single; completionHandler: TExposureModeCompletionHandler); cdecl;
+    function ISO: Single; cdecl;
+  end;
+  TAVCaptureDeviceEx = class(TOCGenericImport<AVCaptureDeviceClass, AVCaptureDeviceEx>) end;
+
+  AVCaptureDeviceFormatEx = interface(AVCaptureDeviceFormat)
+    ['{B0781EFB-06DC-4447-9ED2-7961366BC38A}']
+    function maxISO: Single; cdecl;
+    function minISO: Single; cdecl;
+  end;
+  TAVCaptureDeviceFormatEx = class(TOCGenericImport<AVCaptureDeviceFormatClass, AVCaptureDeviceFormatEx>) end;
+
 { TFaceDetector }
 
 function TFaceDetector.DetectFaces(const AImage: CIImage): Boolean;
@@ -246,6 +275,7 @@ end;
 constructor TPlatformCamera.Create(const ACamera: TCamera);
 begin
   inherited;
+  FISODefault := -1;
   DoAuthorizationStatus(GetVideoAuthorizationStatus);
   FPreview := TCameraPreview.Create(nil);
   FPreview.Align := TAlignLayout.Contents;
@@ -274,6 +304,16 @@ begin
   LGPS.setObject(TNSNumber.OCClass.numberWithDouble(Abs(Camera.Location.Longitude)), NSObjectToID(kCGImagePropertyGPSLongitude));
   LGPS.setObject(StringToID(cLngRefs[Camera.Location.Longitude >= 0]), NSObjectToID(kCGImagePropertyGPSLongitudeRef));
   Result := LGPS;
+end;
+
+function TPlatformCamera.GetExifMetadata: NSDictionary;
+var
+  LEXIF: NSMutableDictionary;
+begin
+  LEXIF := TNSMutableDictionary.Create;
+  if TMetadataOption.Orientation in MetadataOptions then
+    LEXIF.setObject(TNSNumber.OCClass.numberWithInt(kCGImagePropertyOrientationUp), NSObjectToID(kCGImagePropertyOrientation));
+  Result := LEXIF;
 end;
 
 function TPlatformCamera.GetImageData(const AImage: CIImage): NSData;
@@ -313,6 +353,12 @@ begin
     FStillImageOutput.captureStillImageAsynchronouslyFromConnection(LTargetConnection, CaptureStillImageCompletionHandler);
 end;
 
+procedure TPlatformCamera.CameraSettingChanged;
+begin
+  if FDevice <> nil then
+    UpdateDeviceModes;
+end;
+
 procedure TPlatformCamera.CaptureStillImageCompletionHandler(buffer: CMSampleBufferRef; error: NSError);
 var
   LImageBuffer: CVPixelBufferRef;
@@ -334,7 +380,10 @@ begin
     CheckFaces(LCIImage);
   LProperties := TNSMutableDictionary.Create;
   LProperties.setDictionary(LCIImage.properties);
-  LProperties.setObject(NSObjectToID(GetGPSMetadata), NSObjectToID(kCGImagePropertyGPSDictionary));
+  if TMetadataOption.GPS in MetadataOptions then
+    LProperties.setObject(NSObjectToID(GetGPSMetadata), NSObjectToID(kCGImagePropertyGPSDictionary));
+  if TMetadataOption.Orientation in MetadataOptions then
+    LProperties.setObject(NSObjectToID(GetExifMetadata), NSObjectToID(kCGImagePropertyExifDictionary));
   // **** Requires iOS 10+ ****
   LCIImage := TCIImageEx.Wrap(NSObjectToID(LCIImage)).imageBySettingProperties(LProperties);
   LData := GetImageData(LCIImage);
@@ -423,25 +472,58 @@ procedure TPlatformCamera.UpdateDeviceModes;
 begin
   FDevice.lockForConfiguration(nil);
   try
-    if FDevice.hasFlash then
-    begin
-      case FlashMode of
-        TFlashMode.AutoFlash:
-        begin
-          FDevice.setFlashMode(AVCaptureFlashModeAuto);
-        end;
-        TFlashMode.FlashOff:
-        begin
-          FDevice.setFlashMode(AVCaptureFlashModeOff);
-        end;
-        TFlashMode.FlashOn:
-        begin
-          FDevice.setFlashMode(AVCaptureFlashModeOn);
-        end;
-      end;
-    end;
+    UpdateFlashMode;
+    UpdateExposureMode;
   finally
     FDevice.unlockForConfiguration;
+  end;
+end;
+
+procedure TPlatformCamera.UpdateExposureMode;
+var
+  LDevice: AVCaptureDeviceEx;
+  LFormat: AVCaptureDeviceFormatEx;
+  LISO: Single;
+begin
+  LDevice := TAVCaptureDeviceEx.Wrap(NSObjectToID(FDevice));
+  LFormat := TAVCaptureDeviceFormatEx.Wrap(NSObjectToID(FDevice.activeFormat));
+  if Exposure > -1 then
+    LISO := LFormat.minISO + (Exposure * (LFormat.maxISO - LFormat.minISO))
+  else
+    LISO := FISODefault;
+  LDevice.setExposureModeCustomWithDuration(LDevice.exposureDuration, LISO, nil);
+end;
+
+procedure TPlatformCamera.UpdateExposureValue;
+var
+  LDevice: AVCaptureDeviceEx;
+  LFormat: AVCaptureDeviceFormatEx;
+begin
+  LDevice := TAVCaptureDeviceEx.Wrap(NSObjectToID(FDevice));
+  LFormat := TAVCaptureDeviceFormatEx.Wrap(NSObjectToID(FDevice.activeFormat));
+  if FISODefault = -1 then
+    FISODefault := LDevice.ISO;
+  InternalSetExposure((FISODefault - LFormat.minISO) / (LFormat.maxISO - LFormat.minISO));
+end;
+
+procedure TPlatformCamera.UpdateFlashMode;
+begin
+  if FDevice.hasFlash then
+  begin
+    case FlashMode of
+      TFlashMode.AutoFlash:
+      begin
+        FDevice.setFlashMode(AVCaptureFlashModeAuto);
+      end;
+      TFlashMode.FlashOff:
+      begin
+        FDevice.setFlashMode(AVCaptureFlashModeOff);
+      end;
+      TFlashMode.FlashOn:
+      begin
+        FDevice.setFlashMode(AVCaptureFlashModeOn);
+      end;
+    end;
   end;
 end;
 
@@ -498,6 +580,7 @@ begin
   end;
   if FDevice <> nil then
   begin
+    UpdateExposureValue;
     UpdateDeviceModes;
     StartCapture;
     InternalSetActive(True);
@@ -507,6 +590,8 @@ end;
 procedure TPlatformCamera.CloseCamera;
 begin
   StopCapture;
+  if FIsSwapping then
+    FISODefault := -1;
   FDevice := nil;
   FAvailableFaceDetectModes := [];
   SetFaceDetectMode(TFaceDetectMode.None);
@@ -553,7 +638,8 @@ procedure TPlatformCamera.StopCapture;
 begin
   if (FSession <> nil) and FSession.isRunning then
     FSession.stopRunning;
-  FPreviewNative.StopPreview;
+  if not FIsSwapping then
+    FPreviewNative.StopPreview;
   FIsCapturing := False;
 end;
 

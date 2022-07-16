@@ -6,7 +6,7 @@ unit DW.CameraPreview.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -64,17 +64,25 @@ end;
 
 destructor TiOSCameraPreview.Destroy;
 begin
-  StopPreview;
+  if FPreviewLayer <> nil then
+  begin
+    FPreviewLayer.removeFromSuperlayer;
+    FPreviewLayer := nil;
+  end;
   inherited;
 end;
 
 procedure TiOSCameraPreview.StartPreview(const ASession: AVCaptureSession);
 begin
-  StopPreview;
-  FPreviewLayer := TAVCaptureVideoPreviewLayer.Wrap(TAVCaptureVideoPreviewLayer.OCClass.layerWithSession(ASession));
-  FPreviewLayer.setBackgroundColor(TUIColor.Wrap(TUIColor.OCClass.blackColor).CGColor);
-  FPreviewLayer.setVideoGravity(AVLayerVideoGravityResizeAspectFill);
-  View.layer.addSublayer(FPreviewLayer);
+  if FPreviewLayer = nil then
+  begin
+    FPreviewLayer := TAVCaptureVideoPreviewLayer.Wrap(TAVCaptureVideoPreviewLayer.OCClass.layerWithSession(ASession));
+    FPreviewLayer.setBackgroundColor(TUIColor.Wrap(TUIColor.OCClass.blackColor).CGColor);
+    FPreviewLayer.setVideoGravity(AVLayerVideoGravityResizeAspectFill);
+    View.layer.addSublayer(FPreviewLayer);
+  end
+  else
+    FPreviewLayer.setSession(ASession);
   FPreviewLayer.setHidden(False);
   UpdatePreview;
 end;
@@ -82,10 +90,7 @@ end;
 procedure TiOSCameraPreview.StopPreview;
 begin
   if FPreviewLayer <> nil then
-  begin
-    FPreviewLayer.removeFromSuperlayer;
-    FPreviewLayer := nil;
-  end;
+    FPreviewLayer.setHidden(True);
 end;
 
 procedure TiOSCameraPreview.UpdatePreview;
