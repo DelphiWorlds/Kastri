@@ -6,7 +6,7 @@ package com.delphiworlds.kastri;
  *                                                     *
  *        Delphi Worlds Cross-Platform Library         *
  *                                                     *
- *   Copyright 2020 Dave Nottage under MIT license     *
+ * Copyright 2020-2021 Dave Nottage under MIT license  *
  * which is located in the root folder of this library *
  *                                                     *
  *******************************************************/
@@ -23,17 +23,17 @@ public class DWCameraDeviceStateCallback extends CameraDevice.StateCallback {
 
   @Override
   public void onOpened(CameraDevice camera) {
-    mDelegate.Opened(camera);
+    mDelegate.onOpened(camera);
   }
       
   @Override
   public void onError(CameraDevice camera, int error) {
-    mDelegate.Error(camera, error);
+    mDelegate.onError(camera, error);
   }
   
   @Override
   public void onDisconnected(CameraDevice camera) {
-    mDelegate.Disconnected(camera); 
+    mDelegate.onDisconnected(camera); 
   }
 
 }

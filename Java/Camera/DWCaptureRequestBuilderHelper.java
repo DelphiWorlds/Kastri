@@ -6,7 +6,7 @@ package com.delphiworlds.kastri;
  *                                                     *
  *        Delphi Worlds Cross-Platform Library         *
  *                                                     *
- *   Copyright 2020 Dave Nottage under MIT license     *
+ * Copyright 2020-2021 Dave Nottage under MIT license  *
  * which is located in the root folder of this library *
  *                                                     *
  *******************************************************/
@@ -45,6 +45,10 @@ public class DWCaptureRequestBuilderHelper {
   }
 
   public void setIntegerValue(CaptureRequest.Key<Integer> key, int value) {
+    mBuilder.set(key, value);
+  }
+
+  public void setLongValue(CaptureRequest.Key<Long> key, long value) {
     mBuilder.set(key, value);
   }
 }

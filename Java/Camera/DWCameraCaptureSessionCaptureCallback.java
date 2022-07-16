@@ -6,7 +6,7 @@ package com.delphiworlds.kastri;
  *                                                     *
  *        Delphi Worlds Cross-Platform Library         *
  *                                                     *
- *   Copyright 2020 Dave Nottage under MIT license     *
+ * Copyright 2020-2021 Dave Nottage under MIT license  *
  * which is located in the root folder of this library *
  *                                                     *
  *******************************************************/
@@ -26,12 +26,12 @@ public class DWCameraCaptureSessionCaptureCallback extends CameraCaptureSession.
 
   @Override
   public void onCaptureProgressed(CameraCaptureSession session, CaptureRequest request, CaptureResult partialResult) {
-    mDelegate.CaptureProgressed(session, request, partialResult);
+    mDelegate.onCaptureProgressed(session, request, partialResult);
   }
 
   @Override
   public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
-    mDelegate.CaptureCompleted(session, request, result);
+    mDelegate.onCaptureCompleted(session, request, result);
   }
 
 }
