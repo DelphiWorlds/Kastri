@@ -228,7 +228,7 @@ begin
   if FEMDKScanner <> nil then
   begin
     SetScannerTrigger(TScannerTrigger.Hard);
-    if IsEnabled then
+    if IsEnabled and not FEMDKScanner.getScanner.isReadPending then
     begin
       FEMDKScanner.getScanner.read;
       Result := True;
