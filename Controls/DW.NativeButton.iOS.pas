@@ -44,7 +44,6 @@ type
 
   TiOSNativeButton = class(TNativeControl)
   private
-    FLongPressRecognizer: UILongPressGestureRecognizer;
     function GetModel: TCustomNativeButtonModel;
     function GetView: UIButton;
     procedure MMSetText(var AMessage: TDispatchMessageWithValue<string>); message MM_SET_TEXT;
