@@ -30,9 +30,12 @@ type
 
   TCameraCaptureSession = class(TObject)
   private
+    {$IF Defined(USEGL)}
+    FCameraView: JDWGLCameraView;
+    FCameraViewDelegate: JDWGLCameraView_ViewDelegate;
+    {$ELSE}
     FCameraView: JDWCameraView;
-    // FCameraView: JDWGLCameraView;
-    // FCameraViewDelegate: JDWGLCameraView_ViewDelegate;
+    {$ENDIF}
     FCaptureSessionCaptureCallback: JDWCameraCaptureSessionCaptureCallback;
     FCaptureSessionCaptureCallbackDelegate: JDWCameraCaptureSessionCaptureCallbackDelegate;
     FCaptureSessionStateCallback: JDWCameraCaptureSessionStateCallback;
@@ -75,6 +78,7 @@ type
     procedure CameraSettingChanged;
     procedure CaptureStillImage;
     procedure ContinuousImageAvailableHandler(const reader: JImageReader);
+    function GetSensitivity: Integer;
     procedure StartSession;
     procedure StillImageAvailableHandler(const reader: JImageReader);
     procedure StopSession;
@@ -111,6 +115,7 @@ type
     FDetectionDateTime: TDateTime;
     FFaces: TFaces;
     FFacesDetected: Boolean;
+    FFrameBitmap: TBitmap;
     FDeviceStateCallback: JDWCameraDeviceStateCallback;
     FDeviceStateCallbackDelegate: JDWCameraDeviceStateCallbackDelegate;
     FHandler: JHandler;
@@ -122,12 +127,14 @@ type
     function GetExposureTime: Int64;
     function GetISO: Integer;
     function GetIsSwapping: Boolean;
+    // function GetSessionExposure: Single;
     procedure UpdateViewSize;
   protected
     procedure CameraDisconnected(camera: JCameraDevice);
     procedure CameraError(camera: JCameraDevice; error: Integer);
     procedure CameraOpened(camera: JCameraDevice);
     procedure CameraSettingChanged; override;
+    procedure CaptureConfigured;
     procedure CaptureStateChanged;
     procedure CapturedStillImage(const AImageStream: TStream);
     procedure CloseCamera; override;
@@ -407,13 +414,14 @@ begin
   FPreview.OnOrientationChange := OrientationChangeHandler;
   FPreview.OnSizeChange := SizeChangeHandler;
   FSurfaceTextureListener := TSurfaceTextureListener.Create(Self);
-
-  // FCameraViewDelegate := TDWGLCameraViewDelegate.Create(Self);
   FCameraView := TAndroidCameraPreview(FPreview.Presentation).View;
+  {$IF Defined(USEGL)}
+  FCameraViewDelegate := TDWGLCameraViewDelegate.Create(Self);
+  FCameraView.setCaptureFPS(1); // Needs to be controlled from FPlatformCamera
+  FCameraView.setViewDelegate(FCameraViewDelegate);
+  {$ELSE}
   FCameraView.setSurfaceTextureListener(FSurfaceTextureListener);
-  // FCameraView.setCaptureFPS(1); // Needs to be controlled from FPlatformCamera
-  // FCameraView.setViewDelegate(FCameraViewDelegate);
-
+  {$ENDIF}
   StartThread;
 end;
 
@@ -433,6 +441,13 @@ begin
   LRotation := GetSurfaceRotation(ARotation);
   TOSLog.d('> Surface Rotation: %d', [LRotation]);
   Result := (FPlatformCamera.CameraOrientation - LRotation + 360) mod 360;
+end;
+
+function TCameraCaptureSession.GetSensitivity: Integer;
+begin
+  Result := -1;
+  if FRequestHelper <> nil then
+    Result := FRequestHelper.getIntegerValue(TJCaptureRequest.JavaClass.SENSOR_SENSITIVITY);
 end;
 
 //   https://stackoverflow.com/questions/48406497/camera2-understanding-the-sensor-and-device-orientations
@@ -500,9 +515,12 @@ end;
 
 procedure TCameraCaptureSession.UpdatePreview;
 var
+  {$IF not Defined(USEGL)}
   LScreenScale: Single;
+  LPreviewSize: TSize;
+  {$ENDIF}
   LSize: TSizeF;
-  LViewSize, LPreviewSize: TSize;
+  LViewSize: TSize;
   LIsPortrait: Boolean;
 begin
   LIsPortrait := Screen.Height > Screen.Width;
@@ -516,9 +534,11 @@ begin
     LSize := TSizeF.Create(FPreview.ParentControl.Width, FPreview.ParentControl.Width * (LViewSize.cx / LViewSize.cy));
   FPreview.Size.Size := LSize;
   // FCameraView.setCameraRotation(GetSurfaceRotation(TAndroidHelper.Activity.getWindowManager.getDefaultDisplay.getRotation));
+  {$IF not Defined(USEGL)}
   LScreenScale := TAndroidCameraPreview(FPreview.Presentation).ScreenScale;
   LPreviewSize := TSize.Create(Round(FPreview.Size.Size.cx * LScreenScale), Round(FPreview.Size.Size.cy * LScreenScale));
   FCameraView.setPreviewSize(TJutil_Size.JavaClass.init(LPreviewSize.cx, LPreviewSize.cy));
+  {$ENDIF}
 end;
 
 procedure TCameraCaptureSession.CreateStillReader;
@@ -705,6 +725,7 @@ begin
   FPreviewRequestBuilder := FPlatformCamera.CameraDevice.createCaptureRequest(TJCameraDevice.JavaClass.TEMPLATE_PREVIEW);
   FPreviewRequestBuilder.addTarget(FPreviewSurface);
   FRequestHelper.setCaptureRequestBuilder(FPreviewRequestBuilder);
+  FPlatformCamera.CaptureConfigured;
   UpdatePreviewRequest;
 end;
 
@@ -740,6 +761,7 @@ end;
 constructor TPlatformCamera.Create(const ACamera: TCamera);
 begin
   inherited;
+  FFrameBitmap := TBitmap.Create;
   FCameraManager := TJCameraManager.Wrap(TAndroidHelper.Activity.getSystemService(TJContext.JavaClass.CAMERA_SERVICE));
   FDeviceStateCallbackDelegate := TDWCameraDeviceStateCallbackDelegate.Create(Self);
   FDeviceStateCallback := TJDWCameraDeviceStateCallback.JavaClass.init(FDeviceStateCallbackDelegate);
@@ -749,6 +771,7 @@ end;
 
 destructor TPlatformCamera.Destroy;
 begin
+  FFrameBitmap.Free;
   FDeviceStateCallbackDelegate := nil;
   FDeviceStateCallback := nil;
   FCaptureSession.Free;
@@ -824,7 +847,7 @@ function TPlatformCamera.GetExposureTime: Int64;
 begin
   // Result := Round((0.2 * (FSensorExposureTimeRange.Upper - FSensorExposureTimeRange.Lower)) + FSensorExposureTimeRange.Lower);
   Result := Round(FSensorExposureTimeRange.Lower * 25.0);
-  TOSLog.d('TPlatformCamera.GetExposureTime > Lower: %d, Upper: %d, Result: %d', [FSensorExposureTimeRange.Lower, FSensorExposureTimeRange.Upper, Result]);
+  // TOSLog.d('TPlatformCamera.GetExposureTime > Lower: %d, Upper: %d, Result: %d', [FSensorExposureTimeRange.Lower, FSensorExposureTimeRange.Upper, Result]);
 end;
 
 function TPlatformCamera.GetISO: Integer;
@@ -835,9 +858,26 @@ begin
   begin
     LFactor := Round(Exposure * 100) / 100;
     Result := Round((LFactor * (FSensorSensitivityRange.Upper - FSensorSensitivityRange.Lower)) + FSensorSensitivityRange.Lower);
+    // TOSLog.d('TPlatformCamera.GetISO > LFactor: %.2f, Lower: %d, Upper: %d, Result: %d', [LFactor, FSensorSensitivityRange.Lower, FSensorSensitivityRange.Upper, Result]);
+    TOSLog.d('TPlatformCamera.GetISO > LFactor: %.2f, Result: %d', [LFactor, Result]);
   end
   else
     Result := -1;
+end;
+
+{
+function TPlatformCamera.GetSessionExposure: Single;
+begin
+  TOSLog.d('TPlatformCamera.GetSessionExposure');
+  TOSLog.d('> Sensitivity: %d, Lower: %d, Upper: %d',[FCaptureSession.GetSensitivity, FSensorSensitivityRange.Lower, FSensorSensitivityRange.Upper]);
+  Result := (FCaptureSession.GetSensitivity - FSensorSensitivityRange.Lower) / (FSensorSensitivityRange.Upper - FSensorSensitivityRange.Lower);
+  TOSLog.d('> Result: %d', [Result]);
+end;
+}
+
+procedure TPlatformCamera.CaptureConfigured;
+begin
+  // InternalSetExposure(GetSessionExposure); // <----- CRASH!! Why??
 end;
 
 function TPlatformCamera.GetIsSwapping: Boolean;
@@ -1095,23 +1135,10 @@ end;
 *)
 
 procedure TPlatformCamera.FrameAvailable(frame: JBitmap);
-{
-var
-  LBitmap: TBitmap;
 begin
   // Could "build in" barcode detection?
-  LBitmap := TBitmap.Create;
-  try
-    LBitmap.FromJBitmap(frame);
-    DoFrameAvailable(LBitmap);
-  finally
-    LBitmap.Free;
-  end;
-end;
-}
-begin
-  // Have this as an option
-  // CheckBarcode(frame);
+  FFrameBitmap.FromJBitmap(frame);
+  DoFrameAvailable(FFrameBitmap);
 end;
 
 procedure TPlatformCamera.CapturedStillImage(const AImageStream: TStream);
