@@ -43,7 +43,7 @@ type
     /// <summary>
     ///   Returns Black or White, depending on the background color supplied
     /// </summary>
-    class function GetTextColor(const ABackgroundColor: TAlphaColor): TAlphaColor; static;
+    class function GetTextColor(const ABackgroundColor: TAlphaColor; const AFactor: Single = 1): TAlphaColor; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
     /// <summary>
     ///   Force a repaint of the form
@@ -115,12 +115,12 @@ begin
   {$ENDIF}
 end;
 
-class function TUIHelper.GetTextColor(const ABackgroundColor: TAlphaColor): TAlphaColor;
+class function TUIHelper.GetTextColor(const ABackgroundColor: TAlphaColor; const AFactor: Single = 1): TAlphaColor;
 var
   LRec: TAlphaColorRec;
 begin
   LRec := TAlphaColorRec(ABackgroundColor);
-  if ((LRec.R * 0.299) + (LRec.G * 0.587) + (LRec.B * 0.114)) > 127 then
+  if ((LRec.R * 0.299) + (LRec.G * 0.587) + (LRec.B * 0.114)) * AFactor > 127 then
     Result := TAlphaColorRec.Black
   else
     Result := TAlphaColorRec.White;
