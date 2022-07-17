@@ -25,6 +25,8 @@ uses
 //   https://github.com/hans/universal-remote/blob/master/IOKit.framework/Versions/A/Headers/ps/IOPSKeys.h
 //   https://github.com/nanotech/iphoneheaders/blob/master/IOKit/IOKitKeys.h
 
+function IODisplayCreateInfoDictionary(framebuffer: io_service_t; options: IOOptionBits): CFDictionaryRef; cdecl;
+  external libIOKit name _PU + 'IODisplayCreateInfoDictionary';
 function IOPSCopyPowerSourcesInfo: CFTypeRef; cdecl; external libIOKit name _PU + 'IOPSCopyPowerSourcesInfo';
 function IOPSCopyPowerSourcesList(blob: CFTypeRef): CFArrayRef; cdecl; external libIOKit name _PU + 'IOPSCopyPowerSourcesList';
 function IOPSGetPowerSourceDescription(blob: CFTypeRef; ps: CFTypeRef): CFDictionaryRef; cdecl;
