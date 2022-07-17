@@ -21,6 +21,7 @@ uses
 
 type
   JNotification_Builder = interface;
+  JNotification_DecoratedCustomViewStyle = interface;
   JNotification_Extender = interface;
   JNotification_MediaStyle = interface;
   JNotification_Style = interface;
@@ -143,6 +144,19 @@ type
     function setShowActionsInCompactView(actions: TJavaArray<Integer>): JNotification_MediaStyle; cdecl;
   end;
   TJNotification_MediaStyle = class(TJavaGenericImport<JNotification_MediaStyleClass, JNotification_MediaStyle>)
+  end;
+
+  // API 24+
+  JNotification_DecoratedCustomViewStyleClass = interface(JNotification_StyleClass)
+    ['{1ACB123B-6A4D-4D13-90C3-1F5CF8806FA6}']
+    function init: JNotification_DecoratedCustomViewStyle; cdecl; overload;
+  end;
+
+  [JavaSignature('android/app/Notification$DecoratedCustomViewStyle')]
+  JNotification_DecoratedCustomViewStyle = interface(JNotification_Style)
+    ['{D19D754C-F8DF-4261-A9C8-173347D26DA2}']
+  end;
+  TJNotification_DecoratedCustomViewStyle = class(TJavaGenericImport<JNotification_DecoratedCustomViewStyleClass, JNotification_DecoratedCustomViewStyle>)
   end;
 
 implementation
