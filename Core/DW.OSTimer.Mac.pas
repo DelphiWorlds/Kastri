@@ -40,8 +40,10 @@ type
   private
     FPlatformOSTimer: TPlatformOSTimer;
   public
-    constructor Create(const APlatformOSTimer: TPlatformOSTimer);
+    { IOSTimerDelegate }
     procedure timerEvent(timer: NSTimer); cdecl;
+  public
+    constructor Create(const APlatformOSTimer: TPlatformOSTimer);
   end;
 
   TPlatformOSTimer = class(TCustomPlatformOSTimer)
