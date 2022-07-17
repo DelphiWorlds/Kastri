@@ -66,6 +66,7 @@ type
   JDWCaptureRequestBuilderHelper = interface(JObject)
     ['{ECDB6573-589C-4C0E-B8B9-D68F43425D98}']
     function getIntegerValue(key: JCaptureRequest_Key): Integer; cdecl;
+    function getLongValue(key: JCaptureRequest_Key): Int64; cdecl;
     procedure setCaptureRequestBuilder(builder: JCaptureRequest_Builder); cdecl;
     procedure setFaceDetectMode(mode: Integer); cdecl;
     procedure setIntegerValue(key: JCaptureRequest_Key; value: Integer); cdecl;
