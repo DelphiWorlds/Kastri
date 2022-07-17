@@ -50,7 +50,7 @@ uses
   Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers, Androidapi.JNI.Net, Androidapi.JNI.Provider,
   FMX.Platform, FMX.DialogService.Async,
   DW.OSLog,
-  DW.Json, DW.Consts.Android;
+  DW.Json, DW.Consts.Android, DW.Android.Helpers;
 
 const
   cGeofenceRadius = 100; // metres
@@ -79,6 +79,7 @@ end;
 constructor TMainView.Create(AOwner: TComponent);
 begin
   inherited;
+  TAndroidHelperEx.RestartIfNotIgnoringBatteryOptimizations;
   FGeofence := TGeofenceManager.Create;
   FGeofence.OnGeofenceActionComplete := GeofenceActionCompleteHandler;
   FGeofence.OnGeofenceTransition := GeofenceTransitionHandler;
