@@ -31,9 +31,9 @@ uses
 
 class function TPlatformGeodetic.DistanceBetween(const ALatitudeFrom, ALongitudeFrom, ALatitudeTo, ALongitudeTo: Double): Double;
 const
-  cDiameter = 2 * 6372.8; // Might need to check the radius value
+  cDiameter = 2 * 6372800;
 var
-  LDX, LDY, LDZ: double;
+  LDX, LDY, LDZ: Double;
   LLatRadFrom, LLatRadTo, LLongRadDiff: Double;
 begin
   LLongRadDiff := DegToRad(ALongitudeFrom - ALongitudeTo);
