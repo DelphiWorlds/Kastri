@@ -26,14 +26,20 @@ uses
 type
   TAndroidCameraPreview = class(TAndroidNativeView)
   private
+    {$IF Defined(USEGL)}
+    FView: JDWGLCameraView;
+    {$ELSE}
     FView: JDWCameraView;
-    // FView: JDWGLCameraView;
+    {$ENDIF}
   protected
     function CreateView: JView; override;
   public
     constructor Create; override;
+    {$IF Defined(USEGL)}
+    property View: JDWGLCameraView read FView;
+    {$ELSE}
     property View: JDWCameraView read FView;
-    // property View: JDWGLCameraView read FView;
+    {$ENDIF}
   end;
 
 implementation
@@ -58,8 +64,11 @@ end;
 
 function TAndroidCameraPreview.CreateView: JView;
 begin
+  {$IF Defined(USEGL)}
+  FView := TJDWGLCameraView.JavaClass.init(TAndroidHelper.Activity);
+  {$ELSE}
   FView := TJDWCameraView.JavaClass.init(TAndroidHelper.Activity);
-  // FView := TJDWGLCameraView.JavaClass.init(TAndroidHelper.Activity);
+  {$ENDIF}
   Result := FView;
 end;
 
