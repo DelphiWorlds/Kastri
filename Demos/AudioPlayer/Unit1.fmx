@@ -1,0 +1,124 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 650
+  ClientWidth = 476
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object Layout2: TLayout
+    Align = Client
+    Size.Width = 476.000000000000000000
+    Size.Height = 650.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object TracksListBox: TListBox
+      Align = Client
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Size.Width = 468.000000000000000000
+      Size.Height = 532.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      DisableFocusEffect = True
+      DefaultItemStyles.ItemStyle = ''
+      DefaultItemStyles.GroupHeaderStyle = ''
+      DefaultItemStyles.GroupFooterStyle = ''
+      Viewport.Width = 464.000000000000000000
+      Viewport.Height = 528.000000000000000000
+    end
+    object Layout1: TLayout
+      Align = Bottom
+      Padding.Left = 4.000000000000000000
+      Padding.Top = 4.000000000000000000
+      Padding.Right = 4.000000000000000000
+      Padding.Bottom = 4.000000000000000000
+      Position.Y = 600.000000000000000000
+      Size.Width = 476.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object PlayPauseButton: TButton
+        Action = PlayAction
+        Align = Left
+        Enabled = True
+        ImageIndex = -1
+        Position.X = 4.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 109.000000000000000000
+        Size.Height = 42.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+      end
+      object StopButton: TButton
+        Action = StopAction
+        Align = Left
+        Enabled = True
+        ImageIndex = -1
+        Margins.Left = 12.000000000000000000
+        Position.X = 125.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 109.000000000000000000
+        Size.Height = 42.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+      end
+      object StopAllButton: TButton
+        Action = StopAllAction
+        Align = Left
+        Enabled = True
+        ImageIndex = -1
+        Margins.Left = 12.000000000000000000
+        Position.X = 246.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 109.000000000000000000
+        Size.Height = 42.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+      end
+    end
+    object Label1: TLabel
+      Align = Bottom
+      Position.Y = 540.000000000000000000
+      Size.Width = 476.000000000000000000
+      Size.Height = 60.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 
+        'All music was sourced from Free Music Archive:'#13#10'https://freemusi' +
+        'carchive.org/home'#13#10'For details about each artist and title, plea' +
+        'se use the search at that site'
+      TabOrder = 2
+    end
+  end
+  object ActionList: TActionList
+    OnUpdate = ActionListUpdate
+    Left = 116
+    Top = 84
+    object PlayAction: TAction
+      Text = 'Play'
+      OnExecute = PlayActionExecute
+      OnUpdate = PlayActionUpdate
+    end
+    object PauseAction: TAction
+      Text = 'Pause'
+      OnExecute = PauseActionExecute
+      OnUpdate = PauseActionUpdate
+    end
+    object StopAction: TAction
+      Text = 'Stop'
+      OnExecute = StopActionExecute
+      OnUpdate = StopActionUpdate
+    end
+    object StopAllAction: TAction
+      Text = 'Stop All'
+      OnExecute = StopAllActionExecute
+      OnUpdate = StopAllActionUpdate
+    end
+  end
+end
