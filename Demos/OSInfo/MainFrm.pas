@@ -36,6 +36,9 @@ const
   cBatteryStatusCaptions: array[TBatteryStatus] of string = (
     'Unknown', 'No Battery', 'Battery Healthy', 'Battery Normal', 'Battery Low', 'Battery Critical'
   );
+  cUIModeCaptions: array[TUIMode] of string = (
+    'Appliance', 'Car', 'Desk', 'Normal', 'TV', 'VR Headset', 'Undefined', 'Watch'
+  );
 
 function SecondsToTime(ASeconds: Integer): TDateTime;
 var
@@ -80,6 +83,7 @@ begin
     Memo.Lines.Add(Format('Device model: %s', [LDevice.Description]))
   else
     Memo.Lines.Add(Format('Device model: %s', [TOSDevice.GetDeviceModel]));
+  Memo.Lines.Add(Format('UI Mode: %s', [cUIModeCaptions[TOSDevice.GetUIMode]]));
   Memo.Lines.Add(Format('Unique ID: %s', [TOSDevice.GetUniqueDeviceID]));
   if TOSDevice.IsMobile then
     Memo.Lines.Add('Device is a mobile device')
