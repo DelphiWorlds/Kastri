@@ -44,7 +44,8 @@ type
     FWasActive: Boolean;
     procedure CameraAuthorizationStatusHandler(Sender: TObject; const AStatus: TAuthorizationStatus);
     procedure CameraImageCapturedHandler(Sender: TObject; const AImageStream: TStream);
-    procedure CameraStatusChange(Sender: TObject);
+    procedure CameraStatusChangeHandler(Sender: TObject);
+    procedure CameraFrameAvailableHandler(Sender: TObject; const AFrame: TBitmap);
     procedure CreateCamera;
     procedure EnableButtons(const AEnable: Boolean);
     procedure InternalShowPreview;
@@ -113,7 +114,8 @@ begin
   FCamera.CameraPosition := TDevicePosition.Back;
   FCamera.OnImageCaptured := CameraImageCapturedHandler;
   FCamera.OnAuthorizationStatus := CameraAuthorizationStatusHandler;
-  FCamera.OnStatusChange := CameraStatusChange;
+  FCamera.OnStatusChange := CameraStatusChangeHandler;
+  FCamera.OnFrameAvailable := CameraFrameAvailableHandler;
   FCamera.PreviewControl.Parent := PreviewLayout;
 end;
 
@@ -137,6 +139,11 @@ begin
     InternalShowPreview;
 end;
 
+procedure TCameraView.CameraFrameAvailableHandler(Sender: TObject; const AFrame: TBitmap);
+begin
+  // Camera frame available as a bitmap, here. Only works with the conditional define: USEGL
+end;
+
 procedure TCameraView.CameraImageCapturedHandler(Sender: TObject; const AImageStream: TStream);
 begin
   FImageStream.Clear;
@@ -150,7 +157,7 @@ begin
   ExposureSlider.Visible := False;
 end;
 
-procedure TCameraView.CameraStatusChange(Sender: TObject);
+procedure TCameraView.CameraStatusChangeHandler(Sender: TObject);
 begin
   if FCamera.IsCapturing then
   begin
@@ -186,10 +193,10 @@ begin
   begin
     ExposureSlider.Visible := True;
     if FExposureProps.Value > -1 then
-    begin
-      FCamera.Exposure := FExposureProps.Value;
-      ExposureSlider.Value := FExposureProps.Value;
-    end;
+      FCamera.Exposure := FExposureProps.Value
+    else
+      FExposureProps.Value := FCamera.Exposure;
+    ExposureSlider.Value := FExposureProps.Value;
   end;
   FExposureProps.IsSliderVisible := ExposureSlider.Visible;
 end;
