@@ -30,7 +30,7 @@ type
     /// <summary>
     ///   Creates the object from a file if it exists, or creates a new one
     /// </summary>
-    class procedure CreateFromFile<T: TJsonConfig, constructor>(out AObject: T);
+    class procedure CreateFromFile<T: TJsonConfig, constructor>(out AObject: T; const ACreate: Boolean = True);
     /// <summary>
     ///   Returns the name/path of the config file
     /// </summary>
@@ -52,11 +52,12 @@ uses
 
 { TJsonConfig }
 
-class procedure TJsonConfig.CreateFromFile<T>(out AObject: T);
+class procedure TJsonConfig.CreateFromFile<T>(out AObject: T; const ACreate: Boolean = True);
 begin
-  if not TJson.FileToObject(AObject, T.GetConfigFilename) then
+  if not TJson.FileToObject(AObject, T.GetConfigFilename) and ACreate then
     AObject := T.Create;
-  TJsonConfig(AObject).DoLoaded;
+  if AObject <> nil then
+    TJsonConfig(AObject).DoLoaded;
 end;
 
 procedure TJsonConfig.DoLoaded;
