@@ -44,6 +44,14 @@ public class DWCaptureRequestBuilderHelper {
       return Integer.MIN_VALUE;
   }
 
+  public long getLongValue(CaptureRequest.Key<Long> key) {
+    Long value = mBuilder.get(key);
+    if (value != null)
+      return value.longValue();
+    else
+      return Long.MIN_VALUE;
+  }
+
   public void setIntegerValue(CaptureRequest.Key<Integer> key, int value) {
     mBuilder.set(key, value);
   }
