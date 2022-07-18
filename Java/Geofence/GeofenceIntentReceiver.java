@@ -122,7 +122,7 @@ public class GeofenceIntentReceiver extends BroadcastReceiver {
       GeofenceRegions regions = mGeofenceManager.getRegions();
       regions.load();
       // Get the geofences that were triggered. A single event can trigger multiple geofences.
-      List<Geofence> geofenceßs = geofencingEvent.getTriggeringGeofences();
+      List<Geofence> geofences = geofencingEvent.getTriggeringGeofences();
       ArrayList<String> idsList = new ArrayList<>();
       for (Geofence geofence : geofences) {
         GeofenceRegions.Region region = regions.get(geofence.getRequestId());
