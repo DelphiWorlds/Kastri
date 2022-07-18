@@ -22,7 +22,7 @@ uses
   System.Types, System.SysUtils,
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.AdMob, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Widget, Androidapi.Helpers,
-  Androidapi.JNI.JavaTypes, Androidapi.JNI.Util,
+  Androidapi.JNI.JavaTypes, Androidapi.JNI.Util, Androidapi.JNI.App,
   // FMX
   FMX.Presentation.Android, FMX.Controls.Model, FMX.Controls.Presentation, FMX.Presentation.Messages, FMX.Presentation.Factory,
   FMX.Controls, FMX.Types,
