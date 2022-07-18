@@ -1,0 +1,24 @@
+{
+  "includedJars":[
+    "$(BDS)\\lib\\android\\debug\\play-services-ads-base-20.1.0.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-ads-lite-20.1.0.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-base-17.5.0.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-basement-17.6.0.jar",
+    "..\\ThirdParty\\Android\\androidx-annotation-1.1.0.jar"
+  ],
+  "javaFiles":[
+    ".\\AdMob\\DWAdListener.java",
+    ".\\AdMob\\DWAdListenerDelegate.java",
+    ".\\AdMob\\DWAppOpenAdLoadCallback.java",
+    ".\\AdMob\\DWAppOpenAdLoadCallbackDelegate.java",
+    ".\\AdMob\\DWInterstitialAdCallback.java",
+    ".\\AdMob\\DWInterstitialAdCallbackDelegate.java",
+    ".\\AdMob\\DWRewardedAdLoadCallback.java",
+    ".\\AdMob\\DWRewardedAdLoadCallbackDelegate.java",
+    ".\\AdMob\\DWRewardedInterstitialAdLoadCallback.java",
+    ".\\AdMob\\DWRewardedInterstitialAdLoadCallbackDelegate.java"
+  ],
+  "outputFile":"..\\Lib\\dw-admob.jar",
+  "sourceVersion":"1.8",
+  "targetVersion":"1.8"
+}
