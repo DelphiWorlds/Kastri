@@ -1,0 +1,89 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 640
+  ClientWidth = 456
+  Padding.Bottom = 32.000000000000000000
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Memo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Client
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Size.Width = 448.000000000000000000
+    Size.Height = 492.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Viewport.Width = 444.000000000000000000
+    Viewport.Height = 488.000000000000000000
+  end
+  object ButtonsLayout: TLayout
+    Align = Bottom
+    Padding.Left = 4.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 4.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Position.Y = 500.000000000000000000
+    Size.Width = 456.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object ShowBanner: TButton
+      Align = Left
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 101.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'Banner'
+      OnClick = ShowBannerClick
+    end
+    object ShowInterstitial: TButton
+      Align = Left
+      Margins.Left = 8.000000000000000000
+      Position.X = 113.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 101.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Interstitial'
+      OnClick = ShowInterstitialClick
+    end
+    object ShowReward: TButton
+      Align = Left
+      Margins.Left = 8.000000000000000000
+      Position.X = 222.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 101.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Reward'
+      OnClick = ShowRewardClick
+    end
+  end
+  object AdMobBannerAd1: TAdMobBannerAd
+    AdSize = Banner
+    Align = Bottom
+    Position.Y = 540.000000000000000000
+    Size.Width = 456.000000000000000000
+    Size.Height = 68.000000000000000000
+    Size.PlatformDefault = False
+    TestMode = True
+    OnAdClicked = AdMobBannerAd1AdClicked
+    OnAdClosed = AdMobBannerAd1AdClosed
+    OnAdFailedToLoad = AdMobBannerAd1AdFailedToLoad
+    OnAdImpression = AdMobBannerAd1AdImpression
+    OnAdLoaded = AdMobBannerAd1AdLoaded
+    OnAdOpened = AdMobBannerAd1AdOpened
+  end
+end
