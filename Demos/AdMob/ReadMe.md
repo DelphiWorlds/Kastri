@@ -14,7 +14,7 @@ The package can be found [here](https://github.com/DelphiWorlds/Kastri/tree/main
 
 ### Libraries
 
-If creating your own project, you will need to add the [`dw-admob.jar`](https://github.com/DelphiWorlds/Ksstri/blob/master/Lib/dw-admob.jar) file to the Libraries node under the Android platform in Project Manager
+If creating your own project, you will need to add the [`dw-admob.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob.jar) file to the Libraries node under the Android platform in Project Manager
 
 When using Delphi 10.4.x, you will need to add other libraries and disable some default libraries, as per this screenshot:
 
@@ -41,10 +41,6 @@ When configuring your app for non-test Ad UnitIds, you will need to:
 <img style="margin-left: 3em;" src="./Screenshots/iOSInfoPListTemplateAppId.png" alt="PM" height="150"/>
 
 * Ensure that the `TestMode` property of the instances of AdMob classes is set to False, and the AdUnitId is set to a valid AdUnitId for your application.
-
-## Feedback
-
-Please provide feedback about this demo as per [the main ReadMe.](https://github.com/DelphiWorlds/Playground/blob/main/Readme.md)
 
 ## Delphi 10.4.x support
 
