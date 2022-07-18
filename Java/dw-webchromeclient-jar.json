@@ -1,0 +1,12 @@
+{
+  "includedJars":[
+    
+  ],
+  "javaFiles":[
+    ".\\WebChromeClient\\DWWebChromeClient.java",
+    ".\\WebChromeClient\\DWWebChromeClientDelegate.java"
+  ],
+  "outputFile":"..\\Lib\\dw-webchromeclient.jar",
+  "sourceVersion":"1.8",
+  "targetVersion":"1.8"
+}

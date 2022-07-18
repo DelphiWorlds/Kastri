@@ -1,0 +1,17 @@
+{
+  "includedJars":[
+    "..\\ThirdParty\\Android\\play-services-auth-16.0.1.jar",
+    "..\\ThirdParty\\Android\\play-services-auth-base-16.0.0.jar",
+    "..\\ThirdParty\\Android\\play-services-base-15.0.1.jar",
+    "..\\ThirdParty\\Android\\play-services-basement-15.0.1.jar",
+    "..\\ThirdParty\\Android\\play-services-tasks-15.0.1.jar",
+    "..\\ThirdParty\\Android\\androidx-annotation-1.1.0.jar"
+  ],
+  "javaFiles":[
+    ".\\GoogleSignin\\DWGoogleSignIn.java",
+    ".\\GoogleSignin\\DWGoogleSignInDelegate.java"
+  ],
+  "outputFile":"..\\Lib\\dw-google-signin.jar",
+  "sourceVersion":"1.7",
+  "targetVersion":"1.7"
+}

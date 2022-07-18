@@ -1,0 +1,23 @@
+{
+  "includedJars":[
+    "$(BDS)\\lib\\android\\debug\\annotation-1.2.0.jar",
+    "$(BDS)\\lib\\android\\debug\\core-1.5.0-rc02.jar",
+    "$(BDS)\\lib\\android\\debug\\localbroadcastmanager-1.0.0.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-base-17.5.0.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-basement-17.6.0.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-location-18.0.0.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-maps-17.0.1.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-tasks-17.2.0.jar",
+    "..\\ThirdParty\\Android\\gson-2.8.6.jar"
+  ],
+  "javaFiles":[
+    ".\\Geofence\\GeofenceRegions.java",
+    ".\\Geofence\\GeofenceManager.java",
+    ".\\Geofence\\GeofenceManagerDelegate.java",
+    ".\\Geofence\\GeofenceIntentReceiver.java",
+    ".\\Geofence\\GeofenceTransitionsService.java"
+  ],
+  "outputFile":"..\\Lib\\dw-geofence-2.0.0.jar",
+  "sourceVersion":"1.8",
+  "targetVersion":"1.8"
+}

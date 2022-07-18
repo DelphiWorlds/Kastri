@@ -1,0 +1,12 @@
+{
+  "includedJars":[
+    
+  ],
+  "javaFiles":[
+    ".\\Biometric\\DWFingerprintAuthenticationCallback.java",
+    ".\\Biometric\\DWFingerprintAuthenticationCallbackDelegate.java"
+  ],
+  "outputFile":"..\\Lib\\dw-biometric.jar",
+  "sourceVersion":"1.8",
+  "targetVersion":"1.8"
+}

@@ -1,0 +1,26 @@
+{
+  "includedJars":[
+    "$(BDS)\\lib\\android\\debug\\annotation-1.2.0.jar",
+    "$(BDS)\\lib\\android\\debug\\core-1.5.0-rc02.jar",
+    "$(BDS)\\lib\\android\\debug\\fragment-1.0.0.jar",
+    "$(BDS)\\lib\\android\\debug\\lifecycle-common-2.0.0.jar",
+    "$(BDS)\\lib\\android\\debug\\localbroadcastmanager-1.0.0.jar",
+    "..\\ThirdParty\\Android\\androidx-drawerlayout-1.0.0.jar",
+    "..\\ThirdParty\\Android\\lifecycle-viewmodel-2.0.0.jar"
+  ],
+  "javaFiles":[
+    ".\\Base\\DWMultiBroadcastReceiver.java",
+    ".\\Base\\DWMultiBroadcastReceiverDelegate.java",
+    ".\\Base\\DWNotificationPublisher.java",
+    ".\\Base\\DWSeekBar.java",
+    ".\\Base\\DWUtility.java",
+    ".\\Base\\DWWakeUp.java",
+    ".\\Base\\Connectivity\\DWNetworkCallback.java",
+    ".\\Base\\Connectivity\\DWNetworkCallbackDelegate.java",
+    ".\\Base\\TimerTask\\DWTimerTask.java",
+    ".\\Base\\TimerTask\\DWTimerTaskDelegate.java"
+  ],
+  "outputFile":"..\\Lib\\dw-kastri-base-2.0.0.jar",
+  "sourceVersion":"1.7",
+  "targetVersion":"1.7"
+}

@@ -1,0 +1,21 @@
+{
+  "includedJars":[
+    "..\\ThirdParty\\Android\\support-core-utils-26.1.0.jar",
+    "..\\ThirdParty\\Android\\support-compat-26.1.0.jar"
+  ],
+  "javaFiles":[
+    ".\\Base\\TimerTask\\DWTimerTask.java",
+    ".\\Base\\TimerTask\\DWTimerTaskDelegate.java",
+    ".\\Base\\DWMultiBroadcastReceiver.java",
+    ".\\Base\\DWMultiBroadcastReceiverDelegate.java",
+    ".\\Base\\DWWakeUp.java",
+    ".\\Base\\DWNotificationPublisher.java",
+    ".\\Base\\Connectivity\\DWNetworkCallback.java",
+    ".\\Base\\Connectivity\\DWNetworkCallbackDelegate.java",
+    ".\\Base\\DWSeekBar.java",
+    ".\\Base\\DWUtility.java"
+  ],
+  "outputFile":"..\\Lib\\dw-kastri-base.jar",
+  "sourceVersion":"1.7",
+  "targetVersion":"1.7"
+}

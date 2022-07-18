@@ -1,0 +1,22 @@
+{
+  "includedJars":[
+    
+  ],
+  "javaFiles":[
+    ".\\Camera\\DWCameraCaptureSessionCaptureCallback.java",
+    ".\\Camera\\DWCameraCaptureSessionCaptureCallbackDelegate.java",
+    ".\\Camera\\DWCameraCaptureSessionStateCallback.java",
+    ".\\Camera\\DWCameraCaptureSessionStateCallbackDelegate.java",
+    ".\\Camera\\DWCameraCharacteristicsHelper.java",
+    ".\\Camera\\DWCameraDeviceStateCallback.java",
+    ".\\Camera\\DWCameraDeviceStateCallbackDelegate.java",
+    ".\\Camera\\DWCameraView.java",
+    ".\\Camera\\DWCaptureRequestBuilderHelper.java",
+    ".\\Camera\\DWCaptureResultHelper.java",
+    ".\\Camera\\DWGLCameraView.java",
+    ".\\Camera\\DWGLDrawer.java"
+  ],
+  "outputFile":"..\\Lib\\dw-camera.jar",
+  "sourceVersion":"1.7",
+  "targetVersion":"1.7"
+}

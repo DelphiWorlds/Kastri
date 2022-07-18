@@ -1,0 +1,18 @@
+{
+  "includedJars":[
+    "..\\Lib\\dw-kastri-base.jar",
+    "..\\ThirdParty\\Firebase\\Android\\firebase-iid-16.2.0.jar",
+    "..\\ThirdParty\\Firebase\\Android\\firebase-messaging-17.1.0.jar",
+    "..\\ThirdParty\\Android\\play-services-base-15.0.1.jar",
+    "..\\ThirdParty\\Android\\play-services-basement-15.0.1.jar",
+    "..\\ThirdParty\\Android\\play-services-tasks-15.0.1.jar",
+    "..\\ThirdParty\\Android\\support-compat-26.1.0.jar",
+    "..\\ThirdParty\\Android\\support-core-utils-26.1.0.jar"
+  ],
+  "javaFiles":[
+    ".\\Firebase\\DWFirebaseMessagingService.java"
+  ],
+  "outputFile":"..\\Lib\\dw-firebase-messaging.jar",
+  "sourceVersion":"1.8",
+  "targetVersion":"1.8"
+}

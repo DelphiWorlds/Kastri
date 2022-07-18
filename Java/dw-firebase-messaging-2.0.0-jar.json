@@ -1,0 +1,15 @@
+{
+  "includedJars":[
+    "$(BDS)\\lib\\android\\debug\\firebase-messaging-22.0.0.jar",
+    "$(BDS)\\lib\\android\\debug\\localbroadcastmanager-1.0.0.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-basement-17.6.0.jar",
+    "..\\Lib\\dw-kastri-base-2.0.0.jar",
+    "..\\ThirdParty\\Firebase\\Android\\firebase-iid-21.1.0.jar"
+  ],
+  "javaFiles":[
+    ".\\Firebase\\DWFirebaseMessagingService.java"
+  ],
+  "outputFile":"..\\Lib\\dw-firebase-messaging-2.0.0.jar",
+  "sourceVersion":"1.8",
+  "targetVersion":"1.8"
+}

@@ -1,0 +1,18 @@
+{
+  "includedJars": [
+    "$(BDS)\\lib\\android\\debug\\android-support-v4.jar",
+    "$(BDS)\\lib\\android\\debug\\com-google-android-gms.play-services-base.16.0.1.jar",
+    "$(BDS)\\lib\\android\\debug\\com-google-android-gms.play-services-basement.16.2.0.jar",
+    "$(BDS)\\lib\\android\\debug\\com-google-android-gms.play-services-tasks.16.0.1.jar",
+    "..\\ThirdParty\\Android\\androidx-annotation-1.1.0.jar",
+    "..\\ThirdParty\\Android\\play-services-location-16.0.0.jar"
+  ],
+  "javaFiles": [
+    ".\\FusedLocation\\DWFusedLocationClient.java",
+    ".\\FusedLocation\\DWFusedLocationClientDelegate.java",
+    ".\\FusedLocation\\DWLocationReceiver.java"
+  ],
+  "outputFile": "..\\Lib\\dw-fusedlocation.jar",
+  "sourceVersion": "1.8",
+  "targetVersion": "1.8"
+}

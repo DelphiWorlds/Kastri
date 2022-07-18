@@ -1,0 +1,13 @@
+{
+  "includedJars":[
+    "..\\ThirdParty\\Android\\com.symbol.emdk.jar"
+  ],
+  "javaFiles":[
+    ".\\EMDK\\DWEMDKListener.java",
+    ".\\EMDK\\DWEMDKListenerDelegate.java",
+    ".\\EMDK\\DWEMDKScanner.java"
+  ],
+  "outputFile":"..\\Lib\\dw-emdk.jar",
+  "sourceVersion":"1.7",
+  "targetVersion":"1.7"
+}
