@@ -32,6 +32,7 @@ type
     class function GetDeviceName: string; static;
     class function GetPackageID: string; static;
     class function GetPackageVersion: string; static;
+    class function GetPackageDisplayVersion: string; static;
     class function GetUniqueDeviceID: string; static;
     class function IsLocationServiceEnabled: Boolean; static;
     class function IsScreenLocked: Boolean; static;
@@ -141,6 +142,11 @@ end;
 class procedure TPlatformOSDevice.SetPreventScreenLock(const AValue: Boolean);
 begin
   TiOSHelper.SharedApplication.setIdleTimerDisabled(AValue);
+end;
+
+class function TPlatformOSDevice.GetPackageDisplayVersion: string;
+begin
+  Result := TMacHelperEx.GetBundleValue('CFBundleShortVersionString');
 end;
 
 class function TPlatformOSDevice.GetPackageID: string;

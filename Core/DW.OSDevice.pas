@@ -83,7 +83,11 @@ type
     /// </summary>
     class function GetPackageID: string; static;
     /// <summary>
-    ///   Returns version for the application package, if any exists
+    ///   Returns the version that the app should display (Can be different from the package version)
+    /// </summary>
+    class function GetPackageDisplayVersion: string; static;
+    /// <summary>
+    ///   Returns the version for the application package, if any exists
     /// </summary>
     class function GetPackageVersion: string; static;
     /// <summary>
@@ -227,6 +231,15 @@ begin
   Result := TPlatformOSDevice.GetPackageBuild;
   {$ELSE}
   Result := '';
+  {$ENDIF}
+end;
+
+class function TOSDevice.GetPackageDisplayVersion: string;
+begin
+  {$IF not Defined(IOS)}
+  Result := TPlatformOSDevice.GetPackageVersion;
+  {$ELSE}
+  Result := TPlatformOSDevice.GetPackageDisplayVersion;
   {$ENDIF}
 end;
 
