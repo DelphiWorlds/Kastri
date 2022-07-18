@@ -163,8 +163,9 @@ public class GeofenceManager implements OnCompleteListener<Void> {
       Log.w(TAG, "onComplete - Error: " + errorMessage);
     else
       errorMessage = "";
-    mDelegate.onGeofenceActionComplete(mPendingGeofenceTask, taskResult, errorMessage);
+    int currentTask = mPendingGeofenceTask;
     mPendingGeofenceTask = PendingGeofenceTask.NONE;
+    mDelegate.onGeofenceActionComplete(currentTask, taskResult, errorMessage);
   }
 
   public boolean getIsMonitoring() {
