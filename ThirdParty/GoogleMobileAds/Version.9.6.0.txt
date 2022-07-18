@@ -1,0 +1,1 @@
+This is a text file to denote that the version of Google Mobile Ads iOS SDK in this folder is 9.6.0
