@@ -121,18 +121,19 @@ end;
 
 procedure TVertScrollBox.VKStateChangeMessageHandler(const Sender: TObject; const M: TMessage);
 begin
-  if FControlsLayout = nil then
-    Exit; // <=======
-  if TVKStateChangeMessage(M).KeyboardVisible then
+  if FControlsLayout <> nil then
   begin
-    if FVKRect <> TVKStateChangeMessage(M).KeyboardBounds then
+    if TVKStateChangeMessage(M).KeyboardVisible then
     begin
-      FVKRect := TVKStateChangeMessage(M).KeyboardBounds;
-      MoveControls;
-    end;
-  end
-  else
-    RestoreControls;
+      if FVKRect <> TVKStateChangeMessage(M).KeyboardBounds then
+      begin
+        FVKRect := TVKStateChangeMessage(M).KeyboardBounds;
+        MoveControls;
+      end;
+    end
+    else
+      RestoreControls;
+  end;
 end;
 
 function TVertScrollBox.HasCaretPosChanged: Boolean;
@@ -258,9 +259,8 @@ end;
 procedure TVertScrollBox.RestoreControls;
 begin
   FVKRect := TRect.Empty;
-  if FControlsLayout = nil then
-    Exit; // <======
-  Restore(False);
+  if FControlsLayout <> nil then
+    Restore(False);
 end;
 
 procedure TVertScrollBox.Restore(const AIgnoreRestoreViewport: Boolean);
