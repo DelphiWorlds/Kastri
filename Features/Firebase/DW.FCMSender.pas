@@ -74,6 +74,7 @@ type
     FClickAction: string;
     FData: string;
     FImageURL: string;
+    FIsDataOnly: Boolean;
     FOptions: TFCMMessageOptions;
     FPriority: TFCMMessagePriority;
     FSoundName: string;
@@ -95,6 +96,7 @@ type
     property ClickAction: string read FClickAction write FClickAction;
     property Data: string read FData write FData;
     property ImageURL: string read FImageURL write FImageURL;
+    property IsDataOnly: Boolean read FIsDataOnly write FIsDataOnly;
     property Options: TFCMMessageOptions read FOptions write FOptions;
     property Priority: TFCMMessagePriority read FPriority write FPriority;
     property SoundName: string read FSoundName write FSoundName;
@@ -418,7 +420,7 @@ end;
 //   See Table 1
 function TFCMMessage.GetAPNSJSONValue: TJSONValue;
 var
-  LAPNS, LPayload, LAPS: TJSONObject;
+  LAPNS, LPayload, LAPS, LAlert: TJSONObject;
   LHasAPS: Boolean;
 begin
   Result := nil;
@@ -435,6 +437,14 @@ begin
       LAPS.AddPair('badge', TJSONNumber.Create(FBadgeCount));
     if TFCMMessageOption.ContentAvailable in FOptions then
       LAPS.AddPair('content-available', TJSONNumber.Create(1));
+    // "Data only" notifications need an APS alert member
+    if FIsDataOnly then
+    begin
+      LAlert := TJSONObject.Create;
+      LAlert.AddPair('title', TJSONString.Create(FTitle));
+      LAlert.AddPair('body', TJSONString.Create(FBody));
+      LAPS.AddPair('alert', LAlert);
+    end;
     // Add this LAST
     if LAPS.Count > 0 then
       LAPS.AddPair('mutable-content', TJSONNumber.Create(1));
@@ -466,6 +476,14 @@ begin
       LData.AddPair('big_text', '1');
     if not FImageURL.IsEmpty and (TFCMMessageOption.BigImage in FOptions) then
       LData.AddPair('big_image', '1');
+    if FIsDataOnly then
+    begin
+      LData.AddPair('title', TJSONString.Create(FTitle));
+      LData.AddPair('body', TJSONString.Create(FBody));
+      // imageUrl is used in FCM handling code in Kastri
+      if not FImageURL.IsEmpty then
+        LData.AddPair('imageUrl', TJSONString.Create(FImageURL));
+    end;
     LHasData := LData.Count > 0;
   finally
     if LHasData then
@@ -488,10 +506,13 @@ begin
       LNotification.AddPair('click_action', FClickAction);
     if not FChannelID.IsEmpty then
       LNotification.AddPair('channel_id', FChannelID);
-    if not FImageURL.IsEmpty then
-      LNotification.AddPair('image', FImageURL);
-    if not FSoundName.IsEmpty then
-      LNotification.AddPair('sound', FSoundName);
+    if not FIsDataOnly then
+    begin
+      if not FImageURL.IsEmpty then
+        LNotification.AddPair('image', FImageURL);
+      if not FSoundName.IsEmpty then
+        LNotification.AddPair('sound', FSoundName);
+    end;
     LHasProps := LNotification.Count > 0;
   finally
     if LHasProps then
@@ -542,13 +563,16 @@ begin
     LData := GetDataJSONValue;
     if LData <> nil then
       LMessage.AddPair('data', LData);
-    LNotification := TJSONObject.Create;
-    LNotification.AddPair('title', FTitle.Substring(0, 100));
-    if not FBody.IsEmpty then
-      LNotification.AddPair('body', TJSONString.Create(FBody));
-    if not FImageURL.IsEmpty then
-      LNotification.AddPair('image', FImageURL);
-    LMessage.AddPair('notification', LNotification);
+    if not FIsDataOnly then
+    begin
+      LNotification := TJSONObject.Create;
+      LNotification.AddPair('title', FTitle.Substring(0, 100));
+      if not FBody.IsEmpty then
+        LNotification.AddPair('body', TJSONString.Create(FBody));
+      if not FImageURL.IsEmpty then
+        LNotification.AddPair('image', FImageURL);
+      LMessage.AddPair('notification', LNotification);
+    end;
     LAndroid := GetAndroidJSONValue;
     if LAndroid <> nil then
       LMessage.AddPair('android', LAndroid);
