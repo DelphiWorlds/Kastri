@@ -4,6 +4,8 @@
 
 Advertising implementation, specifically for AdMob (at present)
 
+**NOTE: The demo has been updated (on July 26th, 2022) to align it with the Firebase iOS SDK v8.15.0**. See the [Libraries > iOS](#ios) section below.
+
 ## Project Configuration
 
 ### Component
@@ -14,11 +16,17 @@ The package can be found [here](https://github.com/DelphiWorlds/Kastri/tree/main
 
 ### Libraries
 
+#### Android
+
 If creating your own project, you will need to add the [`dw-admob.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob.jar) file to the Libraries node under the Android platform in Project Manager
 
 When using Delphi 10.4.x, you will need to add other libraries and disable some default libraries, as per this screenshot:
 
 <img src="./Screenshots/D104ProjectManager.png" alt="PM" height="500">
+
+#### iOS
+
+AdMob support in Kastri has now been aligned with the latest compatible version of the Firebase SDK for iOS, which is version 8.15.0. Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/v8.15.0/Firebase.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called Firebase, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo.
 
 ### Android Entitlements
 
