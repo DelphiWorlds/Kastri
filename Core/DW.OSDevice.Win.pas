@@ -31,6 +31,7 @@ type
     class function GetPackageBuild: string; static;
     class function GetPackageID: string; static;
     class function GetPackageVersion: string; static;
+    class function GetPackageName: string; static;
     class function GetUniqueDeviceID: string; static;
     class function GetUsername: string; static;
     class function IsBeta: Boolean; static;
@@ -111,6 +112,11 @@ end;
 class function TPlatformOSDevice.GetPackageID: string;
 begin
   Result := GetFileVersionInfo.InternalName;
+end;
+
+class function TPlatformOSDevice.GetPackageName: string;
+begin
+  Result := GetFileVersionInfo.ProductName;
 end;
 
 class function TPlatformOSDevice.GetPackageVersion: string;
