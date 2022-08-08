@@ -20,6 +20,7 @@ const
   cPermissionAccessCoarseLocation = 'android.permission.ACCESS_COARSE_LOCATION';
   cPermissionAccessFineLocation = 'android.permission.ACCESS_FINE_LOCATION';
   cPermissionBluetooth = 'android.permission.BLUETOOTH';
+  cPermissionBluetoothAdvertise = 'android.permission.BLUETOOTH_ADVERTISE';
   cPermissionBluetoothConnect = 'android.permission.BLUETOOTH_CONNECT';
   cPermissionBluetoothScan = 'android.permission.BLUETOOTH_SCAN';
   cPermissionCamera = 'android.permission.CAMERA';
@@ -64,6 +65,9 @@ const
   cDWBroadcastReceiverExtraServiceRestart = cDWBroadcastReceiverName + '.EXTRA_SERVICE_RESTART';
   cDWBroadcastReceiverExtraServiceClassName = cDWBroadcastReceiverName + '.EXTRA_SERVICE_CLASS_NAME';
   cDWBroadcastReceiverExtraStartUnlock = cDWBroadcastReceiverName + '.EXTRA_START_UNLOCK';
+
+  cDWBootBroadcastReceiverActionBootStart = 'DWBootBroadcastReceiver.ACTION_BOOT_START';
+  cDWMetadataKeyServiceInterval = 'KEY_SERVICE_INTERVAL';
 
   cDWFusedLocationClientName = 'com.delphiworlds.kastri.DWFusedLocationClient';
   cDWFusedLocationClientKeyServiceClassName = cDWFusedLocationClientName + '.KEY_SERVICE_CLASS_NAME';
