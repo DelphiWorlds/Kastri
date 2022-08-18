@@ -42,7 +42,7 @@ type
   protected
     class function ConnectivityManager: JConnectivityManager; static;
     class function GetConnectedNetworkInfoFromNetwork(const ANetwork: JNetwork; const ASkipValidation: Boolean): JNetworkInfo; static;
-    class function GetConnectedNetworkInfo(const ASkipValidation: Boolean): JNetworkInfo; static;
+    class function GetConnectedNetworkInfo(const ASkipValidation: Boolean; const ANetworkType: Integer = -1): JNetworkInfo; static;
   public
     { JDWNetworkCallbackDelegate }
     procedure onAvailable(network: JNetwork); cdecl;
@@ -165,7 +165,7 @@ begin
 end;
 
 // Based on: https://github.com/jamesmontemagno/ConnectivityPlugin/issues/56
-class function TNetworkCallbackDelegate.GetConnectedNetworkInfo(const ASkipValidation: Boolean): JNetworkInfo;
+class function TNetworkCallbackDelegate.GetConnectedNetworkInfo(const ASkipValidation: Boolean; const ANetworkType: Integer = -1): JNetworkInfo;
 var
   LAllNetworks: TJavaObjectArray<JNetwork>;
   LAllNetworkInfo: TJavaObjectArray<JNetworkInfo>;
@@ -180,7 +180,7 @@ begin
       for I := 0 to LAllNetworks.Length - 1 do
       begin
         LInfo := GetConnectedNetworkInfoFromNetwork(LAllNetworks[I], ASkipValidation);
-        if LInfo <> nil then
+        if (LInfo <> nil) and ((ANetworkType = -1) or (LInfo.getType = ANetworkType)) then
         begin
           Result := LInfo;
           Break;
@@ -197,7 +197,7 @@ begin
       for I := 0 to LAllNetworkInfo.Length - 1 do
       begin
         LInfo := LAllNetworkInfo[I];
-        if (LInfo <> nil) and LInfo.isAvailable and LInfo.isConnected then
+        if (LInfo <> nil) and ((ANetworkType = -1) or (LInfo.getType = ANetworkType)) and LInfo.isAvailable and LInfo.isConnected then
         begin
           Result := LInfo;
           Break;
@@ -282,8 +282,8 @@ class function TPlatformConnectivity.IsWifiInternetConnection: Boolean;
 var
   LInfo: JNetworkInfo;
 begin
-  LInfo := TNetworkCallbackDelegate.GetConnectedNetworkInfo(False);
-  Result := (LInfo <> nil) and (LInfo.getType = TJConnectivityManager.JavaClass.TYPE_WIFI);
+  LInfo := TNetworkCallbackDelegate.GetConnectedNetworkInfo(False, TJConnectivityManager.JavaClass.TYPE_WIFI);
+  Result := LInfo <> nil;
 end;
 
 function TPlatformConnectivity.SkipValidation: Boolean;
