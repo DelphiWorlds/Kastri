@@ -30,13 +30,19 @@ public class DWCameraCharacteristicsHelper {
   public long getSensorExposureTimeLower() {
     Range<Long> range;
     range = mCharacteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
-    return range.getLower();
+		if (range != null)
+      return range.getLower();
+		else
+      return 0;
   }
 
   public long getSensorExposureTimeUpper() {
     Range<Long> range;
     range = mCharacteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
-    return range.getUpper();
+		if (range != null)
+      return range.getUpper();
+		else
+      return 0;
   }
   
   public int getSensorOrientation() {
@@ -46,13 +52,19 @@ public class DWCameraCharacteristicsHelper {
   public int getSensorSensitivityLower() {
     Range<Integer> range;
     range = mCharacteristics.get(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE);
-    return range.getLower();
+		if (range != null)
+      return range.getLower();
+		else
+      return 0;
   }
 
   public int getSensorSensitivityUpper() {
     Range<Integer> range;
     range = mCharacteristics.get(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE);
-    return range.getUpper();
+		if (range != null)
+      return range.getUpper();
+		else
+      return 0;
   }
 
   public int[] getFaceDetectModes() {
