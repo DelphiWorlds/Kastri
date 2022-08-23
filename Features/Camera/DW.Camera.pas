@@ -72,11 +72,13 @@ type
     procedure SetIsActive(const Value: Boolean);
   protected
     FAvailableFaceDetectModes: TFaceDetectModes;
+    FAvailableControlAEModes: TArray<Integer>;
     FIsActive: Boolean;
     FIsCapturing: Boolean;
     FIsFaceDetectActive: Boolean;
     FIsSwapping: Boolean;
     procedure CameraSettingChanged; virtual;
+    function CanControlExposure: Boolean; virtual;
     procedure CaptureImage;
     procedure CloseCamera; virtual;
     procedure ContinuousCaptureChanged; virtual;
@@ -91,6 +93,7 @@ type
     function GetPreviewControl: TControl; virtual;
     function GetResolutionHeight: Integer; virtual;
     function GetResolutionWidth: Integer; virtual;
+    function HasControlAEMode(const AMode: Integer): Boolean;
     procedure InternalSetActive(const AValue: Boolean);
     procedure InternalSetExposure(const AValue: Single);
     procedure OpenCamera; virtual;
@@ -158,6 +161,10 @@ type
     ///   Captures a still image, returned in OnImageCaptured
     /// </summary>
     procedure CaptureImage;
+    /// <summary>
+    ///   Determines whether the camera supports control of exposure
+    /// </summary>
+    function CanControlExposure: Boolean;
     /// <summary>
     ///   Requests camera permissions, returned in OnAuthorizationStatus
     /// </summary>
@@ -338,6 +345,11 @@ begin
   //
 end;
 
+function TCustomPlatformCamera.CanControlExposure: Boolean;
+begin
+  Result := False;
+end;
+
 procedure TCustomPlatformCamera.CaptureImage;
 begin
   DoCaptureImage;
@@ -428,6 +440,21 @@ end;
 function TCustomPlatformCamera.GetResolutionWidth: Integer;
 begin
   Result := 0;
+end;
+
+function TCustomPlatformCamera.HasControlAEMode(const AMode: Integer): Boolean;
+var
+  LMode: Integer;
+begin
+  Result := False;
+  for LMode in FAvailableControlAEModes do
+  begin
+    if LMode = AMode then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
 end;
 
 procedure TCustomPlatformCamera.OpenCamera;
@@ -687,6 +714,11 @@ end;
 procedure TCamera.SetFlashMode(const Value: TFlashMode);
 begin
   FPlatformCamera.FlashMode := Value;
+end;
+
+function TCamera.CanControlExposure: Boolean;
+begin
+  Result := FPlatformCamera.CanControlExposure;
 end;
 
 procedure TCamera.CaptureImage;
