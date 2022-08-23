@@ -81,6 +81,7 @@ type
     FView: JLinearLayout;
     procedure AlignView(const AView: JView; const AWidth, AHeight: Single; const AAlign: TAlignLayout);
     function GetModel: TCustomNativeSliderModel; overload;
+    procedure MMEnabledChanged(var AMessage: TDispatchMessage); message MM_NATIVESLIDER_ENABLED_CHANGED;
     procedure MMGetMaxValue(var AMessage: TDispatchMessageWithValue<Single>); message MM_NATIVESLIDER_GETMAXVALUE;
     procedure MMGetMinValue(var AMessage: TDispatchMessageWithValue<Single>); message MM_NATIVESLIDER_GETMINVALUE;
     procedure MMGetValue(var AMessage: TDispatchMessageWithValue<Single>); message MM_NATIVESLIDER_GETVALUE;
@@ -175,6 +176,11 @@ end;
 procedure TAndroidNativeSlider.ProgressChanged(const AProgress: Integer);
 begin
   Model.ValueChanged(AProgress / FSeekBar.getMax);
+end;
+
+procedure TAndroidNativeSlider.MMEnabledChanged(var AMessage: TDispatchMessage);
+begin
+  FSeekBar.setEnabled(TNativeSlider(Control).Enabled);
 end;
 
 procedure TAndroidNativeSlider.MMGetMaxValue(var AMessage: TDispatchMessageWithValue<Single>);
