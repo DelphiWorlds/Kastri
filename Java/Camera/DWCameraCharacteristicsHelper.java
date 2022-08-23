@@ -71,6 +71,10 @@ public class DWCameraCharacteristicsHelper {
     return mCharacteristics.get(CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES);
   }
 
+  public int[] getControlAEAvailableModes() {
+    return mCharacteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES);
+	}
+
   public StreamConfigurationMap getMap() {
     return mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
   }
