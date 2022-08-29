@@ -65,8 +65,12 @@ type
 implementation
 
 uses
+  // RTL
+  System.SysUtils,
   // Android
-  Androidapi.Helpers;
+  Androidapi.Helpers,
+  // DW
+  DW.OSLog;
 
 { TInitListener }
 
@@ -120,8 +124,21 @@ begin
   Result := FSpeechStarted;
 end;
 
-function TPlatformTextToSpeech.Speak(const AText: String): Boolean;
+function TPlatformTextToSpeech.Speak(const AText: string): Boolean;
+var
+  LLocale: JLocale;
+  LLanguageResult: Integer;
 begin
+  LLocale := nil;
+  if not Language.IsEmpty then
+    LLocale := TJLocale.JavaClass.forLanguageTag(StringToJString(Language));
+  if LLocale = nil then
+    LLocale := TJLocale.JavaClass.getDefault;
+  LLanguageResult := FTextToSpeech.setLanguage(LLocale);
+  if LLanguageResult = TJTextToSpeech.JavaClass.LANG_MISSING_DATA then
+    TOSLog.w('No language data for %s', [Language])
+  else if LLanguageResult = TJTextToSpeech.JavaClass.LANG_MISSING_DATA then
+    TOSLog.w('Language %s in not supported', [Language]);
   Result := FTextToSpeech.speak(StringToJString(AText), TJTextToSpeech.JavaClass.QUEUE_FLUSH, FParams) = TJTextToSpeech.JavaClass.SUCCESS;
   if Result then
     DoSpeechStarted;

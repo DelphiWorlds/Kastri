@@ -103,6 +103,7 @@ type
     FHasStartedSpeaking: Boolean;
     FSpeechSynthesizer: NSSpeechSynthesizer;
     FDelegate: TSpeechSynthesizerDelegate;
+    function GetVoice: NSString;
   protected
     function IsSpeaking: Boolean; override;
     function Speak(const AText: String): Boolean; override;
@@ -117,8 +118,22 @@ type
 implementation
 
 uses
+  DW.OSLog,
+  // RTL
+  System.SysUtils,
   // macOS
   Macapi.Helpers;
+
+const
+  libAppKit = '/System/Library/Frameworks/AppKit.framework/AppKit';
+
+type
+  NSVoiceAttributeKey = NSString;
+
+function NSVoiceLocaleIdentifier: NSVoiceAttributeKey;
+begin
+  Result := CocoaNSStringConst(libAppKit, 'NSVoiceLocaleIdentifier');
+end;
 
 { TSpeechSynthesizerDelegate }
 
@@ -170,6 +185,25 @@ begin
   inherited;
 end;
 
+function TPlatformTextToSpeech.GetVoice: NSString;
+var
+  LVoices: NSArray;
+  I: Integer;
+  LAttributes: NSDictionary;
+  LVoiceName, LLocale: NSString;
+begin
+  Result := nil;
+  LVoices := TNSSpeechSynthesizer.OCClass.availableVoices;
+  for I := 0 to LVoices.count - 1 do
+  begin
+    LVoiceName := TNSString.Wrap(LVoices.objectAtIndex(I));
+    LAttributes := TNSSpeechSynthesizer.OCClass.attributesForVoice(LVoiceName);
+    LLocale := TNSString.Wrap(LAttributes.objectForKey(NSObjectToID(NSVoiceLocaleIdentifier)));
+    if NSStrToStr(LLocale).Equals(Language.Replace('-', '_')) then
+      Result := LVoiceName;
+  end;
+end;
+
 function TPlatformTextToSpeech.IsSpeaking: Boolean;
 begin
   Result := FSpeechSynthesizer.isSpeaking;
@@ -178,6 +212,10 @@ end;
 function TPlatformTextToSpeech.Speak(const AText: String): Boolean;
 begin
   FHasStartedSpeaking := False;
+  if not Language.IsEmpty then
+    FSpeechSynthesizer.setVoice(GetVoice)
+  else
+    FSpeechSynthesizer.setVoice(nil);
   Result := FSpeechSynthesizer.startSpeakingString(StrToNSStr(AText));
 end;
 

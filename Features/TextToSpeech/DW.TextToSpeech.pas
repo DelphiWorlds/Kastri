@@ -11,6 +11,7 @@ type
   TCustomPlatformTextToSpeech = class(TObject)
   private
     FCanSpeak: Boolean;
+    FLanguage: string;
     FTextToSpeech: TTextToSpeech;
   protected
     procedure DoSpeechStarted;
@@ -19,6 +20,7 @@ type
     function Speak(const AText: string): Boolean; virtual;
     procedure Stop; virtual;
     property CanSpeak: Boolean read FCanSpeak write FCanSpeak;
+    property Language: string read FLanguage write FLanguage;
   public
     constructor Create(const ATextToSpeech: TTextToSpeech); virtual;
   end;
@@ -29,6 +31,8 @@ type
     FOnCanSpeakChanged: TNotifyEvent;
     FOnSpeechStarted: TNotifyEvent;
     FOnSpeechFinished: TNotifyEvent;
+    function GetLanguage: string;
+    procedure SetLanguage(const Value: string);
   protected
     procedure DoCanSpeakChanged;
     procedure DoSpeechStarted;
@@ -37,8 +41,9 @@ type
     constructor Create;
     function CanSpeak: Boolean;
     function IsSpeaking: Boolean;
-    function Speak(const AText: String): Boolean;
+    function Speak(const AText: string): Boolean;
     procedure Stop;
+    property Language: string read GetLanguage write SetLanguage;
     property OnSpeechStarted: TNotifyEvent read FOnSpeechStarted write FOnSpeechStarted;
     property OnSpeechFinished: TNotifyEvent read FOnSpeechFinished write FOnSpeechFinished;
   end;
@@ -120,9 +125,19 @@ begin
     FOnSpeechStarted(Self);
 end;
 
+function TTextToSpeech.GetLanguage: string;
+begin
+  Result := FPlatformTextToSpeech.Language;
+end;
+
 function TTextToSpeech.IsSpeaking: Boolean;
 begin
   Result := FPlatformTextToSpeech.IsSpeaking;
+end;
+
+procedure TTextToSpeech.SetLanguage(const Value: string);
+begin
+  FPlatformTextToSpeech.Language := Value;
 end;
 
 function TTextToSpeech.Speak(const AText: String): Boolean;

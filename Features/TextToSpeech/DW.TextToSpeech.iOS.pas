@@ -67,6 +67,8 @@ type
 implementation
 
 uses
+  // RTL
+  System.SysUtils,
   // macOS
   Macapi.Helpers;
 
@@ -147,6 +149,8 @@ begin
   Stop;
   FHasSpeakingStarted := False;
   LUtterance := TAVSpeechUtterance.Wrap(TAVSpeechUtterance.OCClass.speechUtteranceWithString(StrToNSStr(AText)));
+  if not Language.IsEmpty then
+    LUtterance.setVoice(TAVSpeechSynthesisVoice.OCClass.voiceWithLanguage(StrToNSStr(Language)));
   FSpeechSynthesizer.speakUtterance(LUtterance);
   Result := True;
 end;
