@@ -1,5 +1,4 @@
 object ServiceModule: TServiceModule
-  OldCreateOrder = True
   OnDestroy = AndroidServiceDestroy
   OnStartCommand = AndroidServiceStartCommand
   Height = 238

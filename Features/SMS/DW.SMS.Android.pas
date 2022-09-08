@@ -187,11 +187,13 @@ var
   LSentIntent: JPendingIntent;
   LDestination: string;
   LParts, LSentIntents, LDeliveryIntents: JArrayList;
+  LFlags: Integer;
 begin
+  LFlags := TJPendingIntent.JavaClass.FLAG_CANCEL_CURRENT or TJPendingIntent.JavaClass.FLAG_IMMUTABLE;
   for LDestination in ADestinations do
   begin
     LSentIntent := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, GetNextIntentID, GetMessageIntent(LDestination),
-      TJPendingIntent.JavaClass.FLAG_CANCEL_CURRENT);
+      LFlags);
     LParts := FSMSManager.divideMessage(StringToJString(AText));
     LSentIntents := TJArrayList.JavaClass.init(1);
     LSentIntents.add(LSentIntent);
