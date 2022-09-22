@@ -4,7 +4,9 @@
 
 This demonstrates the use of the [Google MLVision API to scan barcodes](https://developers.google.com/ml-kit/vision/barcode-scanning/android). It has been tested using Delphi 10.4.2, however it may work on earlier versions.
 
-The demo uses a TakePhotoFromCameraAction to capture the image - the code the processes the image to detect barcodes could possibly use images captured "on-the-fly" through video capture.
+~~The demo uses a TakePhotoFromCameraAction to capture the image - the code the processes the image to detect barcodes could possibly use images captured "on-the-fly" through video capture.~~
+
+**UPDATE: Due to improvements in TCameraComponent for Android, the demo now uses that for "on-the-fly" detection**
 
 ## Android 
 
