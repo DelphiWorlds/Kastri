@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 501
-  ClientWidth = 356
+  ClientHeight = 746
+  ClientWidth = 548
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -17,74 +17,96 @@ object Form1: TForm1
     Margins.Top = 4.000000000000000000
     Margins.Right = 4.000000000000000000
     Margins.Bottom = 4.000000000000000000
-    Size.Width = 348.000000000000000000
-    Size.Height = 493.000000000000000000
+    Size.Width = 540.000000000000000000
+    Size.Height = 589.000000000000000000
     Size.PlatformDefault = False
-  end
-  object TabControl: TTabControl
-    Align = Contents
-    Size.Width = 356.000000000000000000
-    Size.Height = 501.000000000000000000
-    Size.PlatformDefault = False
-    TabIndex = 0
-    TabOrder = 1
-    TabPosition = None
-    Sizes = (
-      356s
-      501s)
-    object ImageTab: TTabItem
-      CustomIcon = <
-        item
-        end>
-      IsSelected = True
-      Size.Width = 8.000000000000000000
-      Size.Height = 8.000000000000000000
+    object BracketsLayout: TLayout
+      Align = Center
+      Size.Width = 250.000000000000000000
+      Size.Height = 175.000000000000000000
       Size.PlatformDefault = False
-      StyleLookup = ''
       TabOrder = 0
-      Text = 'ImageTab'
-      ExplicitSize.cx = 8.000000000000000000
-      ExplicitSize.cy = 8.000000000000000000
-      object Memo: TMemo
-        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
-        DataDetectorTypes = []
-        Align = Bottom
-        Margins.Left = 4.000000000000000000
-        Margins.Right = 4.000000000000000000
-        Margins.Bottom = 4.000000000000000000
-        Position.X = 4.000000000000000000
-        Position.Y = 401.000000000000000000
-        Size.Width = 348.000000000000000000
-        Size.Height = 96.000000000000000000
+      object BracketLeftRectangle: TRectangle
+        Fill.Kind = None
+        Sides = [Top, Left]
+        Size.Width = 24.000000000000000000
+        Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 1
-        Viewport.Width = 344.000000000000000000
-        Viewport.Height = 92.000000000000000000
+        Stroke.Color = claChartreuse
+        Stroke.Thickness = 3.000000000000000000
       end
-      object BottomLayout: TLayout
-        Align = Top
-        Size.Width = 356.000000000000000000
-        Size.Height = 49.000000000000000000
+      object BracketBottomLeftRectangle: TRectangle
+        Anchors = [akLeft, akBottom]
+        Fill.Kind = None
+        Position.Y = 150.000000000000000000
+        Sides = [Left, Bottom]
+        Size.Width = 24.000000000000000000
+        Size.Height = 24.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 0
-        object ScanButton: TButton
-          Align = Center
-          Size.Width = 101.000000000000000000
-          Size.Height = 36.000000000000000000
-          Size.PlatformDefault = False
-          TabOrder = 0
-          Text = 'Take Photo'
-          OnClick = ScanButtonClick
-        end
+        Stroke.Color = claChartreuse
+        Stroke.Thickness = 3.000000000000000000
+      end
+      object BracketTopRightRectangle: TRectangle
+        Anchors = [akTop, akRight]
+        Fill.Kind = None
+        Position.X = 227.000000000000000000
+        Sides = [Top, Right]
+        Size.Width = 24.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = claChartreuse
+        Stroke.Thickness = 3.000000000000000000
+      end
+      object BracketBottomRightRectangle: TRectangle
+        Anchors = [akRight, akBottom]
+        Fill.Kind = None
+        Position.X = 227.000000000000000000
+        Position.Y = 151.000000000000000000
+        Sides = [Bottom, Right]
+        Size.Width = 24.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = claChartreuse
+        Stroke.Thickness = 3.000000000000000000
       end
     end
   end
-  object ActionList: TActionList
-    Left = 120
-    Top = 180
-    object TakePhotoFromCameraAction: TTakePhotoFromCameraAction
-      Category = 'Media Library'
-      OnDidFinishTaking = TakePhotoFromCameraActionDidFinishTaking
+  object ButtonLayout: TLayout
+    Align = Bottom
+    Position.Y = 697.000000000000000000
+    Size.Width = 548.000000000000000000
+    Size.Height = 49.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object ScanButton: TButton
+      Align = Center
+      Size.Width = 101.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Scan'
+      OnClick = ScanButtonClick
     end
+  end
+  object Memo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Bottom
+    Margins.Left = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Position.X = 4.000000000000000000
+    Position.Y = 597.000000000000000000
+    Size.Width = 540.000000000000000000
+    Size.Height = 96.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Viewport.Width = 536.000000000000000000
+    Viewport.Height = 92.000000000000000000
+  end
+  object Camera: TCameraComponent
+    OnSampleBufferReady = CameraSampleBufferReady
+    Left = 120
+    Top = 104
   end
 end
