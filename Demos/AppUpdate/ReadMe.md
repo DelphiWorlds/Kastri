@@ -26,6 +26,8 @@ Please refer to the Build Events section of the Project Options. There are two c
 * Merge `AndroidManifest.template.xml` using the `manifestmerge` tool in the Tools folder of Kastri
 * If Delphi generates a `styles.xml` file (as it does when you enable the splash screen), the file `Resources\styles.merge.xml` is merged (using `resmerge` in the Tools folder) with the Delphi generated file into the `Resources\Overrides\res\values` folder. This file is included in the Deployment (see Deployment section below)
 
+**You may need to modify these commands to suit your environment**.
+
 ### Deployment
 
 As per the Build Events section above, the merged `styles.xml` is added to the deployment. As this file is an "override", the Delphi generated styles.xml deployment **needs to be disabled** (if one exists): 
