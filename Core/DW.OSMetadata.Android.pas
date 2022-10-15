@@ -26,7 +26,8 @@ type
     class function GetMetadata: JBundle; static;
   public
     class function ContainsKey(const AKey: string): Boolean; static;
-    class function GetValue(const AKey: string; var AValue: string): Boolean; static;
+    class function GetValue(const AKey: string; var AValue: string): Boolean; overload; static;
+    class function GetValue(const AKey: string; var AValue: Int64): Boolean; overload; static;
   end;
 
 implementation
@@ -59,6 +60,13 @@ begin
   Result := ContainsKey(AKey);
   if Result then
     AValue := JStringToString(GetMetadata.getString(StringToJString(AKey)));
+end;
+
+class function TPlatformOSMetadata.GetValue(const AKey: string; var AValue: Int64): Boolean;
+begin
+  Result := ContainsKey(AKey);
+  if Result then
+    AValue := GetMetadata.getLong(StringToJString(AKey));
 end;
 
 end.
