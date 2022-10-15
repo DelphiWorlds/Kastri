@@ -70,7 +70,6 @@ type
 implementation
 
 uses
-  DW.OSLog,
   // Android
   Androidapi.Helpers,
   // DW
@@ -100,33 +99,17 @@ begin
   FIntentFilter := TJIntentFilter.JavaClass.init;
   ConfigureActions;
   if not FLocal then
-  begin
-    if System.DelphiActivity = nil then
-      TOSLog.d('TAndroidHelper.Context.registerReceiver(FReceiver)');
-    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter);
-  end
+    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter)
   else
-  begin
-    if System.DelphiActivity = nil then
-      TOSLog.d('TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FReceiver)');
     TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FReceiver, FIntentFilter);
-  end;
 end;
 
 destructor TMultiReceiver.Destroy;
 begin
   if not FLocal then
-  begin
-    if System.DelphiActivity = nil then
-      TOSLog.d('TAndroidHelper.Context.unregisterReceiver(FReceiver)');
-    TAndroidHelper.Context.unregisterReceiver(FReceiver);
-  end
+    TAndroidHelper.Context.unregisterReceiver(FReceiver)
   else
-  begin
-    if System.DelphiActivity = nil then
-      TOSLog.d('TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).unregisterReceiver(FReceiver)');
     TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).unregisterReceiver(FReceiver);
-  end;
 end;
 
 function TMultiReceiver.GetResultCode: Integer;
