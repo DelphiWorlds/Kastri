@@ -7,7 +7,7 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Effects,
   FMX.Objects, FMX.Layouts, FMX.Memo.Types, FMX.ScrollBox, FMX.Memo,
   FMX.Controls.Presentation, DW.NativeImage, DW.BarcodeReader, DW.Camera,
-  System.Permissions, DW.Permissions.Helpers, DW.Types;
+  System.Permissions, DW.Permissions.Helpers, DW.Types, DW.NativeSlider;
 
 type
   TfrmMain = class(TForm)
@@ -19,12 +19,14 @@ type
     txtScans: TMemo;
     loCamera: TLayout;
     tmrCapture: TTimer;
+    ExposureSlider: TNativeSlider;
     procedure txtSwapClick(Sender: TObject);
     procedure txtFlashClick(Sender: TObject);
     procedure txtScansClick(Sender: TObject);
     procedure tmrCaptureTimer(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ExposureSliderValueChange(Sender: TObject);
   private
     FCamera : TCamera;
     FIsScanning: Boolean;
@@ -79,22 +81,38 @@ begin
       try
         if (bmp.Width = 0) or (bmp.Height = 0) then
           exit;
-        var bc := TBarcodeReader.Create;
-        try
-          bc.Formats := [TBarcodeFormat.All];
-          bc.OnBarcode := ReaderBarcodeHandler;
-          bc.Scan(bmp);
-        finally
-          bc.Free;
-        end;
+        TThread.CreateAnonymousThread(
+          procedure
+          begin
+            try
+              var bc := TBarcodeReader.Create;
+              try
+                bc.Formats := [TBarcodeFormat.All];
+                bc.OnBarcode := ReaderBarcodeHandler;
+                bc.Scan(bmp);
+              finally
+                bmp.Free;
+                bc.Free;
+              end;
+            except
+              on e: exception do
+                TThread.Synchronize(TThread.Current,
+                  procedure
+                  begin
+                    ShowMessage('Scan Thread Error: '+e.Message);
+                  end
+                );
+            end;
+          end
+        ).Start;
       finally
-        tmrCapture.Enabled := True;
+        //
       end;
     except
       on e: exception do
         ShowMessage(e.Message);
     end;
-  finally
+  except
     bmp.Free;
   end;
 end;
@@ -123,6 +141,11 @@ begin
   inherited;
 end;
 
+procedure TfrmMain.ExposureSliderValueChange(Sender: TObject);
+begin
+  FCamera.Exposure := ExposureSlider.Value;
+end;
+
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   StopCamera;
@@ -136,13 +159,19 @@ end;
 procedure TfrmMain.ReaderBarcodeHandler(Sender: TObject;
   const ABarcodes: TBarcodes; const AError: string);
 begin
-  if Length(ABarcodes) > 0 then
-  begin
-    var
-      LBarcode: TBarcode;
-      for LBarcode in ABarcodes do
-        txtScans.Lines.Insert(0,Format('%s - (%s)', [LBarcode.Value, LBarcode.FormatDescription]));
-  end;
+  TThread.Synchronize(TThread.Current,
+    procedure
+    begin
+      if Length(ABarcodes) > 0 then
+      begin
+        var
+          LBarcode: TBarcode;
+          for LBarcode in ABarcodes do
+            txtScans.Lines.Insert(0,Format('%s - (%s)', [LBarcode.Value, LBarcode.FormatDescription]));
+      end;
+      tmrCapture.Enabled := True;
+    end
+  );
 end;
 
 procedure TfrmMain.StartCamera;
@@ -153,6 +182,7 @@ begin
   FCamera.IsActive := True;
   FIsScanning := True;
   tmrCapture.Enabled := True;
+  ExposureSlider.Value := FCamera.Exposure;
 end;
 
 procedure TfrmMain.StopCamera;
@@ -192,6 +222,7 @@ var
 begin
   if TPlatformServices.Current.SupportsPlatformService(IFMXExtendedClipboardService, clip) then
     clip.SetText(txtScans.Text);
+  txtScans.Lines.Clear;
 
 end;
 
