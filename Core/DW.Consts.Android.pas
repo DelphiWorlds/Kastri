@@ -77,6 +77,7 @@ const
   cDWFusedLocationClientExtraAlarmTimestamp = cDWFusedLocationClientName + '.EXTRA_ALARM_TIMESTAMP';
 
   cServiceCommandAction = 'com.delphiworlds.action.SERVICE_COMMAND';
+  cServiceCommandJSONAction = 'com.delphiworlds.action.SERVICE_COMMAND_JSON';
   cServiceMessageAction = 'com.delphiworlds.action.SERVICE_MESSAGE';
   cServiceStateAction = 'com.delphiworlds.action.SERVICE_STATE';
   cServiceBroadcastParamCommand = 'COMMAND';
@@ -87,6 +88,9 @@ const
   cServiceCommandAppWillTerminate = 3;
   cServiceCommandAppIsRequestingPermissions = 4;
   cServiceCommandAppCheckState = 5;
+  cServiceStateUnknown = 0;
+  cServiceStateStarted = 1;
+  cServiceStateStopped = 2;
 
   cEMBTJavaServicePrefix = 'com.embarcadero.services.';
 

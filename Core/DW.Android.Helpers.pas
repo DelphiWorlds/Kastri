@@ -515,18 +515,23 @@ end;
 
 class function TAndroidHelperEx.GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo;
 var
-  LService: JObject;
+  LObject: JObject;
   LRunningServices: JList;
   LServiceInfo: JActivityManager_RunningServiceInfo;
   I: Integer;
+  LServiceName: string;
 begin
   Result := nil;
-  LService := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.ACTIVITY_SERVICE);
-  LRunningServices := TJActivityManager.Wrap(TAndroidHelper.JObjectToID(LService)).getRunningServices(MaxInt);
+  if AServiceName.StartsWith(cEMBTJavaServicePrefix) then
+    LServiceName := AServiceName
+  else
+    LServiceName := cEMBTJavaServicePrefix + AServiceName;
+  LObject := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.ACTIVITY_SERVICE);
+  LRunningServices := TJActivityManager.Wrap(TAndroidHelper.JObjectToID(LObject)).getRunningServices(MaxInt);
   for I := 0 to LRunningServices.size - 1 do
   begin
     LServiceInfo := TJActivityManager_RunningServiceInfo.Wrap(TAndroidHelper.JObjectToID(LRunningServices.get(I)));
-    if AServiceName.Equals(JStringToString(LServiceInfo.service.getClassName)) then
+    if LServiceName.Equals(JStringToString(LServiceInfo.service.getClassName)) then
       Exit(LServiceInfo);
   end;
 end;
