@@ -1,0 +1,92 @@
+object frmMain: TfrmMain
+  Left = 0
+  Top = 0
+  Caption = 'Form2'
+  ClientHeight = 664
+  ClientWidth = 392
+  Fill.Kind = Solid
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnClose = FormClose
+  OnShow = FormShow
+  DesignerMasterStyle = 0
+  object BottomLayout: TLayout
+    Align = Bottom
+    Padding.Left = 4.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 4.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Position.Y = 592.000000000000000000
+    Size.Width = 392.000000000000000000
+    Size.Height = 72.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object txtFlash: TText
+      Align = Left
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 64.000000000000000000
+      Size.PlatformDefault = False
+      Text = #55357#56614
+      TextSettings.Font.Size = 40.000000000000000000
+      OnClick = txtFlashClick
+      object ShadowEffect1: TShadowEffect
+        Distance = 3.000000000000000000
+        Direction = 45.000000000000000000
+        Softness = 0.200000002980232200
+        Opacity = 0.600000023841857900
+        ShadowColor = claBlack
+      end
+    end
+    object txtSwap: TText
+      Align = Right
+      Position.X = 338.000000000000000000
+      Position.Y = 4.000000000000000000
+      RotationAngle = 75.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 64.000000000000000000
+      Size.PlatformDefault = False
+      Text = #8635
+      TextSettings.Font.Size = 60.000000000000000000
+      OnClick = txtSwapClick
+      object ShadowEffect2: TShadowEffect
+        Distance = 3.000000000000000000
+        Direction = 45.000000000000000000
+        Softness = 0.200000002980232200
+        Opacity = 0.600000023841857900
+        ShadowColor = claBlack
+      end
+    end
+    object txtScans: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      ReadOnly = True
+      Align = Client
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Size.Width = 268.000000000000000000
+      Size.Height = 64.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      OnClick = txtScansClick
+      Viewport.Width = 264.000000000000000000
+      Viewport.Height = 60.000000000000000000
+    end
+  end
+  object loCamera: TLayout
+    Align = Client
+    Size.Width = 392.000000000000000000
+    Size.Height = 592.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+  end
+  object tmrCapture: TTimer
+    Enabled = False
+    Interval = 200
+    OnTimer = tmrCaptureTimer
+    Left = 184
+    Top = 320
+  end
+end
