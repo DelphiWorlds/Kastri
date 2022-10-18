@@ -182,6 +182,8 @@ begin
   FCamera.IsActive := True;
   FIsScanning := True;
   tmrCapture.Enabled := True;
+  FCamera.Exposure := 0.75;
+
   ExposureSlider.Value := FCamera.Exposure;
 end;
 
