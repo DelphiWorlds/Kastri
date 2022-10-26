@@ -89,11 +89,6 @@ uses
   // DW
   DW.Androidapi.JNI.DWBiometricFragmentActivity;
 
-const
-  cAUTHENTICATION_RESULT_SUCCESS = 0;
-  cAUTHENTICATION_RESULT_ERROR = 1;
-  cAUTHENTICATION_RESULT_FAILED = 2;
-
 { TVerifyResult }
 
 constructor TVerifyResult.Create(const AIsSuccess: Boolean; const AMessage: string = '';
@@ -294,7 +289,7 @@ begin
   if AIntent.hasExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT) then
   begin
     LAuthRes := AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT, 2);
-    if LAuthRes = cAUTHENTICATION_RESULT_SUCCESS then
+    if LAuthRes = TJDWBiometricFragmentActivity.JavaClass.AUTHENTICATION_RESULT_SUCCESS then
     begin
       FVerifyResult := TVerifyResult.Create(True);
       if not FIsBackground then
@@ -302,7 +297,7 @@ begin
     end
     // Called when a biometric (e.g. fingerprint, face, etc.) is presented but not recognized as belonging to the user.
     // No error code or message will be returned but the UI will display the failure reason anyway.
-    else if LAuthRes = cAUTHENTICATION_RESULT_ERROR then
+    else if LAuthRes = TJDWBiometricFragmentActivity.JavaClass.AUTHENTICATION_RESULT_ERROR then
     begin
       // See https://developer.android.com/reference/androidx/biometric/BiometricPrompt for error codes
       LErrorCode := AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_CODE, 0);
@@ -322,7 +317,7 @@ begin
     // Failed will happen if auth is working but the user couldn't be autheticated.
     // E.g. couldn't match the finger or face. The UI will tell the user what's wrong
     // so the error message and code will always be empty.
-    else if LAuthRes = cAUTHENTICATION_RESULT_FAILED then
+    else if LAuthRes = TJDWBiometricFragmentActivity.JavaClass.AUTHENTICATION_RESULT_FAILED then
     begin
       Inc(FAttemptCount);
       if (AllowedAttempts > 0) and (FAttemptCount = AllowedAttempts) then
