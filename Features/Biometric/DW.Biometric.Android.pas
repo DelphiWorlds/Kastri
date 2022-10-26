@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.SysUtils,
+  System.SysUtils, System.Messaging,
   // Android
   Androidapi.JNI.JavaTypes, Androidapi.JNIBridge, Androidapi.Jni.GraphicsContentViewText,
   // DW
@@ -36,15 +36,29 @@ type
     constructor Create(const APlatformBiometric: TPlatformBiometric);
   end;
 
+  TVerifyResult = record
+    FailResult: TBiometricFailResult;
+    IsPending: Boolean;
+    IsSuccess: Boolean;
+    Message: string;
+    constructor Create(const AIsSuccess: Boolean; const AMessage: string = ''; const AFailResult: TBiometricFailResult= TBiometricFailResult.Unknown);
+  end;
+
   TPlatformBiometric = class(TCustomPlatformBiometric)
   private
     FActivityReceiver: TBiometricFragmentActivityReceiver;
+    FAttemptCount: Integer;
     FBiometricManager: JBiometricManager;
-    FVerifySuccessResultMethod: TProc;
+    FIsBackground: Boolean;
     FVerifyFailResultMethod: TBiometricFailResultMethod;
+    FVerifyResult: TVerifyResult;
+    FVerifySuccessResultMethod: TProc;
+    procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     function CanAllowDeviceCredential: Boolean;
     function GetPromptInfoIntent: JIntent;
     procedure InitializeStrengths;
+    procedure VerifyFailed;
+    procedure VerifySuccessful;
   protected
     function  GetBiometricCapability: TBiometricCapabilityResult; override;
     procedure HandleAuthenticationResult(const AIntent: JIntent);
@@ -66,8 +80,12 @@ type
 implementation
 
 uses
+  // RTL
+  System.Classes,
   // Android
   Androidapi.Helpers, Androidapi.JNI.Os,
+  // FMX
+  FMX.Platform,
   // DW
   DW.Androidapi.JNI.DWBiometricFragmentActivity;
 
@@ -75,6 +93,17 @@ const
   cAUTHENTICATION_RESULT_SUCCESS = 0;
   cAUTHENTICATION_RESULT_ERROR = 1;
   cAUTHENTICATION_RESULT_FAILED = 2;
+
+{ TVerifyResult }
+
+constructor TVerifyResult.Create(const AIsSuccess: Boolean; const AMessage: string = '';
+  const AFailResult: TBiometricFailResult= TBiometricFailResult.Unknown);
+begin
+  IsPending := True;
+  IsSuccess := AIsSuccess;
+  Message := AMessage;
+  FailResult := AFailResult;
+end;
 
 { TBiometricFragmentActivityReceiver }
 
@@ -100,6 +129,7 @@ end;
 constructor TPlatformBiometric.Create(const ABiometric: TBiometric);
 begin
   inherited;
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   InitializeStrengths;
   FBiometricManager := TJBiometricManager.JavaClass.from(TAndroidHelper.Context);
   FActivityReceiver := TBiometricFragmentActivityReceiver.Create(Self);
@@ -107,18 +137,19 @@ end;
 
 destructor TPlatformBiometric.Destroy;
 begin
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
   FActivityReceiver.Free;
   inherited;
 end;
 
 procedure TPlatformBiometric.Cancel;
 begin
-  //
+  TJDWBiometricFragmentActivity.JavaClass.stop;
 end;
 
 function TPlatformBiometric.CanVerify: Boolean;
 begin
-  Result:=(GetBiometricCapability = TBiometricCapabilityResult.Available);
+  Result:= GetBiometricCapability = TBiometricCapabilityResult.Available;
 end;
 
 function TPlatformBiometric.CanAllowDeviceCredential: Boolean;
@@ -246,6 +277,7 @@ end;
 procedure TPlatformBiometric.Verify(const AMessage: string; const ASuccessResultMethod: TProc;
   const AFailResultMethod: TBiometricFailResultMethod);
 begin
+  FAttemptCount := 0;
   FVerifySuccessResultMethod := ASuccessResultMethod;
   FVerifyFailResultMethod := AFailResultMethod;
   PromptDescription := AMessage;
@@ -257,14 +289,16 @@ procedure TPlatformBiometric.HandleAuthenticationResult(const AIntent: JIntent);
 var
   LAuthRes, LErrorCode: Integer;
   LErrorMsg: String;
+  LFailResult: TBiometricFailResult;
 begin
   if AIntent.hasExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT) then
   begin
     LAuthRes := AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_RESULT, 2);
     if LAuthRes = cAUTHENTICATION_RESULT_SUCCESS then
     begin
-      if Assigned(FVerifySuccessResultMethod) then
-        FVerifySuccessResultMethod;
+      FVerifyResult := TVerifyResult.Create(True);
+      if not FIsBackground then
+        VerifySuccessful;
     end
     // Called when a biometric (e.g. fingerprint, face, etc.) is presented but not recognized as belonging to the user.
     // No error code or message will be returned but the UI will display the failure reason anyway.
@@ -273,19 +307,63 @@ begin
       // See https://developer.android.com/reference/androidx/biometric/BiometricPrompt for error codes
       LErrorCode := AIntent.getIntExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_CODE, 0);
       LErrorMsg := JStringToString(AIntent.getStringExtra(TJDWBiometricFragmentActivity.JavaClass.EXTRA_AUTHENTICATION_ERROR_MESSAGE));
-
-      if Assigned(FVerifyFailResultMethod) then
-        FVerifyFailResultMethod(TBiometricFailResult.Error, Format('Code: %d, Message: %s', [LErrorCode, LErrorMsg]));
+      if (LErrorCode = TJBiometricPrompt.JavaClass.ERROR_USER_CANCELED) or (LErrorCode = TJBiometricPrompt.JavaClass.ERROR_NEGATIVE_BUTTON) then
+        LFailResult := TBiometricFailResult.Cancelled
+      else if LErrorCode = TJBiometricPrompt.JavaClass.ERROR_LOCKOUT then
+        LFailResult := TBiometricFailResult.LockedOut
+      else if LErrorCode = TJBiometricPrompt.JavaClass.ERROR_LOCKOUT_PERMANENT then
+        LFailResult := TBiometricFailResult.LockedOutPermanently
+      else
+        LFailResult := TBiometricFailResult.Error;
+      FVerifyResult := TVerifyResult.Create(False, Format('Code: %d, Message: %s', [LErrorCode, LErrorMsg]), LFailResult);
+      if not FIsBackground then
+        VerifyFailed;
     end
     // Failed will happen if auth is working but the user couldn't be autheticated.
     // E.g. couldn't match the finger or face. The UI will tell the user what's wrong
     // so the error message and code will always be empty.
     else if LAuthRes = cAUTHENTICATION_RESULT_FAILED then
     begin
-      if Assigned(FVerifyFailResultMethod) then
-        FVerifyFailResultMethod(TBiometricFailResult.Denied, '');
+      Inc(FAttemptCount);
+      if (AllowedAttempts > 0) and (FAttemptCount = AllowedAttempts) then
+        TJDWBiometricFragmentActivity.JavaClass.cancel;
+      FVerifyResult := TVerifyResult.Create(False, '', TBiometricFailResult.Denied);
+      if not FIsBackground then
+        VerifyFailed;
     end;
   end;
+end;
+
+procedure TPlatformBiometric.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
+begin
+  case TApplicationEventMessage(M).Value.Event of
+    TApplicationEvent.EnteredBackground:
+      FIsBackground := True;
+    TApplicationEvent.BecameActive:
+    begin
+      FIsBackground := False;
+      if FVerifyResult.IsPending then
+      begin
+        FVerifyResult.IsPending := False;
+        if FVerifyResult.IsSuccess then
+          VerifySuccessful
+        else
+          VerifyFailed;
+      end;
+    end;
+  end;
+end;
+
+procedure TPlatformBiometric.VerifyFailed;
+begin
+  if Assigned(FVerifyFailResultMethod) then
+    FVerifyFailResultMethod(FVerifyResult.FailResult, FVerifyResult.Message);
+end;
+
+procedure TPlatformBiometric.VerifySuccessful;
+begin
+  if Assigned(FVerifySuccessResultMethod) then
+    FVerifySuccessResultMethod;
 end;
 
 function TPlatformBiometric.HasUserInterface: Boolean;
