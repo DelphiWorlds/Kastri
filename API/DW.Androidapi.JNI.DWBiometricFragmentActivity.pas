@@ -40,7 +40,9 @@ type
     {class} function _GetEXTRA_PROMPT_SUBTITLE: JString; cdecl;
     {class} function _GetEXTRA_PROMPT_TITLE: JString; cdecl;
     {class} function _GetEXTRA_PROMPT_CONFIRMATION_REQUIRED: JString; cdecl;
+    {class} procedure cancel; cdecl;
     {class} procedure start(context: JContext; intent: JIntent); cdecl;
+    {class} procedure stop; cdecl;
     {class} property ACTION_AUTHENTICATION: JString read _GetACTION_AUTHENTICATION;
     {class} property AUTHENTICATION_RESULT_ERROR: JString read _GetAUTHENTICATION_RESULT_ERROR;
     {class} property AUTHENTICATION_RESULT_FAILED: JString read _GetAUTHENTICATION_RESULT_FAILED;
