@@ -135,6 +135,7 @@ constructor TPlatformFilesSelector.Create(const ASelector: TFilesSelector);
 begin
   inherited;
   FPicker := TUIDocumentPickerDelegate.Create(Self);
+  FileKindsChanged;
 end;
 
 destructor TPlatformFilesSelector.Destroy;
@@ -155,7 +156,7 @@ begin
   FUTIs := [];
   for LFileKind := Low(TFileKind) to High(TFileKind) do
   begin
-    if LFileKind in FileKinds then
+    if (LFileKind in FileKinds) or (FileKinds = []) then
       FUTIs := FUTIs + [GetUTI(LFileKind)];
   end;
 end;
@@ -182,6 +183,8 @@ begin
       Result := 'public.content';
     TFileKind.SourceCode:
       Result := 'public.source-code';
+    TFileKind.PDF:
+      Result := 'com.adobe.pdf';
   else
     Result := 'public.item';
   end;
