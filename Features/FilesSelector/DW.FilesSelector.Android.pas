@@ -84,6 +84,8 @@ begin
       Result := 'video/*';
     TFileKind.Text, TFileKind.Content, TFileKind.SourceCode:
       Result := 'text/*';
+    TFileKind.PDF:
+      Result := 'application/pdf';
   else
     Result := '';
   end;
@@ -199,7 +201,7 @@ begin
   FMimeTypes := [];
   for LFileKind := Low(TFileKind) to High(TFileKind) do
   begin
-    if LFileKind in FileKinds then
+    if (LFileKind in FileKinds) or (FileKinds = []) then
       FMimeTypes := FMimeTypes + [GetMimeType(LFileKind)];
   end;
   UpdateIntentMimeTypes;
