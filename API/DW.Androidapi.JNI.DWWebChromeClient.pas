@@ -44,6 +44,7 @@ type
   JDWWebChromeClientDelegate = interface(IJavaInstance)
     ['{C2A5E444-EAA4-4447-919D-F06B6A38C102}']
     function onFileChooserIntent(intent: JIntent): Boolean; cdecl;
+    function onShouldOverrideUrlLoading(url: JString): Boolean; cdecl;
   end;
   TJDWWebChromeClientDelegate = class(TJavaGenericImport<JDWWebChromeClientDelegateClass, JDWWebChromeClientDelegate>) end;
 
