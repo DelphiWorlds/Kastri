@@ -2,6 +2,8 @@
 
 This demo shows how to use the Text To Speech feature to convert text into speech
 
+Use the CheckData method (Android ONLY) to invoke Android's activities for checking/installing TTS data
+
 ### Supported Delphi versions
 
 The demo should compile and work for at least versions 10.4.x and 11.x
