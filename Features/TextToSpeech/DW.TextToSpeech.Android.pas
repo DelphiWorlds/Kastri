@@ -6,7 +6,7 @@ unit DW.TextToSpeech.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2022 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -16,9 +16,11 @@ unit DW.TextToSpeech.Android;
 interface
 
 uses
+  // RTL
+  System.Messaging,
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes,
-  {$IF RTLVersion >= 31} Androidapi.JNI.Speech,{$ELSE} Androidapi.JNI.GraphicsContentViewText, {$ENDIF}
+  Androidapi.JNI.Speech, Androidapi.JNI.GraphicsContentViewText,
   // DW
   DW.TextToSpeech;
 
@@ -52,7 +54,10 @@ type
     FParams: JHashMap;
     FSpeechStarted: Boolean;
     FUtteranceCompletedListener: JTextToSpeech_OnUtteranceCompletedListener;
+    function InstallData: Boolean;
+    procedure MessageResultNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
   protected
+    function CheckData: Boolean; override;
     procedure Init(const AStatus: Integer);
     function IsSpeaking: Boolean; override;
     function Speak(const AText: String): Boolean; override;
@@ -60,6 +65,7 @@ type
     procedure UtteranceCompleted(const AUtteranceId: JString);
   public
     constructor Create(const ATextToSpeech: TTextToSpeech); override;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -68,9 +74,12 @@ uses
   // RTL
   System.SysUtils,
   // Android
-  Androidapi.Helpers,
+  Androidapi.Helpers, Androidapi.JNI.App,
   // DW
   DW.OSLog;
+
+const
+  cCheckTTSDataRequestCode = 2222;
 
 { TInitListener }
 
@@ -103,9 +112,16 @@ end;
 constructor TPlatformTextToSpeech.Create(const ATextToSpeech: TTextToSpeech);
 begin
   inherited;
+  TMessageManager.DefaultManager.SubscribeToMessage(TMessageResultNotification, MessageResultNotificationMessageHandler);
   FUtteranceCompletedListener := TUtteranceCompletedListener.Create(Self);
   FInitListener := TInitListener.Create(Self);
   FTextToSpeech := TJTextToSpeech.JavaClass.init(TAndroidHelper.Context, FInitListener);
+end;
+
+destructor TPlatformTextToSpeech.Destroy;
+begin
+  TMessageManager.DefaultManager.Unsubscribe(TMessageResultNotification, MessageResultNotificationMessageHandler);
+  inherited;
 end;
 
 procedure TPlatformTextToSpeech.Init(const AStatus: Integer);
@@ -116,6 +132,75 @@ begin
     FParams := TJHashMap.Create;
     FParams.put(TJTextToSpeech_Engine.JavaClass.KEY_PARAM_UTTERANCE_ID, StringToJString('DWUtteranceId'));
     FTextToSpeech.setOnUtteranceCompletedListener(FUtteranceCompletedListener);
+  end;
+end;
+
+function TPlatformTextToSpeech.InstallData: Boolean;
+var
+  LIntent: JIntent;
+  LResolveInfo: JResolveInfo;
+begin
+  Result := False;
+  LIntent := TJIntent.JavaClass.init(TJTextToSpeech_Engine.JavaClass.ACTION_INSTALL_TTS_DATA);
+  LResolveInfo := TAndroidHelper.Context.getPackageManager.resolveActivity(LIntent, TJPackageManager.JavaClass.MATCH_DEFAULT_ONLY);
+  if LResolveInfo <> nil then
+  begin
+    TAndroidHelper.Context.startActivity(LIntent);
+    Result := True;
+  end;
+end;
+
+function TPlatformTextToSpeech.CheckData: Boolean;
+var
+  LIntent: JIntent;
+  LResolveInfo: JResolveInfo;
+begin
+  Result := False;
+  LIntent := TJIntent.JavaClass.init(TJTextToSpeech_Engine.JavaClass.ACTION_CHECK_TTS_DATA);
+  LResolveInfo := TAndroidHelper.Context.getPackageManager.resolveActivity(LIntent, TJPackageManager.JavaClass.MATCH_DEFAULT_ONLY);
+  if LResolveInfo <> nil then
+  begin
+    AvailableVoices := [];
+    UnavailableVoices := [];
+    TAndroidHelper.Activity.startActivityForResult(LIntent, cCheckTTSDataRequestCode);
+    Result := True;
+  end;
+end;
+
+procedure TPlatformTextToSpeech.MessageResultNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
+var
+  LMessage: TMessageResultNotification;
+  LList: JArrayList;
+  LVoice: string;
+  I: Integer;
+begin
+  LMessage := TMessageResultNotification(AMsg);
+  if LMessage.RequestCode = cCheckTTSDataRequestCode then
+  begin
+    LList := LMessage.Value.getStringArrayListExtra(TJTextToSpeech_Engine.JavaClass.EXTRA_AVAILABLE_VOICES);
+    if LList <> nil then
+    begin
+      for I := 0 to LList.size - 1 do
+      begin
+        LVoice := JStringToString(TJString.Wrap(TAndroidHelper.JObjectToID(LList.get(I)))).Trim;
+        if not LVoice.IsEmpty then
+          AvailableVoices := AvailableVoices + [LVoice];
+      end;
+    end;
+    LList := LMessage.Value.getStringArrayListExtra(TJTextToSpeech_Engine.JavaClass.EXTRA_UNAVAILABLE_VOICES);
+    if LList <> nil then
+    begin
+      for I := 0 to LList.size - 1 do
+      begin
+        LVoice := JStringToString(TJString.Wrap(TAndroidHelper.JObjectToID(LList.get(I)))).Trim;
+        if not LVoice.IsEmpty then
+          UnavailableVoices := UnavailableVoices + [LVoice];
+      end;
+    end;
+    DoCheckDataComplete;
+    if LMessage.ResultCode = TJTextToSpeech_Engine.JavaClass.CHECK_VOICE_DATA_PASS then
+      InstallData;
+    // Else notify that data is not available, or whatever
   end;
 end;
 
