@@ -5,8 +5,8 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts, FMX.Controls.Presentation, FMX.StdCtrls,
-  FMX.Memo.Types, FMX.ScrollBox, FMX.Memo,
-  DW.TextToSpeech, FMX.ListBox;
+  FMX.Memo.Types, FMX.ScrollBox, FMX.Memo, FMX.ListBox,
+  DW.TextToSpeech;
 
 type
   TForm1 = class(TForm)
@@ -24,6 +24,7 @@ type
     procedure UseExampleCheckBoxChange(Sender: TObject);
   private
     FSpeaker: TTextToSpeech;
+    procedure SpeakerCheckDataCompleteHandler(Sender: TObject);
     procedure SpeakerSpeechStartedHandler(Sender: TObject);
     procedure SpeakerSpeechFinishedHandler(Sender: TObject);
   public
@@ -54,6 +55,9 @@ begin
   FSpeaker := TTextToSpeech.Create;
   FSpeaker.OnSpeechStarted := SpeakerSpeechStartedHandler;
   FSpeaker.OnSpeechFinished := SpeakerSpeechFinishedHandler;
+  FSpeaker.OnCheckDataComplete := SpeakerCheckDataCompleteHandler;
+  if not FSpeaker.CheckData then
+    LogMemo.Lines.Add('Cannot check available data');
   TextMemo.Text := cExampleText[LangComboBox.ItemIndex];
 end;
 
@@ -84,6 +88,25 @@ procedure TForm1.UseExampleCheckBoxChange(Sender: TObject);
 begin
   if not UseExampleCheckBox.IsChecked then
     TextMemo.Text := '';
+end;
+
+procedure TForm1.SpeakerCheckDataCompleteHandler(Sender: TObject);
+var
+  LVoice: string;
+begin
+  // LogMemo.Lines.Add('Speaking finished');
+  if Length(FSpeaker.AvailableVoices) > 0 then
+  begin
+    LogMemo.Lines.Add('Available voices:');
+    for LVoice in FSpeaker.AvailableVoices do
+      LogMemo.Lines.Add(LVoice);
+  end;
+  if Length(FSpeaker.UnavailableVoices) > 0 then
+  begin
+    LogMemo.Lines.Add('Unavailable voices:');
+    for LVoice in FSpeaker.UnavailableVoices do
+      LogMemo.Lines.Add(LVoice);
+  end;
 end;
 
 procedure TForm1.SpeakerSpeechFinishedHandler(Sender: TObject);
