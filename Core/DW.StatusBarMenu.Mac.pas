@@ -65,6 +65,7 @@ type
     FMenuItems: TMacOSMenuItems;
     FStatusItem: NSStatusItem;
     FPopupMenu: TPopupMenu;
+    FUpdateCount: Integer;
     procedure AddMenuItem(const AItem: TMenuItem);
     procedure AddSubMenuItem(const AMacOSMenuItem: TMacOSMenuItem; const AItem: TMenuItem);
     procedure ClearMenuItems;
@@ -80,6 +81,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeginUpdate;
+    procedure EndUpdate;
     procedure RecreateMenu;
     procedure Refresh;
     property PopupMenu: TPopupMenu read FPopupMenu write SetPopupMenu;
@@ -273,6 +276,17 @@ begin
   inherited;
 end;
 
+procedure TStatusBarMenu.BeginUpdate;
+begin
+  Inc(FUpdateCount);
+end;
+
+procedure TStatusBarMenu.EndUpdate;
+begin
+  if FUpdateCount > 0 then
+    Dec(FUpdateCount);
+end;
+
 procedure TStatusBarMenu.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
@@ -286,7 +300,8 @@ begin
     else if FMenuItems.IndexOfFMXItem(AComponent) > -1 then
     begin
       AComponent.RemoveFreeNotification(Self);
-      RecreateMenu;
+      if FUpdateCount = 0 then
+        RecreateMenu;
     end;
   end;
 end;
