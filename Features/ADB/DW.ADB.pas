@@ -23,31 +23,13 @@ uses
   System.SysUtils, System.Classes, Vcl.ExtCtrls,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  DW.RunProcess.Win, DW.ExternalDevice.Win;
+  DW.RunProcess.Win, DW.ExternalDevice.Win, DW.Types;
 
 const
   cADBLogLevels = 'IDEWVF';
-  CRLF = #13#10;
 
 type
-  TStringArray = record
-    Items: TArray<string>;
-    procedure Add(const AValue: string);
-    procedure Clear;
-    function Count: Integer;
-    function GetKey(const AValue: string): string; overload;
-    function GetKey(const AIndex: Integer): string; overload;
-    function GetValue(const AKey: string): string;
-    function IndexOf(const AValue: string): Integer;
-    function IndexOfName(const AKey: string): Integer;
-    procedure SetValue(const AKey: string; const AValue: string);
-    function Text(const ASeparator: string = CRLF): string;
-    function Values: TArray<string>;
-  end;
-
-  TLogLevel = (Info, Debug, Error, Warning, Verbose, Fatal);
-  TLogLevels = set of TLogLevel;
-  TLogcatStatus = (Started, Stopped);
+  TLogcatStatus = (Started, IsCurrent, Stopped);
 
   TLogcatOutputEvent = procedure(Sender: TObject; const Output: string) of object;
   TLogcatStatusEvent = procedure(Sender: TObject; const Status: TLogcatStatus) of object;
@@ -81,17 +63,19 @@ type
     FDevicesCheck: TDateTime;
     FDeviceWatcher: TExternalDeviceWatcher;
     FFilterUpdateCount: Integer;
+    FHistoryCount: Integer;
     FIsProcessListHeading: Boolean;
-    FLogLevelsFilter: TLogLevels;
+    FLineCount: Integer;
+    FLogLevelsFilter: TAndroidLogLevels;
+    FNeedsFiltersUpdate: Boolean;
     FNeedsLogcatRestart: Boolean;
-    FNeedsProcessCheck: Boolean;
     FProcessList: TStringArray;
+    FProcessListText: string;
     FProcessNameColumnIndex: Integer;
     FProcessNameFilter: string;
     FProcessPIDColumnIndex: Integer;
-    FRunningProcessList: TStringArray;
-    FRunningProcessListText: string;
     FSelectedDevice: string;
+    FSelectedDeviceItem: TStringArrayItem;
     FTagFilter: string;
     FTCPIPDevice: string;
     FTextFilter: string;
@@ -125,13 +109,11 @@ type
     procedure HandleLogCatOutput(const AOutput: string);
     procedure LogcatStopped;
     procedure ProcessListTerminated;
-    function SerialFromSelectedDevice: string;
-    function SerialFromDevice(const ADevice: string): string;
     procedure UpdateDeviceList;
     procedure UpdateFilters;
     procedure UpdateProcessList;
     procedure UpdateSelectedDevice;
-    procedure SetLogLevelsFilter(const Value: TLogLevels);
+    procedure SetLogLevelsFilter(const Value: TAndroidLogLevels);
     procedure SetProcessNameFilter(const Value: string);
     procedure SetSelectedDevice(const Value: string);
     procedure SetTagFilter(const Value: string);
@@ -187,7 +169,7 @@ type
     /// <summary>
     ///   Determines which log levels are filtered. This is applied to the in-memory dataset
     /// </summary>
-    property LogLevelsFilter: TLogLevels read FLogLevelsFilter write SetLogLevelsFilter;
+    property LogLevelsFilter: TAndroidLogLevels read FLogLevelsFilter write SetLogLevelsFilter;
     /// <summary>
     ///   List of processes running on the selected device
     /// </summary>
@@ -200,6 +182,7 @@ type
     ///   Currently selected device. Setting this value will periodically update ProcessList
     /// </summary>
     property SelectedDevice: string read FSelectedDevice write SetSelectedDevice;
+    property SelectedDeviceItem: TStringArrayItem read FSelectedDeviceItem;
     /// <summary>
     ///   Filters log entries that have a tag field where this value matches any part of it. This is applied to the in-memory dataset
     /// </summary>
@@ -270,7 +253,6 @@ const
   cADBDeviceKeyDevice = 'device:';
   cADBScreenCaptureCommand = '%s exec-out screencap -p %s'; // [-d display-id]
   cADBPullCommand = '%s pull %s %s';
-  cDeviceListModel = '%s (%s)';
   cProcessListStartsWithPID = 'PID';
 
 function IsMonthFirst: Boolean;
@@ -278,147 +260,12 @@ begin
   Result := FormatSettings.ShortDateFormat.LastIndexOf('M') < FormatSettings.ShortDateFormat.LastIndexOf('d');
 end;
 
-{ TStringArray }
-
-procedure TStringArray.Add(const AValue: string);
-begin
-  Items := Items + [AValue];
-end;
-
-procedure TStringArray.Clear;
-begin
-  Items := [];
-end;
-
-function TStringArray.Count: Integer;
-begin
-  Result := Length(Items);
-end;
-
-function TStringArray.IndexOf(const AValue: string): Integer;
-var
-  I: Integer;
-begin
-  Result := -1;
-  for I := 0 to Count - 1 do
-  begin
-    if Items[I].Equals(AValue) then
-    begin
-      Result := I;
-      Break;
-    end;
-  end;
-end;
-
-function TStringArray.IndexOfName(const AKey: string): Integer;
-var
-  I: Integer;
-  LParts: TArray<string>;
-begin
-  Result := -1;
-  for I := 0 to Count - 1 do
-  begin
-    LParts := Items[I].Split(['='], 2);
-    if (Length(LParts) > 1) and LParts[0].Equals(AKey) then
-    begin
-      Result := I;
-      Break;
-    end;
-  end;
-end;
-
-procedure TStringArray.SetValue(const AKey, AValue: string);
-var
-  I: Integer;
-  LParts: TArray<string>;
-  LIsFound: Boolean;
-begin
-  LIsFound := False;
-  for I := 0 to Count - 1 do
-  begin
-    LParts := Items[I].Split(['='], 2);
-    if (Length(LParts) > 1) and LParts[0].Equals(AKey) then
-    begin
-      LIsFound := True;
-      Items[I] := Format('%s=%s', [AKey, AValue]);
-      Break;
-    end;
-  end;
-  if not LIsFound then
-    Add(Format('%s=%s', [AKey, AValue]));
-end;
-
-function TStringArray.Text(const ASeparator: string): string;
-begin
-  Result := string.Join(ASeparator, Items);
-end;
-
-function TStringArray.Values: TArray<string>;
-var
-  I: Integer;
-  LParts: TArray<string>;
-begin
-  Result := [];
-  for I := 0 to Count - 1 do
-  begin
-    LParts := Items[I].Split(['='], 2);
-    if Length(LParts) > 1 then
-      Result := Result + [LParts[1]];
-  end;
-end;
-
-function TStringArray.GetKey(const AValue: string): string;
-var
-  I: Integer;
-  LParts: TArray<string>;
-begin
-  Result := '';
-  for I := 0 to Count - 1 do
-  begin
-    LParts := Items[I].Split(['='], 2);
-    if (Length(LParts) > 1) and LParts[1].Equals(AValue) then
-    begin
-      Result := LParts[0];
-      Break;
-    end;
-  end;
-end;
-
-function TStringArray.GetKey(const AIndex: Integer): string;
-var
-  LParts: TArray<string>;
-begin
-  Result := '';
-  if (AIndex >= 0) and (AIndex < Count) then
-  begin
-    LParts := Items[AIndex].Split(['='], 2);
-    if Length(LParts) > 0 then
-      Result := LParts[0];
-  end;
-end;
-
-function TStringArray.GetValue(const AKey: string): string;
-var
-  I: Integer;
-  LParts: TArray<string>;
-begin
-  Result := '';
-  for I := 0 to Count - 1 do
-  begin
-    LParts := Items[I].Split(['='], 2);
-    if (Length(LParts) > 1) and LParts[0].Equals(AKey) then
-    begin
-      Result := LParts[1];
-      Break;
-    end;
-  end;
-end;
-
 { TADBModule }
 
 constructor TADBModule.Create(AOwner: TComponent);
 begin
   inherited;
+  FHistoryCount := 200;
   FDeviceWatcher := TExternalDeviceWatcher.Create;
   FDeviceWatcher.OnDeviceChanged := DeviceWatcherDeviceChangedHandler;
   FADBGeneral := TRunProcess.Create;
@@ -448,19 +295,6 @@ begin
   FADBProcessList.Free;
   FADBScreenCapture.Free;
   inherited;
-end;
-
-function TADBModule.SerialFromSelectedDevice: string;
-begin
-  Result := SerialFromDevice(FSelectedDevice);
-end;
-
-function TADBModule.SerialFromDevice(const ADevice: string): string;
-var
-  LPos: Integer;
-begin
-  LPos := Pos('(', ADevice);
-  Result := ADevice.Substring(LPos, ADevice.Length - LPos - 1);
 end;
 
 function TADBModule.GetIsLogcatRunning: Boolean;
@@ -508,7 +342,7 @@ begin
     LSerial := AOutput.Substring(0, Pos(' ', AOutput) - 1);
     LStart := Pos(cADBDeviceKeyModel, AOutput) + cADBDeviceKeyModel.Length - 1;
     LModel := AOutput.Substring(LStart, Pos(cADBDeviceKeyDevice, AOutput) - LStart - 2);
-    FDeviceList.Add(Format(cDeviceListModel, [LModel, LSerial]));
+    FDeviceList.SetValue(LSerial, LModel);
   end;
 end;
 
@@ -519,6 +353,15 @@ end;
 
 procedure TADBModule.ADBLogCatOutputHandler(Sender: TObject; const AOutput: string);
 begin
+  if (FLineCount > -1) and (FLineCount < FHistoryCount) then
+  begin
+    Inc(FLineCount);
+    if FLineCount = FHistoryCount then
+    begin
+      FLineCount := -1;
+      DoLogcatStatus(TLogcatStatus.IsCurrent);
+    end;
+  end;
   if not AOutput.StartsWith('---') then
   begin
     while FViewUpdateCount > 0 do ;
@@ -544,63 +387,56 @@ var
   LTokenizer: TTokenizer;
   LIndex: Integer;
 begin
-  if AOutput.StartsWith('root') then
-    Exit; // <=======
-  if FIsProcessListHeading then
+  if not AOutput.StartsWith('root') then
   begin
-    FIsProcessListHeading := False;
-    FColumnCount := 0;
-    LTokenizer := TTokenizer.Create(AOutput);
-    try
-      LTokenizer.Tokenize(
-        procedure(const AToken: string)
-        begin
-          Inc(FColumnCount);
-          if AToken.Equals('PID') then
-            FProcessPIDColumnIndex := FColumnCount
-          else if AToken.Equals('NAME') then
-            FProcessNameColumnIndex := FColumnCount;
-        end
-      );
-    finally
-      LTokenizer.Free;
-    end;
-    if AOutput.Contains('ADDR S') then
-      FProcessNameColumnIndex := FProcessNameColumnIndex - 1
-    else if AOutput.Contains('PC  NAME') then
-      FProcessNameColumnIndex := FProcessNameColumnIndex + 1;
-  end
-  else
-  begin
-    LIndex := 0;
-    LTokenizer := TTokenizer.Create(AOutput);
-    try
-      LTokenizer.Tokenize(
-        procedure(const AToken: string)
-        begin
-          Inc(LIndex);
-          if LIndex = FProcessPIDColumnIndex then
-            LPID := AToken
-          else if LIndex = FProcessNameColumnIndex then
-          begin
-            LName := AToken;
-            if (Length(LName) = 1) and (LIndex <= FColumnCount)  then
-              FProcessNameColumnIndex := LIndex + 1;
-          end;
-        end
-      );
-    finally
-      LTokenizer.Free;
-    end;
-    if not LPID.IsEmpty and not LName.StartsWith('[') and not LName.Contains('@') and LName.Contains('.') then
+    if FIsProcessListHeading then
     begin
-      FRunningProcessList.SetValue(LPID, LName);
-      // New entries need a check
-      if FProcessList.IndexOfName(LPID) = -1 then
-      begin
-        FNeedsProcessCheck := True;
-        FProcessList.SetValue(LPID, LName);
+      FIsProcessListHeading := False;
+      FColumnCount := 0;
+      LTokenizer := TTokenizer.Create(AOutput);
+      try
+        LTokenizer.Tokenize(
+          procedure(const AToken: string)
+          begin
+            Inc(FColumnCount);
+            if AToken.Equals('PID') then
+              FProcessPIDColumnIndex := FColumnCount
+            else if AToken.Equals('NAME') then
+              FProcessNameColumnIndex := FColumnCount;
+          end
+        );
+      finally
+        LTokenizer.Free;
       end;
+      if AOutput.Contains('ADDR S') then
+        FProcessNameColumnIndex := FProcessNameColumnIndex - 1
+      else if AOutput.Contains('PC  NAME') then
+        FProcessNameColumnIndex := FProcessNameColumnIndex + 1;
+    end
+    else
+    begin
+      LIndex := 0;
+      LTokenizer := TTokenizer.Create(AOutput);
+      try
+        LTokenizer.Tokenize(
+          procedure(const AToken: string)
+          begin
+            Inc(LIndex);
+            if LIndex = FProcessPIDColumnIndex then
+              LPID := AToken
+            else if LIndex = FProcessNameColumnIndex then
+            begin
+              LName := AToken;
+              if (Length(LName) = 1) and (LIndex <= FColumnCount)  then
+                FProcessNameColumnIndex := LIndex + 1;
+            end;
+          end
+        );
+      finally
+        LTokenizer.Free;
+      end;
+      if not LPID.IsEmpty and not LName.StartsWith('[') and not LName.Contains('@') and LName.Contains('.') then
+        FProcessList.SetValue(LPID, LName);
     end;
   end;
 end;
@@ -637,7 +473,7 @@ begin
   FTCPIPDevice := ADevice;
   FADBGeneral.OnProcessOutput := ADBTCPIPOutputHandler;
   FADBGeneral.OnProcessTerminated := ADBTCPITerminatedHandler;
-  FADBGeneral.CommandLine := Format(cADBTCPIPCommand, [FADBEXEPath, SerialFromDevice(FTCPIPDevice)]);
+  FADBGeneral.CommandLine := Format(cADBTCPIPCommand, [FADBEXEPath, FTCPIPDevice]);
   FADBGeneral.Run;
 end;
 
@@ -645,7 +481,7 @@ procedure TADBModule.DoDeviceListUpdated;
 begin
   if Assigned(FOnDeviceListUpdated) then
     FOnDeviceListUpdated(Self);
-  if FADBLogcat.IsRunning and (FDeviceList.IndexOf(FSelectedDevice) = -1) then
+  if FADBLogcat.IsRunning and (FDeviceList.IndexOfName(FSelectedDevice) = -1) then
     StopLogcat;
 end;
 
@@ -675,12 +511,17 @@ end;
 
 procedure TADBModule.DoStartLogcat;
 begin
-  LogFDMemTable.EmptyDataSet;
-  if TFile.Exists(FADBEXEPath) then
+  if not FSelectedDevice.IsEmpty then
   begin
-    FADBLogCat.CommandLine := Format(cADBLogCatRecentLinesCommand, [FADBEXEPath, SerialFromSelectedDevice, 500]); // Last 500 lines
-    FADBLogCat.Run;
-    DoLogcatStatus(TLogcatStatus.Started);
+    LogFDMemTable.EmptyDataSet;
+    if TFile.Exists(FADBEXEPath) then
+    begin
+      FLineCount := 0;
+      FADBLogCat.CommandLine := Format(cADBLogCatRecentLinesCommand, [FADBEXEPath, FSelectedDevice, FHistoryCount]);
+      TOSLog.d('Command: %s', [FADBLogCat.CommandLine]);
+      FADBLogCat.Run;
+      DoLogcatStatus(TLogcatStatus.Started);
+    end;
   end;
 end;
 
@@ -744,7 +585,7 @@ begin
   UpdateSelectedDevice;
 end;
 
-procedure TADBModule.SetLogLevelsFilter(const Value: TLogLevels);
+procedure TADBModule.SetLogLevelsFilter(const Value: TAndroidLogLevels);
 begin
   if FLogLevelsFilter <> Value then
   begin
@@ -781,10 +622,15 @@ begin
 end;
 
 procedure TADBModule.SetSelectedDevice(const Value: string);
+var
+  LIndex: Integer;
 begin
-  if (FSelectedDevice <> Value) and (FDeviceList.IndexOf(Value) > -1) then
+  LIndex := FDeviceList.IndexOfName(Value);
+  if (FSelectedDevice <> Value) and (LIndex > -1) then
   begin
     FSelectedDevice := Value;
+    FSelectedDeviceItem := FDeviceList.GetItem(LIndex);
+    FProcessList.Clear;
     UpdateSelectedDevice;
   end;
 end;
@@ -805,30 +651,31 @@ begin
 end;
 
 procedure TADBModule.ProcessListTerminated;
+var
+  LText: string;
 begin
-  if not FRunningProcessList.Text.Equals(FRunningProcessListText) then
+  LText := FProcessList.Text;
+  if FProcessListText.IsEmpty or not LText.Equals(FProcessListText) then
   begin
-    FNeedsProcessCheck := True;
-    FRunningProcessListText := FRunningProcessList.Text;
-  end;
-  if FNeedsProcessCheck then
+    FProcessListText := LText;
     DoProcessListUpdated;
-  FNeedsProcessCheck := False;
+  end;
+  if FNeedsFiltersUpdate then
+  begin
+    FNeedsFiltersUpdate := False;
+    UpdateFilters;
+  end;
 end;
 
 procedure TADBModule.UpdateProcessList;
-var
-  LSerial: string;
 begin
   if TFile.Exists(FADBEXEPath) then
   begin
-    FNeedsProcessCheck := False;
-    FRunningProcessList.Clear;
-    LSerial := SerialFromSelectedDevice;
-    if not LSerial.IsEmpty then
+    FProcessList.Clear;
+    if not FSelectedDevice.IsEmpty then
     begin
       FIsProcessListHeading := True;
-      FADBProcessList.CommandLine := Format(cADBProcessesCommand, [FADBEXEPath, LSerial]);
+      FADBProcessList.CommandLine := Format(cADBProcessesCommand, [FADBEXEPath, FSelectedDevice]);
       FADBProcessList.Run;
     end
     else
@@ -860,7 +707,7 @@ begin
     LTokenized := LTokenizer.Tokenize(
       function(const AToken: string): Boolean
       var
-        LDateFirstInt, LDateSecondInt: Integer;
+        LDateSecondInt: Integer;
       begin
         Result := True;
         case LTokenIndex of
@@ -870,30 +717,15 @@ begin
             LDateParts := AToken.Split(['-']);
             if Length(LDateParts) <> 2 then
               Exit(False); // <=======
-            if IsMonthFirst then
+            LDateSecond := LDateParts[0];
+            LDateFirst := LDateParts[1];
+            if TryStrToInt(LDateSecond, LDateSecondInt) then
             begin
-              LDateFirst := LDateParts[0];
-              LDateSecond := LDateParts[1];
-              if TryStrToInt(LDateFirst, LDateFirstInt) then
-              begin
-                if LDateFirstInt > MonthOf(Now) then
-                  LYear := IncYear(Now, -1);
-              end
-              else
-                Exit(False); // <======
+              if LDateSecondInt > MonthOf(Now) then
+                LYear := IncYear(Now, -1);
             end
             else
-            begin
-              LDateSecond := LDateParts[0];
-              LDateFirst := LDateParts[1];
-              if TryStrToInt(LDateSecond, LDateSecondInt) then
-              begin
-                if LDateSecondInt > MonthOf(Now) then
-                  LYear := IncYear(Now, -1);
-              end
-              else
-                Exit(False); // <======
-            end;
+              Exit(False); // <======
             LDate := LDateFirst + FormatSettings.DateSeparator + LDateSecond + FormatSettings.DateSeparator + YearOf(LYear).ToString;
           end;
           1:
@@ -958,61 +790,49 @@ const
 var
   LFilters: TStrings;
   LFilter, LTextFilter, LTagFilter: string;
-  LProcessIDs: TArray<string>;
-  I: Integer;
-  LHasFilter: Boolean;
 begin
   if FFilterUpdateCount = 0 then
   begin
-    LHasFilter := True;
-    LTextFilter := StringReplace(FTextFilter, '''', '''''', [rfReplaceAll]).Trim;
-    LTagFilter := StringReplace(FTagFilter, '''', '''''', [rfReplaceAll]).Trim;
-    LFilter := LogFDMemTable.Filter;
-    LFilters := TStringList.Create;
-    try
-      LFilters.NameValueSeparator := #0;
-      if not FProcessNameFilter.IsEmpty  then
-        LProcessIDs := [FProcessList.GetKey(FProcessNameFilter)]
-      else
-        LHasFilter := False;
-      if LHasFilter then
-      begin
-        if Length(LProcessIDs) > 0 then
-        begin
-          for I := 0 to Length(LProcessIDs) - 1 do
-          begin
-            if I > 0 then
-              LFilters.Add('OR');
-            LFilters.Add('ProcessID = ' + LProcessIDs[I]);
-          end;
-        end
-        else
-          LFilters.Add('ProcessID = -1');
-        if LFilters.Count > 0 then
-          LFilters.Text := '(' + LFilters.Text + ')';
+    // If no process filter, or has process filter and process list is not running..
+    if FProcessNameFilter.IsEmpty or (not FProcessNameFilter.IsEmpty and not FADBProcessList.IsRunning) then
+    begin
+      LTextFilter := StringReplace(FTextFilter, '''', '''''', [rfReplaceAll]).Trim;
+      LTagFilter := StringReplace(FTagFilter, '''', '''''', [rfReplaceAll]).Trim;
+      LFilter := LogFDMemTable.Filter;
+      LFilters := TStringList.Create;
+      try
+        LFilters.NameValueSeparator := #0;
+        if not FProcessNameFilter.IsEmpty then
+          LFilters.Add('(Application LIKE ''%' + FProcessNameFilter + '%'')');
+        if not (TAndroidLogLevel.Info in FLogLevelsFilter) then
+          LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''I''');
+        if not (TAndroidLogLevel.Debug in FLogLevelsFilter) then
+          LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''D''');
+        if not (TAndroidLogLevel.Warning in FLogLevelsFilter) then
+          LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''W''');
+        if not (TAndroidLogLevel.Error in FLogLevelsFilter) then
+          LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''E''');
+        if not (TAndroidLogLevel.Fatal in FLogLevelsFilter) then
+          LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''F''');
+        if not (TAndroidLogLevel.Verbose in FLogLevelsFilter) then
+          LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''V''');
+        LFilters.Add(cAnd[LFilters.Count > 0] + 'TEXT LIKE ''%' + LTextFilter + '%''');
+        if not LTagFilter.IsEmpty then
+          LFilters.Add(cAnd[LFilters.Count > 0] + 'TAG LIKE ''%' + LTagFilter + '%''');
+        try
+          LogFDMemTable.Filter := StringReplace(LFilters.Text, #13#10, ' ', [rfReplaceAll]);
+        except
+          Sleep(0);
+        end;
+      finally
+        LFilters.Free;
       end;
-      if not (TLogLevel.Info in FLogLevelsFilter) then
-        LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''I''');
-      if not (TLogLevel.Debug in FLogLevelsFilter) then
-        LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''D''');
-      if not (TLogLevel.Warning in FLogLevelsFilter) then
-        LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''W''');
-      if not (TLogLevel.Error in FLogLevelsFilter) then
-        LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''E''');
-      if not (TLogLevel.Fatal in FLogLevelsFilter) then
-        LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''F''');
-      if not (TLogLevel.Verbose in FLogLevelsFilter) then
-        LFilters.Add(cAnd[LFilters.Count > 0] + 'LEVEL <> ''V''');
-      LFilters.Add(cAnd[LFilters.Count > 0] + 'TEXT LIKE ''%' + LTextFilter + '%''');
-      if not LTagFilter.IsEmpty then
-        LFilters.Add(cAnd[LFilters.Count > 0] + 'TAG LIKE ''%' + LTagFilter + '%''');
-      LogFDMemTable.Filter := StringReplace(LFilters.Text, #13#10, ' ', [rfReplaceAll]);
-    finally
-      LFilters.Free;
-    end;
-    LogFDMemTable.Filtered := not LogFDMemTable.Filter.IsEmpty;
-    if not LFilter.Equals(LogFDMemTable.Filter) then
-      DoFiltersUpdated;
+      LogFDMemTable.Filtered := not LogFDMemTable.Filter.IsEmpty;
+      if not LFilter.Equals(LogFDMemTable.Filter) then
+        DoFiltersUpdated;
+    end
+    else
+      FNeedsFiltersUpdate := True;
   end;
 end;
 
