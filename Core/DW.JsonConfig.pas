@@ -35,6 +35,10 @@ type
     ///   Returns the name/path of the config file
     /// </summary>
     class function GetConfigFileName: string; virtual;
+    /// <summary>
+    ///   Checks if a property exists
+    /// </summary>
+    class function HasProperty(const APath: string): Boolean;
   public
     procedure Save;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
@@ -44,7 +48,7 @@ implementation
 
 uses
   // RTL
-  System.IOUtils, System.SysUtils,
+  System.IOUtils, System.SysUtils, System.JSON,
   // REST
   REST.Json,
   // DW
@@ -78,6 +82,23 @@ end;
 class function TJsonConfig.GetConfigFilename: string;
 begin
   Result := TPathHelper.GetAppSupportFile(TPathHelper.GetAppName + '.json');
+end;
+
+class function TJsonConfig.HasProperty(const APath: string): Boolean;
+var
+  LJSON: TJSONValue;
+begin
+  Result := False;
+  if TFile.Exists(GetConfigFileName) then
+  begin
+    LJSON := TJSONObject.ParseJSONValue(TFile.ReadAllText(GetConfigFileName));
+    if LJSON <> nil then
+    try
+      Result := LJSON.FindValue(APath) <> nil;
+    finally
+      LJSON.Free;
+    end;
+  end;
 end;
 
 procedure TJsonConfig.Save;
