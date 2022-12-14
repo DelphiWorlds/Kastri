@@ -102,7 +102,7 @@ end;
 
 procedure TUserNotificationCenterDelegate.ProcessNotificationRequest(request: UNNotificationRequest; const AMode: TNotificationMode);
 begin
-  if request.trigger.isKindOfClass(objc_getClass('UNPushNotificationTrigger')) then
+  if (request.trigger <> nil) and request.trigger.isKindOfClass(objc_getClass('UNPushNotificationTrigger')) then
     ProcessRemoteNotification(request, AMode)
   else
     ProcessLocalNotification(request, AMode);
