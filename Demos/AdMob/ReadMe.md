@@ -28,6 +28,13 @@ When using Delphi 10.4.x, you will need to add other libraries and disable some 
 
 AdMob support in Kastri has now been aligned with the latest compatible version of the Firebase SDK for iOS, which is version 8.15.0. Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/v8.15.0/Firebase.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called Firebase, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo.
 
+In order to compile successfully for iOS, it's necessary to add the following frameworks to the iOS SDK:
+
+* AVKit
+* CoreMotion
+
+[This article](https://delphiworlds.com/2013/10/adding-other-ios-frameworks-to-the-sdk-manager/) is a guide as to how to add the frameworks.
+
 ### Android Entitlements
 
 Ensure your project has the `AdMob Service` enabled. This adds Google Play services metadata and the Ads activity to the manifest.
