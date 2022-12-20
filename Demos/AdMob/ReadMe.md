@@ -37,7 +37,7 @@ In order to compile successfully for iOS, it's also necessary to add the followi
 
 ### Project Options
 
-Ensure you have a value of: `-ObjC` for the `Options passed to the LD linker` option in the Project Options:
+Ensure you have a value of: `-ObjC` for the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit:
 
 <img src="./Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
 
