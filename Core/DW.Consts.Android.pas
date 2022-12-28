@@ -24,6 +24,7 @@ const
   cPermissionBluetoothConnect = 'android.permission.BLUETOOTH_CONNECT';
   cPermissionBluetoothScan = 'android.permission.BLUETOOTH_SCAN';
   cPermissionCamera = 'android.permission.CAMERA';
+  cPermissionPostNotifications = 'android.permission.POST_NOTIFICATIONS';
   cPermissionReadCallLog = 'android.permission.READ_CALL_LOG';
   cPermissionReadContacts = 'android.permission.READ_CONTACTS';
   cPermissionReadExternalStorage = 'android.permission.READ_EXTERNAL_STORAGE';
