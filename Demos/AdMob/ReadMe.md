@@ -57,7 +57,7 @@ When configuring your app for non-test Ad UnitIds, you will need to:
   
 <img style="margin-left: 3em;" src="./Screenshots/AndroidManifestTemplateAppId.png" alt="PM" height="300"/>
 
-* For iOS: modify `info.plist.TemplateiOS.xml` to change the value for the `GADApplicationIdentifier` key. Please refer to the image below for an example of what to change. 
+* For iOS: modify your projects `info.plist.TemplateiOS.xml` file to add the `GADApplicationIdentifier` key **and the array below it** from the `info.plist.TemplateiOS.xml` file _in the demo_, but change the _value_ for `GADApplicationIdentifier` to your AdMob Application ID. Please refer to the image below for an example of what to change. 
   
 <img style="margin-left: 3em;" src="./Screenshots/iOSInfoPListTemplateAppId.png" alt="PM" height="150"/>
 
