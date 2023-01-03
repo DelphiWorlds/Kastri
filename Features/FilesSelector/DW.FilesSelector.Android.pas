@@ -34,7 +34,7 @@ type
     FMimeTypes: TArray<string>;
     procedure AddFile(const AURI: Jnet_Uri);
     procedure CreateIntent;
-    function GetMimeType(const AFileKind: TFileKind): string;
+    function GetMimeTypes(const AFileKind: TFileKind): string;
     procedure HandleSelectorOK(const AData: JIntent);
     procedure MessageResultNotificationMessageHandler(const Sender: TObject; const M: TMessage);
     procedure UpdateIntentMimeTypes;
@@ -73,7 +73,7 @@ begin
   inherited;
 end;
 
-function TPlatformFilesSelector.GetMimeType(const AFileKind: TFileKind): string;
+function TPlatformFilesSelector.GetMimeTypes(const AFileKind: TFileKind): string;
 begin
   case AFileKind of
     TFileKind.Image:
@@ -86,6 +86,14 @@ begin
       Result := 'text/*';
     TFileKind.PDF:
       Result := 'application/pdf';
+    TFileKind.X509Certificate:
+      begin
+        // From: https://android.googlesource.com/platform/packages/apps/CertInstaller/+/88ded90/src/com/android/certinstaller/CertInstallerMain.java
+        Result := 'application/x-pkcs12|application/x-x509-ca-cert|application/x-x509-user-cert|application/x-x509-server-cert|' +
+          'application/x-pem-file|application/pkix-cert';
+      end;
+    TFileKind.Key:
+      Result := 'application/pgp-keys';
   else
     Result := '';
   end;
@@ -197,12 +205,16 @@ end;
 procedure TPlatformFilesSelector.FileKindsChanged;
 var
   LFileKind: TFileKind;
+  LMimeType: string;
 begin
   FMimeTypes := [];
   for LFileKind := Low(TFileKind) to High(TFileKind) do
   begin
     if (LFileKind in FileKinds) or (FileKinds = []) then
-      FMimeTypes := FMimeTypes + [GetMimeType(LFileKind)];
+    begin
+      for LMimeType in GetMimeTypes(LFileKind).Split(['|']) do
+        FMimeTypes := FMimeTypes + [LMimeType];
+    end;
   end;
   UpdateIntentMimeTypes;
 end;

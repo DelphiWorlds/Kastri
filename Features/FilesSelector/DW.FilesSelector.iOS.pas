@@ -177,10 +177,12 @@ begin
       Result := 'public.movie';
     TFileKind.Text:
       Result := 'public.text';
-    TFileKind.Item:
+    TFileKind.Item, TFileKind.Key: // Apparently .item will work for .key files?
       Result := 'public.item';
     TFileKind.Content:
       Result := 'public.content';
+    TFileKind.X509Certificate:
+      Result := 'public.x509-certificate';
     TFileKind.SourceCode:
       Result := 'public.source-code';
     TFileKind.PDF:
