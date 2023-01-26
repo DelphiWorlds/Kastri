@@ -198,7 +198,7 @@ public class DWNotificationPublisher {
       intent.setClassName(context, "com.embarcadero.firemonkey.FMXNativeActivity");
       intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       mUniqueId = mUniqueId + 1;
-      PendingIntent pendingIntent = PendingIntent.getActivity(context, mUniqueId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+      PendingIntent pendingIntent = PendingIntent.getActivity(context, mUniqueId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
       builder = builder.setContentIntent(pendingIntent); 
       if (intent.hasExtra("fullscreen") && intent.getStringExtra("fullscreen").equals("1")) { 
         Log.d(TAG, "fullscreen intent");
