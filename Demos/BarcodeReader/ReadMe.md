@@ -29,12 +29,16 @@ The demo is dependent on prebuilt libraries in the [`ThirdParty\iOS`](https://gi
 
 The MLKitBarcodeScanning framework is over 100MB, so it has been zipped (`MLKitBarcodeScanning.framework.zip`). **It will need to be unzipped in place, in order for the app to compile**
 
-If you are creating a new project (i.e. other than the demo) you will need to add the path to the 
+If you are creating a new project (i.e. other than the demo) in the Project Options, you will need to add the path to the: 
 
 * Framework search path, and:
 * Search path
 
-..in the project options
+..and ensure you have a value of: `-ObjC` for the `Options passed to the LD linker` option:
+
+<img src="./Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
+
+<br>
 
 <img src="./Screenshots/BarcodeScanExample.png" alt="logo" height="1200">
 
