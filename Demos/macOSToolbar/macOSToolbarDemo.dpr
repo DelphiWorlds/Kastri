@@ -3,8 +3,7 @@ program macOSToolbarDemo;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  Unit1 in 'Unit1.pas' {Form1},
-  DW.Toolbar.Mac in 'DW.Toolbar.Mac.pas';
+  Unit1 in 'Unit1.pas' {Form1};
 
 {$R *.res}
 
