@@ -208,7 +208,23 @@ const
   NSWindowDocumentIconButton = 4;
   NSWindowDocumentVersionsButton = 6;
 
+  NSWindowStyleMaskBorderless = 0;
+  NSWindowStyleMaskTitled = 1;
+  NSWindowStyleMaskClosable = 2;
+  NSWindowStyleMaskMiniaturizable = 4;
+  NSWindowStyleMaskResizable = 8;
+  NSWindowStyleMaskTexturedBackground = 256;
+  NSWindowStyleMaskUnifiedTitleAndToolbar = 4096;
+  NSWindowStyleMaskFullScreen = 16384;
+  NSWindowStyleMaskFullSizeContentView = 32768;
+  NSWindowStyleMaskUtilityWindow = 16;
+  NSWindowStyleMaskDocModalWindow = 64;
+  NSWindowStyleMaskNonactivatingPanel = 128;
+
+  cNSWindowStyleMaskAllSystemButtons = NSWindowStyleMaskClosable or NSWindowStyleMaskMiniaturizable or NSWindowStyleMaskResizable;
+
 type
+  NSWindowStyleMask = NSInteger;
   NSWindowTitleVisibility = NSInteger;
 
   NSWindowClass = interface(NSResponderClass)
@@ -217,10 +233,13 @@ type
 
   NSWindow = interface(NSResponder)
     ['{110F8D27-1D2C-480F-84C4-0FAD931FA44E}']
+    procedure setStyleMask(styleMask: NSWindowStyleMask); cdecl;
+    procedure setTitlebarAppearsTransparent(titlebarAppearsTransparent: Boolean); cdecl;
     procedure setTitleVisibility(titleVisibility: NSWindowTitleVisibility); cdecl;
     procedure setToolbar(toolbar: NSToolbar); cdecl;
     procedure setToolbarStyle(toolbarStyle: NSWindowToolbarStyle); cdecl;
     function standardWindowButton(b: NSWindowButton): NSButton; cdecl;
+    function styleMask: NSWindowStyleMask; cdecl;
   end;
   TNSWindow = class(TOCGenericImport<NSWindowClass, NSWindow>) end;
 
@@ -377,9 +396,10 @@ begin
   if FForm <> nil then
   begin
     LWindow := GetWindow(FForm);
-    LWindow.standardWindowButton(NSWindowCloseButton).setHidden(FHideSystemButtons);
-    LWindow.standardWindowButton(NSWindowMiniaturizeButton).setHidden(FHideSystemButtons);
-    LWindow.standardWindowButton(NSWindowZoomButton).setHidden(FHideSystemButtons);
+    if FHideSystemButtons then
+      LWindow.setStyleMask(LWindow.styleMask and not cNSWindowStyleMaskAllSystemButtons)
+    else
+      LWindow.setStyleMask(LWindow.styleMask or cNSWindowStyleMaskAllSystemButtons);
   end;
 end;
 
