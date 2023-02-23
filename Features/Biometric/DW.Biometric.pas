@@ -26,7 +26,7 @@ type
 
   TBiometricCapabilityResult = (Unknown, Available, HardwareUnavailable, NoHardware, NoneEnrolled, SecurityUpdateRequired, Unsupported);
 
-  TBiometricFailResult = (Unknown, Cancelled, Fallback, Denied, LockedOut, Error, Help);
+  TBiometricFailResult = (Unknown, Cancelled, Fallback, Denied, LockedOut, LockedOutPermanently, Error, Help);
 
   TBiometryKind = (None, Face, Touch);
 
@@ -36,6 +36,7 @@ type
 
   TCustomPlatformBiometric = class(TObject)
   private
+    FAllowedAttempts: Integer;
     FBiometric: TBiometric;
     FBiometricStrengths: TBiometricStrengths;
     FPromptCancelButtonText: string;
@@ -59,6 +60,7 @@ type
     procedure SetKeyName(const AValue: string); virtual;
     procedure SetReuseTime(const AInterval: Double); virtual;
     procedure Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod); virtual;
+    property AllowedAttempts: Integer read FAllowedAttempts write FAllowedAttempts;
     property Biometric: TBiometric read FBiometric;
     property BiometricStrengths: TBiometricStrengths read FBiometricStrengths write FBiometricStrengths;
     property PromptCancelButtonText: string read FPromptCancelButtonText write SetPromptCancelButtonText;
@@ -79,11 +81,13 @@ type
     class function GetCurrent: TBiometric; static;
   private
     FPlatformBiometric: TCustomPlatformBiometric;
+    function GetAllowedAttempts: Integer;
     function GetPromptCancelButtonText: string;
     function GetPromptConfirmationRequired: Boolean;
     function GetPromptDescription: string;
     function GetPromptSubtitle: string;
     function GetPromptTitle: string;
+    procedure SetAllowedAttempts(const Value: Integer);
     procedure SetPromptCancelButtonText(const Value: string);
     procedure SetPromptConfirmationRequired(const Value: Boolean);
     procedure SetPromptDescription(const Value: string);
@@ -135,6 +139,7 @@ type
     ///   Verifies the fingerprint, passing the result in AResultMethod
     /// </summary>
     procedure Verify(const AMessage: string; const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod);
+    property AllowedAttempts: Integer read GetAllowedAttempts write SetAllowedAttempts;
     /// <summary>
     ///   Key name used for key storage (currently applies to Android only - Delphi 10.4.x)
     /// </summary>
@@ -297,6 +302,11 @@ begin
   Result := FPlatformBiometric.CanVerify;
 end;
 
+function TBiometric.GetAllowedAttempts: Integer;
+begin
+  Result := FPlatformBiometric.AllowedAttempts;
+end;
+
 class function TBiometric.GetBiometryKind: TBiometryKind;
 begin
   Result := TPlatformBiometric.GetBiometryKind;
@@ -362,6 +372,11 @@ end;
 procedure TBiometric.RestoreBiometry(const ASuccessResultMethod: TProc; const AFailResultMethod: TBiometricFailResultMethod);
 begin
   FPlatformBiometric.RestoreBiometry(ASuccessResultMethod, AFailResultMethod);
+end;
+
+procedure TBiometric.SetAllowedAttempts(const Value: Integer);
+begin
+  FPlatformBiometric.AllowedAttempts := Value;
 end;
 
 procedure TBiometric.SetKeyName(const AValue: string);

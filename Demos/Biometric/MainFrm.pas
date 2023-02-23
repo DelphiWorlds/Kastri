@@ -3,7 +3,7 @@ unit MainFrm;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, System.Messaging,
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts,
   DW.Biometric;
 
@@ -20,7 +20,6 @@ type
     procedure ResetButtonClick(Sender: TObject);
   private
     FBiometric: TBiometric;
-    procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     procedure Listening(const AIsListening: Boolean);
     procedure VerificationFailResultHandler(const AFailResult: TBiometricFailResult; const AResultMessage: string);
     procedure VerificationSuccessResultHandler;
@@ -46,11 +45,11 @@ const
 constructor TfrmMain.Create(AOwner: TComponent);
 begin
   inherited;
-  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   Listening(False);
   if TBiometric.IsSupported then
   begin
     FBiometric := TBiometric.Current;
+    FBiometric.AllowedAttempts := 1;
     case FBiometric.GetBiometryKind of
       TBiometryKind.None:
         KindLabel.Text := 'Biometry kind: None, or not implemented';
@@ -70,7 +69,7 @@ end;
 
 destructor TfrmMain.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
+  //
   inherited;
 end;
 
@@ -89,18 +88,6 @@ begin
   if FBiometric <> nil then
     FBiometric.Reset;
   ShowMessage('Authentication has been reset, if supported');
-end;
-
-procedure TfrmMain.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
-begin
-  case TApplicationEventMessage(M).Value.Event of
-    TApplicationEvent.EnteredBackground:
-    begin
-      // When your app goes into the background, you should cancel listening for verification!
-      if FBiometric <> nil then
-        FBiometric.Cancel;
-    end;
-  end;
 end;
 
 procedure TfrmMain.CancelButtonClick(Sender: TObject);

@@ -195,7 +195,7 @@
         <iPad_SpotLight80>$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png</iPad_SpotLight80>
         <iPad_Setting58>$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png</iPad_Setting58>
         <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
-        <DCC_FrameworkPath>..\..\ThirdParty\GoogleMobileAds;$(DCC_FrameworkPath)</DCC_FrameworkPath>
+        <DCC_FrameworkPath>$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\PromisesObjC.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64_armv7;$(DCC_FrameworkPath)</DCC_FrameworkPath>
         <DCC_LinkerOptions>-ObjC</DCC_LinkerOptions>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_OSX64)'!=''">

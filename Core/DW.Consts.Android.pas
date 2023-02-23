@@ -20,9 +20,11 @@ const
   cPermissionAccessCoarseLocation = 'android.permission.ACCESS_COARSE_LOCATION';
   cPermissionAccessFineLocation = 'android.permission.ACCESS_FINE_LOCATION';
   cPermissionBluetooth = 'android.permission.BLUETOOTH';
+  cPermissionBluetoothAdvertise = 'android.permission.BLUETOOTH_ADVERTISE';
   cPermissionBluetoothConnect = 'android.permission.BLUETOOTH_CONNECT';
   cPermissionBluetoothScan = 'android.permission.BLUETOOTH_SCAN';
   cPermissionCamera = 'android.permission.CAMERA';
+  cPermissionPostNotifications = 'android.permission.POST_NOTIFICATIONS';
   cPermissionReadCallLog = 'android.permission.READ_CALL_LOG';
   cPermissionReadContacts = 'android.permission.READ_CONTACTS';
   cPermissionReadExternalStorage = 'android.permission.READ_EXTERNAL_STORAGE';
@@ -65,6 +67,9 @@ const
   cDWBroadcastReceiverExtraServiceClassName = cDWBroadcastReceiverName + '.EXTRA_SERVICE_CLASS_NAME';
   cDWBroadcastReceiverExtraStartUnlock = cDWBroadcastReceiverName + '.EXTRA_START_UNLOCK';
 
+  cDWBootBroadcastReceiverActionBootStart = 'DWBootBroadcastReceiver.ACTION_BOOT_START';
+  cDWMetadataKeyServiceInterval = 'KEY_SERVICE_INTERVAL';
+
   cDWFusedLocationClientName = 'com.delphiworlds.kastri.DWFusedLocationClient';
   cDWFusedLocationClientKeyServiceClassName = cDWFusedLocationClientName + '.KEY_SERVICE_CLASS_NAME';
   cDWFusedLocationClientKeyJobId = cDWFusedLocationClientName + '.KEY_JOB_ID';
@@ -73,6 +78,7 @@ const
   cDWFusedLocationClientExtraAlarmTimestamp = cDWFusedLocationClientName + '.EXTRA_ALARM_TIMESTAMP';
 
   cServiceCommandAction = 'com.delphiworlds.action.SERVICE_COMMAND';
+  cServiceCommandJSONAction = 'com.delphiworlds.action.SERVICE_COMMAND_JSON';
   cServiceMessageAction = 'com.delphiworlds.action.SERVICE_MESSAGE';
   cServiceStateAction = 'com.delphiworlds.action.SERVICE_STATE';
   cServiceBroadcastParamCommand = 'COMMAND';
@@ -83,6 +89,9 @@ const
   cServiceCommandAppWillTerminate = 3;
   cServiceCommandAppIsRequestingPermissions = 4;
   cServiceCommandAppCheckState = 5;
+  cServiceStateUnknown = 0;
+  cServiceStateStarted = 1;
+  cServiceStateStopped = 2;
 
   cEMBTJavaServicePrefix = 'com.embarcadero.services.';
 

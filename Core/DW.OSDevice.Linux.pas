@@ -20,6 +20,7 @@ type
   public
     class function GetDeviceName: string; static;
     class function GetPackageID: string; static;
+    class function GetPackageName: string; static;
     class function GetPackageVersion: string; static;
     class function GetUniqueDeviceID: string; static;
     class function IsTouchDevice: Boolean; static;
@@ -46,6 +47,11 @@ begin
 end;
 
 class function TPlatformOSDevice.GetPackageID: string;
+begin
+  Result := ''; // None yet
+end;
+
+class function TPlatformOSDevice.GetPackageName: string;
 begin
   Result := ''; // None yet
 end;

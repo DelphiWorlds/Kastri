@@ -32,6 +32,7 @@ const
   MM_NATIVESLIDER_SETORIENTATION = MM_USER + 9;
   MM_NATIVESLIDER_SETTHUMBIMAGE = MM_USER + 10;
   MM_NATIVESLIDER_SETVALUE = MM_USER + 11;
+  MM_NATIVESLIDER_ENABLED_CHANGED = MM_USER + 12;
 
 type
   TSliderOrientation = (Horizontal, Vertical);
@@ -50,6 +51,7 @@ type
     procedure SetMaxImage(const Value: TBitmap);
     procedure SetMinImage(const Value: TBitmap);
   protected
+    procedure EnabledChanged;
     procedure SliderLoaded;
     property MaxImage: TBitmap read FMaxImage write SetMaxImage;
     property MinImage: TBitmap read FMinImage write SetMinImage;
@@ -80,6 +82,7 @@ type
   protected
     procedure AfterPaint; override;
     function DefineModelClass: TDataModelClass; override;
+    procedure EnabledChanged; override;
     procedure Loaded; override;
     procedure Paint; override;
     function RecommendSize(const AWishedSize: TSizeF): TSizeF; override;
@@ -149,6 +152,11 @@ begin
   FMaxImage.Free;
   FMinImage.Free;
   inherited;
+end;
+
+procedure TCustomNativeSliderModel.EnabledChanged;
+begin
+  SendMessage(MM_NATIVESLIDER_ENABLED_CHANGED);
 end;
 
 procedure TCustomNativeSliderModel.SliderLoaded;
@@ -342,6 +350,12 @@ end;
 function TCustomNativeSlider.RecommendSize(const AWishedSize: TSizeF): TSizeF;
 begin
   Result := AWishedSize;
+end;
+
+procedure TCustomNativeSlider.EnabledChanged;
+begin
+  inherited;
+  Model.EnabledChanged;
 end;
 
 procedure TCustomNativeSlider.SetMaxImage(const Value: TBitmap);

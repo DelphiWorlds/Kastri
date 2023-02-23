@@ -45,6 +45,7 @@ type
   [JavaSignature('com/delphiworlds/kastri/DWCameraCharacteristicsHelper')]
   JDWCameraCharacteristicsHelper = interface(JObject)
     ['{66872D0B-17E3-4AF1-8B27-1D1731A40DE9}']
+    function getControlAEAvailableModes: TJavaArray<Integer>; cdecl;
     function getFaceDetectModes: TJavaArray<Integer>; cdecl;
     function getLensFacing: Integer; cdecl;
     function getMap: JStreamConfigurationMap; cdecl;

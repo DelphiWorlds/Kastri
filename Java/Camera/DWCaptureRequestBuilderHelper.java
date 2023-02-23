@@ -37,26 +37,30 @@ public class DWCaptureRequestBuilderHelper {
   }
 
   public int getIntegerValue(CaptureRequest.Key<Integer> key) {
-    Integer value = mBuilder.get(key);
-    if (value != null)
-      return value.intValue();
-    else
-      return Integer.MIN_VALUE;
+		if (key != null) {
+	    Integer value = mBuilder.get(key);
+	    if (value != null)
+	      return value.intValue();
+    }
+    return Integer.MIN_VALUE;
   }
 
   public long getLongValue(CaptureRequest.Key<Long> key) {
-    Long value = mBuilder.get(key);
-    if (value != null)
-      return value.longValue();
-    else
-      return Long.MIN_VALUE;
+	  if (key != null) {
+	    Long value = mBuilder.get(key);
+	    if (value != null)
+	      return value.longValue();
+		};
+    return Long.MIN_VALUE;
   }
 
   public void setIntegerValue(CaptureRequest.Key<Integer> key, int value) {
-    mBuilder.set(key, value);
+	  if (key != null)
+      mBuilder.set(key, value);
   }
 
   public void setLongValue(CaptureRequest.Key<Long> key, long value) {
-    mBuilder.set(key, value);
+	  if (key != null)
+      mBuilder.set(key, value);
   }
 }

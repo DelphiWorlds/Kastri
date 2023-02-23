@@ -5,6 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts, FMX.ListBox,
+  FMX.TabControl, FMX.Objects,
   DW.FilesSelector;
 
 type
@@ -17,12 +18,17 @@ type
     ButtonsLayout: TLayout;
     SelectImagesAndMoviesButton: TButton;
     SelectTextButton: TButton;
+    TabControl: TTabControl;
+    FilesTab: TTabItem;
+    ImageTab: TTabItem;
+    Image: TImage;
     procedure SelectImagesButtonClick(Sender: TObject);
     procedure ListBox1ItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
     procedure SelectImagesAndMoviesButtonClick(Sender: TObject);
     procedure SelectTextButtonClick(Sender: TObject);
   private
     FSelector: TFilesSelector;
+    procedure LoadImage(const AFilePath: string);
     procedure SelectorCompleteHandler(Sender: TObject; const AOK: Boolean);
   protected
     procedure Resize; override;
@@ -39,6 +45,9 @@ implementation
 {$R *.fmx}
 
 uses
+  {$IF Defined(ANDROID)}
+  DW.Android.Helpers,
+  {$ENDIF}
   System.Permissions,
   FMX.TextLayout,
   DW.UIHelper;
@@ -68,6 +77,7 @@ end;
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
+  TabControl.ActiveTab := FilesTab;
   FSelector := TFilesSelector.Create;
   FSelector.Title := 'Select a file';
   FSelector.OnComplete := SelectorCompleteHandler;
@@ -80,9 +90,33 @@ begin
 end;
 
 procedure TForm1.ListBox1ItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
+var
+  LDisplayName: string;
 begin
-  DisplayNameValueLabel.Text := FSelector.SelectedFiles[Item.Index].DisplayName;
+  LDisplayName := FSelector.SelectedFiles[Item.Index].DisplayName;
+  DisplayNameValueLabel.Text := LDisplayName;
+  if LDisplayName.EndsWith('jpg', True) or LDisplayName.EndsWith('jpeg', True) or LDisplayName.EndsWith('bmp', True) or LDisplayName.EndsWith('png', True) then
+    LoadImage(FSelector.SelectedFiles[Item.Index].RawPath);
 end;
+
+procedure TForm1.LoadImage(const AFilePath: string);
+{$IF Defined(ANDROID)}
+var
+  LFileStream: TAndroidFileStream;
+begin
+  LFileStream := TAndroidFileStream.Create(AFilePath);
+  try
+    Image.Bitmap.LoadFromStream(LFileStream);
+    TabControl.ActiveTab := ImageTab;
+  finally
+    LFileStream.Free;
+  end;
+end;
+{$ELSE}
+begin
+  // TODO: Implement for other platforms
+end;
+{$ENDIF}
 
 procedure TForm1.Resize;
 begin
@@ -96,6 +130,7 @@ var
   LMaxChars, LDiff, LHalf, I: Integer;
   LFudge: Single;
 begin
+  TabControl.ActiveTab := FilesTab;
   ListBox1.Clear;
   ListBox1.Items.Add('W');
   {$IF Defined(IOS)}

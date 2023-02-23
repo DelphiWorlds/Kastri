@@ -157,6 +157,8 @@ Following the example from the [`Adding links to your webpage`](#adding-links-to
 
 Due to an [issue in Delphi](https://quality.embarcadero.com/browse/RSP-31487), you will need to:
 
+**NOTE: The issue mentioned here has been fixed in Delphi 11.2. If you have this version, you can now add associated domains in the Entitlements List for iOS in the Project Options**
+
 1. Compile the app
 2. In the Delphi menu, use Project|Deploy [your project name] (Shift-Ctrl-Alt-F9) to deploy the project files
 3. Copy the .entitlements (the file name will start with the same name as your project) file from the deployed files (e.g. in the iOSDevice64\Debug subfolder), and put it in another folder (e.g. the project root)

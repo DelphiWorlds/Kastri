@@ -311,7 +311,7 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
   private void setRepeatAlarm(Context context, Intent intent, long alarmTime) {
     int id = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
     Log.d(TAG, "Setting repeat alarm for id: " + id);
-    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     if (Build.VERSION.SDK_INT >= 21)
       alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);

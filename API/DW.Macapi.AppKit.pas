@@ -22,10 +22,20 @@ uses
 type
   NSOpenPanel = interface;
   NSSavePanel = interface;
+  NSStoryboard = interface;
+  NSViewController = interface;
 
   NSModalResponse = NSInteger;
+  NSNibName = NSString;
+  NSPopoverBehavior = NSInteger;
+  NSViewControllerTransitionOptions = NSInteger;
+  NSStoryboardName = NSString;
+  NSStoryboardSceneIdentifier = NSString;
+
+  NSStoryboardControllerCreator = function(coder: NSCoder): Pointer of object;
 
   TNSSavePanelBlockMethod1 = procedure(result: NSModalResponse) of object;
+  TNSViewControllerBlockMethod1 = procedure of object;
 
   NSSavePanelClass = interface(NSPanelClass)
     ['{E810D910-C0A9-4EFE-AFAE-FD417F913EEB}']
@@ -139,6 +149,83 @@ type
     function URLs: NSArray; cdecl;
   end;
   TNSOpenPanel = class(TOCGenericImport<NSOpenPanelClass, NSOpenPanel>) end;
+
+  NSStoryboardClass = interface(NSObjectClass)
+    ['{51860B2C-1299-44AF-86AF-E4264002E95C}']
+    {class} function mainStoryboard: NSStoryboard; cdecl;
+    {class} function storyboardWithName(name: NSStoryboardName; bundle: NSBundle): Pointer; cdecl;
+  end;
+
+  NSStoryboard = interface(NSObject)
+    ['{58CA900E-0ED2-4F58-B586-E5F0A6537C27}']
+    function instantiateControllerWithIdentifier(identifier: NSStoryboardSceneIdentifier): Pointer; overload; cdecl;
+    function instantiateControllerWithIdentifier(identifier: NSStoryboardSceneIdentifier; creator: NSStoryboardControllerCreator): Pointer; overload; cdecl;
+    function instantiateInitialController: Pointer; cdecl;
+    function instantiateInitialControllerWithCreator(block: NSStoryboardControllerCreator): Pointer; cdecl;
+  end;
+  TNSStoryboard = class(TOCGenericImport<NSStoryboardClass, NSStoryboard>) end;
+
+  NSViewControllerClass = interface(NSResponderClass)
+    ['{586C8CDC-6893-405C-89E1-305C8C64DEAC}']
+  end;
+
+  NSViewController = interface(NSResponder)
+    ['{B9802D1E-21A6-4ABD-9343-48AB899C21E6}']
+    procedure addChildViewController(childViewController: NSViewController); cdecl;
+    function childViewControllers: NSArray; cdecl;
+    function commitEditing: Boolean; cdecl;
+    procedure commitEditingWithDelegate(delegate: Pointer; didCommitSelector: SEL; contextInfo: Pointer); cdecl;
+    procedure discardEditing; cdecl;
+    procedure dismissController(sender: Pointer); cdecl;
+    procedure dismissViewController(viewController: NSViewController); cdecl;
+    function extensionContext: NSExtensionContext; cdecl;
+    function initWithCoder(coder: NSCoder): Pointer; cdecl;
+    function initWithNibName(nibNameOrNil: NSNibName; bundle: NSBundle): Pointer; cdecl;
+    procedure insertChildViewController(childViewController: NSViewController; atIndex: NSInteger); cdecl;
+    function isViewLoaded: Boolean; cdecl;
+    procedure loadView; cdecl;
+    function nibBundle: NSBundle; cdecl;
+    function nibName: NSNibName; cdecl;
+    function parentViewController: NSViewController; cdecl;
+    function preferredContentSize: NSSize; cdecl;
+    procedure preferredContentSizeDidChangeForViewController(viewController: NSViewController); cdecl;
+    function preferredMaximumSize: NSSize; cdecl;
+    function preferredMinimumSize: NSSize; cdecl;
+    function preferredScreenOrigin: NSPoint; cdecl;
+    function presentedViewControllers: NSArray; cdecl;
+    function presentingViewController: NSViewController; cdecl;
+    procedure presentViewController(viewController: NSViewController; asPopoverRelativeToRect: NSRect; ofView: NSView; preferredEdge: NSRectEdge;
+      behavior: NSPopoverBehavior); overload; cdecl;
+    procedure presentViewController(viewController: NSViewController; animator: Pointer); overload; cdecl;
+    procedure presentViewControllerAsModalWindow(viewController: NSViewController); cdecl;
+    procedure presentViewControllerAsSheet(viewController: NSViewController); cdecl;
+    procedure removeChildViewControllerAtIndex(index: NSInteger); cdecl;
+    procedure removeFromParentViewController; cdecl;
+    function representedObject: Pointer; cdecl;
+    procedure setChildViewControllers(childViewControllers: NSArray); cdecl;
+    procedure setPreferredContentSize(preferredContentSize: NSSize); cdecl;
+    procedure setPreferredScreenOrigin(preferredScreenOrigin: NSPoint); cdecl;
+    procedure setRepresentedObject(representedObject: Pointer); cdecl;
+    procedure setSourceItemView(sourceItemView: NSView); cdecl;
+    procedure setTitle(title: NSString); cdecl;
+    procedure setView(view: NSView); cdecl;
+    function sourceItemView: NSView; cdecl;
+    function storyboard: NSStoryboard; cdecl;
+    function title: NSString; cdecl;
+    procedure transitionFromViewController(fromViewController: NSViewController; toViewController: NSViewController;
+      options: NSViewControllerTransitionOptions; completionHandler: TNSViewControllerBlockMethod1); cdecl;
+    procedure updateViewConstraints; cdecl;
+    function view: NSView; cdecl;
+    procedure viewDidAppear; cdecl;
+    procedure viewDidDisappear; cdecl;
+    procedure viewDidLayout; cdecl;
+    procedure viewDidLoad; cdecl;
+    procedure viewWillAppear; cdecl;
+    procedure viewWillDisappear; cdecl;
+    procedure viewWillLayout; cdecl;
+    procedure viewWillTransitionToSize(newSize: NSSize); cdecl;
+  end;
+  TNSViewController = class(TOCGenericImport<NSViewControllerClass, NSViewController>) end;
 
 implementation
 

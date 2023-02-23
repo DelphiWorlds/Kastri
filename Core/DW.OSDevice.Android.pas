@@ -32,6 +32,7 @@ type
     class function GetDeviceName: string; static;
     class function GetManufacturer: string; static;
     class function GetPackageID: string; static;
+    class function GetPackageName: string; static;
     class function GetPackageVersion: string; static;
     class function GetUIMode: TUIMode; static;
     class function GetUniqueDeviceID: string; static;
@@ -125,6 +126,18 @@ end;
 class function TPlatformOSDevice.GetPackageID: string;
 begin
   Result := JStringToString(TAndroidHelper.Context.getPackageName);
+end;
+
+class function TPlatformOSDevice.GetPackageName: string;
+var
+  LInfo: JApplicationInfo;
+begin
+  // https://stackoverflow.com/a/15114434/3164070
+  LInfo := TAndroidHelper.Context.getApplicationInfo;
+  if LInfo.labelRes = 0 then
+    Result := JStringToString(LInfo.nonLocalizedLabel.toString)
+  else
+    Result := JStringToString(TAndroidHelper.Context.getString(LInfo.labelRes));
 end;
 
 class function TPlatformOSDevice.GetPackageVersion: string;

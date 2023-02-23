@@ -31,23 +31,6 @@ implementation
 
 {$R *.fmx}
 
-uses
-  Macapi.AppKit, Macapi.ObjectiveC, Macapi.CocoaTypes, Macapi.Helpers, Macapi.Foundation,
-  FMX.Platform.Mac;
-
-const
-  NSWindowTitleVisible = 0;
-  NSWindowTitleHidden = 1;
-
-type
-  NSWindowTitleVisibility = NSInteger;
-
-  NSWindow = interface(Macapi.AppKit.NSWindow)
-    ['{5782E82A-D658-4003-881E-14CEC0F2F886}']
-    procedure setTitleVisibility(titleVisibility: NSWindowTitleVisibility); cdecl;
-  end;
-  TNSWindow = class(TOCGenericImport<NSWindowClass, NSWindow>) end;
-
 { TForm1 }
 
 constructor TForm1.Create(AOwner: TComponent);
@@ -87,7 +70,6 @@ begin
   LItem.Hint := 'App information';
   LItem.OnClick := ItemInfoClickHandler;
   FToolbar.Form := Self;
-  TNSWindow.Wrap(NSObjectToID(WindowHandleToPlatform(Handle).Wnd)).setTitleVisibility(NSWindowTitleHidden);
 end;
 
 procedure TForm1.ItemEditCopyClickHandler(Sender: TObject);

@@ -83,6 +83,7 @@ type
     class function GetDeviceRotation: Double;
   protected
     procedure CameraSettingChanged; override;
+    function CanControlExposure: Boolean; override;
     procedure CloseCamera; override;
     procedure DoCaptureImage; override;
     function GetPreviewControl: TControl; override;
@@ -357,6 +358,11 @@ procedure TPlatformCamera.CameraSettingChanged;
 begin
   if FDevice <> nil then
     UpdateDeviceModes;
+end;
+
+function TPlatformCamera.CanControlExposure: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TPlatformCamera.CaptureStillImageCompletionHandler(buffer: CMSampleBufferRef; error: NSError);

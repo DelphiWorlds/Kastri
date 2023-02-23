@@ -30,7 +30,7 @@ type
     destructor Destroy; override;
     function GetPageCount: Integer;
     procedure LoadFromFile(const AFileName: string);
-    procedure RenderPage(const APageIndex: Integer; const ABitmap: TBitmap; const AScale: Single = 1.0);
+    procedure RenderPage(const APageIndex: Integer; const ABitmap: TBitmap);
   end;
 
 implementation
@@ -75,22 +75,26 @@ begin
   FRenderer := TJPdfRenderer.JavaClass.init(LDescriptor);
 end;
 
-procedure TPDFRenderer.RenderPage(const APageIndex: Integer; const ABitmap: TBitmap; const AScale: Single = 1.0);
+procedure TPDFRenderer.RenderPage(const APageIndex: Integer; const ABitmap: TBitmap);
 var
   LNativeBitmap: JBitmap;
   LPage: JPdfRenderer_Page;
   LSurface: TBitmapSurface;
 begin
-  LNativeBitmap := TJBitmap.JavaClass.createBitmap(Round(ABitmap.Width * AScale), Round(ABitmap.Height * AScale), TJBitmap_Config.JavaClass.ARGB_4444);
-  LPage := FRenderer.openPage(APageIndex);
-  LPage.render(LNativeBitmap, nil, nil, TJPdfRenderer_Page.JavaClass.RENDER_MODE_FOR_DISPLAY);
-  LPage.close;
-  LSurface := TBitmapSurface.Create;
+  LNativeBitmap := TJBitmap.JavaClass.createBitmap(ABitmap.Width, ABitmap.Height, TJBitmap_Config.JavaClass.ARGB_4444);
   try
-    if JBitmapToSurface(LNativeBitmap, LSurface) then
-      ABitmap.Assign(LSurface);
+    LPage := FRenderer.openPage(APageIndex);
+    LPage.render(LNativeBitmap, nil, nil, TJPdfRenderer_Page.JavaClass.RENDER_MODE_FOR_DISPLAY);
+    LPage.close;
+    LSurface := TBitmapSurface.Create;
+    try
+      if JBitmapToSurface(LNativeBitmap, LSurface) then
+        ABitmap.Assign(LSurface);
+    finally
+      LSurface.Free;
+    end;
   finally
-    LSurface.Free;
+    LNativeBitmap.recycle;
   end;
 end;
 

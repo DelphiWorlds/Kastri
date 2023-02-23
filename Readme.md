@@ -27,6 +27,10 @@ If you're looking to [learn Delphi, please visit this link](https://learndelphi.
 * Is kept as simple as practicable
 * Is named after the [place in Greece](https://en.wikipedia.org/wiki/Kastri,_Phocis) where [Delphi](https://en.wikipedia.org/wiki/Delphi) once stood
 
+## Playground
+
+[Playground](https://github.com/DelphiWorlds/Playground) is a separate repository that serves as a testing ground for features that may or may not be included in Kastri. Please visit the Playground for features/demos that are on the bleeding edge!
+
 ## Delphi 11 changes
 
 With the introduction of Delphi 11, there have been some changes related to Android. You may notice new jar files in the `Lib` folder where the name is the same as an existing jar, with a suffix of `2.0.0` (or greater) e.g. `dw-kastri-base-2.0.0.jar`. Jars with a `2.0.0` suffix will work **only with Delphi 11** (and possibly later). If a jar does not have a corresponding jar with a `2.0.0` (or greater) suffix, it should also work with Delphi 11. Please also see the Demos section below.
@@ -69,6 +73,8 @@ If you would like to join the Delphi Worlds Slack workspace, [please visit this 
 
 You'll find demo applications in the [Demos](./Demos) folder, including those associated with articles posted on the [Delphi Worlds blog](http://www.delphiworlds.com/blog)
 
+Note: Most demos have a readme associated with them, and **they may have vital configuration information that should be applied when using the feature(s) in your own projects**
+
 **Delphi 11 users please note**: Some of the demos that have Android support have been updated in line with changes in Delphi 11, and now have separate project (`.dproj`) and group project (`.groupproj`) (where applicable) files, which have been suffixed with `D11`. For demos that do not have a suffix of `D11` in the name, you may need to open Project Manager and for each Android target you wish to use, right-click the `Libraries` node and click `Revery System Files to Default` before building the project. 
 
 ### API imports
@@ -97,7 +103,23 @@ Implementations include:
 
 The Features folder contains more feature-rich cross-platform implementations of APIs. These are structured in such a way so as to shield your cross-platform code from the platform-specific implementation.
 There are demos for each of the features in the Demos folder
-Features include:
+Features include (amongst others):
+
+#### AdMob
+
+Support for Google Ads on Android and iOS
+
+#### AndroidPDF 
+
+PDF Renderer for Android
+
+#### AppUpdate
+
+In-app updating of the application. (Android only)
+
+#### AudioPlayer
+
+Play audio files on Android, iOS and Windows. Specifically constructed to allow synchronization of audio and visual display.
 
 #### Barcode
 
@@ -147,9 +169,21 @@ Support for the proximity sensor on Android and iOS, including switching the scr
 
 A more feature-rich alternative for the Share Sheet implementation provided with Delphi, for Android and iOS
 
+#### SMS
+
+Support for sending SMS messages on Android and iOS
+
 #### Speech Recognition
 
 Android and iOS implementations for speech-to-text services. On Android, the actual speech API is used, rather than via Intents
+
+#### Symbol Scanner
+
+Scanning of codes specifically for popular scanning devices such as Zebra, Symbol and Honeywell (Android)
+
+#### Text To Speech
+
+Allows your device to speak from the supplied text. Support for Android, iOS, macOS and Windows
 
 #### Universal Links
 
@@ -165,7 +199,7 @@ A simplified variation on [Grijjy's excellent Google SignIn](https://github.com/
 
 #### Media Manager
 
-For accessing photos/videos stored on the device via the albums on Android and iOS
+For accessing photos/videos stored on the device via the albums on Android and iOS. This feature is currently in the [Playground](https://github.com/DelphiWorlds/Playground/tree/main/Demos/MediaManager).
 
 #### Simple backend framework for managing push tokens
 

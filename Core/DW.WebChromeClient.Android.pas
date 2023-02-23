@@ -19,7 +19,7 @@ uses
   // RTL
   System.Classes, System.Messaging,
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.WebKit, Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNIBridge, Androidapi.JNI.WebKit, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes,
   // FMX
   FMX.WebBrowser,
   // DW
@@ -34,6 +34,7 @@ type
   public
     { JDWWebChromeClientDelegate }
     function onFileChooserIntent(intent: JIntent): Boolean; cdecl;
+    function onShouldOverrideUrlLoading(url: JString): Boolean; cdecl;
   public
     constructor Create(const AManager: TWebChromeClientManager);
   end;
@@ -45,7 +46,8 @@ type
     procedure MessageResultNotificationHandler(const Sender: TObject; const M: TMessage);
   protected
     procedure FlushCookies; override;
-    function HandleFileChooserIntent(intent: JIntent): Boolean;
+    function HandleFileChooserIntent(const AIntent: JIntent): Boolean;
+    function ShouldOverrideUrlLoading(const AUrl: JString): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -77,6 +79,11 @@ begin
   Result := FManager.HandleFileChooserIntent(intent);
 end;
 
+function TWebChromeClientDelegate.onShouldOverrideUrlLoading(url: JString): Boolean;
+begin
+  Result := FManager.ShouldOverrideUrlLoading(url);
+end;
+
 { TWebChromeClientManager }
 
 constructor TWebChromeClientManager.Create(AOwner: TComponent);
@@ -99,9 +106,9 @@ begin
   inherited;
 end;
 
-function TWebChromeClientManager.HandleFileChooserIntent(intent: JIntent): Boolean;
+function TWebChromeClientManager.HandleFileChooserIntent(const AIntent: JIntent): Boolean;
 begin
-  TAndroidHelper.Activity.startActivityForResult(intent, cFileChooserRequestCode);
+  TAndroidHelper.Activity.startActivityForResult(AIntent, cFileChooserRequestCode);
   Result := True;
 end;
 
@@ -115,6 +122,12 @@ begin
     if LResult.RequestCode = cFileChooserRequestCode then
       FWebChromeClient.handleFileChooserResult(LResult.Value, LResult.ResultCode);
   end;
+end;
+
+function TWebChromeClientManager.ShouldOverrideUrlLoading(const AUrl: JString): Boolean;
+begin
+  Result := False;
+  DoShouldOverrideUrl(JStringToString(AUrl), Result);
 end;
 
 procedure TWebChromeClientManager.FlushCookies;

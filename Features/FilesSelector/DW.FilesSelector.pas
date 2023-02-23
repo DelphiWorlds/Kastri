@@ -32,7 +32,7 @@ type
 
   TSelectedFiles = TArray<TSelectedFile>;
 
-  TFileKind = (Image, Audio, Movie, Text, Item, Content, SourceCode);
+  TFileKind = (Image, Audio, Movie, Text, Item, Content, SourceCode, PDF, X509Certificate, Key);
 
   TFileKinds = set of TFileKind;
 
@@ -106,7 +106,7 @@ type
     ///   An empty list implies all file types unless the FileKinds property is not empty
     /// </summary>
     /// <remarks>
-    ///   NOTE: Altering this property will clear the FileTypes property
+    ///   NOTE: Altering this property will clear the FileKinds property
     /// </remarks>
     property FileTypes: TStrings read GetFileTypes;
     /// <summary>

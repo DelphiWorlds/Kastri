@@ -16,7 +16,8 @@ unit DW.iOSapi.EventKit;
 interface
 
 uses
-  Macapi.ObjectiveC, iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreGraphics, iOSapi.CoreLocation, iOSapi.MapKit, iOSapi.AddressBook;
+  Macapi.ObjectiveC, Macapi.CoreFoundation,
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreGraphics, iOSapi.CoreLocation, iOSapi.MapKit, iOSapi.AddressBook;
 
 const
   EKAuthorizationStatusNotDetermined = 0;
@@ -125,6 +126,10 @@ type
   EKReminder = interface;
   EKSource = interface;
   EKStructuredLocation = interface;
+  EKVirtualConferenceRoomTypeDescriptor = interface;
+  EKVirtualConferenceURLDescriptor = interface;
+  EKVirtualConferenceDescriptor = interface;
+  EKVirtualConferenceProvider = interface;
 
   PBoolean = ^Boolean;
   EKAuthorizationStatus = NSInteger;
@@ -149,7 +154,12 @@ type
   EKEventSearchCallback = procedure(event: EKEvent; stop: PBoolean) of object;
 
   EKEventStoreRequestAccessCompletionHandler = procedure(granted: Boolean; error: NSError) of object;
+  ABRecordRef = CFTypeRef;
+  ABAddressBookRef = CFTypeRef;
+  EKVirtualConferenceRoomTypeIdentifier = NSString;
   TEKEventStoreBlockMethod1 = procedure(reminders: NSArray) of object;
+  TEKVirtualConferenceProviderBlockMethod1 = procedure(param1: NSArray; param2: NSError) of object;
+  TEKVirtualConferenceProviderBlockMethod2 = procedure(param1: EKVirtualConferenceDescriptor; param2: NSError) of object;
 
   EKObjectClass = interface(NSObjectClass)
     ['{1CBE647E-EAC3-41D5-B303-E3E2523B895C}']
@@ -188,7 +198,6 @@ type
 
   EKCalendarClass = interface(EKObjectClass)
     ['{23035E0B-3B75-4BE6-A38C-C0A449AF6DC6}']
-    [MethodName('calendarForEntityType:eventStore:')]
     {class} function calendarForEntityType(entityType: EKEntityType; eventStore: EKEventStore): EKCalendar; cdecl;
     {class} function calendarWithEventStore(eventStore: EKEventStore): EKCalendar; cdecl;
   end;
@@ -297,40 +306,27 @@ type
     function defaultCalendarForNewEvents: EKCalendar; cdecl;
     function defaultCalendarForNewReminders: EKCalendar; cdecl;
     function delegateSources: NSArray; cdecl;
-    [MethodName('enumerateEventsMatchingPredicate:usingBlock:')]
-    procedure enumerateEventsMatchingPredicate(predicate: NSPredicate; block: EKEventSearchCallback); cdecl;
+    procedure enumerateEventsMatchingPredicate(predicate: NSPredicate; usingBlock: EKEventSearchCallback); cdecl;
     function eventsMatchingPredicate(predicate: NSPredicate): NSArray; cdecl;
     function eventStoreIdentifier: NSString; cdecl;
     function eventWithIdentifier(identifier: NSString): EKEvent; cdecl;
-    [MethodName('fetchRemindersMatchingPredicate:completion:')]
     function fetchRemindersMatchingPredicate(predicate: NSPredicate; completion: TEKEventStoreBlockMethod1): Pointer; cdecl;
     function initWithAccessToEntityTypes(entityTypes: EKEntityMask): Pointer; cdecl;
-    [MethodName('predicateForCompletedRemindersWithCompletionDateStarting:ending:calendars:')]
-    function predicateForCompletedRemindersWithCompletionDateStarting(startDate: NSDate; endDate: NSDate; calendars: NSArray): NSPredicate; cdecl;
-    [MethodName('predicateForEventsWithStartDate:endDate:calendars:')]
+    function initWithSources(sources: NSArray): Pointer; cdecl;
+    function predicateForCompletedRemindersWithCompletionDateStarting(startDate: NSDate; ending: NSDate; calendars: NSArray): NSPredicate; cdecl;
     function predicateForEventsWithStartDate(startDate: NSDate; endDate: NSDate; calendars: NSArray): NSPredicate; cdecl;
-    [MethodName('predicateForIncompleteRemindersWithDueDateStarting:ending:calendars:')]
-    function predicateForIncompleteRemindersWithDueDateStarting(startDate: NSDate; endDate: NSDate; calendars: NSArray): NSPredicate; cdecl;
+    function predicateForIncompleteRemindersWithDueDateStarting(startDate: NSDate; ending: NSDate; calendars: NSArray): NSPredicate; cdecl;
     function predicateForRemindersInCalendars(calendars: NSArray): NSPredicate; cdecl;
     procedure refreshSourcesIfNecessary; cdecl;
-    [MethodName('removeCalendar:commit:error:')]
     function removeCalendar(calendar: EKCalendar; commit: Boolean; error: PPointer): Boolean; cdecl;
-    [MethodName('removeEvent:span:error:')]
     function removeEvent(event: EKEvent; span: EKSpan; error: PPointer): Boolean; overload; cdecl;
-    [MethodName('removeEvent:span:commit:error:')]
     function removeEvent(event: EKEvent; span: EKSpan; commit: Boolean; error: PPointer): Boolean; overload; cdecl;
-    [MethodName('removeReminder:commit:error:')]
     function removeReminder(reminder: EKReminder; commit: Boolean; error: PPointer): Boolean; cdecl;
-    [MethodName('requestAccessToEntityType:completion:')]
     procedure requestAccessToEntityType(entityType: EKEntityType; completion: EKEventStoreRequestAccessCompletionHandler); cdecl;
     procedure reset; cdecl;
-    [MethodName('saveCalendar:commit:error:')]
     function saveCalendar(calendar: EKCalendar; commit: Boolean; error: PPointer): Boolean; cdecl;
-    [MethodName('saveEvent:span:commit:error:')]
     function saveEvent(event: EKEvent; span: EKSpan; commit: Boolean; error: PPointer): Boolean; overload; cdecl;
-    [MethodName('saveEvent:span:error:')]
     function saveEvent(event: EKEvent; span: EKSpan; error: PPointer): Boolean; overload; cdecl;
-    [MethodName('saveReminder:commit:error:')]
     function saveReminder(reminder: EKReminder; commit: Boolean; error: PPointer): Boolean; cdecl;
     function sources: NSArray; cdecl;
     function sourceWithIdentifier(identifier: NSString): EKSource; cdecl;
@@ -357,14 +353,12 @@ type
   EKRecurrenceDayOfWeekClass = interface(NSObjectClass)
     ['{9EE611D3-F42A-49E5-B893-3DD2D5443079}']
     {class} function dayOfWeek(dayOfTheWeek: EKWeekday): Pointer; overload; cdecl;
-    [MethodName('dayOfWeek:weekNumber:')]
     {class} function dayOfWeek(dayOfTheWeek: EKWeekday; weekNumber: NSInteger): Pointer; overload; cdecl;
   end;
 
   EKRecurrenceDayOfWeek = interface(NSObject)
     ['{4C716179-3D74-4AB6-845C-BB3E7F5F5B75}']
     function dayOfTheWeek: EKWeekday; cdecl;
-    [MethodName('initWithDayOfTheWeek:weekNumber:')]
     function initWithDayOfTheWeek(dayOfTheWeek: EKWeekday; weekNumber: NSInteger): Pointer; cdecl;
     function weekNumber: NSInteger; cdecl;
   end;
@@ -395,10 +389,9 @@ type
     function daysOfTheYear: NSArray; cdecl;
     function firstDayOfTheWeek: NSInteger; cdecl;
     function frequency: EKRecurrenceFrequency; cdecl;
-    [MethodName('initRecurrenceWithFrequency:interval:end:')]
     function initRecurrenceWithFrequency(&type: EKRecurrenceFrequency; interval: NSInteger; &end: EKRecurrenceEnd): Pointer; overload; cdecl;
-    [MethodName('initRecurrenceWithFrequency:interval:daysOfTheWeek:daysOfTheMonth:monthsOfTheYear:weeksOfTheYear:daysOfTheYear:setPositions:end:')]
-    function initRecurrenceWithFrequency(&type: EKRecurrenceFrequency; interval: NSInteger; days: NSArray; monthDays: NSArray; months: NSArray; weeksOfTheYear: NSArray; daysOfTheYear: NSArray; setPositions: NSArray; &end: EKRecurrenceEnd): Pointer; overload; cdecl;
+    function initRecurrenceWithFrequency(&type: EKRecurrenceFrequency; interval: NSInteger; daysOfTheWeek: NSArray; daysOfTheMonth: NSArray;
+      monthsOfTheYear: NSArray; weeksOfTheYear: NSArray; daysOfTheYear: NSArray; setPositions: NSArray; &end: EKRecurrenceEnd): Pointer; overload; cdecl;
     function interval: NSInteger; cdecl;
     function monthsOfTheYear: NSArray; cdecl;
     function recurrenceEnd: EKRecurrenceEnd; cdecl;
@@ -436,6 +429,7 @@ type
     ['{2741FEBB-C580-4CA5-A324-82542C7EDC65}']
     function calendars: NSSet; cdecl;
     function calendarsForEntityType(entityType: EKEntityType): NSSet; cdecl;
+    function isDelegate: Boolean; cdecl;
     function sourceIdentifier: NSString; cdecl;
     function sourceType: EKSourceType; cdecl;
     function title: NSString; cdecl;
@@ -459,38 +453,85 @@ type
   end;
   TEKStructuredLocation = class(TOCGenericImport<EKStructuredLocationClass, EKStructuredLocation>) end;
 
-function EKErrorDomain: NSString;
+  EKVirtualConferenceRoomTypeDescriptorClass = interface(NSObjectClass)
+    ['{BBF0DC08-058E-46F7-BE1F-D8D1FBFCB5E4}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  EKVirtualConferenceRoomTypeDescriptor = interface(NSObject)
+    ['{B4741F59-918F-4261-9A8E-2B1AF817C138}']
+    function identifier: EKVirtualConferenceRoomTypeIdentifier; cdecl;
+    function initWithTitle(title: NSString; identifier: EKVirtualConferenceRoomTypeIdentifier): Pointer; cdecl;
+    function title: NSString; cdecl;
+  end;
+  TEKVirtualConferenceRoomTypeDescriptor = class(TOCGenericImport<EKVirtualConferenceRoomTypeDescriptorClass, EKVirtualConferenceRoomTypeDescriptor>) end;
+
+  EKVirtualConferenceURLDescriptorClass = interface(NSObjectClass)
+    ['{527BAFD3-2479-4710-B477-D9DDDDD452E7}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  EKVirtualConferenceURLDescriptor = interface(NSObject)
+    ['{95506E95-F859-427D-8EC7-17BD7AC00D0B}']
+    function initWithTitle(title: NSString; URL: NSURL): Pointer; cdecl;
+    function title: NSString; cdecl;
+    function URL: NSURL; cdecl;
+  end;
+  TEKVirtualConferenceURLDescriptor = class(TOCGenericImport<EKVirtualConferenceURLDescriptorClass, EKVirtualConferenceURLDescriptor>) end;
+
+  EKVirtualConferenceDescriptorClass = interface(NSObjectClass)
+    ['{6E8680F3-BD73-4353-83BC-9C6BDEEE8FBD}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  EKVirtualConferenceDescriptor = interface(NSObject)
+    ['{09052190-10E0-4991-9D6A-2413B710156A}']
+    function conferenceDetails: NSString; cdecl;
+    function initWithTitle(title: NSString; URLDescriptors: NSArray; conferenceDetails: NSString): Pointer; cdecl;
+    function title: NSString; cdecl;
+    function URLDescriptors: NSArray; cdecl;
+  end;
+  TEKVirtualConferenceDescriptor = class(TOCGenericImport<EKVirtualConferenceDescriptorClass, EKVirtualConferenceDescriptor>) end;
+
+  EKVirtualConferenceProviderClass = interface(NSObjectClass)
+    ['{CFD67F43-036B-4794-9DEE-A267152BCA33}']
+  end;
+
+  EKVirtualConferenceProvider = interface(NSObject)
+    ['{E609F739-C3AE-4710-90B5-5E7697210A6C}']
+    procedure fetchAvailableRoomTypesWithCompletionHandler(completionHandler: TEKVirtualConferenceProviderBlockMethod1); cdecl;
+    procedure fetchVirtualConferenceForIdentifier(identifier: EKVirtualConferenceRoomTypeIdentifier; completionHandler: TEKVirtualConferenceProviderBlockMethod2); cdecl;
+  end;
+  TEKVirtualConferenceProvider = class(TOCGenericImport<EKVirtualConferenceProviderClass, EKVirtualConferenceProvider>) end;
+
 function EKEventStoreChangedNotification: NSString;
+function EKErrorDomain: NSString;
 
 const
   libEventKit = '/System/Library/Frameworks/EventKit.framework/EventKit';
 
 implementation
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 uses
   Posix.Dlfcn;
 
 var
   EventKitModule: THandle;
-{$ENDIF}
-
-function EKErrorDomain: NSString;
-begin
-  Result := CocoaNSStringConst(libEventKit, 'EKErrorDomain');
-end;
 
 function EKEventStoreChangedNotification: NSString;
 begin
   Result := CocoaNSStringConst(libEventKit, 'EKEventStoreChangedNotification');
 end;
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
+function EKErrorDomain: NSString;
+begin
+  Result := CocoaNSStringConst(libEventKit, 'EKErrorDomain');
+end;
+
 initialization
   EventKitModule := dlopen(MarshaledAString(libEventKit), RTLD_LAZY);
 
 finalization
-  dlclose(EventKitModule)
-{$ENDIF}
+  dlclose(EventKitModule);
 
 end.

@@ -32,6 +32,7 @@ type
     class function GetDeviceName: string; static;
     class function GetOSBuild: string; static;
     class function GetPackageID: string; static;
+    class function GetPackageName: string; static;
     class function GetPackageVersion: string; static;
     class function GetUniqueDeviceID: string; static;
     class function GetUsername: string; static;
@@ -131,6 +132,11 @@ end;
 class function TPlatformOSDevice.GetPackageID: string;
 begin
   Result := TMacHelperEx.GetBundleValue('CFBundleIdentifier');
+end;
+
+class function TPlatformOSDevice.GetPackageName: string;
+begin
+  Result := TMacHelperEx.GetBundleValue('CFBundleName');
 end;
 
 class function TPlatformOSDevice.GetPackageVersion: string;

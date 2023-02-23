@@ -202,6 +202,7 @@ end;
 function TBackgroundMonitor.CreateDozeAlarm(const AAction: string; const AAlarm: Int64): Boolean;
 var
   LIntent: JIntent;
+  LFlags: Integer;
 begin
   Result := False;
   // Make doubly sure that the old alarm is removed
@@ -210,7 +211,8 @@ begin
   LIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cDWBroadcastReceiverName));
   // The broadcast receiver that monitors for alarms needs to know whether it was requested by a service
   LIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceClassName), StringToJString(FServiceName));
-  FDozeAlarmIntent := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, 0, LIntent, TJPendingIntent.JavaClass.FLAG_CANCEL_CURRENT);
+  LFlags := TJPendingIntent.JavaClass.FLAG_CANCEL_CURRENT or TJPendingIntent.JavaClass.FLAG_IMMUTABLE;
+  FDozeAlarmIntent := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, 0, LIntent, LFlags);
   if FDozeAlarmIntent <> nil then
   begin
     TAndroidHelper.AlarmManager.setAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, AAlarm, FDozeAlarmIntent);

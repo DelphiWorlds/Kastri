@@ -412,16 +412,19 @@ end;
 function TPlatformNotifications.GetNotificationIntent(const ANotification: TNotification; const AID: Integer): JPendingIntent;
 var
   LIntent: JIntent;
+  LFlags: Integer;
 begin
   LIntent := TAndroidHelper.Context.getPackageManager().getLaunchIntentForPackage(TAndroidHelper.Context.getPackageName());
   LIntent.setFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP or TJIntent.JavaClass.FLAG_ACTIVITY_CLEAR_TOP);
-  Result := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, AID, LIntent, TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT);
+  LFlags := TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT or TJPendingIntent.JavaClass.FLAG_IMMUTABLE;
+  Result := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, AID, LIntent, LFlags);
 end;
 
 function TPlatformNotifications.GetNotificationPendingIntent(const ANotification: TNotification; const AID: Integer): JPendingIntent;
 var
   LIntent: JIntent;
   LNotification: JNotification;
+  LFlags: Integer;
 begin
   LNotification := GetNativeNotification(ANotification, AID);
   LNotification.extras.putString(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_NAME, StringToJString(ANotification.Name));
@@ -431,7 +434,8 @@ begin
   LIntent.setAction(TJDWMultiBroadcastReceiver.JavaClass.ACTION_NOTIFICATION);
   LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_ID, AID);
   LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION, TJParcelable.Wrap((LNotification as ILocalObject).GetObjectID));
-  Result := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, AID, LIntent, TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT);
+  LFlags := TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT or TJPendingIntent.JavaClass.FLAG_IMMUTABLE;
+  Result := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, AID, LIntent, LFlags);
 end;
 
 function TPlatformNotifications.GetNativeNotification(const ANotification: TNotification; const AID: Integer): JNotification;

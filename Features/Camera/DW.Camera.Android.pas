@@ -134,6 +134,7 @@ type
     procedure CameraError(camera: JCameraDevice; error: Integer);
     procedure CameraOpened(camera: JCameraDevice);
     procedure CameraSettingChanged; override;
+    function CanControlExposure: Boolean; override;
     procedure CaptureConfigured;
     procedure CaptureStateChanged;
     procedure CapturedStillImage(const AImageStream: TStream);
@@ -605,7 +606,7 @@ begin
     TFlashMode.FlashOff:
     begin
       LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON);
-      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.FLASH_MODE, TJCaptureRequest.JavaClass.FLASH_MODE_OFF);
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.FLASH_MODE, TJCameraMetadata.JavaClass.FLASH_MODE_OFF);
     end;
     TFlashMode.FlashOn:
     begin
@@ -620,12 +621,27 @@ begin
   end;
   if FPlatformCamera.ISO > -1 then
   begin
-    LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCaptureRequest.JavaClass.CONTROL_AE_MODE_OFF);
-    LRequestHelper.setLongValue(TJCaptureRequest.JavaClass.SENSOR_EXPOSURE_TIME, FPlatformCamera.ExposureTime);
-    LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.SENSOR_SENSITIVITY, FPlatformCamera.ISO);
+    if FPlatformCamera.HasControlAEMode(TJCameraMetadata.JavaClass.CONTROL_AE_MODE_OFF) then
+    begin
+      TOSLog.d('Attempting to set AE mode OFF');
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_OFF);
+      LRequestHelper.setLongValue(TJCaptureRequest.JavaClass.SENSOR_EXPOSURE_TIME, FPlatformCamera.ExposureTime);
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.SENSOR_SENSITIVITY, FPlatformCamera.ISO);
+    end
+    else
+      TOSLog.w('Camera does not support CONTROL_AE_MODE_OFF');
   end
   else
-    LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCaptureRequest.JavaClass.CONTROL_AE_MODE_ON);
+  begin
+    if FPlatformCamera.HasControlAEMode(TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON) then
+    begin
+      TOSLog.d('Attempting to set AE mode ON');
+      LRequestHelper.setIntegerValue(TJCaptureRequest.JavaClass.CONTROL_AE_MODE, TJCameraMetadata.JavaClass.CONTROL_AE_MODE_ON);
+      TOSLog.d('Set AE mode ON');
+    end
+    else
+      TOSLog.d('Does not have CONTROL_AE_MODE_ON');
+  end;
   FSession.capture(LBuilder.build, FCaptureSessionCaptureCallback, FHandler);
 end;
 
@@ -914,7 +930,7 @@ var
   LCharacteristics: JCameraCharacteristics;
   LHelper: JDWCameraCharacteristicsHelper;
   LMap: JStreamConfigurationMap;
-  LFaceDetectModes: TJavaArray<Integer>;
+  LModes: TJavaArray<Integer>;
   I: Integer;
 begin
   TOSLog.d('+TPlatformCamera.DoOpenCamera');
@@ -973,11 +989,22 @@ begin
   FSensorSensitivityRange.Lower := LHelper.getSensorSensitivityLower;
   FSensorSensitivityRange.Upper := LHelper.getSensorSensitivityUpper;
   FAvailableFaceDetectModes := [];
-  LFaceDetectModes := LHelper.getFaceDetectModes;
-  if LFaceDetectModes <> nil then
-  begin
-    for I := 0 to LFaceDetectModes.Length - 1 do
-      Include(FAvailableFaceDetectModes, TFaceDetectMode(LFaceDetectModes.Items[I]));
+  LModes := LHelper.getFaceDetectModes;
+  if LModes <> nil then
+  try
+    for I := 0 to LModes.Length - 1 do
+      Include(FAvailableFaceDetectModes, TFaceDetectMode(LModes.Items[I]));
+  finally
+    LModes.Free;
+  end;
+  FAvailableControlAEModes := [];
+  LModes := LHelper.getControlAEAvailableModes;
+  if LModes <> nil then
+  try
+    for I := 0 to LModes.Length - 1 do
+      FAvailableControlAEModes := FAvailableControlAEModes + [LModes.Items[I]];
+  finally
+    LModes.Free;
   end;
   // May need to rethink this - largest preview size may not be appropriate, except for stills
   FAvailableViewSizes := LMap.getOutputSizes(TJImageFormat.JavaClass.RAW_SENSOR);
@@ -1094,6 +1121,11 @@ end;
 procedure TPlatformCamera.CameraSettingChanged;
 begin
   FCaptureSession.CameraSettingChanged;
+end;
+
+function TPlatformCamera.CanControlExposure: Boolean;
+begin
+  Result := HasControlAEMode(TJCameraMetadata.JavaClass.CONTROL_AE_MODE_OFF);
 end;
 
 (*

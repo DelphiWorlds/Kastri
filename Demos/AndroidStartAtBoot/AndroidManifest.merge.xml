@@ -7,7 +7,9 @@
     <!-- Start after package replaced -->
     <meta-data android:name="DWMultiBroadcastReceiver.KEY_RESTART_AFTER_REPLACE" android:value="true" />
     <!-- **** This is the BroadcastReceiver **** -->
-    <receiver android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver">
+    <receiver
+      android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver"
+      android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
         <action android:name="android.intent.action.BOOT_COMPLETED"/>

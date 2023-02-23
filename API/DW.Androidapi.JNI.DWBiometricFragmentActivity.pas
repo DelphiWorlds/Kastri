@@ -28,9 +28,9 @@ type
   JDWBiometricFragmentActivityClass = interface(JFragmentActivityClass)
     ['{FC751FC8-4506-4B2A-BDAC-4A764B21A200}']
     {class} function _GetACTION_AUTHENTICATION: JString; cdecl;
-    {class} function _GetAUTHENTICATION_RESULT_ERROR: JString; cdecl;
-    {class} function _GetAUTHENTICATION_RESULT_FAILED: JString; cdecl;
-    {class} function _GetAUTHENTICATION_RESULT_SUCCESS: JString; cdecl;
+    {class} function _GetAUTHENTICATION_RESULT_ERROR: Integer; cdecl;
+    {class} function _GetAUTHENTICATION_RESULT_FAILED: Integer; cdecl;
+    {class} function _GetAUTHENTICATION_RESULT_SUCCESS: Integer; cdecl;
     {class} function _GetEXTRA_AUTHENTICATION_RESULT: JString; cdecl;
     {class} function _GetEXTRA_AUTHENTICATION_ERROR_CODE: JString; cdecl;
     {class} function _GetEXTRA_AUTHENTICATION_ERROR_MESSAGE: JString; cdecl;
@@ -40,11 +40,13 @@ type
     {class} function _GetEXTRA_PROMPT_SUBTITLE: JString; cdecl;
     {class} function _GetEXTRA_PROMPT_TITLE: JString; cdecl;
     {class} function _GetEXTRA_PROMPT_CONFIRMATION_REQUIRED: JString; cdecl;
+    {class} procedure cancel; cdecl;
     {class} procedure start(context: JContext; intent: JIntent); cdecl;
+    {class} procedure stop; cdecl;
     {class} property ACTION_AUTHENTICATION: JString read _GetACTION_AUTHENTICATION;
-    {class} property AUTHENTICATION_RESULT_ERROR: JString read _GetAUTHENTICATION_RESULT_ERROR;
-    {class} property AUTHENTICATION_RESULT_FAILED: JString read _GetAUTHENTICATION_RESULT_FAILED;
-    {class} property AUTHENTICATION_RESULT_SUCCESS: JString read _GetAUTHENTICATION_RESULT_SUCCESS;
+    {class} property AUTHENTICATION_RESULT_ERROR: Integer read _GetAUTHENTICATION_RESULT_ERROR;
+    {class} property AUTHENTICATION_RESULT_FAILED: Integer read _GetAUTHENTICATION_RESULT_FAILED;
+    {class} property AUTHENTICATION_RESULT_SUCCESS: Integer read _GetAUTHENTICATION_RESULT_SUCCESS;
     {class} property EXTRA_AUTHENTICATION_RESULT: JString read _GetEXTRA_AUTHENTICATION_RESULT;
     {class} property EXTRA_AUTHENTICATION_ERROR_CODE: JString read _GetEXTRA_AUTHENTICATION_ERROR_CODE;
     {class} property EXTRA_AUTHENTICATION_ERROR_MESSAGE: JString read _GetEXTRA_AUTHENTICATION_ERROR_MESSAGE;

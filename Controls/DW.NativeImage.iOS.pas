@@ -95,7 +95,7 @@ end;
 
 function TiOSNativeImage.GetImageControl: TCustomNativeImage;
 begin
-  Result := TCustomNativeImage(Control)
+  Result := TCustomNativeImage(Control);
 end;
 
 function TiOSNativeImage.GetModel: TCustomNativeImageModel;

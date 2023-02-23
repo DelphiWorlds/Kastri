@@ -75,6 +75,10 @@ type
     /// </summary>
     class function GetPackageBuild: string; static;
     /// <summary>
+    ///   Returns the version that the app should display (Can be different from the package version)
+    /// </summary>
+    class function GetPackageDisplayVersion: string; static;
+    /// <summary>
     ///   Returns the filename of the binary
     /// </summary>
     class function GetPackageFileName: string; static;
@@ -83,9 +87,9 @@ type
     /// </summary>
     class function GetPackageID: string; static;
     /// <summary>
-    ///   Returns the version that the app should display (Can be different from the package version)
+    ///   Returns the name of the binary
     /// </summary>
-    class function GetPackageDisplayVersion: string; static;
+    class function GetPackageName: string; static;
     /// <summary>
     ///   Returns the version for the application package, if any exists
     /// </summary>
@@ -251,6 +255,11 @@ end;
 class function TOSDevice.GetPackageID: string;
 begin
   Result := TPlatformOSDevice.GetPackageID;
+end;
+
+class function TOSDevice.GetPackageName: string;
+begin
+  Result := TPlatformOSDevice.GetPackageName;
 end;
 
 class function TOSDevice.GetPackageVersion: string;

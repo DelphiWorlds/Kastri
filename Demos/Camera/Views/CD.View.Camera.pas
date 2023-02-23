@@ -192,11 +192,15 @@ begin
   else
   begin
     ExposureSlider.Visible := True;
-    if FExposureProps.Value > -1 then
-      FCamera.Exposure := FExposureProps.Value
-    else
-      FExposureProps.Value := FCamera.Exposure;
-    ExposureSlider.Value := FExposureProps.Value;
+    ExposureSlider.Enabled := FCamera.CanControlExposure;
+    if ExposureSlider.Enabled then
+    begin
+      if FExposureProps.Value > -1 then
+        FCamera.Exposure := FExposureProps.Value
+      else
+        FExposureProps.Value := FCamera.Exposure;
+      ExposureSlider.Value := FExposureProps.Value;
+    end;
   end;
   FExposureProps.IsSliderVisible := ExposureSlider.Visible;
 end;

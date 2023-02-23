@@ -58,9 +58,7 @@ type
   MCSessionState = NSInteger;
   MCEncryptionPreference = NSInteger;
   TMCSessionBlockMethod1 = procedure(error: NSError) of object;
-  TMCSessionDelegateBlockMethod1 = procedure(accept: Boolean) of object;
   TMCSessionBlockMethod2 = procedure(connectionData: NSData; error: NSError) of object;
-  TMCNearbyServiceAdvertiserDelegateBlockMethod1 = procedure(accept: Boolean; session: MCSession) of object;
 
   MCPeerIDClass = interface(NSObjectClass)
     ['{9205C9AA-F4EA-4D89-A496-9206D4648039}']
@@ -104,7 +102,7 @@ type
     procedure session(session: MCSession; didFinishReceivingResourceWithName: NSString; fromPeer: MCPeerID; atURL: NSURL;
       withError: NSError); overload; cdecl;
     procedure session(session: MCSession; didReceiveCertificate: NSArray; fromPeer: MCPeerID;
-      certificateHandler: TMCSessionDelegateBlockMethod1); overload; cdecl;
+      certificateHandler: Pointer); overload; cdecl;
     procedure session(session: MCSession; peer: MCPeerID; didChangeState: MCSessionState); overload; cdecl;
     procedure session(session: MCSession; didReceiveData: NSData; fromPeer: MCPeerID); overload; cdecl;
     procedure session(session: MCSession; didReceiveStream: NSInputStream; withName: NSString; fromPeer: MCPeerID); overload; cdecl;
@@ -130,7 +128,7 @@ type
   MCNearbyServiceAdvertiserDelegate = interface(IObjectiveC)
     ['{21234B15-63E7-4FE5-9A1C-E12624939E31}']
     procedure advertiser(advertiser: MCNearbyServiceAdvertiser; didReceiveInvitationFromPeer: MCPeerID; withContext: NSData;
-      invitationHandler: TMCNearbyServiceAdvertiserDelegateBlockMethod1); overload; cdecl;
+      invitationHandler: Pointer); overload; cdecl;
     procedure advertiser(advertiser: MCNearbyServiceAdvertiser; didNotStartAdvertisingPeer: NSError); overload; cdecl;
   end;
 

@@ -4,6 +4,8 @@
 
 Advertising implementation, specifically for AdMob (at present)
 
+**NOTE: The demo has been updated (on July 26th, 2022) to align it with the Firebase iOS SDK v8.15.0**. See the [Libraries > iOS](#ios) section below.
+
 ## Project Configuration
 
 ### Component
@@ -14,11 +16,30 @@ The package can be found [here](https://github.com/DelphiWorlds/Kastri/tree/main
 
 ### Libraries
 
+#### Android
+
 If creating your own project, you will need to add the [`dw-admob.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob.jar) file to the Libraries node under the Android platform in Project Manager
 
 When using Delphi 10.4.x, you will need to add other libraries and disable some default libraries, as per this screenshot:
 
 <img src="./Screenshots/D104ProjectManager.png" alt="PM" height="500">
+
+#### iOS
+
+AdMob support in Kastri has now been aligned with the latest compatible version of the Firebase SDK for iOS, which is version 8.15.0. Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/v8.15.0/Firebase.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called Firebase, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo.
+
+In order to compile successfully for iOS, it's also necessary to add the following frameworks to the iOS SDK:
+
+* AVKit
+* CoreMotion
+
+[This article](https://delphiworlds.com/2013/10/adding-other-ios-frameworks-to-the-sdk-manager/) is a guide as to how to add the frameworks.
+
+### Project Options
+
+Ensure you have a value of: `-ObjC` for the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit:
+
+<img src="./Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
 
 ### Android Entitlements
 
@@ -36,7 +57,7 @@ When configuring your app for non-test Ad UnitIds, you will need to:
   
 <img style="margin-left: 3em;" src="./Screenshots/AndroidManifestTemplateAppId.png" alt="PM" height="300"/>
 
-* For iOS: modify `info.plist.TemplateiOS.xml` to change the value for the `GADApplicationIdentifier` key. Please refer to the image below for an example of what to change. 
+* For iOS: modify your projects `info.plist.TemplateiOS.xml` file to add the `GADApplicationIdentifier` key **and the array below it** from the `info.plist.TemplateiOS.xml` file _in the demo_, but change the _value_ for `GADApplicationIdentifier` to your AdMob Application ID. Please refer to the image below for an example of what to change. 
   
 <img style="margin-left: 3em;" src="./Screenshots/iOSInfoPListTemplateAppId.png" alt="PM" height="150"/>
 

@@ -1,0 +1,10 @@
+<manifest xmlns:merge="http://www.delphiworlds.com/xmlns/merge" xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <activity merge:update="add"
+        android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
+        android:enabled="false"
+        android:exported="true"
+        android:stateNotNeeded="true"
+        android:theme="@style/Theme.PlayCore.Transparent" />
+  </application>
+</manifest>

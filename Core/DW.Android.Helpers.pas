@@ -39,8 +39,10 @@ type
     class var FUncaughtExceptionHandler: JThread_UncaughtExceptionHandler;
     class var FWakeLock: JPowerManager_WakeLock;
   private
-    class function InternalSetAlarm(const AAction: string; const AAlarm: TDateTime; const AFromLock: Boolean; const ARequestCodeOrJobID: Integer;
-      const AServiceName: string = ''): JPendingIntent; static;
+    class function GetAlarmPendingIntent(const AAction: string; const AFromLock: Boolean; const ARequestCode: Integer;
+      const AServiceName: string): JPendingIntent; static;
+    class function InternalSetAlarm(const AAction: string; const AAlarm: TDateTime; const AFromLock: Boolean;
+      const ARequestCode: Integer = 0; const AServiceName: string = ''): JPendingIntent; static;
   public
     const
       ICE_CREAM_SANDWICH = 14;
@@ -185,10 +187,10 @@ type
     /// </remarks>
     class function SetStartAlarm(const AAlarm: TDateTime; const AFromLock: Boolean; const ARequestCode: Integer = 0): JPendingIntent; static;
     /// <summary>
-    ///   Same as SetStartAlarm, but starts the service specified by AServiceName. If it is an IntentService, use a value for JobID > 0
+    ///   Same as SetStartAlarm, but starts the service specified by AServiceName
     /// </summary>
-    class function SetServiceAlarm(const AServiceName: string; const AAlarm: TDateTime; const AFromLock: Boolean;
-      const AJobId: Integer = 0): JPendingIntent; static;
+    class function SetServiceAlarm(const AServiceName: string; const AAlarm: TDateTime): JPendingIntent; overload; static;
+    class function SetServiceAlarm(const AServiceName: string; const AInterval: Int64): JPendingIntent; overload; static;
     /// <summary>
     ///   Shows the manage files access activity if they are yet to be enabled
     /// </summary>
@@ -199,6 +201,10 @@ type
     ///   See also NeedsAllFilesAccessPermission
     /// </remarks>
     class function ShowAllFilesAccessPermissionSettings: Boolean; static;
+    /// <summary>
+    ///   Sends the device to the home screen
+    /// </summary>
+    class procedure ShowHome; static;
     class procedure ShowLocationPermissionSettings; static;
     /// <summary>
     ///   Converts file to uri, using FileProvider if target API >= 24
@@ -387,6 +393,16 @@ begin
   Result := TJSystem.JavaClass.currentTimeMillis + (ASecondsFromNow * 1000);
 end;
 
+class procedure TAndroidHelperEx.ShowHome;
+var
+  LIntent: JIntent;
+begin
+  LIntent := TJIntent.JavaClass.init(TJIntent.JavaClass.ACTION_MAIN);
+  LIntent.addCategory(TJIntent.JavaClass.CATEGORY_HOME);
+  LIntent.setFlags(TJIntent.JavaClass.FLAG_ACTIVITY_NEW_TASK);
+  TAndroidHelper.Context.startActivity(LIntent);
+end;
+
 class procedure TAndroidHelperEx.HookUncaughtExceptionHandler;
 begin
   if FUncaughtExceptionHandler = nil then
@@ -499,18 +515,23 @@ end;
 
 class function TAndroidHelperEx.GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo;
 var
-  LService: JObject;
+  LObject: JObject;
   LRunningServices: JList;
   LServiceInfo: JActivityManager_RunningServiceInfo;
   I: Integer;
+  LServiceName: string;
 begin
   Result := nil;
-  LService := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.ACTIVITY_SERVICE);
-  LRunningServices := TJActivityManager.Wrap(TAndroidHelper.JObjectToID(LService)).getRunningServices(MaxInt);
+  if AServiceName.StartsWith(cEMBTJavaServicePrefix) then
+    LServiceName := AServiceName
+  else
+    LServiceName := cEMBTJavaServicePrefix + AServiceName;
+  LObject := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.ACTIVITY_SERVICE);
+  LRunningServices := TJActivityManager.Wrap(TAndroidHelper.JObjectToID(LObject)).getRunningServices(MaxInt);
   for I := 0 to LRunningServices.size - 1 do
   begin
     LServiceInfo := TJActivityManager_RunningServiceInfo.Wrap(TAndroidHelper.JObjectToID(LRunningServices.get(I)));
-    if AServiceName.Equals(JStringToString(LServiceInfo.service.getClassName)) then
+    if LServiceName.Equals(JStringToString(LServiceInfo.service.getClassName)) then
       Exit(LServiceInfo);
   end;
 end;
@@ -615,26 +636,28 @@ begin
   Result := LCalendar.getTimeInMillis;
 end;
 
-class function TAndroidHelperEx.InternalSetAlarm(const AAction: string; const AAlarm: TDateTime; const AFromLock: Boolean;
-  const ARequestCodeOrJobID: Integer; const AServiceName: string = ''): JPendingIntent;
+class function TAndroidHelperEx.GetAlarmPendingIntent(const AAction: string; const AFromLock: Boolean; const ARequestCode: Integer;
+  const AServiceName: string): JPendingIntent;
 var
   LActionIntent: JIntent;
-  LStartAt: Int64;
-  LRequestCode: Integer;
+  LFlags: Integer;
 begin
   LActionIntent := TJIntent.JavaClass.init(StringToJString(AAction));
   LActionIntent.setClassName(TAndroidHelper.Context.getPackageName, StringToJString(cDWBroadcastReceiverName));
   if AFromLock = True then
     LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraStartUnlock), AFromLock);
-  LRequestCode := ARequestCodeOrJobID;
   if not AServiceName.IsEmpty then
-  begin
-    LRequestCode := 0;
     LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraServiceClassName), StringToJString(AServiceName));
-    if ARequestCodeOrJobID > 0 then
-      LActionIntent.putExtra(StringToJString(cDWBroadcastReceiverExtraJobId), ARequestCodeOrJobID);
-  end;
-  Result := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, LRequestCode, LActionIntent, TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT);
+  LFlags := TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT or TJPendingIntent.JavaClass.FLAG_IMMUTABLE;
+  Result := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, ARequestCode, LActionIntent, LFlags);
+end;
+
+class function TAndroidHelperEx.InternalSetAlarm(const AAction: string; const AAlarm: TDateTime; const AFromLock: Boolean;
+  const ARequestCode: Integer = 0; const AServiceName: string = ''): JPendingIntent;
+var
+  LStartAt: Int64;
+begin
+  Result := GetAlarmPendingIntent(AAction, AFromLock, ARequestCode, AServiceName);
   LStartAt := GetTimeFromNowInMillis(SecondsBetween(Now, AAlarm));
   // Allow for alarms while in "doze" mode
   if TOSVersion.Check(6) then
@@ -643,10 +666,15 @@ begin
     TAndroidHelper.AlarmManager.&set(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result);
 end;
 
-class function TAndroidHelperEx.SetServiceAlarm(const AServiceName: string; const AAlarm: TDateTime; const AFromLock: Boolean;
-  const AJobId: Integer = 0): JPendingIntent;
+class function TAndroidHelperEx.SetServiceAlarm(const AServiceName: string; const AAlarm: TDateTime): JPendingIntent;
 begin
-  Result := InternalSetAlarm(cDWBroadcastReceiverActionServiceAlarm, AAlarm, AFromLock, AJobId, AServiceName);
+  Result := InternalSetAlarm(cDWBroadcastReceiverActionServiceAlarm, AAlarm, False, -1, AServiceName);
+end;
+
+class function TAndroidHelperEx.SetServiceAlarm(const AServiceName: string; const AInterval: Int64): JPendingIntent;
+begin
+  Result := GetAlarmPendingIntent(cDWBroadcastReceiverActionServiceAlarm, False, 0, AServiceName);
+  TAndroidHelper.AlarmManager.setRepeating(TJAlarmManager.JavaClass.RTC_WAKEUP, GetTimeFromNowInMillis(AInterval), AInterval, Result);
 end;
 
 class function TAndroidHelperEx.SetStartAlarm(const AAlarm: TDateTime; const AFromLock: Boolean; const ARequestCode: Integer = 0): JPendingIntent;

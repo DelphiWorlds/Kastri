@@ -36,7 +36,8 @@
             android:name="com.embarcadero.firemonkey.FMXNativeActivity"
             android:label="%activityLabel%"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:exported="True">
             <!-- Tell NativeActivity the name of our .so -->
             <meta-data android:name="android.app.lib_name" android:value="%libNameValue%" />
 
@@ -49,7 +50,9 @@
 <%activity%>
 <%receivers%>
         <!-- ***** Adding receiver to receive broadcasts ***** -->
-        <receiver android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver">
+        <receiver
+          android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver"
+          android:exported="True">
             <intent-filter>
                 <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_ALARM_TIMER" />
                 <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_SERVICE_ALARM" />

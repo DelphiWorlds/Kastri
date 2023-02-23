@@ -44,6 +44,7 @@ type
     function GetModel: TCustomNativeSliderModel; overload;
     function GetScaledBitmap(const ABitmap: TBitmap; const ASize: Integer): TBitmap;
     function GetView: UISlider;
+    procedure MMEnabledChanged(var AMessage: TDispatchMessage); message MM_NATIVESLIDER_ENABLED_CHANGED;
     procedure MMGetMaxValue(var AMessage: TDispatchMessageWithValue<Single>); message MM_NATIVESLIDER_GETMAXVALUE;
     procedure MMGetMinValue(var AMessage: TDispatchMessageWithValue<Single>); message MM_NATIVESLIDER_GETMINVALUE;
     procedure MMGetValue(var AMessage: TDispatchMessageWithValue<Single>); message MM_NATIVESLIDER_GETVALUE;
@@ -102,6 +103,11 @@ end;
 function TiOSNativeSlider.GetView: UISlider;
 begin
   Result := inherited GetView<UISlider>;
+end;
+
+procedure TiOSNativeSlider.MMEnabledChanged(var AMessage: TDispatchMessage);
+begin
+  GetView.setEnabled(TNativeSlider(Control).Enabled);
 end;
 
 procedure TiOSNativeSlider.MMGetMaxValue(var AMessage: TDispatchMessageWithValue<Single>);

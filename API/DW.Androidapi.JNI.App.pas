@@ -18,7 +18,7 @@ interface
 uses
   // Android
   AndroidAPI.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.Os, Androidapi.JNI.Net, Androidapi.JNI.Media, Androidapi.JNI.App,
-  Androidapi.JNI.GraphicsContentViewText;
+  Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Util;
 
 type
   JKeyguardManager = interface;
@@ -30,6 +30,10 @@ type
   JNotificationChannelGroup = interface;
   {$ENDIF}
   JUiModeManager = interface;
+  JWallpaperColors = interface;
+  JWallpaperInfo = interface;
+  JWallpaperManager = interface;
+  JWallpaperManager_OnColorsChangedListener = interface;
 
   // Placeholder import to support compiling with Delphi 10.2.x
   {$IF CompilerVersion < 33}
@@ -246,8 +250,147 @@ type
     procedure setCustomNightModeStart(time: JLocalTime); cdecl;
     procedure setNightMode(mode: Integer); cdecl;
   end;
-
   TJUiModeManager = class(TJavaGenericImport<JUiModeManagerClass, JUiModeManager>)
+  end;
+
+  JWallpaperColorsClass = interface(JObjectClass)
+    ['{D33DAC27-33AE-4047-9C4E-136711E0630F}']
+    function fromBitmap(bitmap: JBitmap): JWallpaperColors; cdecl;
+    function fromDrawable(drawable: JDrawable): JWallpaperColors; cdecl;
+    function init(parcel: JParcel): JWallpaperColors; cdecl; overload;
+    function init(primaryColor: JColor; secondaryColor: JColor; tertiaryColor: JColor): JWallpaperColors; cdecl; overload;
+    function init(primaryColor: JColor; secondaryColor: JColor; tertiaryColor: JColor; colorHints: Integer): JWallpaperColors; cdecl; overload;
+  end;
+
+  [JavaSignature('android/app/WallpaperColors')]
+  JWallpaperColors = interface(JObject)
+    ['{0A1C6300-9392-42EE-B4E6-D228A663E601}']
+    function describeContents: Integer; cdecl;
+    function equals(o: JObject): boolean; cdecl;
+    function getColorHints: Integer; cdecl;
+    function getPrimaryColor: JColor; cdecl;
+    function getSecondaryColor: JColor; cdecl;
+    function getTertiaryColor: JColor; cdecl;
+    function hashCode: Integer; cdecl;
+    function toString: JString; cdecl;
+    procedure writeToParcel(dest: JParcel; flags: Integer); cdecl;
+  end;
+  TJWallpaperColors = class(TJavaGenericImport<JWallpaperColorsClass, JWallpaperColors>)
+  end;
+
+  JWallpaperInfoClass = interface(JObjectClass)
+    ['{38C90129-35B2-414F-87A5-D7F7D2B23D9E}']
+    function init(context: JContext; service: JResolveInfo): JWallpaperInfo; cdecl;
+  end;
+
+  [JavaSignature('android/app/WallpaperInfo')]
+  JWallpaperInfo = interface(JObject)
+    ['{C9FA4FEA-1B76-4CBF-859D-C6FA37C9BD01}']
+    function describeContents: Integer; cdecl;
+    procedure dump(pw: JPrinter; prefix: JString); cdecl;
+    function getComponent: JComponentName; cdecl;
+    function getPackageName: JString; cdecl;
+    function getServiceInfo: JServiceInfo; cdecl;
+    function getServiceName: JString; cdecl;
+    function getSettingsActivity: JString; cdecl;
+    function getSettingsSliceUri: Jnet_Uri; cdecl;
+    function getShowMetadataInPreview: boolean; cdecl;
+    function loadAuthor(pm: JPackageManager): JCharSequence; cdecl;
+    function loadContextDescription(pm: JPackageManager): JCharSequence; cdecl;
+    function loadContextUri(pm: JPackageManager): Jnet_Uri; cdecl;
+    function loadDescription(pm: JPackageManager): JCharSequence; cdecl;
+    function loadIcon(pm: JPackageManager): JDrawable; cdecl;
+    function loadLabel(pm: JPackageManager): JCharSequence; cdecl;
+    function loadThumbnail(pm: JPackageManager): JDrawable; cdecl;
+    function shouldUseDefaultUnfoldTransition: Boolean; cdecl;
+    function supportsMultipleDisplays: Boolean; cdecl;
+    function toString: JString; cdecl;
+    procedure writeToParcel(dest: JParcel; flags: Integer); cdecl;
+  end;
+  TJWallpaperInfo = class(TJavaGenericImport<JWallpaperInfoClass, JWallpaperInfo>)
+  end;
+
+  JWallpaperManagerClass = interface(JObjectClass)
+    ['{C8F0FD68-3263-4620-B1E9-2EA40CE71754}']
+    function _GetACTION_CHANGE_LIVE_WALLPAPER: JString; cdecl;
+    function _GetACTION_CROP_AND_SET_WALLPAPER: JString; cdecl;
+    function _GetACTION_LIVE_WALLPAPER_CHOOSER: JString; cdecl;
+    function _GetCOMMAND_DROP: JString; cdecl;
+    function _GetCOMMAND_SECONDARY_TAP: JString; cdecl;
+    function _GetCOMMAND_TAP: JString; cdecl;
+    function _GetEXTRA_LIVE_WALLPAPER_COMPONENT: JString; cdecl;
+    function _GetFLAG_LOCK: Integer; cdecl;
+    function _GetFLAG_SYSTEM: Integer; cdecl;
+    function _GetWALLPAPER_PREVIEW_META_DATA: JString; cdecl;
+    function getInstance(context: JContext): JWallpaperManager; cdecl;
+    property ACTION_CHANGE_LIVE_WALLPAPER: JString read _GetACTION_CHANGE_LIVE_WALLPAPER;
+    property ACTION_CROP_AND_SET_WALLPAPER: JString read _GetACTION_CROP_AND_SET_WALLPAPER;
+    property ACTION_LIVE_WALLPAPER_CHOOSER: JString read _GetACTION_LIVE_WALLPAPER_CHOOSER;
+    property COMMAND_DROP: JString read _GetCOMMAND_DROP;
+    property COMMAND_SECONDARY_TAP: JString read _GetCOMMAND_SECONDARY_TAP;
+    property COMMAND_TAP: JString read _GetCOMMAND_TAP;
+    property EXTRA_LIVE_WALLPAPER_COMPONENT: JString read _GetEXTRA_LIVE_WALLPAPER_COMPONENT;
+    property FLAG_LOCK: Integer read _GetFLAG_LOCK;
+    property FLAG_SYSTEM: Integer read _GetFLAG_SYSTEM;
+    property WALLPAPER_PREVIEW_META_DATA: JString read _GetWALLPAPER_PREVIEW_META_DATA;
+  end;
+
+  [JavaSignature('android/app/WallpaperManager')]
+  JWallpaperManager = interface(JObject)
+    ['{70425A01-A43B-4499-B0D5-DF80C34E3F7A}']
+    function getBuiltInDrawable: JDrawable; cdecl; overload;
+    function getBuiltInDrawable(outWidth: Integer; outHeight: Integer; scaleToFit: boolean; horizontalAlignment: Single; verticalAlignment: Single): JDrawable; cdecl; overload;
+    function getBuiltInDrawable(outWidth: Integer; outHeight: Integer; scaleToFit: boolean; horizontalAlignment: Single; verticalAlignment: Single; which: Integer): JDrawable; cdecl; overload;
+    function getBuiltInDrawable(which: Integer): JDrawable; cdecl; overload;
+    function getCropAndSetWallpaperIntent(imageUri: Jnet_Uri): JIntent; cdecl;
+    function getDesiredMinimumHeight: Integer; cdecl;
+    function getDesiredMinimumWidth: Integer; cdecl;
+    function getDrawable: JDrawable; cdecl;
+    function getFastDrawable: JDrawable; cdecl;
+    function getWallpaperColors(which: Integer): JWallpaperColors; cdecl;
+    function getWallpaperFile(which: Integer): JParcelFileDescriptor; cdecl;
+    function getWallpaperId(which: Integer): Integer; cdecl;
+    function getWallpaperInfo: JWallpaperInfo; cdecl;
+    function hasResourceWallpaper(resid: Integer): boolean; cdecl;
+    function isSetWallpaperAllowed: boolean; cdecl;
+    function isWallpaperSupported: boolean; cdecl;
+    function peekDrawable: JDrawable; cdecl;
+    function peekFastDrawable: JDrawable; cdecl;
+    function setBitmap(fullImage: JBitmap; visibleCropHint: JRect; allowBackup: boolean): Integer; cdecl; overload;
+    function setBitmap(fullImage: JBitmap; visibleCropHint: JRect; allowBackup: boolean; which: Integer): Integer; cdecl; overload;
+    function setResource(resid: Integer; which: Integer): Integer; cdecl; overload;
+    function setStream(bitmapData: JInputStream; visibleCropHint: JRect; allowBackup: boolean): Integer; cdecl; overload;
+    function setStream(bitmapData: JInputStream; visibleCropHint: JRect; allowBackup: boolean; which: Integer): Integer; cdecl; overload;
+    procedure addOnColorsChangedListener(listener: JWallpaperManager_OnColorsChangedListener; handler: JHandler); cdecl;
+    procedure clear; cdecl; overload;
+    procedure clear(which: Integer); cdecl; overload;
+    procedure clearWallpaper; cdecl;
+    procedure clearWallpaperOffsets(windowToken: JIBinder); cdecl;
+    procedure forgetLoadedWallpaper; cdecl;
+    procedure removeOnColorsChangedListener(callback: JWallpaperManager_OnColorsChangedListener); cdecl;
+    procedure sendWallpaperCommand(windowToken: JIBinder; action: JString; x: Integer; y: Integer; z: Integer; extras: JBundle); cdecl;
+    procedure setBitmap(bitmap: JBitmap); cdecl; overload;
+    procedure setDisplayPadding(padding: JRect); cdecl;
+    procedure setResource(resid: Integer); cdecl; overload;
+    procedure setStream(bitmapData: JInputStream); cdecl; overload;
+    procedure setWallpaperOffsetSteps(xStep: Single; yStep: Single); cdecl;
+    procedure setWallpaperOffsets(windowToken: JIBinder; xOffset: Single; yOffset: Single); cdecl;
+    procedure suggestDesiredDimensions(minimumWidth: Integer; minimumHeight: Integer); cdecl;
+  end;
+  TJWallpaperManager = class(TJavaGenericImport<JWallpaperManagerClass, JWallpaperManager>)
+  end;
+
+  JWallpaperManager_OnColorsChangedListenerClass = interface(IJavaClass)
+    ['{4F240A03-576C-4F60-895B-8775E817E86B}']
+  end;
+
+  [JavaSignature('android/app/WallpaperManager_OnColorsChangedListener')]
+  JWallpaperManager_OnColorsChangedListener = interface(IJavaInstance)
+    ['{EC8760FB-1DDD-4ADC-80A5-FDE4CF3E8792}']
+    procedure onColorsChanged(colors: JWallpaperColors; which: Integer); cdecl;
+  end;
+  TJWallpaperManager_OnColorsChangedListener = class(TJavaGenericImport<JWallpaperManager_OnColorsChangedListenerClass,
+    JWallpaperManager_OnColorsChangedListener>)
   end;
 
 implementation

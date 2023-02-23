@@ -1,5 +1,4 @@
 object ADBModule: TADBModule
-  OldCreateOrder = False
   Height = 452
   Width = 687
   object LogFDMemTable: TFDMemTable
@@ -69,6 +68,7 @@ object ADBModule: TADBModule
     end
     object LogFDMemTableLogDateTime: TDateTimeField
       FieldName = 'LogDateTime'
+      DisplayFormat = 'yyyy/mm/dd hh:nn:ss.zzz'
     end
     object LogFDMemTableLevel: TStringField
       FieldName = 'Level'
