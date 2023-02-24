@@ -141,7 +141,7 @@ public class GeofenceIntentReceiver extends BroadcastReceiver {
       enqueueTransition(context, transitionIntent);
     } else {
       // Log the error.
-      Log.e(TAG, "Unknown geofence transition type");
+      Log.e(TAG, "Unknown geofence transition type: " + String.valueOf(geofenceTransition));
     }
     // Enqueues a JobIntentService descendant passing the context and intent as parameters
     // GeofenceTransitionsService.enqueueWork(context, intent);

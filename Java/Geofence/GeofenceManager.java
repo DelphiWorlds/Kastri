@@ -138,7 +138,7 @@ public class GeofenceManager implements OnCompleteListener<Void> {
     mRegions = GeofenceRegions.getInstance(mContext);
     Intent intent = new Intent(mContext, GeofenceIntentReceiver.class);
     // intent.setAction(GeofenceIntentReceiver.ACTION_RECEIVE_GEOFENCE);
-    mPendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    mPendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
   }
 
   // OnCompleteListener
