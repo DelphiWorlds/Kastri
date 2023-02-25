@@ -144,7 +144,7 @@ uses
   Posix.Dlfcn;
 
 var
-  QuickLookModule: Cardinal;
+  QuickLookModule: THandle;
 
 initialization
   QuickLookModule := dlopen(MarshaledAString(libQuickLook), RTLD_LAZY);
