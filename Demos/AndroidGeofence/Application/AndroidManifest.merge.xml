@@ -1,4 +1,4 @@
-<manifest>
+<manifest xmlns:merge="http://www.delphiworlds.com/xmlns/merge" xmlns:android="http://schemas.android.com/apk/res/android">
   <application>
     <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
     <meta-data android:name="com.delphiworlds.kastri.GeofenceIntentReceiver.SERVICE_CLASS_NAME" android:value="com.embarcadero.services.AGDemoService" />
