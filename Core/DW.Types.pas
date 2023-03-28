@@ -32,6 +32,7 @@ type
     function GetValue(const AKey: string): string; overload;
     function IndexOf(const AValue: string): Integer;
     function IndexOfName(const AKey: string): Integer;
+    function Reconcile(const AChanges: TStringArray): Boolean;
     procedure SetValue(const AKey: string; const AValue: string);
     function Text(const ASeparator: string = CRLF): string;
     function Values: TArray<string>;
@@ -100,6 +101,36 @@ begin
       Break;
     end;
   end;
+end;
+
+function TStringArray.Reconcile(const AChanges: TStringArray): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 0 to AChanges.Count - 1 do
+  begin
+    // New key does not exist in the old list
+    if IndexOfName(AChanges.GetKey(I)) = -1 then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+  if not Result then
+  begin
+    for I := 0 to Count - 1 do
+    begin
+      // Old key does not exist in the new list
+      if AChanges.IndexOfName(GetKey(I)) = -1 then
+      begin
+        Result := True;
+        Break;
+      end;
+    end;
+  end;
+  if Result then
+    Items := Copy(AChanges.Items);
 end;
 
 procedure TStringArray.SetValue(const AKey, AValue: string);
