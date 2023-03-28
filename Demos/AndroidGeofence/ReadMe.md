@@ -11,7 +11,7 @@ There are 2 project groups, one named `AGDemoAndroidGroup` and the other `AGDemo
 ## Configuration
 
 The demo project has a file called `AndroidManifest.merge.xml`, and there is a `Post-Build` build event in the Project Options (Under Building > Build Events) that uses the `manifestmerge` tool (from the `Tools` folder in Kastri) to merge the entries into the final `AndroidManifest.xml` file.
-The merge adds a metadata entry to indicate the class name of the service to which the geofence transition intents will be sent. This is required for when geofence transitions need to be monitored when the application is in the background, and when the application is not running (see Monitoring geofence transitions, below)
+The merge adds a metadata entry to indicate the class name of the service to which the geofence transition intents will be sent. This is required for when geofence transitions need to be monitored when the application is in the background, and when the application is not running (see [Monitoring geofence transitions](#monitoring-geofence-transitions), below)
 
 ## Background location permissions
 
