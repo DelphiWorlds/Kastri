@@ -1,0 +1,19 @@
+<manifest xmlns:merge="http://www.delphiworlds.com/xmlns/merge" xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- ***** Adding metadata to allow service to start at boot ***** -->
+    <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_SERVICE_ON_BOOT" android:value="CrossPlatformLocationService" />
+    <!-- ***** Google Play services version is required for Fused Location API ***** -->
+    <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+    <receiver
+      android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver"
+      android:exported="True">
+        <intent-filter>
+            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_ALARM_TIMER" />
+            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_SERVICE_ALARM" />
+            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_SERVICE_RESTART" />
+            <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+        </intent-filter>
+    </receiver>
+  </application>
+</manifest>
