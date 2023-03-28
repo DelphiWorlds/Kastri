@@ -6,7 +6,7 @@ unit DW.IOUtils.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -92,6 +92,10 @@ type
     ///   Appends the source file to the end of the dest file
     /// </summary>
     class procedure Concat(const ASourceName, ADestName: string); static;
+    /// <summary>
+    ///   Copies the source file to dest file if it is newer
+    /// </summary>
+    class function CopyIfNewer(const ASourceName, ADestName: string; const AOverwrite: Boolean): Boolean; static;
     class function GetBackupFileName(const AFileName: string; const AExt: string = 'bak'): string; static;
     /// <summary>
     ///   Checks if the file is in use
@@ -325,6 +329,24 @@ begin
       end;
     finally
       LDestStream.Free;
+    end;
+  end;
+end;
+
+class function TFileHelper.CopyIfNewer(const ASourceName, ADestName: string; const AOverwrite: Boolean): Boolean;
+var
+  LDestDateTime: TDateTime;
+begin
+  Result := False;
+  if TFile.Exists(ASourceName) then
+  begin
+    LDestDateTime := 0;
+    if TFile.Exists(ADestName) then
+      LDestDateTime := TFile.GetLastWriteTime(ADestName);
+    if TFile.GetLastWriteTime(ASourceName) > LDestDateTime then
+    begin
+      TFile.Copy(ASourceName, ADestName, AOverwrite);
+      Result := True;
     end;
   end;
 end;
