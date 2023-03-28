@@ -6,7 +6,7 @@ unit DW.Base64.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -57,7 +57,11 @@ type
     /// <summary>
     ///   Encodes a stream to a Base64 string
     /// </summary>
-    class function Encode(const AStream: TStream): string; static;
+    class function Encode(const AStream: TStream): string; overload; static;
+    /// <summary>
+    ///   Encodes a string to a Base64 string
+    /// </summary>
+    class function Encode(const ASource: string): string; overload; static;
     /// <summary>
     ///   Encodes a file to a Base64 string
     /// </summary>
@@ -210,6 +214,18 @@ begin
     Result := LBase64Stream.DataString;
   finally
     LBase64Stream.Free;
+  end;
+end;
+
+class function TBase64Helper.Encode(const ASource: string): string;
+var
+  LBase64: TBase64Encoding;
+begin
+  LBase64 := TBase64Encoding.Create(0, '');
+  try
+    Result := LBase64.Encode(ASource);
+  finally
+    LBase64.Free;
   end;
 end;
 

@@ -6,7 +6,7 @@ unit DW.OSTimer.Linux;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -28,7 +28,7 @@ type
   private
     FHandle: timer_t;
   protected
-    procedure StartTimer; override;
+    procedure StartTimer(const ARepeating: Boolean); override;
     procedure StopTimer; override;
     procedure TimerEvent;
   public
@@ -75,7 +75,7 @@ begin
     LTimer.TimerEvent;
 end;
 
-procedure TPlatformOSTimer.StartTimer;
+procedure TPlatformOSTimer.StartTimer(const ARepeating: Boolean);
 const
   SIGEV_THREAD = 2;
 var
