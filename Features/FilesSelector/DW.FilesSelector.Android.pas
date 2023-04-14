@@ -153,46 +153,18 @@ procedure TPlatformFilesSelector.MessageResultNotificationMessageHandler(const S
 var
   LMessage: TMessageResultNotification;
 begin
-  if M is TMessageResultNotification then
+  LMessage := TMessageResultNotification(M);
+  if LMessage.RequestCode = cSelectorCode then
   begin
-    LMessage := TMessageResultNotification(M);
-    if LMessage.RequestCode = cSelectorCode then
-    begin
-      if LMessage.ResultCode = TJActivity.JavaClass.RESULT_OK then
-        HandleSelectorOK(LMessage.Value)
-      else
-        DoComplete(False);
-    end;
+    if LMessage.ResultCode = TJActivity.JavaClass.RESULT_OK then
+      HandleSelectorOK(LMessage.Value)
+    else
+      DoComplete(False);
   end;
 end;
 
 procedure TPlatformFilesSelector.DoSelect(const AMode: TSelectionMode);
-var
-  LMimeTypes: TJavaObjectArray<JString>;
-  I: Integer;
 begin
-  if Length(FMimeTypes) > 0 then
-  begin
-    FIntent.setType(StringToJString(FMimeTypes[0]));
-    if Length(FMimeTypes) > 1 then
-    begin
-      LMimeTypes := TJavaObjectArray<JString>.Create(Length(FMimeTypes));
-      try
-        for I := 1 to Length(FMimeTypes) - 1 do
-          LMimeTypes.Items[I] := StringToJString(FMimeTypes[I]);
-        FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
-      finally
-        LMimeTypes.Free;
-      end;
-    end
-    else
-    begin
-      LMimeTypes := nil;
-      FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
-    end;
-  end
-  else
-    FIntent.setType(StringToJString('*/*'));
   case AMode of
     TSelectionMode.Documents:
       FIntent.setAction(TJIntent.JavaClass.ACTION_OPEN_DOCUMENT);
@@ -232,26 +204,22 @@ var
 begin
   if Length(FMimeTypes) > 0 then
   begin
-    FIntent.setType(StringToJString(FMimeTypes[0]));
-    if Length(FMimeTypes) > 1 then
-    begin
-      LMimeTypes := TJavaObjectArray<JString>.Create(Length(FMimeTypes));
-      try
-        for I := 1 to Length(FMimeTypes) - 1 do
-          LMimeTypes.Items[I] := StringToJString(FMimeTypes[I]);
-        FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
-      finally
-        LMimeTypes.Free;
+    LMimeTypes := TJavaObjectArray<JString>.Create(Length(FMimeTypes));
+    try
+      for I := 0 to Length(FMimeTypes) - 1 do
+      begin
+        LMimeTypes.Items[I] := StringToJString(FMimeTypes[I]);
       end;
-    end
-    else
-    begin
-      LMimeTypes := nil;
       FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
+    finally
+      LMimeTypes.Free;
     end;
   end
   else
-    FIntent.setType(StringToJString('*/*'));
+  begin
+    LMimeTypes := nil;
+    FIntent.putExtra(TJIntent.JavaClass.EXTRA_MIME_TYPES, LMimeTypes);
+  end;
   UpdateIntentActivities;
 end;
 
