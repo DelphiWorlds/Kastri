@@ -134,10 +134,18 @@ var
 begin
   // https://stackoverflow.com/a/15114434/3164070
   LInfo := TAndroidHelper.Context.getApplicationInfo;
-  if LInfo.labelRes = 0 then
-    Result := JStringToString(LInfo.nonLocalizedLabel.toString)
-  else
-    Result := JStringToString(TAndroidHelper.Context.getString(LInfo.labelRes));
+  if LInfo <> nil then
+  begin
+    if LInfo.labelRes = 0 then
+    begin
+      if LInfo.nonLocalizedLabel <> nil then
+        Result := JStringToString(LInfo.nonLocalizedLabel.toString)
+      else if LInfo.packageName <> nil then
+        Result := JStringToString(LInfo.packageName);
+    end
+    else
+      Result := JStringToString(TAndroidHelper.Context.getString(LInfo.labelRes));
+  end;
 end;
 
 class function TPlatformOSDevice.GetPackageVersion: string;
