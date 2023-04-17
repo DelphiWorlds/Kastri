@@ -106,6 +106,10 @@ type
     /// </summary>
     class function GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo; static;
     /// <summary>
+    ///   Returns whether the application has permissions for a secure setting
+    /// </summary>
+    class function HasSecurePermissions(const ASetting: string): Boolean; static;
+    /// <summary>
     ///   Sets an exception handler for any uncaught exceptions that occur in Java code
     /// </summary>
     /// <remarks>
@@ -563,6 +567,34 @@ end;
 class function TAndroidHelperEx.IsServiceRunning(const AServiceName: string): Boolean;
 begin
   Result := GetRunningServiceInfo(AServiceName) <> nil;
+end;
+
+class function TAndroidHelperEx.HasSecurePermissions(const ASetting: string): Boolean;
+var
+  LPackageNames: JString;
+  LPackages: TJavaObjectArray<JString>;
+  LComponentName: JComponentName;
+  I: Integer;
+begin
+  Result := False;
+  LPackageNames := TJSettings_Secure.JavaClass.getString(TAndroidHelper.ContentResolver, StringToJString(ASetting));
+  if LPackageNames <> nil then
+  begin
+    LPackages := LPackageNames.split(StringToJString(':'));
+    try
+      for I := 0 to LPackages.Length - 1 do
+      begin
+        LComponentName := TJComponentName.JavaClass.unflattenFromString(LPackages.Items[I]);
+        if (LComponentName <> nil) and TAndroidHelper.Context.getPackageName.equals(LComponentName.getPackageName) then
+        begin
+          Result := True;
+          Break;
+        end;
+      end;
+    finally
+      LPackages.Free;
+    end;
+  end;
 end;
 
 class function TAndroidHelperEx.KeyguardManager: JKeyguardManager;
