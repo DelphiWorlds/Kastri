@@ -50,6 +50,10 @@ uses
 uses
   DW.EXIF.Android;
 {$ENDIF}
+{$IF Defined(MSWINDOWS)}
+uses
+  DW.EXIF.Win;
+{$ENDIF}
 
 { TEXIF }
 
