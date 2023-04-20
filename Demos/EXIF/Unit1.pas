@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, FMX.Memo.Types, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo,
-  FMX.StdCtrls, FMX.Layouts, System.Actions, FMX.ActnList, FMX.Advertising.Firebase;
+  FMX.StdCtrls, FMX.Layouts;
 
 type
   TForm1 = class(TForm)
@@ -42,7 +42,12 @@ constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
   FIndex := -1;
+  // **** For Windows, please copy the images from the Images folder of the demo source to Documents\EXIFDemo\Images ****
+  {$IF Defined(MSWINDOWS)}
+  FFiles := TDirectory.GetFiles(TPath.Combine(TPath.GetDocumentsPath, 'EXIFDemo\Images'), '*.jpg', TSearchOption.soTopDirectoryOnly);
+  {$ELSE}
   FFiles := TDirectory.GetFiles(TPath.Combine(TPath.GetDocumentsPath, 'Images'), '*.jpg', TSearchOption.soTopDirectoryOnly);
+  {$ENDIF}
   if Length(FFiles) > 0 then
   begin
     FIndex := 0;
