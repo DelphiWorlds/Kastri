@@ -13,6 +13,7 @@
     ".\\Base\\DWMultiBroadcastReceiverDelegate.java",
     ".\\Base\\DWNotificationListenerService.java",
     ".\\Base\\DWNotificationPublisher.java",
+    ".\\Base\\DWNotificationPresenter.java",
     ".\\Base\\DWSeekBar.java",
     ".\\Base\\DWUtility.java",
     ".\\Base\\DWWakeUp.java",
