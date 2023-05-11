@@ -32,6 +32,7 @@ type
     procedure CheckPushEnabled(const AHandler: TCheckPushEnabledMethod);
     function GetOnMessageReceived: TMessageReceivedEvent;
     function GetOnStatusChange: TNotifyEvent;
+    function GetPushService: TPushService;
     function GetShowBannerIfForeground: Boolean;
     /// <summary>
     ///   Returns the FCM token
@@ -56,6 +57,10 @@ type
     ///   Unsubscribes the app from the specified topic
     /// </summary>
     procedure UnsubscribeFromTopic(const ATopic: string);
+    /// <summary>
+    ///   Provides access to the underlying push service
+    /// </summary>
+    property PushService: TPushService read GetPushService;
     /// <summary>
     ///   Indicates whether or not a notification banner should be presented when the app is in the foreground
     /// </summary>
@@ -171,7 +176,6 @@ type
     procedure CreateChannel;
     procedure CreateConnection;
     procedure DoStart;
-    function GetPushService: TPushService;
     {$IF Defined(ANDROID)}
     function IsAndroidPushEnabled: Boolean;
     {$ENDIF}
@@ -186,6 +190,7 @@ type
     procedure CheckPushEnabled(const AHandler: TCheckPushEnabledMethod);
     function GetOnMessageReceived: TMessageReceivedEvent;
     function GetOnStatusChange: TNotifyEvent;
+    function GetPushService: TPushService;
     function GetShowBannerIfForeground: Boolean;
     function GetToken: string;
     function IsStarted: Boolean;
@@ -274,7 +279,7 @@ procedure TFCMManager.CreateConnection;
 var
   LPushService: TPushService;
 begin
-  LPushService := GetPushService;
+  LPushService := TPushServiceManager.Instance.GetServiceByName(TPushService.TServiceNames.FCM);
   if LPushService <> nil  then
   begin
     FServiceConnection := TPushServiceConnection.Create(LPushService);
@@ -401,7 +406,10 @@ end;
 
 function TFCMManager.GetPushService: TPushService;
 begin
-  Result := TPushServiceManager.Instance.GetServiceByName(TPushService.TServiceNames.FCM);
+  if FServiceConnection <> nil then
+    Result := FServiceConnection.Service
+  else
+    Result := nil;
 end;
 
 function TFCMManager.GetShowBannerIfForeground: Boolean;
@@ -472,9 +480,14 @@ end;
 procedure TFCMManager.ServiceConnectionChangeHandler(Sender: TObject; APushChanges: TPushService.TChanges);
 begin
   if TPushService.TChange.DeviceToken in APushChanges then
-    FDeviceToken := GetPushService.DeviceTokenValue[TPushService.TDeviceTokenNames.DeviceToken];
-  if (TPushService.TChange.Status in APushChanges) and Assigned(FOnStatusChange) then
-    FOnStatusChange(Self);
+    FDeviceToken := FServiceConnection.Service.DeviceTokenValue[TPushService.TDeviceTokenNames.DeviceToken];
+  if TPushService.TChange.Status in APushChanges then
+  begin
+    if FServiceConnection.Service.Status = TPushService.TStatus.StartupError then
+      TOSLog.d('Startup error: %s', [FServiceConnection.Service.StartupError]);
+    if Assigned(FOnStatusChange) then
+      FOnStatusChange(Self);
+  end;
 end;
 
 procedure TFCMManager.DoStart;
