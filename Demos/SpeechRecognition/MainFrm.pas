@@ -42,6 +42,7 @@ begin
   inherited;
   FSpeech := TSpeechRecognition.Create;
   FSpeech.StopInterval := 1500;
+  FSpeech.WantPartialResults := True;
   FSpeech.OnAuthorizationStatus := SpeechAuthorizationHandler;
   FSpeech.OnRecording := SpeechRecordingHandler;
   FSpeech.OnStopped := SpeechStoppedHandler;
@@ -91,13 +92,18 @@ end;
 
 procedure TfrmMain.SpeechStoppedHandler(Sender: TObject);
 begin
-  if not FText.IsEmpty then
-    Memo.Lines.Add('I heard this: ' + FText);
+  // Show text at the end, if not using partial results
+  if not FSpeech.WantPartialResults then
+    Memo.Lines.Text := FText;
+  FText := '';
 end;
 
 procedure TfrmMain.SpeechTextHandler(Sender: TObject; const AText: string);
 begin
   FText := AText;
+  // Show text immediately, if using partial results
+  if FSpeech.WantPartialResults then
+    Memo.Lines.Text := FText;
 end;
 
 procedure TfrmMain.RecordButtonClick(Sender: TObject);
