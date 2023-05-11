@@ -54,6 +54,7 @@ type
     FStartupIntentHandled: Boolean;
     FTokenTaskCompleteListener: JOnCompleteListener;
     procedure CreateChannel;
+    procedure DoStart;
     procedure MessageReceivedNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
   protected
     procedure DoApplicationBecameActive; override;
@@ -74,7 +75,7 @@ implementation
 
 uses
   // RTL
-  System.SysUtils, System.Classes,
+  System.SysUtils, System.Classes, System.Permissions,
   // Android
   Androidapi.JNI.Os, Androidapi.Helpers, Androidapi.JNI.App,
   // FMX
@@ -83,7 +84,7 @@ uses
   DW.OSLog,
   DW.Classes.Helpers, DW.Androidapi.JNI.DWFirebaseServiceHelpers, DW.FirebaseApp.Android, DW.Consts.Android, DW.OSMetadata,
   {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.Androidx.LocalBroadcastManager, {$ENDIF}
-  DW.Androidapi.JNI.Firebase, DW.Androidapi.JNI.Content;
+  DW.Androidapi.JNI.Firebase, DW.Androidapi.JNI.Content, DW.Permissions.Helpers;
 
 { TTokenTaskCompleteListener }
 
@@ -96,7 +97,13 @@ end;
 procedure TTokenTaskCompleteListener.onComplete(task: JTask);
 begin
   if task.isSuccessful then
-    FFirebaseMessaging.DoTokenReceived(JStringToString(TJString.Wrap(task.getResult)));
+    FFirebaseMessaging.DoTokenReceived(JStringToString(TJString.Wrap(task.getResult)))
+  else if task.isCanceled then
+    FFirebaseMessaging.DoFailedToRegister('Token request cancelled')
+  else if task.getException <> nil then
+    FFirebaseMessaging.DoFailedToRegister(Format('Token request failed - %s', [JStringToString(task.getException.getLocalizedMessage)]))
+  else
+    FFirebaseMessaging.DoFailedToRegister('Token request failed');
 end;
 
 { TFirebaseMessagingReceiver }
@@ -168,15 +175,18 @@ end;
 
 function TPlatformFirebaseMessaging.Start: Boolean;
 begin
-  if TOSVersion.Check(8) then
-    CreateChannel;
-  TPlatformFirebaseApp.Start;
-  {$IF CompilerVersion < 35}
-  TJDWFirebaseMessagingService.JavaClass.queryToken(TAndroidHelper.Context);
-  {$ELSE}
-  FTokenTaskCompleteListener := TTokenTaskCompleteListener.Create(Self);
-  TJFirebaseMessaging.JavaClass.getInstance.getToken.addOnCompleteListener(FTokenTaskCompleteListener);
-  {$ENDIF}
+  if TAndroidHelperEx.CheckBuildAndTarget(33) then
+  begin
+    PermissionsService.RequestPermissions([cPermissionPostNotifications],
+      procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
+      begin
+        if AGrantResults.AreAllGranted then
+          DoStart;
+      end
+    );
+  end
+  else
+    DoStart;
   Result := True;
 end;
 
@@ -193,6 +203,20 @@ end;
 procedure TPlatformFirebaseMessaging.DoApplicationEnteredBackground;
 begin
   FStartupIntentHandled := False;
+end;
+
+procedure TPlatformFirebaseMessaging.DoStart;
+begin
+  TOSLog.d('TPlatformFirebaseMessaging.DoStart');
+  if TOSVersion.Check(8) then
+    CreateChannel;
+  TPlatformFirebaseApp.Start;
+  {$IF CompilerVersion < 35}
+  TJDWFirebaseMessagingService.JavaClass.queryToken(TAndroidHelper.Context);
+  {$ELSE}
+  FTokenTaskCompleteListener := TTokenTaskCompleteListener.Create(Self);
+  TJFirebaseMessaging.JavaClass.getInstance.getToken.addOnCompleteListener(FTokenTaskCompleteListener);
+  {$ENDIF}
 end;
 
 procedure TPlatformFirebaseMessaging.HandleMessageReceived(const data: JIntent; const AIsStartup: Boolean = False);
