@@ -175,7 +175,7 @@ begin
   FRequest := TSFSpeechAudioBufferRecognitionRequest.Create;
   FInputNode := FAudioEngine.inputNode;
   // Check LRequest and LInputNode for nil?
-  FRequest.setShouldReportPartialResults(True);
+  FRequest.setShouldReportPartialResults(Speech.WantPartialResults);
   FTask := FRecognizer.recognitionTaskWithRequest(FRequest, RecognitionRequestSpeechResultHandler);
   FInputNode.installTapOnBus(0, 4096, FInputNode.outputFormatForBus(0), InputNodeInstallTapOnBusHandler);
   FAudioEngine.prepare;

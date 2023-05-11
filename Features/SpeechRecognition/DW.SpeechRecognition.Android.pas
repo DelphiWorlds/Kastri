@@ -187,6 +187,7 @@ var
   LIntent: JIntent;
 begin
   LIntent := TJIntent.JavaClass.init(TJRecognizerIntent.JavaClass.ACTION_RECOGNIZE_SPEECH);
+  LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_PARTIAL_RESULTS, Speech.WantPartialResults);
   LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_LANGUAGE_MODEL, TJRecognizerIntent.JavaClass.LANGUAGE_MODEL_FREE_FORM);
   if Speech.Language.IsEmpty then
     LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_LANGUAGE, TJLocale.JavaClass.getDefault.toString)
@@ -252,12 +253,17 @@ var
   LResult: JString;
   I: Integer;
 begin
-  LArrayList := results.getStringArrayList(TJSpeechRecognizer.JavaClass.RESULTS_RECOGNITION);
-  for I := 0 to LArrayList.size - 1 do
-    LResult := TJString.Wrap(TAndroidHelper.JObjectToID(LArrayList.get(I)));
-  FIsRecording := False;
-  DoRecordingStatusChanged;
-  DoRecognition(JStringToString(LResult), True);
+  if not Speech.WantPartialResults then
+  begin
+    LArrayList := results.getStringArrayList(TJSpeechRecognizer.JavaClass.RESULTS_RECOGNITION);
+    for I := 0 to LArrayList.size - 1 do
+      LResult := TJString.Wrap(TAndroidHelper.JObjectToID(LArrayList.get(I)));
+    FIsRecording := False;
+    DoRecordingStatusChanged;
+    DoRecognition(JStringToString(LResult), True);
+  end
+  else
+    Stopped;
 end;
 
 procedure TPlatformSpeechRecognition.RmsChanged(rmsdB: Single);
@@ -276,8 +282,14 @@ begin
 end;
 
 procedure TPlatformSpeechRecognition.PartialResults(partialResults: JBundle);
+var
+  LList: JArrayList;
+  LText: string;
 begin
-  //
+  LList := partialResults.getStringArrayList(TJSpeechRecognizer.JavaClass.RESULTS_RECOGNITION);
+  LText := JStringToString(TJString.Wrap(LList.get(0)));
+  if not LText.IsEmpty then
+    DoRecognition(LText, False);
 end;
 
 end.

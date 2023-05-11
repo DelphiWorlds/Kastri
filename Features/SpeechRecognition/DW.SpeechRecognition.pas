@@ -53,6 +53,7 @@ type
     FPrompt: string;
     FStopInterval: Integer;
     FText: string;
+    FWantPartialResults: Boolean;
     FOnAuthorizationStatus: TAuthorizationStatusEvent;
     FOnRecording: TSpeechRecognitionRecordingEvent;
     FOnStopped: TNotifyEvent;
@@ -113,6 +114,10 @@ type
     ///   Text from recording
     /// </summary>
     property Text: string read FText;
+    /// <summary>
+    ///   Indicates whether or not speech recognition should provide partial results
+    /// </summary>
+    property WantPartialResults: Boolean read FWantPartialResults write FWantPartialResults;
     /// <summary>
     ///   Event fired when an authorization request has returned
     /// </summary>
