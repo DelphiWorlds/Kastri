@@ -94,6 +94,8 @@ var
   LURIs, LTexts: JArrayList;
   LFileName, LType: string;
   LKind: TMimeTypes.TKind;
+  LClipData: JClipData;
+  I: Integer;
 begin
   LURIs := TJArrayList.Create;
   LTexts := TJArrayList.Create;
@@ -143,6 +145,14 @@ begin
       LIntent.putExtra(TJIntent.JavaClass.EXTRA_TEXT, TJString.Wrap(LTexts.get(0)));
     if LURIs.size > 0 then
       LIntent.putExtra(TJIntent.JavaClass.EXTRA_STREAM, TJParcelable.Wrap(LURIs.get(0)));
+  end;
+  // From https://stackoverflow.com/a/69393343/3164070
+  if LURIs.size > 0 then
+  begin
+    LClipData := TJClipData.JavaClass.newRawUri(StrToJCharSequence(''), TJnet_Uri.Wrap(LURIs.get(0)));
+    for I := 1 to LURIs.size - 1 do
+      LClipData.addItem(TJClipData_Item.JavaClass.init(TJnet_Uri.Wrap(LURIs.get(I))));
+    LIntent.setClipData(LClipData);
   end;
   LIntent.setFlags(TJIntent.JavaClass.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
   LIntent.addFlags(TJIntent.JavaClass.FLAG_GRANT_READ_URI_PERMISSION);
