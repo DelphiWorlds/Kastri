@@ -60,7 +60,6 @@ type
 implementation
 
 uses
-  DW.OSLog,
   // RTL
   System.SysUtils, System.Permissions,
   // Android
@@ -190,18 +189,18 @@ procedure TWebChromeClientManager.MessageResultNotificationHandler(const Sender:
 var
   LResult: TMessageResultNotification;
 begin
-  if M is TMessageResultNotification then
+  LResult := TMessageResultNotification(M);
+  if (LResult.RequestCode = cFileChooserRequestCodeDefault) or (LResult.RequestCode = cFileChooserRequestCodeCamera) then
   begin
-    LResult := TMessageResultNotification(M);
-    if (LResult.RequestCode = cFileChooserRequestCodeDefault) or (LResult.RequestCode = cFileChooserRequestCodeCamera) then
+    if LResult.RequestCode = cFileChooserRequestCodeCamera then
     begin
-      if LResult.RequestCode = cFileChooserRequestCodeCamera then
+      if LResult.Value <> nil then
       begin
         LResult.Value.setData(FImageUri);
         LResult.Value.setFlags(TJIntent.JavaClass.FLAG_GRANT_READ_URI_PERMISSION);
       end;
-      FWebChromeClient.handleFileChooserResult(LResult.Value, LResult.ResultCode);
     end;
+    FWebChromeClient.handleFileChooserResult(LResult.Value, LResult.ResultCode);
   end;
 end;
 
