@@ -22,7 +22,7 @@ uses
   Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App, Androidapi.JNI.Media,
   Androidapi.JNIBridge,
   // DW
-  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes, DW.Androidapi.JNI.DWUtility;
+  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes, DW.Androidapi.JNI.DWUtility, DW.Androidapi.JNI.PlayCore;
 
 type
   TUncaughtExceptionHandler = class(TJavaLocal, JThread_UncaughtExceptionHandler)
@@ -105,6 +105,10 @@ type
     ///   Returns information about a running service, if the service is running
     /// </summary>
     class function GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo; static;
+    /// <summary>
+    ///   Returns whether the application has the specified permission declared in the manifest
+    /// </summary>
+    class function HasManifestPermission(const APermission: string): Boolean; static;
     /// <summary>
     ///   Returns whether the application has permissions for a secure setting
     /// </summary>
@@ -288,6 +292,18 @@ type
     constructor Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
   end;
 
+  TPlayCoreOnCompleteMethod = procedure(const ATask: JTask) of object;
+
+  TPlayCoreOnCompleteListener = class(TJavaLocal, JOnCompleteListener)
+  private
+    FOnCompleteHandler: TPlayCoreOnCompleteMethod;
+  public
+    { JOnCompleteListener }
+    procedure onComplete(task: JTask); cdecl;
+  public
+    constructor Create(const AOnCompleteHandler: TPlayCoreOnCompleteMethod);
+  end;
+
   TAndroidFileStream = class(TBytesStream)
   public
     constructor Create(const AFile: JFile); overload;
@@ -395,6 +411,33 @@ end;
 class function TAndroidHelperEx.GetTimeFromNowInMillis(const ASecondsFromNow: Int64): Int64;
 begin
   Result := TJSystem.JavaClass.currentTimeMillis + (ASecondsFromNow * 1000);
+end;
+
+class function TAndroidHelperEx.HasManifestPermission(const APermission: string): Boolean;
+var
+  LPackageInfo: JPackageInfo;
+  LPackageName, LPermission: JString;
+  LPermissions: TJavaObjectArray<JString>;
+  I: Integer;
+begin
+  Result := False;
+  LPackageName := TAndroidHelper.Context.getPackageName;
+  LPackageInfo := TAndroidHelper.Context.getPackageManager.getPackageInfo(LPackageName, TJPackageManager.JavaClass.GET_PERMISSIONS);
+  LPermissions := LPackageInfo.requestedPermissions;
+  if LPermissions <> nil then
+  try
+    LPermission := StringToJString(APermission);
+    for I := 0 to LPermissions.Length - 1 do
+    begin
+      if LPermissions[I].equals(LPermission) then
+      begin
+        Result := True;
+        Break;
+      end;
+    end;
+  finally
+    LPermissions.Free;
+  end;
 end;
 
 class procedure TAndroidHelperEx.ShowHome;
@@ -911,6 +954,19 @@ begin
     TThread.ForceQueue(nil, FRunHandler)
   else
     FRunHandler;
+end;
+
+{ TPlayCoreOnCompleteListener }
+
+constructor TPlayCoreOnCompleteListener.Create(const AOnCompleteHandler: TPlayCoreOnCompleteMethod);
+begin
+  FOnCompleteHandler := AOnCompleteHandler;
+end;
+
+procedure TPlayCoreOnCompleteListener.onComplete(task: JTask);
+begin
+  if Assigned(FOnCompleteHandler) then
+    FOnCompleteHandler(task);
 end;
 
 { TAndroidFileStream }
