@@ -18,6 +18,8 @@ interface
 implementation
 
 uses
+  // RTL
+  System.TypInfo,
   // Android
   Androidapi.Helpers,
   // DW
@@ -36,17 +38,23 @@ type
     procedure RequestReview;
   end;
 
+const
+  cPlayCoreLibraryName = 'play-core-1.10.0.jar';
+
 { TAppReview }
 
 procedure TPlatformAppReview.RequestReview;
 var
   LTask: JTask;
 begin
-  if FReviewManager = nil then
-    FReviewManager := TJReviewManagerFactory.JavaClass.create(TAndroidHelper.Context);
-  if FRequestReviewFlowOnCompleteListener = nil then
-    FRequestReviewFlowOnCompleteListener := TPlayCoreOnCompleteListener.Create(RequestReviewCompleted);
-  LTask := FReviewManager.requestReviewFlow.addOnCompleteListener(FRequestReviewFlowOnCompleteListener);
+  if TAndroidHelperEx.HasClass(TypeInfo(JReviewManager), cPlayCoreLibraryName) then
+  begin
+    if FReviewManager = nil then
+      FReviewManager := TJReviewManagerFactory.JavaClass.create(TAndroidHelper.Context);
+    if FRequestReviewFlowOnCompleteListener = nil then
+      FRequestReviewFlowOnCompleteListener := TPlayCoreOnCompleteListener.Create(RequestReviewCompleted);
+    LTask := FReviewManager.requestReviewFlow.addOnCompleteListener(FRequestReviewFlowOnCompleteListener);
+  end;
 end;
 
 procedure TPlatformAppReview.RequestReviewCompleted(const ATask: JTask);
