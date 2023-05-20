@@ -27,6 +27,10 @@ type
     /// </summary>
     class function CombineAll(const APaths: array of string): string; static;
     /// <summary>
+    ///   Returns a path for ATargetPath that is absolute
+    /// </summary>
+    class function GetAbsolutePath(const ABasePath, ARelativePath: string): string; static;
+    /// <summary>
     ///   Returns the specified filename in the documents folder, or appends the app folder if not on mobile
     /// </summary>
     class function GetAppDocumentsFile(const AFileName: string; const AAppFolder: string = ''): string; static;
@@ -58,6 +62,10 @@ type
     /// </remarks>
     class function GetAppSupportPath(const AFolder: string = ''): string; static;
     class function GetDirectoryName(const AFileName: string): string; static;
+    /// <summary>
+    ///   Returns a path for ATargetPath that is relative to ABasePath
+    /// </summary>
+    class function GetRelativePath(const ABasePath, ATargetPath: string): string; static;
     /// <summary>
     ///   Returns the path to a file in deployed resources (e.g. on macOS, to Contents\Resources), and appends the folder if present
     /// </summary>
@@ -163,7 +171,7 @@ implementation
 
 uses
   // RTL
-  System.SysUtils, System.Classes,
+  System.SysUtils, System.Classes, System.Math,
   // DW
   {$IF Defined(MSWINDOWS)}
   DW.IOUtils.Helpers.Win,
@@ -252,6 +260,87 @@ end;
 class function TPathHelper.GetAppDocumentsFile(const AFileName, AAppFolder: string): string;
 begin
   Result := TPath.Combine(GetAppDocumentsPath(AAppFolder), AFileName);
+end;
+
+function GetDriveLetter(const APath: string): string;
+begin
+  Result := '';
+  if not APath.IsEmpty and (Length(APath) > 1) and (APath.Chars[1] = ':') then
+    Result := APath.Chars[0];
+end;
+
+class function TPathHelper.GetAbsolutePath(const ABasePath, ARelativePath: string): string;
+var
+  LRelDriveLetter: string;
+  LBaseParts, LRelativeParts: TArray<string>;
+begin
+  Result := ABasePath;
+  if not ARelativePath.IsEmpty then
+  begin
+    LRelDriveLetter := GetDriveLetter(ARelativePath);
+    if LRelDriveLetter.IsEmpty or LRelDriveLetter.Equals(GetDriveLetter(ABasePath)) then
+    begin
+      LRelativeParts := ARelativePath.Split([PathDelim]);
+      if Length(LRelativeParts) > 0 then
+      begin
+        if LRelativeParts[0].Equals('.') then
+          Result := ExcludeTrailingPathDelimiter(ABasePath) + ARelativePath.Substring(1)
+        else
+        begin
+          LBaseParts := ExcludeTrailingPathDelimiter(ABasePath).Split([PathDelim]);
+          // Not supporting weirdos who might do crap like this: ..\.\..\..\.\MyDir
+          while (Length(LBaseParts) > 0) and (Length(LRelativeParts) > 0) and LRelativeParts[0].Equals('..') do
+          begin
+            Delete(LRelativeParts, 0, 1);
+            Delete(LBaseParts, Length(LBaseParts) - 1, 1);
+          end;
+          Result := string.Join(PathDelim, LBaseParts) + PathDelim + string.Join(PathDelim, LRelativeParts);
+        end;
+      end;
+    end
+    else
+      Result := ARelativePath;
+  end;
+end;
+
+class function TPathHelper.GetRelativePath(const ABasePath, ATargetPath: string): string;
+var
+  LBaseDriveLetter: string;
+  LBaseParts, LTargetParts: TArray<string>;
+  I, LIndex, LLevels: Integer;
+begin
+  Result := ATargetPath;
+  LBaseDriveLetter := GetDriveLetter(ABasePath);
+  if not LBaseDriveLetter.IsEmpty and LBaseDriveLetter.Equals(GetDriveLetter(ATargetPath)) then
+  begin
+    LBaseParts := ExcludeTrailingPathDelimiter(ABasePath).Split([PathDelim]);
+    LTargetParts := ExcludeTrailingPathDelimiter(ATargetPath).Split([PathDelim]);
+    LIndex := -1;
+    for I := 0 to Max(High(LBaseParts), High(LTargetParts)) do
+    begin
+      if (I > High(LBaseParts)) or not SameText(LBaseParts[I], LTargetParts[I]) then
+      begin
+        LIndex := I;
+        Break;
+      end;
+    end;
+    if LIndex > 0 then
+    begin
+      Result := '';
+      LLevels := Length(LBaseParts) - LIndex;
+      Delete(LTargetParts, 0, LIndex);
+      if LLevels > 0 then
+      begin
+        Result := '..';
+        for I := 0 to LLevels - 2 do
+          Result := Result + PathDelim + '..';
+      end
+      else
+        Result := '.';
+      for I := 0 to High(LTargetParts) do
+        Result := Result + PathDelim + LTargetParts[I];
+    end;
+  end;
 end;
 
 class function TPathHelper.GetResourcesFile(const AFileName, AFolder: string): string;
