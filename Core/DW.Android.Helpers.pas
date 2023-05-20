@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Classes, System.SysUtils,
+  System.Classes, System.SysUtils, System.TypInfo,
   // Android
   Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App, Androidapi.JNI.Media,
   Androidapi.JNIBridge,
@@ -70,6 +70,10 @@ type
     /// </summary>
     class function CheckBuildAndTarget(const AValue: Integer): Boolean; static;
     /// <summary>
+    ///   Creates a view from an Android resource
+    /// </summary>
+    class function CreateViewFromResource(const AName: string): JView; static;
+    /// <summary>
     ///   Enables/disables the Wake Lock. Needs Wake Lock checked in the Permissions section of the Project Options
     /// </summary>
     class procedure EnableWakeLock(const AEnable: Boolean); static;
@@ -105,6 +109,14 @@ type
     ///   Returns information about a running service, if the service is running
     /// </summary>
     class function GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo; static;
+    /// <summary>
+    ///   Determines whether or not a class is present. Note: If the class does not exist, a Java exception will show in the logs
+    /// </summary>
+    /// <remarks>
+    ///   This method should be used only to warn app developers when they may have missed including a required library
+    /// </remarks>
+    class function HasClass(const AClassName: string; const ALibraryName: string = ''): Boolean; overload; static;
+    class function HasClass(const ATypeInfo: PTypeInfo; const ALibraryName: string = ''): Boolean; overload; static;
     /// <summary>
     ///   Returns whether the application has the specified permission declared in the manifest
     /// </summary>
@@ -333,12 +345,12 @@ implementation
 
 uses
   // RTL
-  System.DateUtils, System.IOUtils,
+  System.DateUtils, System.IOUtils, System.Rtti,
   // Android
   Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI, Androidapi.JNI.Support,
   // DW
   {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.AndroidX.FileProvider, {$ENDIF}
-  DW.Consts.Android, DW.Androidapi.JNI.Util;
+  DW.Consts.Android, DW.Androidapi.JNI.Util, DW.Toast.Android;
 
 { TUncaughtExceptionHandler }
 
@@ -381,6 +393,16 @@ begin
   Result := (GetBuildSdkVersion >= AValue) and (GetTargetSdkVersion >= AValue);
 end;
 
+class function TAndroidHelperEx.CreateViewFromResource(const AName: string): JView;
+var
+  LResources: JResources;
+  LID: Integer;
+begin
+  LResources := TAndroidHelper.Context.getResources;
+  LID := LResources.getIdentifier(StringToJString('id/' + AName), nil, TAndroidHelper.Context.getPackageName);
+  Result := TAndroidHelper.Activity.getLayoutInflater.inflate(LID, nil);
+end;
+
 class procedure TAndroidHelperEx.EnableWakeLock(const AEnable: Boolean);
 var
   LTag: string;
@@ -411,6 +433,45 @@ end;
 class function TAndroidHelperEx.GetTimeFromNowInMillis(const ASecondsFromNow: Int64): Int64;
 begin
   Result := TJSystem.JavaClass.currentTimeMillis + (ASecondsFromNow * 1000);
+end;
+
+class function TAndroidHelperEx.HasClass(const AClassName: string; const ALibraryName: string = ''): Boolean;
+var
+  LShortClassName: string;
+begin
+  try
+    TJlang_Class.JavaClass.forName(StringToJString(AClassName));
+    Result := True;
+  except
+    // Eat the exception
+    Result := False;
+  end;
+  if not Result and not ALibraryName.IsEmpty then
+  begin
+    LShortClassName := AClassName.Substring(AClassName.LastIndexOf('.') + 1);
+    TToast.MakeEx(Format('J%s not found. Please add %s to the project', [LShortClassName, ALibraryName]), False);
+  end;
+end;
+
+class function TAndroidHelperEx.HasClass(const ATypeInfo: PTypeInfo; const ALibraryName: string = ''): Boolean;
+var
+  LContext: TRttiContext;
+  LType: TRttiType;
+  LAttribute: JavaSignatureAttribute;
+  LClassName: string;
+begin
+  Result := False;
+  LClassName := '';
+  LContext := TRttiContext.Create;
+  try
+    LType := LContext.GetType(ATypeInfo);
+    if (Length(LType.GetAttributes) > 0) and (LType.GetAttributes[0] is JavaSignatureAttribute) then
+      LClassName := JavaSignatureAttribute(LType.GetAttributes[0]).Signature.Replace('/', '.');
+  finally
+    LContext.Free;
+  end;
+  if not LClassName.IsEmpty then
+    Result := HasClass(LClassName, ALibraryName);
 end;
 
 class function TAndroidHelperEx.HasManifestPermission(const APermission: string): Boolean;
@@ -461,7 +522,7 @@ end;
 
 class function TAndroidHelperEx.GetClass(const APackageClassName: string): Jlang_Class;
 begin
-  Result := TJLang_Class.JavaClass.forName(StringToJString(APackageClassName), True, TAndroidHelper.Context.getClassLoader);
+  Result := TJLang_Class.JavaClass.forName(StringToJString(APackageClassName));
 end;
 
 class function TAndroidHelperEx.GetCrashTrace: string;
