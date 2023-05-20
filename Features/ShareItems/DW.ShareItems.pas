@@ -60,7 +60,8 @@ type
     function GetItems: TSharingItems;
   protected
     procedure DoShareCompleted(const AActivity: TShareActivity; const AError: string);
-    procedure Share(const AControl: TControl; const AExcludedActivities: TShareActivities); virtual;
+    procedure Share(const AControl: TControl; const AExcludedActivities: TShareActivities); overload; virtual;
+    procedure Share(const AControl: TControl; const ATargetPackage: string); overload; virtual;
     property Items: TSharingItems read GetItems;
     property ShareItems: TShareItems read FShareItems;
   public
@@ -89,6 +90,7 @@ type
     procedure Clear;
     procedure Share(const AControl: TControl); overload;
     procedure Share(const AControl: TControl; const AExcludedActivities: TShareActivities); overload;
+    procedure Share(const AControl: TControl; const ATargetPackage: string); overload;
     property OnShareCompleted: TShareCompletedEvent read FOnShareCompleted write FOnShareCompleted;
   end;
 
@@ -154,6 +156,11 @@ begin
   Result := FShareItems.Items;
 end;
 
+procedure TCustomPlatformShareItems.Share(const AControl: TControl; const ATargetPackage: string);
+begin
+  //
+end;
+
 procedure TCustomPlatformShareItems.Share(const AControl: TControl; const AExcludedActivities: TShareActivities);
 begin
   //
@@ -188,6 +195,11 @@ procedure TShareItems.DoShareCompleted(const AActivity: TShareActivity; const AE
 begin
   if Assigned(FOnShareCompleted) then
     FOnShareCompleted(Self, AActivity, AError);
+end;
+
+procedure TShareItems.Share(const AControl: TControl; const ATargetPackage: string);
+begin
+  FPlatformShareItems.Share(AControl, ATargetPackage);
 end;
 
 procedure TShareItems.Share(const AControl: TControl; const AExcludedActivities: TShareActivities);

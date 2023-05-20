@@ -28,11 +28,14 @@ uses
 type
   TPlatformShareItems = class(TCustomPlatformShareItems)
   private
+    function GetShareIntent(const AExcludedActivities: TShareActivities): JIntent;
     procedure MessageResultNotificationHandler(const Sender: TObject; const M: TMessage);
     function SaveFile(const AFileName: string): Jnet_Uri;
     function SaveImage(const ABitmap: TBitmap): Jnet_Uri;
+    procedure StartActivity(const AIntent: JIntent);
   protected
-    procedure Share(const AControl: TControl; const AExcludedActivities: TShareActivities); override;
+    procedure Share(const AControl: TControl; const AExcludedActivities: TShareActivities); overload; override;
+    procedure Share(const AControl: TControl; const ATargetPackage: string); overload; override;
   public
     constructor Create(const AShareItems: TShareItems); override;
     destructor Destroy; override;
@@ -86,7 +89,7 @@ begin
   ABitmap.SaveToFile(JStringToString(LFile.getAbsolutePath));
 end;
 
-procedure TPlatformShareItems.Share(const AControl: TControl; const AExcludedActivities: TShareActivities);
+function TPlatformShareItems.GetShareIntent(const AExcludedActivities: TShareActivities): JIntent;
 var
   LIntent: JIntent;
   LItem: TSharingItem;
@@ -156,7 +159,27 @@ begin
   end;
   LIntent.setFlags(TJIntent.JavaClass.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
   LIntent.addFlags(TJIntent.JavaClass.FLAG_GRANT_READ_URI_PERMISSION);
-  TAndroidHelper.Activity.startActivityForResult(TJIntent.JavaClass.createChooser(LIntent, StrToJCharSequence('Share using:')), cRequestCodeShare);
+  Result := LIntent;
+end;
+
+procedure TPlatformShareItems.Share(const AControl: TControl; const ATargetPackage: string);
+var
+  LIntent: JIntent;
+begin
+  // For now, assume that the package name is everything before the activity classname
+  LIntent := GetShareIntent([]);
+  LIntent.setPackage(StringToJString(ATargetPackage));
+  StartActivity(LIntent);
+end;
+
+procedure TPlatformShareItems.StartActivity(const AIntent: JIntent);
+begin
+  TAndroidHelper.Activity.startActivityForResult(TJIntent.JavaClass.createChooser(AIntent, StrToJCharSequence('Share using:')), cRequestCodeShare);
+end;
+
+procedure TPlatformShareItems.Share(const AControl: TControl; const AExcludedActivities: TShareActivities);
+begin
+  StartActivity(GetShareIntent(AExcludedActivities));
 end;
 
 procedure TPlatformShareItems.MessageResultNotificationHandler(const Sender: TObject; const M: TMessage);
