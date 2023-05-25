@@ -19,7 +19,9 @@ uses
   // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics;
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics,
+  // DW
+  DW.iOSapi.UIKit;
 
 const
   kPDFActionNamedNone = 0;
@@ -71,6 +73,14 @@ const
   kPDFDocumentPermissionsNone = 0;
   kPDFDocumentPermissionsUser = 1;
   kPDFDocumentPermissionsOwner = 2;
+  PDFAllowsLowQualityPrinting = 1;
+  PDFAllowsHighQualityPrinting = 2;
+  PDFAllowsDocumentChanges = 4;
+  PDFAllowsDocumentAssembly = 8;
+  PDFAllowsContentCopying = 16;
+  PDFAllowsContentAccessibility = 32;
+  PDFAllowsCommenting = 64;
+  PDFAllowsFormFieldEntry = 128;
   PDFThumbnailLayoutModeVertical = 0;
   PDFThumbnailLayoutModeHorizontal = 1;
   kPDFDisplaySinglePage = 0;
@@ -89,6 +99,7 @@ const
   kPDFIconArea = 64;
   kPDFPopupArea = 128;
   kPDFImageArea = 256;
+  kPDFAnyArea = 2147483647;
   kPDFInterpolationQualityNone = 0;
   kPDFInterpolationQualityLow = 1;
   kPDFInterpolationQualityHigh = 2;
@@ -97,8 +108,8 @@ type
   PDFAction = interface;
   PDFActionGoTo = interface;
   PDFActionNamed = interface;
-  PDFActionRemoteGoTo = interface;
   PDFActionResetForm = interface;
+  PDFActionRemoteGoTo = interface;
   PDFActionURL = interface;
   PDFPage = interface;
   PDFAnnotation = interface;
@@ -112,9 +123,11 @@ type
   PDFThumbnailView = interface;
   PDFView = interface;
   PDFViewDelegate = interface;
+  PDFPageOverlayViewProvider = interface;
 
   PDFActionNamedName = NSInteger;
   PDFDisplayBox = NSInteger;
+  PDFPageImageInitializationOption = NSString;
   PDFAnnotationSubtype = NSString;
   PDFAnnotationKey = NSString;
   PDFLineStyle = NSInteger;
@@ -132,6 +145,7 @@ type
   PDFDocumentPermissions = NSInteger;
   PDFDocumentAttribute = NSString;
   PDFDocumentWriteOption = NSString;
+  PDFAccessPermissions = NSInteger;
   PDFThumbnailLayoutMode = NSInteger;
   PDFDisplayMode = NSInteger;
   PDFDisplayDirection = NSInteger;
@@ -139,21 +153,21 @@ type
   PDFInterpolationQuality = NSInteger;
 
   PDFActionClass = interface(NSObjectClass)
-    ['{C153FFCF-8745-4DBB-BD84-31934FFDF7A6}']
+    ['{4C9BBD4B-E79E-4981-B892-6AABDA448DE5}']
   end;
 
   PDFAction = interface(NSObject)
-    ['{4020A55C-A3DB-44A8-AA2E-DD1BBF4F5164}']
+    ['{2118C2AC-8DA3-4109-9496-C8023C3FAC40}']
     function &type: NSString; cdecl;
   end;
   TPDFAction = class(TOCGenericImport<PDFActionClass, PDFAction>) end;
 
   PDFActionGoToClass = interface(PDFActionClass)
-    ['{437F4AC5-10A2-4385-AB78-3912E073FA54}']
+    ['{1C7A13E4-B73A-4D88-BDE4-7F02A813604F}']
   end;
 
   PDFActionGoTo = interface(PDFAction)
-    ['{7A5F5883-70E3-466F-8E70-5D4D453AE369}']
+    ['{143E284D-1375-47ED-9244-07E46E583AC0}']
     function destination: PDFDestination; cdecl;
     function initWithDestination(destination: PDFDestination): Pointer; cdecl;
     procedure setDestination(destination: PDFDestination); cdecl;
@@ -161,23 +175,36 @@ type
   TPDFActionGoTo = class(TOCGenericImport<PDFActionGoToClass, PDFActionGoTo>) end;
 
   PDFActionNamedClass = interface(PDFActionClass)
-    ['{D8F686D8-6C0A-41DB-8A28-2263655C351E}']
+    ['{CF4257D3-BDB0-44C1-87C6-E937B588DF3D}']
   end;
 
   PDFActionNamed = interface(PDFAction)
-    ['{7BD41F1A-5955-4A4C-93B5-97E9C1024A71}']
+    ['{38FE0046-AF0D-4A36-9E39-FDFC64AABEEA}']
     function initWithName(name: PDFActionNamedName): Pointer; cdecl;
     function name: PDFActionNamedName; cdecl;
     procedure setName(name: PDFActionNamedName); cdecl;
   end;
   TPDFActionNamed = class(TOCGenericImport<PDFActionNamedClass, PDFActionNamed>) end;
 
+  PDFActionResetFormClass = interface(PDFActionClass)
+    ['{B48F502D-5E67-40A4-9B7E-1FBB30F486C6}']
+  end;
+
+  PDFActionResetForm = interface(PDFAction)
+    ['{83215791-173B-46DB-A9AB-8F601067BA21}']
+    function fields: NSArray; cdecl;
+    function fieldsIncludedAreCleared: Boolean; cdecl;
+    procedure setFields(fields: NSArray); cdecl;
+    procedure setFieldsIncludedAreCleared(fieldsIncludedAreCleared: Boolean); cdecl;
+  end;
+  TPDFActionResetForm = class(TOCGenericImport<PDFActionResetFormClass, PDFActionResetForm>) end;
+
   PDFActionRemoteGoToClass = interface(PDFActionClass)
-    ['{71CD5F05-169A-4FFE-A377-97E82773B03B}']
+    ['{958B0002-0638-4D18-A7EA-6A1E3FEEE310}']
   end;
 
   PDFActionRemoteGoTo = interface(PDFAction)
-    ['{9F3C01EB-AB08-4C90-A85D-20186DB94F9C}']
+    ['{08184F2F-3BC0-4893-B848-C4501BD50E83}']
     function initWithPageIndex(pageIndex: NSUInteger; atPoint: CGPoint; fileURL: NSURL): Pointer; cdecl;
     function pageIndex: NSUInteger; cdecl;
     function point: CGPoint; cdecl;
@@ -188,25 +215,12 @@ type
   end;
   TPDFActionRemoteGoTo = class(TOCGenericImport<PDFActionRemoteGoToClass, PDFActionRemoteGoTo>) end;
 
-  PDFActionResetFormClass = interface(PDFActionClass)
-    ['{69E13E78-F873-49A0-A5CE-52069CDAAE01}']
-  end;
-
-  PDFActionResetForm = interface(PDFAction)
-    ['{3DE15BDC-57EC-4CDE-8ABE-0680CAD3AF06}']
-    function fields: NSArray; cdecl;
-    function fieldsIncludedAreCleared: Boolean; cdecl;
-    procedure setFields(fields: NSArray); cdecl;
-    procedure setFieldsIncludedAreCleared(fieldsIncludedAreCleared: Boolean); cdecl;
-  end;
-  TPDFActionResetForm = class(TOCGenericImport<PDFActionResetFormClass, PDFActionResetForm>) end;
-
   PDFActionURLClass = interface(PDFActionClass)
-    ['{0DD2A0AF-7CC2-4569-B287-482A9F00A276}']
+    ['{2DD0B28B-7EFC-47A6-9C35-4C1089C60BCA}']
   end;
 
   PDFActionURL = interface(PDFAction)
-    ['{62AC67D1-8E15-4C73-90B5-4EA7435E85E1}']
+    ['{AD68ED50-C4FB-44BA-8802-275ED0E2B01C}']
     function initWithURL(url: NSURL): Pointer; cdecl;
     procedure setURL(URL: NSURL); cdecl;
     function URL: NSURL; cdecl;
@@ -214,11 +228,13 @@ type
   TPDFActionURL = class(TOCGenericImport<PDFActionURLClass, PDFActionURL>) end;
 
   PDFPageClass = interface(NSObjectClass)
-    ['{EE7118A3-4A33-41E8-87B4-4733ECBDC8ED}']
+    ['{A6DD8008-2DDB-41C8-B45B-C77B42E12463}']
   end;
 
   PDFPage = interface(NSObject)
-    ['{42F4D5C2-D67A-4BCA-B092-A18C6C5B6B11}']
+    ['{AC296F83-8FA2-4B5C-898F-31ED231C1D44}']
+    function &label: NSString; cdecl;
+    function &string: NSString; cdecl;
     procedure addAnnotation(annotation: PDFAnnotation); cdecl;
     function annotationAtPoint(point: CGPoint): PDFAnnotation; cdecl;
     function annotations: NSArray; cdecl;
@@ -230,8 +246,8 @@ type
     function displaysAnnotations: Boolean; cdecl;
     function document: PDFDocument; cdecl;
     procedure drawWithBox(box: PDFDisplayBox; toContext: CGContextRef); cdecl;
-    function initWithImage(image: UIImage): Pointer; cdecl;
-    function &label: NSString; cdecl;
+    function initWithImage(image: UIImage; options: NSDictionary): Pointer; overload; cdecl;
+    function initWithImage(image: UIImage): Pointer; overload; cdecl;
     function numberOfCharacters: NSUInteger; cdecl;
     function pageRef: CGPDFPageRef; cdecl;
     procedure removeAnnotation(annotation: PDFAnnotation); cdecl;
@@ -244,7 +260,6 @@ type
     procedure setBounds(bounds: CGRect; forBox: PDFDisplayBox); cdecl;
     procedure setDisplaysAnnotations(displaysAnnotations: Boolean); cdecl;
     procedure setRotation(rotation: NSInteger); cdecl;
-    function &string: NSString; cdecl;
     function thumbnailOfSize(size: CGSize; forBox: PDFDisplayBox): UIImage; cdecl;
     procedure transformContext(context: CGContextRef; forBox: PDFDisplayBox); cdecl;
     function transformForBox(box: PDFDisplayBox): CGAffineTransform; cdecl;
@@ -252,13 +267,14 @@ type
   TPDFPage = class(TOCGenericImport<PDFPageClass, PDFPage>) end;
 
   PDFAnnotationClass = interface(NSObjectClass)
-    ['{91D65EDE-2AC1-4012-8F4D-06178A8F76B9}']
+    ['{D4AC98FE-6383-444C-A738-61C0E90FE658}']
     {class} function lineStyleFromName(name: NSString): PDFLineStyle; cdecl;
     {class} function nameForLineStyle(style: PDFLineStyle): NSString; cdecl;
   end;
 
   PDFAnnotation = interface(NSObject)
-    ['{BD1D5DF2-FF93-4275-99A5-D6B643F07369}']
+    ['{D690B0AF-1089-4E7B-BD01-0AF332A014D6}']
+    function &type: NSString; cdecl;
     function action: PDFAction; cdecl;
     procedure addBezierPath(path: UIBezierPath); cdecl;
     function alignment: NSTextAlignment; cdecl;
@@ -355,7 +371,6 @@ type
     function stampName: NSString; cdecl;
     function startLineStyle: PDFLineStyle; cdecl;
     function startPoint: CGPoint; cdecl;
-    function &type: NSString; cdecl;
     function URL: NSURL; cdecl;
     function userName: NSString; cdecl;
     function valueForAnnotationKey(key: PDFAnnotationKey): Pointer; cdecl;
@@ -368,11 +383,11 @@ type
   TPDFAnnotation = class(TOCGenericImport<PDFAnnotationClass, PDFAnnotation>) end;
 
   PDFAppearanceCharacteristicsClass = interface(NSObjectClass)
-    ['{AA78A095-9E47-488E-9A6C-ED1489365523}']
+    ['{145CF234-E316-4150-AD86-00A46F4B89BD}']
   end;
 
   PDFAppearanceCharacteristics = interface(NSObject)
-    ['{39020923-0491-4210-B094-15AECC217CDB}']
+    ['{0892C247-2049-420D-9709-74154F41D8F3}']
     function appearanceCharacteristicsKeyValues: NSDictionary; cdecl;
     function backgroundColor: UIColor; cdecl;
     function borderColor: UIColor; cdecl;
@@ -392,11 +407,11 @@ type
   TPDFAppearanceCharacteristics = class(TOCGenericImport<PDFAppearanceCharacteristicsClass, PDFAppearanceCharacteristics>) end;
 
   PDFBorderClass = interface(NSObjectClass)
-    ['{AB18BFB4-D847-4336-A3EF-3B4400265166}']
+    ['{70166163-2673-429B-BA64-6BB8E2A5CC41}']
   end;
 
   PDFBorder = interface(NSObject)
-    ['{934A1F52-8E51-4086-B7A9-2D47721FD4B3}']
+    ['{5DDA24D7-B16F-43D6-9D97-E4BD4803F34C}']
     function borderKeyValues: NSDictionary; cdecl;
     function dashPattern: NSArray; cdecl;
     procedure drawInRect(rect: CGRect); cdecl;
@@ -409,11 +424,11 @@ type
   TPDFBorder = class(TOCGenericImport<PDFBorderClass, PDFBorder>) end;
 
   PDFDestinationClass = interface(NSObjectClass)
-    ['{1FDD9FB0-533C-4302-AFD2-A9747F38B158}']
+    ['{33EB60B8-507D-48EA-AA72-B08EBE539E04}']
   end;
 
   PDFDestination = interface(NSObject)
-    ['{ACE9B194-4B81-4C8E-B209-D451F1206537}']
+    ['{215E9302-C38B-445D-8276-282803C14524}']
     function compare(destination: PDFDestination): NSComparisonResult; cdecl;
     function initWithPage(page: PDFPage; atPoint: CGPoint): Pointer; cdecl;
     function page: PDFPage; cdecl;
@@ -424,11 +439,13 @@ type
   TPDFDestination = class(TOCGenericImport<PDFDestinationClass, PDFDestination>) end;
 
   PDFDocumentClass = interface(NSObjectClass)
-    ['{C0A5018A-17B9-43F7-BD3C-29905517E889}']
+    ['{ADE419C4-C875-4167-A65A-65050D1C6182}']
   end;
 
   PDFDocument = interface(NSObject)
-    ['{D04948B1-5B96-41F4-B6E8-9DCEF8CBEF75}']
+    ['{071D3BB0-DD3C-44F2-B27D-FE7E73F17836}']
+    function &string: NSString; cdecl;
+    function accessPermissions: PDFAccessPermissions; cdecl;
     function allowsCommenting: Boolean; cdecl;
     function allowsContentAccessibility: Boolean; cdecl;
     function allowsCopying: Boolean; cdecl;
@@ -446,8 +463,8 @@ type
     function documentRef: CGPDFDocumentRef; cdecl;
     function documentURL: NSURL; cdecl;
     procedure exchangePageAtIndex(indexA: NSUInteger; withPageAtIndex: NSUInteger); cdecl;
-    function findString(&string: NSString; withOptions: NSStringCompareOptions): NSArray; overload; cdecl;
     function findString(&string: NSString; fromSelection: PDFSelection; withOptions: NSStringCompareOptions): PDFSelection; overload; cdecl;
+    function findString(&string: NSString; withOptions: NSStringCompareOptions): NSArray; overload; cdecl;
     function indexForPage(page: PDFPage): NSUInteger; cdecl;
     function initWithData(data: NSData): Pointer; cdecl;
     function initWithURL(url: NSURL): Pointer; cdecl;
@@ -465,25 +482,23 @@ type
     function permissionsStatus: PDFDocumentPermissions; cdecl;
     procedure removePageAtIndex(index: NSUInteger); cdecl;
     function selectionForEntireDocument: PDFSelection; cdecl;
-    [MethodName('selectionFromPage:startPage:atPoint:toPage:atPoint')]
-    function selectionFromPage(startPage: PDFPage; startPoint: CGPoint; toPage: PDFPage; endPoint: CGPoint): PDFSelection; overload; cdecl;
-    [MethodName('selectionFromPage:startPage:atCharacterIndex:toPage:atCharacterIndex')]
-    function selectionFromPage(startPage: PDFPage; startCharacterIndex: NSUInteger; toPage: PDFPage;
-      endCharacterIndex: NSUInteger): PDFSelection; overload; cdecl;
+    [MethodName('selectionFromPage:atPoint:toPage:atPoint:')]
+    function selectionFromPage(startPage: PDFPage; atPoint: CGPoint; toPage: PDFPage; endPoint: CGPoint): PDFSelection; overload; cdecl;
+    [MethodName('selectionFromPage:atCharacterIndex:toPage:atCharacterIndex:')]
+    function selectionFromPage(startPage: PDFPage; atCharacterIndex: NSUInteger; toPage: PDFPage; endCharacter: NSUInteger): PDFSelection; overload; cdecl;
     procedure setDelegate(delegate: Pointer); cdecl;
     procedure setDocumentAttributes(documentAttributes: NSDictionary); cdecl;
     procedure setOutlineRoot(outlineRoot: PDFOutline); cdecl;
-    function &string: NSString; cdecl;
     function unlockWithPassword(password: NSString): Boolean; cdecl;
-    function writeToFile(path: NSString; withOptions: NSDictionary): Boolean; overload; cdecl;
     function writeToFile(path: NSString): Boolean; overload; cdecl;
+    function writeToFile(path: NSString; withOptions: NSDictionary): Boolean; overload; cdecl;
     function writeToURL(url: NSURL; withOptions: NSDictionary): Boolean; overload; cdecl;
     function writeToURL(url: NSURL): Boolean; overload; cdecl;
   end;
   TPDFDocument = class(TOCGenericImport<PDFDocumentClass, PDFDocument>) end;
 
   PDFDocumentDelegate = interface(IObjectiveC)
-    ['{27AAAC1F-503A-416C-875D-46EFB0C2A904}']
+    ['{7BE1674B-641E-4A4B-815F-7F9B7897AB34}']
     function classForAnnotationType(annotationType: NSString): Pointer; cdecl;
     function classForPage: Pointer; cdecl;
     procedure didMatchString(instance: PDFSelection); cdecl;
@@ -496,11 +511,12 @@ type
   end;
 
   PDFOutlineClass = interface(NSObjectClass)
-    ['{17167333-DEEB-445D-A0F9-0A1409E2C036}']
+    ['{C6B4FF53-6B56-4240-8416-4E03D0318880}']
   end;
 
   PDFOutline = interface(NSObject)
-    ['{D6DDE178-BE77-4358-BBF9-A479D2CF5D57}']
+    ['{B7C73CE3-3C9F-49A5-B4DC-200D326AE35A}']
+    function &label: NSString; cdecl;
     function action: PDFAction; cdecl;
     function childAtIndex(index: NSUInteger): PDFOutline; cdecl;
     function destination: PDFDestination; cdecl;
@@ -508,7 +524,6 @@ type
     function index: NSUInteger; cdecl;
     procedure insertChild(child: PDFOutline; atIndex: NSUInteger); cdecl;
     function isOpen: Boolean; cdecl;
-    function &label: NSString; cdecl;
     function numberOfChildren: NSUInteger; cdecl;
     function parent: PDFOutline; cdecl;
     procedure removeFromParent; cdecl;
@@ -520,11 +535,12 @@ type
   TPDFOutline = class(TOCGenericImport<PDFOutlineClass, PDFOutline>) end;
 
   PDFSelectionClass = interface(NSObjectClass)
-    ['{9C044CAE-552B-43F0-8F9D-7AB29F28FC85}']
+    ['{790235A1-E266-4167-8E49-E7FD390E391B}']
   end;
 
   PDFSelection = interface(NSObject)
-    ['{C9E8383B-4818-4EA5-9A19-37572191DBC9}']
+    ['{E798AC2B-04F8-4900-9635-87A2C9F766C0}']
+    function &string: NSString; cdecl;
     procedure addSelection(selection: PDFSelection); cdecl;
     procedure addSelections(selections: NSArray); cdecl;
     function attributedString: NSAttributedString; cdecl;
@@ -541,16 +557,15 @@ type
     function rangeAtIndex(index: NSUInteger; onPage: PDFPage): NSRange; cdecl;
     function selectionsByLine: NSArray; cdecl;
     procedure setColor(color: UIColor); cdecl;
-    function &string: NSString; cdecl;
   end;
   TPDFSelection = class(TOCGenericImport<PDFSelectionClass, PDFSelection>) end;
 
   PDFThumbnailViewClass = interface(UIViewClass)
-    ['{7211424C-1662-4E4E-9CF5-2C9C555D373A}']
+    ['{96B1B157-6EC6-47AF-BE29-0C7CF48D1A9A}']
   end;
 
   PDFThumbnailView = interface(UIView)
-    ['{DFE52798-27FE-4461-8FB2-C68CD6327F84}']
+    ['{64655607-F895-4945-9E52-4189244E516A}']
     function backgroundColor: UIColor; cdecl;
     function contentInset: UIEdgeInsets; cdecl;
     function layoutMode: PDFThumbnailLayoutMode; cdecl;
@@ -566,11 +581,11 @@ type
   TPDFThumbnailView = class(TOCGenericImport<PDFThumbnailViewClass, PDFThumbnailView>) end;
 
   PDFViewClass = interface(UIViewClass)
-    ['{F688EA1D-A175-4784-9C9A-75F474E461B4}']
+    ['{17831A2A-9716-4573-A212-53912411C235}']
   end;
 
   PDFView = interface(UIView)
-    ['{FDB47171-995D-49FD-B0B2-C11883CD0E97}']
+    ['{783575F3-3FAE-4DEE-A6EC-D938A917587B}']
     procedure annotationsChangedOnPage(page: PDFPage); cdecl;
     function areaOfInterestForMouse(event: UIEvent): PDFAreaOfInterest; cdecl;
     function areaOfInterestForPoint(cursorLocation: CGPoint): PDFAreaOfInterest; cdecl;
@@ -610,6 +625,7 @@ type
     procedure drawPagePost(page: PDFPage; toContext: CGContextRef); cdecl;
     function enableDataDetectors: Boolean; cdecl;
     procedure enablePageShadows(pageShadowsEnabled: Boolean); cdecl;
+    function findInteraction: UIFindInteraction; cdecl;
     procedure goBack(sender: Pointer); cdecl;
     procedure goForward(sender: Pointer); cdecl;
     procedure goToDestination(destination: PDFDestination); cdecl;
@@ -622,12 +638,15 @@ type
     procedure goToSelection(selection: PDFSelection); cdecl;
     function highlightedSelections: NSArray; cdecl;
     function interpolationQuality: PDFInterpolationQuality; cdecl;
+    function isFindInteractionEnabled: Boolean; cdecl;
+    function isInMarkupMode: Boolean; cdecl;
     function isUsingPageViewController: Boolean; cdecl;
     procedure layoutDocumentView; cdecl;
     function maxScaleFactor: CGFloat; cdecl;
     function minScaleFactor: CGFloat; cdecl;
     function pageBreakMargins: UIEdgeInsets; cdecl;
     function pageForPoint(point: CGPoint; nearest: Boolean): PDFPage; cdecl;
+    function pageOverlayViewProvider: Pointer; cdecl;
     function pageShadowsEnabled: Boolean; cdecl;
     procedure performAction(action: PDFAction); cdecl;
     function rowSizeForPage(page: PDFPage): CGSize; cdecl;
@@ -637,8 +656,8 @@ type
     procedure selectAll(sender: Pointer); cdecl;
     procedure setAutoScales(autoScales: Boolean); cdecl;
     procedure setBackgroundColor(backgroundColor: UIColor); cdecl;
-    procedure setCurrentSelection(currentSelection: PDFSelection); overload; cdecl;
     procedure setCurrentSelection(selection: PDFSelection; animate: Boolean); overload; cdecl;
+    procedure setCurrentSelection(currentSelection: PDFSelection); overload; cdecl;
     procedure setDelegate(delegate: Pointer); cdecl;
     procedure setDisplayBox(displayBox: PDFDisplayBox); cdecl;
     procedure setDisplayDirection(displayDirection: PDFDisplayDirection); cdecl;
@@ -648,11 +667,14 @@ type
     procedure setDisplaysRTL(displaysRTL: Boolean); cdecl;
     procedure setDocument(document: PDFDocument); cdecl;
     procedure setEnableDataDetectors(enableDataDetectors: Boolean); cdecl;
+    procedure setFindInteractionEnabled(findInteractionEnabled: Boolean); cdecl;
     procedure setHighlightedSelections(highlightedSelections: NSArray); cdecl;
+    procedure setInMarkupMode(inMarkupMode: Boolean); cdecl;
     procedure setInterpolationQuality(interpolationQuality: PDFInterpolationQuality); cdecl;
     procedure setMaxScaleFactor(maxScaleFactor: CGFloat); cdecl;
     procedure setMinScaleFactor(minScaleFactor: CGFloat); cdecl;
     procedure setPageBreakMargins(pageBreakMargins: UIEdgeInsets); cdecl;
+    procedure setPageOverlayViewProvider(pageOverlayViewProvider: Pointer); cdecl;
     procedure setScaleFactor(scaleFactor: CGFloat); cdecl;
     procedure usePageViewController(enable: Boolean; withViewOptions: NSDictionary); cdecl;
     function visiblePages: NSArray; cdecl;
@@ -662,7 +684,7 @@ type
   TPDFView = class(TOCGenericImport<PDFViewClass, PDFView>) end;
 
   PDFViewDelegate = interface(IObjectiveC)
-    ['{CE8C625A-C43C-4BF4-B45B-383D05044684}']
+    ['{8B663321-6395-44C1-8C2B-E2DA70A6AD47}']
     procedure PDFViewOpenPDF(sender: PDFView; forRemoteGoToAction: PDFActionRemoteGoTo); cdecl;
     function PDFViewParentViewController: UIViewController; cdecl;
     procedure PDFViewPerformFind(sender: PDFView); cdecl;
@@ -670,6 +692,20 @@ type
     procedure PDFViewWillClickOnLink(sender: PDFView; withURL: NSURL); cdecl;
   end;
 
+  PDFPageOverlayViewProvider = interface(IObjectiveC)
+    ['{E0A01002-6E74-4FD5-927F-99B422B96A6E}']
+    [MethodName('pdfView:overlayViewForPage:')]
+    function pdfViewOverlayViewForPage(view: PDFView; overlayViewForPage: PDFPage): UIView; cdecl;
+    [MethodName('pdfView:willDisplayOverlayView:forPage:')]
+    procedure pdfViewWillDisplayOverlayView(pdfView: PDFView; willDisplayOverlayView: UIView; forPage: PDFPage); cdecl;
+    [MethodName('pdfView:willEndDisplayingOverlayView:forPage:')]
+    procedure pdfViewWillEndDisplayingOverlayView(pdfView: PDFView; willEndDisplayingOverlayView: UIView; forPage: PDFPage); cdecl;
+  end;
+
+function PDFPageImageInitializationOptionMediaBox: PDFPageImageInitializationOption;
+function PDFPageImageInitializationOptionRotation: PDFPageImageInitializationOption;
+function PDFPageImageInitializationOptionUpscaleIfSmaller: PDFPageImageInitializationOption;
+function PDFPageImageInitializationOptionCompressionQuality: PDFPageImageInitializationOption;
 function PDFAnnotationKeyAppearanceDictionary: PDFAnnotationKey;
 function PDFAnnotationKeyAppearanceState: PDFAnnotationKey;
 function PDFAnnotationKeyBorder: PDFAnnotationKey;
@@ -765,6 +801,8 @@ function PDFDocumentDidBeginWriteNotification: NSNotificationName;
 function PDFDocumentDidEndWriteNotification: NSNotificationName;
 function PDFDocumentDidBeginPageWriteNotification: NSNotificationName;
 function PDFDocumentDidEndPageWriteNotification: NSNotificationName;
+function PDFDocumentFoundSelectionKey: NSString;
+function PDFDocumentPageIndexKey: NSString;
 function PDFDocumentTitleAttribute: PDFDocumentAttribute;
 function PDFDocumentAuthorAttribute: PDFDocumentAttribute;
 function PDFDocumentSubjectAttribute: PDFDocumentAttribute;
@@ -775,6 +813,11 @@ function PDFDocumentModificationDateAttribute: PDFDocumentAttribute;
 function PDFDocumentKeywordsAttribute: PDFDocumentAttribute;
 function PDFDocumentOwnerPasswordOption: PDFDocumentWriteOption;
 function PDFDocumentUserPasswordOption: PDFDocumentWriteOption;
+function PDFDocumentAccessPermissionsOption: PDFDocumentWriteOption;
+function PDFDocumentBurnInAnnotationsOption: PDFDocumentWriteOption;
+function PDFDocumentSaveTextFromOCROption: PDFDocumentWriteOption;
+function PDFDocumentSaveImagesAsJPEGOption: PDFDocumentWriteOption;
+function PDFDocumentOptimizeImagesForScreenOption: PDFDocumentWriteOption;
 function PDFThumbnailViewDocumentEditedNotification: NSString;
 function PDFViewDocumentChangedNotification: NSNotificationName;
 function PDFViewChangedHistoryNotification: NSNotificationName;
@@ -799,6 +842,26 @@ uses
 
 var
   PDFKitModule: THandle;
+
+function PDFPageImageInitializationOptionMediaBox: PDFPageImageInitializationOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFPageImageInitializationOptionMediaBox');
+end;
+
+function PDFPageImageInitializationOptionRotation: PDFPageImageInitializationOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFPageImageInitializationOptionRotation');
+end;
+
+function PDFPageImageInitializationOptionUpscaleIfSmaller: PDFPageImageInitializationOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFPageImageInitializationOptionUpscaleIfSmaller');
+end;
+
+function PDFPageImageInitializationOptionCompressionQuality: PDFPageImageInitializationOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFPageImageInitializationOptionCompressionQuality');
+end;
 
 function PDFAnnotationKeyAppearanceDictionary: PDFAnnotationKey;
 begin
@@ -1275,6 +1338,16 @@ begin
   Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentDidEndPageWriteNotification');
 end;
 
+function PDFDocumentFoundSelectionKey: NSString;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentFoundSelectionKey');
+end;
+
+function PDFDocumentPageIndexKey: NSString;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentPageIndexKey');
+end;
+
 function PDFDocumentTitleAttribute: PDFDocumentAttribute;
 begin
   Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentTitleAttribute');
@@ -1323,6 +1396,31 @@ end;
 function PDFDocumentUserPasswordOption: PDFDocumentWriteOption;
 begin
   Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentUserPasswordOption');
+end;
+
+function PDFDocumentAccessPermissionsOption: PDFDocumentWriteOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentAccessPermissionsOption');
+end;
+
+function PDFDocumentBurnInAnnotationsOption: PDFDocumentWriteOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentBurnInAnnotationsOption');
+end;
+
+function PDFDocumentSaveTextFromOCROption: PDFDocumentWriteOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentSaveTextFromOCROption');
+end;
+
+function PDFDocumentSaveImagesAsJPEGOption: PDFDocumentWriteOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentSaveImagesAsJPEGOption');
+end;
+
+function PDFDocumentOptimizeImagesForScreenOption: PDFDocumentWriteOption;
+begin
+  Result := CocoaNSStringConst(libPDFKit, 'PDFDocumentOptimizeImagesForScreenOption');
 end;
 
 function PDFThumbnailViewDocumentEditedNotification: NSString;
