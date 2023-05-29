@@ -9,7 +9,6 @@
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Android</Platform>
         <TargetedPlatforms>32784</TargetedPlatforms>
-        <PlatformSDK Condition="'$(PlatformSDK)'=='' And '$(Platform)'=='Android64'">AndroidSDK26.1.1_64bit.sdk</PlatformSDK>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
