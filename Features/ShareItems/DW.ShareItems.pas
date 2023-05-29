@@ -59,7 +59,7 @@ type
     FShareItems: TShareItems;
     function GetItems: TSharingItems;
   protected
-    procedure DoShareCompleted(const AActivity: TShareActivity; const AError: string);
+    procedure DoShareCompleted(const AActivity: TShareActivity; const AError: string); virtual;
     procedure Share(const AControl: TControl; const AExcludedActivities: TShareActivities); overload; virtual;
     procedure Share(const AControl: TControl; const ATargetPackage: string); overload; virtual;
     property Items: TSharingItems read GetItems;
@@ -102,9 +102,12 @@ uses
 {$ELSEIF Defined(ANDROID)}
 uses
   DW.ShareItems.Android;
+{$ELSEIF Defined(MACOS)}
+uses
+  DW.ShareItems.Mac;
 {$ENDIF}
 
-{$IF not (Defined(IOS) or Defined(ANDROID))}
+{$IF not (Defined(IOS) or Defined(ANDROID) or Defined(MACOS))}
 type
   TPlatformShareItems = class(TCustomPlatformShareItems);
 {$ENDIF}
