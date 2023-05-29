@@ -39,6 +39,7 @@ type
   NSNetServiceBrowser = interface;
   NSNetServiceDelegate = interface;
   NSNetServiceBrowserDelegate = interface;
+  NSPersonNameComponents = interface;
   NSProgress = interface;
 
   NSDataReadingOptions = NSInteger;
@@ -57,6 +58,7 @@ type
   NSProgressKind = NSString;
   NSProgressUserInfoKey = NSString;
   NSProgressFileOperationKind = NSString;
+  NSQualityOfService = NSInteger;
 
   NSProgressUnpublishingHandler = procedure of object;
   NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
@@ -357,6 +359,29 @@ type
     function userInfo: NSDictionary; cdecl;
   end;
   TNSProgress = class(TOCGenericImport<NSProgressClass, NSProgress>) end;
+
+  NSPersonNameComponentsClass = interface(NSObjectClass)
+    ['{181A864A-3BAC-47AD-8EA5-3A9860F063D0}']
+  end;
+
+  NSPersonNameComponents = interface(NSObject)
+    ['{B7FEB33B-30A3-4492-9599-FEFA3C20CB90}']
+    function familyName: NSString; cdecl;
+    function givenName: NSString; cdecl;
+    function middleName: NSString; cdecl;
+    function namePrefix: NSString; cdecl;
+    function nameSuffix: NSString; cdecl;
+    function nickname: NSString; cdecl;
+    function phoneticRepresentation: NSPersonNameComponents; cdecl;
+    procedure setFamilyName(familyName: NSString); cdecl;
+    procedure setGivenName(givenName: NSString); cdecl;
+    procedure setMiddleName(middleName: NSString); cdecl;
+    procedure setNamePrefix(namePrefix: NSString); cdecl;
+    procedure setNameSuffix(nameSuffix: NSString); cdecl;
+    procedure setNickname(nickname: NSString); cdecl;
+    procedure setPhoneticRepresentation(phoneticRepresentation: NSPersonNameComponents); cdecl;
+  end;
+  TNSPersonNameComponents = class(TOCGenericImport<NSPersonNameComponentsClass, NSPersonNameComponents>) end;
 
 implementation
 
