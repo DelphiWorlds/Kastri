@@ -43,7 +43,11 @@ Add `GoogleServices-info.plist` to the deployment, as per the demo, as described
 
 If you are creating your own project:
 
-FCM Rebooted relies on `dw-kastri-base-2.0.0.jar` and `dw-fcm-2.0.0.jar` from the `Lib` folder, so add them to the `Libraries` node under the `Android 32 bit` platform in Project Manager. (There is no need to add them to `Android 64 bit`).
+FCM Rebooted relies on `dw-kastri-base-2.0.0.jar` and `dw-fcm-2.0.0.jar` from the `Lib` folder, so add them to the `Libraries` node under the `Android 32 bit` platform in Project Manager.
+
+**Note if using Delphi 11.3** (as at Jun 3rd, 2023):
+
+    Due to a bug in Delphi 11.3, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the required jar files to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file to Android 64-bit does _not_ work)
 
 ### Relay Demo
 
