@@ -22,9 +22,15 @@ In order to use the Fused Location API, it was necessary to write some Java code
 
 If you are creating a new project (i.e. other than the demo) you will need to add these jars to the `Libraries` node under the Android platform in Project Manager, for the support that the respective jars provide
 
-### Manifest changes
+### Project Configuration
 
-You will also need to modify AndroidManifest.template.xml as per the modifications (which are commented) in the same file in the Application project in the demo
+When configuring your **own** project for Android, configure Build Events in Project Options to add a Post-Build event with the command:  
+
+```
+[kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
+```  
+
+Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
 
 ## iOS
 
