@@ -82,6 +82,15 @@ public class DWNotificationPresenter
       Log.w("DWNotificationPresenter", "Unable to locate resource notification_custom");
     }  return remoteViews;
   }
+
+  private static String getChannelId(Intent intent, String defaultChannelId) {
+    String channelId = defaultChannelId;
+    if (intent.hasExtra("gcm.notification.android_channel_id"))
+      channelId = intent.getStringExtra("gcm.notification.android_channel_id");
+    else if (intent.hasExtra("channel_id"))
+      channelId = intent.getStringExtra("channel_id");
+    return channelId;
+  }
   
   public static void presentNotification(Context context, Intent intent, String channelId, int iconId) {
     mUniqueId++;
@@ -92,7 +101,7 @@ public class DWNotificationPresenter
     String body = intent.hasExtra("body") ? intent.getStringExtra("body") : "";
     String imageUrl = intent.hasExtra("imageUrl") ? intent.getStringExtra("imageUrl") : "";
     RemoteViews remoteViews = getCustomContentView(context, title, body, imageUrl);
-    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, DWNotificationPresenter.getChannelId(intent, channelId))
       .setContentTitle(title)
       .setContentText(body)
       .setSmallIcon(iconId)
