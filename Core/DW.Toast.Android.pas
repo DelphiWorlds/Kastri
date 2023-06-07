@@ -65,7 +65,17 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.Widget, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Support,
   // DW
-  DW.Androidapi.JNI.Widget.Toast, DW.UIHelper;
+  DW.Androidapi.JNI.Widget.Toast;
+
+function IsDarkTheme: Boolean;
+var
+  LConfiguration: JConfiguration;
+  LNightMode: Integer;
+begin
+  LConfiguration := TAndroidHelper.Context.getResources.getConfiguration;
+  LNightMode := LConfiguration.uiMode and TJConfiguration.JavaClass.UI_MODE_NIGHT_MASK;
+  Result := LNightMode = TJConfiguration.JavaClass.UI_MODE_NIGHT_YES;
+end;
 
 { TToast }
 
@@ -126,7 +136,7 @@ var
   LIsDark: Boolean;
   LBackgroundColorID, LTextColorID: Integer;
 begin
-  LIsDark := TUIHelper.GetUserInterfaceStyle = TUserInterfaceStyle.Dark;
+  LIsDark := IsDarkTheme;
   LResources := TAndroidHelper.Context.getResources;
   LBackgroundColorID := LResources.getIdentifier(StringToJString('android:color/background_' + cResNameSuffix[LIsDark]), nil, nil);
   LTextColorID := LResources.getIdentifier(StringToJString('android:color/primary_text_' + cResNameSuffix[LIsDark]), nil, nil);
