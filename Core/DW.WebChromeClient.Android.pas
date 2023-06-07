@@ -63,7 +63,7 @@ uses
   // RTL
   System.SysUtils, System.Permissions,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.Provider, Androidapi.JNI.Os,
+  Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.Provider, Androidapi.JNI.Os, Androidapi.JNI.Support,
   // DW
   DW.Android.Helpers, DW.Consts.Android, DW.Permissions.Helpers;
 
@@ -171,7 +171,8 @@ begin
             if LPhotosPath <> nil then
             begin
               LFileName := Format(cImageFileNameTemplate, [FormatDateTime('yyyymmdd_hhnnss', Now)]);
-              FImageUri := TAndroidHelperEx.UriFromFile(TJFile.JavaClass.init(LPhotosPath, StringToJString(LFileName)));
+              FImageUri := TAndroidHelper.JFileToJURI(TJFile.JavaClass.init(LPhotosPath, StringToJString(LFileName)));
+              // TOSLog.d('FImageUri: %s', [JStringToString(FImageUri.toString)]);
               LIntent := TJIntent.JavaClass.init(TJMediaStore.JavaClass.ACTION_IMAGE_CAPTURE);
               LIntent.putExtra(TJMediaStore.JavaClass.EXTRA_OUTPUT, TJParcelable.Wrap(FImageUri));
               LIntent.setFlags(TJIntent.JavaClass.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -188,19 +189,20 @@ end;
 procedure TWebChromeClientManager.MessageResultNotificationHandler(const Sender: TObject; const M: TMessage);
 var
   LResult: TMessageResultNotification;
+  LIntent: JIntent;
 begin
   LResult := TMessageResultNotification(M);
   if (LResult.RequestCode = cFileChooserRequestCodeDefault) or (LResult.RequestCode = cFileChooserRequestCodeCamera) then
   begin
+    LIntent := LResult.Value;
+    if LIntent = nil then
+      LIntent := TJIntent.JavaClass.init;
     if LResult.RequestCode = cFileChooserRequestCodeCamera then
     begin
-      if LResult.Value <> nil then
-      begin
-        LResult.Value.setData(FImageUri);
-        LResult.Value.setFlags(TJIntent.JavaClass.FLAG_GRANT_READ_URI_PERMISSION);
-      end;
+      LIntent.setData(FImageUri);
+      LIntent.setFlags(TJIntent.JavaClass.FLAG_GRANT_READ_URI_PERMISSION);
     end;
-    FWebChromeClient.handleFileChooserResult(LResult.Value, LResult.ResultCode);
+    FWebChromeClient.handleFileChooserResult(LIntent, LResult.ResultCode);
   end;
 end;
 
