@@ -10,26 +10,29 @@ uses
 
 type
   TForm1 = class(TForm)
-    SelectImagesButton: TButton;
     ListBox1: TListBox;
     DisplayNameLabel: TLabel;
     BottomLayout: TLayout;
     DisplayNameValueLabel: TLabel;
     ButtonsLayout: TLayout;
-    SelectImagesAndMoviesButton: TButton;
-    SelectTextButton: TButton;
     TabControl: TTabControl;
     FilesTab: TTabItem;
     ImageTab: TTabItem;
     Image: TImage;
-    procedure SelectImagesButtonClick(Sender: TObject);
+    SelectButton: TButton;
+    PhotosTab: TTabItem;
+    SelectTypesComboBox: TComboBox;
+    SelectTypesLayout: TLayout;
+    PhotosFlowLayout: TFlowLayout;
+    PhotosVertScrollBox: TVertScrollBox;
     procedure ListBox1ItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
-    procedure SelectImagesAndMoviesButtonClick(Sender: TObject);
-    procedure SelectTextButtonClick(Sender: TObject);
+    procedure SelectButtonClick(Sender: TObject);
+    procedure PhotosFlowLayoutResized(Sender: TObject);
   private
     FSelector: TFilesSelector;
     procedure LoadImage(const AFilePath: string);
     procedure SelectorCompleteHandler(Sender: TObject; const AOK: Boolean);
+    procedure SelectorImageStreamHandler(Sender: TObject; const AFileName: string; const AIMageStream: TStream);
   protected
     procedure Resize; override;
   public
@@ -45,6 +48,7 @@ implementation
 {$R *.fmx}
 
 uses
+  DW.OSLog,
   {$IF Defined(ANDROID)}
   DW.Android.Helpers,
   {$ENDIF}
@@ -81,6 +85,7 @@ begin
   FSelector := TFilesSelector.Create;
   FSelector.Title := 'Select a file';
   FSelector.OnComplete := SelectorCompleteHandler;
+  FSelector.OnImageStream := SelectorImageStreamHandler;
 end;
 
 destructor TForm1.Destroy;
@@ -116,6 +121,7 @@ end;
 begin
   // TODO: Implement for other platforms
 end;
+
 {$ENDIF}
 
 procedure TForm1.Resize;
@@ -160,21 +166,48 @@ begin
   // via a ContentResolver, i.e. you will not be able to simply load the files using normal mechanisms in Delphi
 end;
 
-procedure TForm1.SelectTextButtonClick(Sender: TObject);
+procedure TForm1.SelectorImageStreamHandler(Sender: TObject; const AFileName: string; const AImageStream: TStream);
+var
+  LImage: TImage;
 begin
-  FSelector.FileKinds := [TFileKind.Text];
-  FSelector.Select(TSelectionMode.Content);
+  TOSLog.d('Photo stream: %s', [AFileName]);
+  TabControl.ActiveTab := PhotosTab;
+  LImage := TImage.Create(Self);
+  LImage.Width := PhotosFlowLayout.Width / 3;
+  LImage.Height := LImage.Width * 1.61803398875;
+  LImage.Bitmap.LoadFromStream(AImageStream);
+  LImage.Parent := PhotosFlowLayout;
 end;
 
-procedure TForm1.SelectImagesButtonClick(Sender: TObject);
+procedure TForm1.PhotosFlowLayoutResized(Sender: TObject);
+var
+  I: Integer;
+  LControl: TControl;
 begin
-  FSelector.FileKinds := [TFileKind.Image];
-  FSelector.Select(TSelectionMode.Content);
+  for I := 0 to PhotosFlowLayout.ControlsCount - 1 do
+  begin
+    LControl := PhotosFlowLayout.Controls[I];
+    LControl.Width := PhotosFlowLayout.Width / 3;
+    LControl.Height := LControl.Width * 1.61803398875;
+  end;
 end;
 
-procedure TForm1.SelectImagesAndMoviesButtonClick(Sender: TObject);
+procedure TForm1.SelectButtonClick(Sender: TObject);
 begin
-  FSelector.FileKinds := [TFileKind.Image, TFileKind.Movie];
+  case SelectTypesComboBox.ItemIndex of
+    0:
+      FSelector.FileKinds := [TFileKind.Image];
+    1:
+      FSelector.FileKinds := [TFileKind.Image, TFileKind.Movie];
+    2:
+      FSelector.FileKinds := [TFileKind.Text];
+    3:
+    begin
+      while PhotosFlowLayout.ControlsCount > 0 do
+        PhotosFlowLayout.Controls[0].Free;
+      FSelector.FileKinds := [TFileKind.Photo];
+    end;
+  end;
   FSelector.Select(TSelectionMode.Content);
 end;
 

@@ -32,7 +32,7 @@ type
 
   TSelectedFiles = TArray<TSelectedFile>;
 
-  TFileKind = (Image, Audio, Movie, Text, Item, Content, SourceCode, PDF, X509Certificate, Key);
+  TFileKind = (Image, Audio, Movie, Text, Item, Content, SourceCode, PDF, X509Certificate, Key, Photo);
 
   TFileKinds = set of TFileKind;
 
@@ -41,6 +41,7 @@ type
     FActivities: TStrings;
     FFileName: string;
     FSelectedFiles: TSelectedFiles;
+    FSelectionLimit: Integer;
     FSelector: TFilesSelector;
     FTitle: string;
     procedure FileTypesChangeHandler(Sender: TObject);
@@ -50,6 +51,7 @@ type
     FFileTypes: TStrings;
     procedure AddSelectedFile(const ASelectedFile: TSelectedFile);
     procedure DoComplete(const AOK: Boolean);
+    procedure DoImageStream(const AFileName: string; const AImageStream: TStream);
     procedure DoSelect(const AMode: TSelectionMode); virtual; abstract;
     procedure FileKindsChanged; virtual;
     procedure FileTypesChanged; virtual;
@@ -64,23 +66,30 @@ type
   public
     constructor Create(const ASelector: TFilesSelector); virtual;
     destructor Destroy; override;
+    function IsSelectionLimit(const ASelectedCount: Integer): Boolean;
+    property SelectionLimit: Integer read FSelectionLimit write FSelectionLimit;
   end;
 
   TSelectorCompleteEvent = procedure(Sender: TObject; const OK: Boolean) of object;
+  TSelectorImageStreamEvent = procedure(Sender: TObject; const FileName: string; const ImageStream: TStream) of object;
 
   TFilesSelector = class(TObject)
   private
     FPlatformSelector: TCustomPlatformFilesSelector;
     FOnComplete: TSelectorCompleteEvent;
+    FOnImageStream: TSelectorImageStreamEvent;
     function GetActivities: TStrings;
     function GetFileKinds: TFileKinds;
     function GetFileTypes: TStrings;
     function GetSelectedFiles: TSelectedFiles;
+    function GetSelectionLimit: Integer;
     function GetTitle: string;
     procedure SetFileKinds(const Value: TFileKinds);
+    procedure SetSelectionLimit(const Value: Integer);
     procedure SetTitle(const Value: string);
   protected
     procedure DoComplete(const AOK: Boolean);
+    procedure DoImageStream(const AFileName: string; const AImageStream: TStream);
   public
     constructor Create;
     destructor Destroy; override;
@@ -114,10 +123,15 @@ type
     /// </summary>
     property SelectedFiles: TSelectedFiles read GetSelectedFiles;
     /// <summary>
+    ///   Limit of images that can be selected when using TFileKind.Photo
+    /// </summary>
+    property SelectionLimit: Integer read GetSelectionLimit write SetSelectionLimit;
+    /// <summary>
     ///   Title for the file selector
     /// </summary>
     property Title: string read GetTitle write SetTitle;
     property OnComplete: TSelectorCompleteEvent read FOnComplete write FOnComplete;
+    property OnImageStream: TSelectorImageStreamEvent read FOnImageStream write FOnImageStream;
   end;
 
 implementation
@@ -149,9 +163,19 @@ begin
   inherited;
 end;
 
+function TCustomPlatformFilesSelector.IsSelectionLimit(const ASelectedCount: Integer): Boolean;
+begin
+  Result := (FSelectionLimit <> 0) and (ASelectedCount >= FSelectionLimit);
+end;
+
 procedure TCustomPlatformFilesSelector.DoComplete(const AOK: Boolean);
 begin
   FSelector.DoComplete(AOK);
+end;
+
+procedure TCustomPlatformFilesSelector.DoImageStream(const AFileName: string; const AImageStream: TStream);
+begin
+  FSelector.DoImageStream(AFileName, AImageStream);
 end;
 
 procedure TCustomPlatformFilesSelector.FileKindsChanged;
@@ -211,6 +235,12 @@ begin
     FOnComplete(Self, AOK);
 end;
 
+procedure TFilesSelector. DoImageStream(const AFileName: string; const AImageStream: TStream);
+begin
+  if Assigned(FOnImageStream) then
+    FOnImageStream(Self, AFileName, AImageStream);
+end;
+
 function TFilesSelector.GetActivities: TStrings;
 begin
   Result := FPlatformSelector.Activities;
@@ -231,6 +261,11 @@ begin
   Result := FPlatformSelector.SelectedFiles;
 end;
 
+function TFilesSelector.GetSelectionLimit: Integer;
+begin
+  Result := FPlatformSelector.SelectionLimit;
+end;
+
 function TFilesSelector.GetTitle: string;
 begin
   Result := FPlatformSelector.Title;
@@ -244,6 +279,11 @@ end;
 procedure TFilesSelector.SetFileKinds(const Value: TFileKinds);
 begin
   FPlatformSelector.FileKinds := Value;
+end;
+
+procedure TFilesSelector.SetSelectionLimit(const Value: Integer);
+begin
+  FPlatformSelector.SelectionLimit := Value;
 end;
 
 procedure TFilesSelector.SetTitle(const Value: string);
