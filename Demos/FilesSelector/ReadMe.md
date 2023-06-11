@@ -28,9 +28,8 @@ On iOS, with the document picker it is not entirely obvious how to make multiple
 <br/>
 <img src="./Screenshots/PickeriOSSelectOpen.png" alt="Select Open" height="750">
 <br/>
-<br/>
 
-When using a value of `[TFileKind.Photo]` for `FileKinds` on iOS, the standard gallery picker will be shown, and images selected will be returned in the `OnImageStream` event. This way developers can choose what they want to do with the stream, e.g. it could be saved as a file, using code like this:
+When using a value of `[TFileKind.Photo]` for `FileKinds` on iOS, the standard gallery picker will be shown, and images selected will be returned in the `OnImageStream` event, called once for each image. This way developers can choose what they want to do with the stream, e.g. it could be saved as a file, using code like this:
 
 ```Pascal
 var
