@@ -30,6 +30,8 @@ type
     Email: string;
     Password: string;
     User: string;
+    GivenName: string;
+    FamilyName: string;
   end;
 
   TAppleIDAuthorizationResponse = record

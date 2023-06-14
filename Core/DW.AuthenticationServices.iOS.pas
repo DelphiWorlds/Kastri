@@ -141,6 +141,11 @@ begin
       begin
         LCredentials.Credential := TAppleIDAuthorizationCredential.AppleID;
         LCredentials.User := NSStrToStr(LAppleIDCredential.user);
+        if LAppleIDCredential.fullName <> nil then
+        begin
+          LCredentials.GivenName := NSStrToStr(LAppleIDCredential.fullName.givenName);
+          LCredentials.FamilyName := NSStrToStr(LAppleIDCredential.fullName.familyName);
+        end;
         if LAppleIDCredential.email <> nil then
           LCredentials.EMail := NSStrToStr(LAppleIDCredential.email);
         LCredentials.AuthorizationCode := NSStrToStr(LAppleIDCredential.email);
