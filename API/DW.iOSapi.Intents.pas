@@ -19,7 +19,7 @@ uses
   // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreLocation, iOSapi.CoreGraphics,
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreLocation, iOSapi.UserNotifications, iOSapi.CoreGraphics,
   // DW
   DW.iOSapi.Foundation, DW.iOSapi.EventKit;
 
@@ -63,6 +63,9 @@ const
   INIntentErrorEncodingGeneric = 8000;
   INIntentErrorEncodingFailed = 8001;
   INIntentErrorDecodingGeneric = 9000;
+  INCallAudioRouteUnknown = 0;
+  INCallAudioRouteSpeakerphoneAudioRoute = 1;
+  INCallAudioRouteBluetoothAudioRoute = 2;
   INCallCapabilityOptionAudioCall = 1;
   INCallCapabilityOptionVideoCall = 2;
   INCallRecordTypeUnknown = 0;
@@ -92,9 +95,6 @@ const
   INCallDestinationTypeEmergencyDestination = 2;
   INCallDestinationTypeVoicemailDestination = 3;
   INCallDestinationTypeRedialDestination = 4;
-  INCallAudioRouteUnknown = 0;
-  INCallAudioRouteSpeakerphoneAudioRoute = 1;
-  INCallAudioRouteBluetoothAudioRoute = 2;
   INCallCapabilityUnknown = 0;
   INCallCapabilityAudioCall = 1;
   INCallCapabilityVideoCall = 2;
@@ -292,6 +292,20 @@ const
   INInteractionDirectionUnspecified = 0;
   INInteractionDirectionOutgoing = 1;
   INInteractionDirectionIncoming = 2;
+  INAnswerCallIntentResponseCodeUnspecified = 0;
+  INAnswerCallIntentResponseCodeReady = 1;
+  INAnswerCallIntentResponseCodeContinueInApp = 2;
+  INAnswerCallIntentResponseCodeInProgress = 3;
+  INAnswerCallIntentResponseCodeSuccess = 4;
+  INAnswerCallIntentResponseCodeFailure = 5;
+  INAnswerCallIntentResponseCodeFailureRequiringAppLaunch = 6;
+  INHangUpCallIntentResponseCodeUnspecified = 0;
+  INHangUpCallIntentResponseCodeReady = 1;
+  INHangUpCallIntentResponseCodeInProgress = 2;
+  INHangUpCallIntentResponseCodeSuccess = 3;
+  INHangUpCallIntentResponseCodeFailure = 4;
+  INHangUpCallIntentResponseCodeFailureRequiringAppLaunch = 5;
+  INHangUpCallIntentResponseCodeFailureNoCallToHangUp = 6;
   INSearchCallHistoryIntentResponseCodeUnspecified = 0;
   INSearchCallHistoryIntentResponseCodeReady = 1;
   INSearchCallHistoryIntentResponseCodeContinueInApp = 2;
@@ -438,6 +452,12 @@ const
   INStartWorkoutIntentResponseCodeFailureNoMatchingWorkout = 6;
   INStartWorkoutIntentResponseCodeHandleInApp = 7;
   INStartWorkoutIntentResponseCodeSuccess = 8;
+  INShareFocusStatusIntentResponseCodeUnspecified = 0;
+  INShareFocusStatusIntentResponseCodeReady = 1;
+  INShareFocusStatusIntentResponseCodeInProgress = 2;
+  INShareFocusStatusIntentResponseCodeSuccess = 3;
+  INShareFocusStatusIntentResponseCodeFailure = 4;
+  INShareFocusStatusIntentResponseCodeFailureRequiringAppLaunch = 5;
   INAddMediaIntentResponseCodeUnspecified = 0;
   INAddMediaIntentResponseCodeReady = 1;
   INAddMediaIntentResponseCodeInProgress = 2;
@@ -456,6 +476,7 @@ const
   INPlayMediaIntentResponseCodeFailureUnknownMediaType = 8;
   INPlayMediaIntentResponseCodeFailureNoUnplayedContent = 9;
   INPlayMediaIntentResponseCodeFailureRestrictedContent = 10;
+  INPlayMediaIntentResponseCodeFailureMaxStreamLimitReached = 11;
   INSearchForMediaIntentResponseCodeUnspecified = 0;
   INSearchForMediaIntentResponseCodeReady = 1;
   INSearchForMediaIntentResponseCodeContinueInApp = 2;
@@ -920,6 +941,10 @@ const
   INSiriAuthorizationStatusRestricted = 1;
   INSiriAuthorizationStatusDenied = 2;
   INSiriAuthorizationStatusAuthorized = 3;
+  INFocusStatusAuthorizationStatusNotDetermined = 0;
+  INFocusStatusAuthorizationStatusRestricted = 1;
+  INFocusStatusAuthorizationStatusDenied = 2;
+  INFocusStatusAuthorizationStatusAuthorized = 3;
   INMediaUserContextSubscriptionStatusUnknown = 0;
   INMediaUserContextSubscriptionStatusNotSubscribed = 1;
   INMediaUserContextSubscriptionStatusSubscribed = 2;
@@ -941,6 +966,10 @@ type
   INIntentHandlerProviding = interface;
   INIntentResponse = interface;
   INIntentResolutionResult = interface;
+  INAnswerCallIntent = interface;
+  INAnswerCallIntentHandling = interface;
+  INHangUpCallIntent = interface;
+  INHangUpCallIntentHandling = interface;
   INSearchCallHistoryIntent = interface;
   INSearchCallHistoryIntentHandling = interface;
   INStartAudioCallIntent = interface;
@@ -982,6 +1011,8 @@ type
   INResumeWorkoutIntentHandling = interface;
   INStartWorkoutIntent = interface;
   INStartWorkoutIntentHandling = interface;
+  INShareFocusStatusIntent = interface;
+  INShareFocusStatusIntentHandling = interface;
   INAddMediaIntent = interface;
   INAddMediaIntentHandling = interface;
   INPlayMediaIntent = interface;
@@ -1060,6 +1091,8 @@ type
   INParameter = interface;
   INObjectSection = interface;
   INObjectCollection = interface;
+  INAnswerCallIntentResponse = interface;
+  INHangUpCallIntentResponse = interface;
   INSearchCallHistoryIntentResponse = interface;
   INStartAudioCallIntentResponse = interface;
   INStartCallIntentResponse = interface;
@@ -1080,6 +1113,7 @@ type
   INPauseWorkoutIntentResponse = interface;
   INResumeWorkoutIntentResponse = interface;
   INStartWorkoutIntentResponse = interface;
+  INShareFocusStatusIntentResponse = interface;
   INAddMediaIntentResponse = interface;
   INPlayMediaIntentResponse = interface;
   INSearchForMediaIntentResponse = interface;
@@ -1152,6 +1186,7 @@ type
   INDeleteTasksTaskResolutionResult = interface;
   INFileResolutionResult = interface;
   INFlight = interface;
+  INFocusStatus = interface;
   INLocationSearchTypeResolutionResult = interface;
   INMediaAffinityTypeResolutionResult = interface;
   INMediaDestination = interface;
@@ -1208,6 +1243,8 @@ type
   INVisualCodeTypeResolutionResult = interface;
   INWorkoutGoalUnitTypeResolutionResult = interface;
   INWorkoutLocationTypeResolutionResult = interface;
+  INIntentDonationMetadata = interface;
+  INSendMessageIntentDonationMetadata = interface;
   INExtension = interface;
   INPersonHandle = interface;
   INCurrencyAmount = interface;
@@ -1283,6 +1320,7 @@ type
   INVocabulary = interface;
   INUpcomingMediaManager = interface;
   INPreferences = interface;
+  INFocusStatusCenter = interface;
   INUserContext = interface;
   INMediaUserContext = interface;
   INNoteContent = interface;
@@ -1302,11 +1340,11 @@ type
 
   INShortcutAvailabilityOptions = NSInteger;
   INIntentErrorCode = NSInteger;
+  INCallAudioRoute = NSInteger;
   INCallCapabilityOptions = NSInteger;
   INCallRecordType = NSInteger;
   INCallRecordTypeOptions = NSInteger;
   INCallDestinationType = NSInteger;
-  INCallAudioRoute = NSInteger;
   INCallCapability = NSInteger;
   INCarSignalOptions = NSInteger;
   INCarAudioSource = NSInteger;
@@ -1339,6 +1377,8 @@ type
   INVisualCodeType = NSInteger;
   INIntentHandlingStatus = NSInteger;
   INInteractionDirection = NSInteger;
+  INAnswerCallIntentResponseCode = NSInteger;
+  INHangUpCallIntentResponseCode = NSInteger;
   INSearchCallHistoryIntentResponseCode = NSInteger;
   INStartAudioCallIntentResponseCode = NSInteger;
   INStartCallIntentResponseCode = NSInteger;
@@ -1360,6 +1400,7 @@ type
   INPauseWorkoutIntentResponseCode = NSInteger;
   INResumeWorkoutIntentResponseCode = NSInteger;
   INStartWorkoutIntentResponseCode = NSInteger;
+  INShareFocusStatusIntentResponseCode = NSInteger;
   INAddMediaIntentResponseCode = NSInteger;
   INPlayMediaIntentResponseCode = NSInteger;
   INSearchForMediaIntentResponseCode = NSInteger;
@@ -1443,9 +1484,12 @@ type
   INVocabularyStringType = NSInteger;
   INUpcomingMediaPredictionMode = NSInteger;
   INSiriAuthorizationStatus = NSInteger;
+  INFocusStatusAuthorizationStatus = NSInteger;
   INMediaUserContextSubscriptionStatus = NSInteger;
   INDailyRoutineSituation = NSInteger;
   INRelevantShortcutRole = NSInteger;
+  TINAnswerCallIntentHandlingBlockMethod1 = procedure(response: INAnswerCallIntentResponse) of object;
+  TINHangUpCallIntentHandlingBlockMethod1 = procedure(response: INHangUpCallIntentResponse) of object;
   TINSearchCallHistoryIntentHandlingBlockMethod1 = procedure(response: INSearchCallHistoryIntentResponse) of object;
   TINSearchCallHistoryIntentHandlingBlockMethod2 = procedure(resolutionResult: INCallRecordTypeResolutionResult) of object;
   TINSearchCallHistoryIntentHandlingBlockMethod3 = procedure(resolutionResult: INDateComponentsRangeResolutionResult) of object;
@@ -1517,6 +1561,7 @@ type
   TINStartWorkoutIntentHandlingBlockMethod4 = procedure(resolutionResult: INWorkoutGoalUnitTypeResolutionResult) of object;
   TINStartWorkoutIntentHandlingBlockMethod5 = procedure(resolutionResult: INWorkoutLocationTypeResolutionResult) of object;
   TINStartWorkoutIntentHandlingBlockMethod6 = procedure(resolutionResult: INBooleanResolutionResult) of object;
+  TINShareFocusStatusIntentHandlingBlockMethod1 = procedure(response: INShareFocusStatusIntentResponse) of object;
   TINAddMediaIntentHandlingBlockMethod1 = procedure(response: INAddMediaIntentResponse) of object;
   TINAddMediaIntentHandlingBlockMethod2 = procedure(resolutionResults: NSArray) of object;
   TINAddMediaIntentHandlingBlockMethod3 = procedure(resolutionResult: INAddMediaMediaDestinationResolutionResult) of object;
@@ -1651,33 +1696,33 @@ type
   TINBookRestaurantReservationIntentHandlingBlockMethod4 = procedure(resolutionResult: INIntegerResolutionResult) of object;
   TINBookRestaurantReservationIntentHandlingBlockMethod5 = procedure(resolutionResult: INRestaurantGuestResolutionResult) of object;
   TINBookRestaurantReservationIntentHandlingBlockMethod6 = procedure(resolutionResult: INStringResolutionResult) of object;
-  TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod1 =
-    procedure(response: INGetAvailableRestaurantReservationBookingsIntentResponse) of object;
+  TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod1 = procedure(response: INGetAvailableRestaurantReservationBookingsIntentResponse) of object;
   TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod2 = procedure(resolutionResult: INRestaurantResolutionResult) of object;
   TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod3 = procedure(resolutionResult: INIntegerResolutionResult) of object;
   TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod4 = procedure(resolutionResult: INDateComponentsResolutionResult) of object;
-  TINGetUserCurrentRestaurantReservationBookingsIntentHandlingBlockMethod1 =
-    procedure(response: INGetUserCurrentRestaurantReservationBookingsIntentResponse) of object;
+  TINGetUserCurrentRestaurantReservationBookingsIntentHandlingBlockMethod1 = procedure(response: INGetUserCurrentRestaurantReservationBookingsIntentResponse) of object;
   TINGetUserCurrentRestaurantReservationBookingsIntentHandlingBlockMethod2 = procedure(resolutionResult: INRestaurantResolutionResult) of object;
-  TINGetAvailableRestaurantReservationBookingDefaultsIntentHandlingBlockMethod1 =
-    procedure(response: INGetAvailableRestaurantReservationBookingDefaultsIntentResponse) of object;
+  TINGetAvailableRestaurantReservationBookingDefaultsIntentHandlingBlockMethod1 = procedure(response: INGetAvailableRestaurantReservationBookingDefaultsIntentResponse) of object;
   TINGetAvailableRestaurantReservationBookingDefaultsIntentHandlingBlockMethod2 = procedure(resolutionResult: INRestaurantResolutionResult) of object;
   TINGetRestaurantGuestIntentHandlingBlockMethod1 = procedure(response: INGetRestaurantGuestIntentResponse) of object;
   TINPreferencesBlockMethod1 = procedure(status: INSiriAuthorizationStatus) of object;
+  TINFocusStatusCenterBlockMethod1 = procedure(status: INFocusStatusAuthorizationStatus) of object;
   TINRelevantShortcutStoreBlockMethod1 = procedure(error: NSError) of object;
   TINVoiceShortcutCenterBlockMethod1 = procedure(voiceShortcuts: NSArray; error: NSError) of object;
   TINVoiceShortcutCenterBlockMethod2 = procedure(voiceShortcut: INVoiceShortcut; error: NSError) of object;
 
   INIntentClass = interface(NSObjectClass)
-    ['{0E70C80E-9E49-4286-933C-91F5B9641CC5}']
+    ['{2751981C-E973-4995-AED6-2A0F14C46FA4}']
   end;
 
   INIntent = interface(NSObject)
-    ['{80AF7CF8-FB59-45BD-9637-8AE51273468D}']
+    ['{BD801A93-701A-4A5E-BFBB-C2DB37BA6F79}']
+    function donationMetadata: INIntentDonationMetadata; cdecl;
     function identifier: NSString; cdecl;
     function imageForParameterNamed(parameterName: NSString): INImage; cdecl;
     function intentDescription: NSString; cdecl;
     function keyImage: INImage; cdecl;
+    procedure setDonationMetadata(donationMetadata: INIntentDonationMetadata); cdecl;
     procedure setImage(image: INImage; forParameterNamed: NSString); cdecl;
     procedure setShortcutAvailability(shortcutAvailability: INShortcutAvailabilityOptions); cdecl;
     procedure setSuggestedInvocationPhrase(suggestedInvocationPhrase: NSString); cdecl;
@@ -1687,23 +1732,23 @@ type
   TINIntent = class(TOCGenericImport<INIntentClass, INIntent>) end;
 
   INIntentHandlerProviding = interface(IObjectiveC)
-    ['{79EE77D6-74AA-43D6-946F-DD18BCA1BD0C}']
+    ['{E747F59A-B243-4E9C-8739-4498933E2B1F}']
     function handlerForIntent(intent: INIntent): Pointer; cdecl;
   end;
 
   INIntentResponseClass = interface(NSObjectClass)
-    ['{B4C85DA7-3F09-4B15-B07B-F42BE1D1E58C}']
+    ['{027401F0-48D5-4642-A385-26A7ED167069}']
   end;
 
   INIntentResponse = interface(NSObject)
-    ['{294CC6A6-333D-4A72-BC11-D35A3D27F56D}']
+    ['{1691C760-92B9-40B0-8084-3A84C27E4965}']
     procedure setUserActivity(userActivity: NSUserActivity); cdecl;
     function userActivity: NSUserActivity; cdecl;
   end;
   TINIntentResponse = class(TOCGenericImport<INIntentResponseClass, INIntentResponse>) end;
 
   INIntentResolutionResultClass = interface(NSObjectClass)
-    ['{8AFDC91B-A4FF-4970-A1E7-2028E7563F59}']
+    ['{F5A53A13-1B43-408D-ABD1-FA4BEBBC78CB}']
     {class} function confirmationRequiredWithItemToConfirm(itemToConfirm: Pointer; forReason: NSInteger): Pointer; cdecl;
     {class} function needsValue: Pointer; cdecl;
     {class} function notRequired: Pointer; cdecl;
@@ -1712,16 +1757,51 @@ type
   end;
 
   INIntentResolutionResult = interface(NSObject)
-    ['{3E4AAD30-9011-49FF-BFA8-8CCCD5FAFB5B}']
+    ['{1C77B86F-1056-42F7-811D-B28A1DA11829}']
   end;
   TINIntentResolutionResult = class(TOCGenericImport<INIntentResolutionResultClass, INIntentResolutionResult>) end;
 
+  INAnswerCallIntentClass = interface(INIntentClass)
+    ['{6BF842E6-07B3-4D83-90FF-B0A9AE0DF8CE}']
+  end;
+
+  INAnswerCallIntent = interface(INIntent)
+    ['{E70A9D93-CEB0-47A5-8476-F22BB9569FFB}']
+    function audioRoute: INCallAudioRoute; cdecl;
+    function callIdentifier: NSString; cdecl;
+    function initWithAudioRoute(audioRoute: INCallAudioRoute; callIdentifier: NSString): Pointer; cdecl;
+  end;
+  TINAnswerCallIntent = class(TOCGenericImport<INAnswerCallIntentClass, INAnswerCallIntent>) end;
+
+  INAnswerCallIntentHandling = interface(IObjectiveC)
+    ['{9177A61F-D071-4FFE-8F6A-91CD2DC4259F}']
+    procedure confirmAnswerCall(intent: INAnswerCallIntent; completion: Pointer); cdecl;
+    procedure handleAnswerCall(intent: INAnswerCallIntent; completion: Pointer); cdecl;
+  end;
+
+  INHangUpCallIntentClass = interface(INIntentClass)
+    ['{E29FC2D6-8D3A-46ED-9021-6C69DF8DD4D3}']
+  end;
+
+  INHangUpCallIntent = interface(INIntent)
+    ['{614E6178-BD58-4339-80B6-747D16B226CD}']
+    function callIdentifier: NSString; cdecl;
+    function initWithCallIdentifier(callIdentifier: NSString): Pointer; cdecl;
+  end;
+  TINHangUpCallIntent = class(TOCGenericImport<INHangUpCallIntentClass, INHangUpCallIntent>) end;
+
+  INHangUpCallIntentHandling = interface(IObjectiveC)
+    ['{AB934C95-D25F-4E5A-A1DE-A3C3D070FD34}']
+    procedure confirmHangUpCall(intent: INHangUpCallIntent; completion: Pointer); cdecl;
+    procedure handleHangUpCall(intent: INHangUpCallIntent; completion: Pointer); cdecl;
+  end;
+
   INSearchCallHistoryIntentClass = interface(INIntentClass)
-    ['{8CC9BB47-AF1A-4A10-B9A3-37D52911ED14}']
+    ['{8ACEC255-970D-4943-A9C5-007B760F5DAC}']
   end;
 
   INSearchCallHistoryIntent = interface(INIntent)
-    ['{231E19CC-2E90-43D4-8566-E9B96A179FCB}']
+    ['{BAAADBE0-5A25-4660-B593-985A1B85F5D6}']
     function callCapabilities: INCallCapabilityOptions; cdecl;
     function callType: INCallRecordType; cdecl; // API_DEPRECATED("Use callTypes instead", ios(10.0, 11.0), watchos(3.2, 4.0))
     function callTypes: INCallRecordTypeOptions; cdecl;
@@ -1736,27 +1816,22 @@ type
   TINSearchCallHistoryIntent = class(TOCGenericImport<INSearchCallHistoryIntentClass, INSearchCallHistoryIntent>) end;
 
   INSearchCallHistoryIntentHandling = interface(IObjectiveC)
-    ['{A764F6C1-7958-47E4-8F06-9D0B8F0D9E91}']
-    procedure confirmSearchCallHistory(intent: INSearchCallHistoryIntent; completion: TINSearchCallHistoryIntentHandlingBlockMethod1); cdecl;
-    procedure handleSearchCallHistory(intent: INSearchCallHistoryIntent; completion: TINSearchCallHistoryIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCallTypeForSearchCallHistory(intent: INSearchCallHistoryIntent;
-      withCompletion: TINSearchCallHistoryIntentHandlingBlockMethod2); cdecl; // API_DEPRECATED("resolveCallTypeForSearchCallHistory:withCompletion: is deprecated. Use resolveCallTypesForSearchCallHistory:withCompletion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
-    procedure resolveCallTypesForSearchCallHistory(intent: INSearchCallHistoryIntent;
-      withCompletion: TINSearchCallHistoryIntentHandlingBlockMethod5); cdecl;
-    procedure resolveDateCreatedForSearchCallHistory(intent: INSearchCallHistoryIntent;
-      withCompletion: TINSearchCallHistoryIntentHandlingBlockMethod3); cdecl;
-    procedure resolveRecipientForSearchCallHistory(intent: INSearchCallHistoryIntent;
-      withCompletion: TINSearchCallHistoryIntentHandlingBlockMethod4); cdecl;
-    procedure resolveUnseenForSearchCallHistory(intent: INSearchCallHistoryIntent;
-      withCompletion: TINSearchCallHistoryIntentHandlingBlockMethod6); cdecl;
+    ['{5B76FB93-171D-4AAA-A255-4D083FA2EAC0}']
+    procedure confirmSearchCallHistory(intent: INSearchCallHistoryIntent; completion: Pointer); cdecl;
+    procedure handleSearchCallHistory(intent: INSearchCallHistoryIntent; completion: Pointer); cdecl;
+    procedure resolveCallTypeForSearchCallHistory(intent: INSearchCallHistoryIntent; withCompletion: Pointer); cdecl;
+    procedure resolveCallTypesForSearchCallHistory(intent: INSearchCallHistoryIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDateCreatedForSearchCallHistory(intent: INSearchCallHistoryIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRecipientForSearchCallHistory(intent: INSearchCallHistoryIntent; withCompletion: Pointer); cdecl;
+    procedure resolveUnseenForSearchCallHistory(intent: INSearchCallHistoryIntent; withCompletion: Pointer); cdecl;
   end;
 
   INStartAudioCallIntentClass = interface(INIntentClass)
-    ['{F7CDB7EF-6FBA-47B3-81CE-0E2CA4133C7F}']
+    ['{CB658367-0438-48B2-AE81-34E17BE0FCED}']
   end;
 
   INStartAudioCallIntent = interface(INIntent)
-    ['{25A50E39-A39A-41AD-B90E-96C5CB1B4238}']
+    ['{E69DAEE1-2778-4627-8D51-DE5BF3BB5AD1}']
     function contacts: NSArray; cdecl;
     function destinationType: INCallDestinationType; cdecl;
     function initWithContacts(contacts: NSArray): Pointer; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 11.0), watchos(3.2, 4.0))
@@ -1765,19 +1840,19 @@ type
   TINStartAudioCallIntent = class(TOCGenericImport<INStartAudioCallIntentClass, INStartAudioCallIntent>) end;
 
   INStartAudioCallIntentHandling = interface(IObjectiveC)
-    ['{3C5713D7-1AD7-4EC4-A536-7AD67509EB00}']
-    procedure confirmStartAudioCall(intent: INStartAudioCallIntent; completion: TINStartAudioCallIntentHandlingBlockMethod1); cdecl;
-    procedure handleStartAudioCall(intent: INStartAudioCallIntent; completion: TINStartAudioCallIntentHandlingBlockMethod1); cdecl;
-    procedure resolveContactsForStartAudioCall(intent: INStartAudioCallIntent; withCompletion: TINStartAudioCallIntentHandlingBlockMethod3); cdecl;
-    procedure resolveDestinationTypeForStartAudioCall(intent: INStartAudioCallIntent; withCompletion: TINStartAudioCallIntentHandlingBlockMethod2); cdecl;
+    ['{88B54954-E63C-4F7E-8EEE-2B38CF081810}']
+    procedure confirmStartAudioCall(intent: INStartAudioCallIntent; completion: Pointer); cdecl;
+    procedure handleStartAudioCall(intent: INStartAudioCallIntent; completion: Pointer); cdecl;
+    procedure resolveContactsForStartAudioCall(intent: INStartAudioCallIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDestinationTypeForStartAudioCall(intent: INStartAudioCallIntent; withCompletion: Pointer); cdecl;
   end;
 
   INStartCallIntentClass = interface(INIntentClass)
-    ['{A021D092-BC12-49C5-A14B-10868C984214}']
+    ['{7F539E35-79D6-4F51-ABC3-0497382089FC}']
   end;
 
   INStartCallIntent = interface(INIntent)
-    ['{0C9127B0-DE38-40DD-9BF8-2183D16F5B65}']
+    ['{070EEFBD-73C5-4B3C-9C98-E6DF10918A15}']
     function audioRoute: INCallAudioRoute; cdecl;
     function callCapability: INCallCapability; cdecl;
     function callRecordFilter: INCallRecordFilter; cdecl;
@@ -1793,39 +1868,39 @@ type
   TINStartCallIntent = class(TOCGenericImport<INStartCallIntentClass, INStartCallIntent>) end;
 
   INStartCallIntentHandling = interface(IObjectiveC)
-    ['{2FE5A31E-8C19-40F6-9927-CAA99F2F3840}']
-    procedure confirmStartCall(intent: INStartCallIntent; completion: TINStartCallIntentHandlingBlockMethod1); cdecl;
-    procedure handleStartCall(intent: INStartCallIntent; completion: TINStartCallIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCallCapabilityForStartCall(intent: INStartCallIntent; withCompletion: TINStartCallIntentHandlingBlockMethod5); cdecl;
-    procedure resolveCallRecordToCallBackForStartCall(intent: INStartCallIntent; withCompletion: TINStartCallIntentHandlingBlockMethod2); cdecl;
-    procedure resolveContactsForStartCall(intent: INStartCallIntent; withCompletion: TINStartCallIntentHandlingBlockMethod4); cdecl;
-    procedure resolveDestinationTypeForStartCall(intent: INStartCallIntent; withCompletion: TINStartCallIntentHandlingBlockMethod3); cdecl;
+    ['{11030634-28FE-4D34-AAC5-6C79B34FBBF9}']
+    procedure confirmStartCall(intent: INStartCallIntent; completion: Pointer); cdecl;
+    procedure handleStartCall(intent: INStartCallIntent; completion: Pointer); cdecl;
+    procedure resolveCallCapabilityForStartCall(intent: INStartCallIntent; withCompletion: Pointer); cdecl;
+    procedure resolveCallRecordToCallBackForStartCall(intent: INStartCallIntent; withCompletion: Pointer); cdecl;
+    procedure resolveContactsForStartCall(intent: INStartCallIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDestinationTypeForStartCall(intent: INStartCallIntent; withCompletion: Pointer); cdecl;
   end;
 
   INStartVideoCallIntentClass = interface(INIntentClass)
-    ['{AF21369C-AA83-41D4-9106-FA0639C8234D}']
+    ['{B7D8C00B-1219-4547-ABA9-908586F85BC0}']
   end;
 
   INStartVideoCallIntent = interface(INIntent)
-    ['{FB746C75-37FD-4869-8B7B-9F4AC9ACD860}']
+    ['{E698BBF0-DED2-4FCF-9425-9FC3C97741E0}']
     function contacts: NSArray; cdecl;
     function initWithContacts(contacts: NSArray): Pointer; cdecl;
   end;
   TINStartVideoCallIntent = class(TOCGenericImport<INStartVideoCallIntentClass, INStartVideoCallIntent>) end;
 
   INStartVideoCallIntentHandling = interface(IObjectiveC)
-    ['{DA1B24B0-76BD-48E3-91C6-1DBA8E1BB3B4}']
-    procedure confirmStartVideoCall(intent: INStartVideoCallIntent; completion: TINStartVideoCallIntentHandlingBlockMethod1); cdecl;
-    procedure handleStartVideoCall(intent: INStartVideoCallIntent; completion: TINStartVideoCallIntentHandlingBlockMethod1); cdecl;
-    procedure resolveContactsForStartVideoCall(intent: INStartVideoCallIntent; withCompletion: TINStartVideoCallIntentHandlingBlockMethod2); cdecl;
+    ['{ABB50F71-71F1-4FE6-AF9C-0F0FC9D7FB07}']
+    procedure confirmStartVideoCall(intent: INStartVideoCallIntent; completion: Pointer); cdecl;
+    procedure handleStartVideoCall(intent: INStartVideoCallIntent; completion: Pointer); cdecl;
+    procedure resolveContactsForStartVideoCall(intent: INStartVideoCallIntent; withCompletion: Pointer); cdecl;
   end;
 
   INActivateCarSignalIntentClass = interface(INIntentClass)
-    ['{0A7E8921-19F7-4FB5-B43F-A5960B30E51F}']
+    ['{F89A7D46-B0BA-4000-ABD0-D9D9DED29CDA}']
   end;
 
   INActivateCarSignalIntent = interface(INIntent)
-    ['{DF73C682-780B-4964-9FD2-4E2B287E7CDF}']
+    ['{7EA561CE-F324-4F32-A595-7902BE6E46D0}']
     function carName: INSpeakableString; cdecl;
     function initWithCarName(carName: INSpeakableString; signals: INCarSignalOptions): Pointer; cdecl;
     function signals: INCarSignalOptions; cdecl;
@@ -1833,83 +1908,77 @@ type
   TINActivateCarSignalIntent = class(TOCGenericImport<INActivateCarSignalIntentClass, INActivateCarSignalIntent>) end;
 
   INActivateCarSignalIntentHandling = interface(IObjectiveC)
-    ['{225AE190-2109-43A8-934E-7F1BBBB1AEE7}']
-    procedure confirmActivateCarSignal(intent: INActivateCarSignalIntent; completion: TINActivateCarSignalIntentHandlingBlockMethod1); cdecl;
-    procedure handleActivateCarSignal(intent: INActivateCarSignalIntent; completion: TINActivateCarSignalIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCarNameForActivateCarSignal(intent: INActivateCarSignalIntent;
-      withCompletion: TINActivateCarSignalIntentHandlingBlockMethod2); cdecl;
-    procedure resolveSignalsForActivateCarSignal(intent: INActivateCarSignalIntent;
-      withCompletion: TINActivateCarSignalIntentHandlingBlockMethod3); cdecl;
+    ['{BE04E72B-47FA-4BBE-B5FC-470CC26CC09D}']
+    procedure confirmActivateCarSignal(intent: INActivateCarSignalIntent; completion: Pointer); cdecl;
+    procedure handleActivateCarSignal(intent: INActivateCarSignalIntent; completion: Pointer); cdecl;
+    procedure resolveCarNameForActivateCarSignal(intent: INActivateCarSignalIntent; withCompletion: Pointer); cdecl;
+    procedure resolveSignalsForActivateCarSignal(intent: INActivateCarSignalIntent; withCompletion: Pointer); cdecl;
   end;
 
   INGetCarLockStatusIntentClass = interface(INIntentClass)
-    ['{33309CBC-2147-4BCC-B9E6-E5A5947D16F5}']
+    ['{CDAF3463-7AF7-450E-9A57-56C7600501DB}']
   end;
 
   INGetCarLockStatusIntent = interface(INIntent)
-    ['{CC95A2E2-6EA1-476D-A252-7F760250DBC9}']
+    ['{38C61D36-2D3B-46AF-B540-240D0044CBB2}']
     function carName: INSpeakableString; cdecl;
     function initWithCarName(carName: INSpeakableString): Pointer; cdecl;
   end;
   TINGetCarLockStatusIntent = class(TOCGenericImport<INGetCarLockStatusIntentClass, INGetCarLockStatusIntent>) end;
 
   INGetCarLockStatusIntentHandling = interface(IObjectiveC)
-    ['{42C36F54-2E97-4221-8B22-E01453CED346}']
-    procedure confirmGetCarLockStatus(intent: INGetCarLockStatusIntent; completion: TINGetCarLockStatusIntentHandlingBlockMethod1); cdecl;
-    procedure handleGetCarLockStatus(intent: INGetCarLockStatusIntent; completion: TINGetCarLockStatusIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCarNameForGetCarLockStatus(intent: INGetCarLockStatusIntent;
-      withCompletion: TINGetCarLockStatusIntentHandlingBlockMethod2); cdecl;
+    ['{BB12A38D-949E-4AD1-A6F1-016EC794A833}']
+    procedure confirmGetCarLockStatus(intent: INGetCarLockStatusIntent; completion: Pointer); cdecl;
+    procedure handleGetCarLockStatus(intent: INGetCarLockStatusIntent; completion: Pointer); cdecl;
+    procedure resolveCarNameForGetCarLockStatus(intent: INGetCarLockStatusIntent; withCompletion: Pointer); cdecl;
   end;
 
   INGetCarPowerLevelStatusIntentClass = interface(INIntentClass)
-    ['{5B85821C-5599-4191-B3B1-6F7039F16EDB}']
+    ['{815AC8F5-4834-4217-BFB4-07A3EAA500FA}']
   end;
 
   INGetCarPowerLevelStatusIntent = interface(INIntent)
-    ['{5972F9C4-DBF4-44BF-97E6-9C10C734B422}']
+    ['{41249345-7E0B-4F74-BE5C-DDCC63D2DB44}']
     function carName: INSpeakableString; cdecl;
     function initWithCarName(carName: INSpeakableString): Pointer; cdecl;
   end;
   TINGetCarPowerLevelStatusIntent = class(TOCGenericImport<INGetCarPowerLevelStatusIntentClass, INGetCarPowerLevelStatusIntent>) end;
 
   INGetCarPowerLevelStatusIntentHandling = interface(IObjectiveC)
-    ['{2285537E-1D93-451E-B637-CC791A5082AA}']
-    procedure confirmGetCarPowerLevelStatus(intent: INGetCarPowerLevelStatusIntent;
-      completion: TINGetCarPowerLevelStatusIntentHandlingBlockMethod1); cdecl;
-    procedure handleGetCarPowerLevelStatus(intent: INGetCarPowerLevelStatusIntent;
-      completion: TINGetCarPowerLevelStatusIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCarNameForGetCarPowerLevelStatus(intent: INGetCarPowerLevelStatusIntent;
-      withCompletion: TINGetCarPowerLevelStatusIntentHandlingBlockMethod2); cdecl;
+    ['{8F83CAE7-2D6E-407A-8308-DBDA2E39649F}']
+    procedure confirmGetCarPowerLevelStatus(intent: INGetCarPowerLevelStatusIntent; completion: Pointer); cdecl;
+    procedure handleGetCarPowerLevelStatus(intent: INGetCarPowerLevelStatusIntent; completion: Pointer); cdecl;
+    procedure resolveCarNameForGetCarPowerLevelStatus(intent: INGetCarPowerLevelStatusIntent; withCompletion: Pointer); cdecl;
     procedure startSendingUpdatesForGetCarPowerLevelStatus(intent: INGetCarPowerLevelStatusIntent; toObserver: Pointer); cdecl;
     procedure stopSendingUpdatesForGetCarPowerLevelStatus(intent: INGetCarPowerLevelStatusIntent); cdecl;
   end;
 
   INGetCarPowerLevelStatusIntentResponseObserver = interface(IObjectiveC)
-    ['{36BBC241-48A1-4C09-B034-4C8759188248}']
+    ['{2D84CCDF-96BA-4AA4-9D1D-15AE8359A5E5}']
     procedure getCarPowerLevelStatusResponseDidUpdate(response: INGetCarPowerLevelStatusIntentResponse); cdecl;
   end;
 
   INListCarsIntentClass = interface(INIntentClass)
-    ['{76BF622B-70DA-498A-AAC4-0DC8890628C3}']
+    ['{9F23545F-163D-47F7-A912-D759D594A3FB}']
   end;
 
   INListCarsIntent = interface(INIntent)
-    ['{C5236E65-2233-4463-850D-91C0B88FD2BB}']
+    ['{8D550C1E-BE00-4E5B-A171-3AD1B38FC952}']
   end;
   TINListCarsIntent = class(TOCGenericImport<INListCarsIntentClass, INListCarsIntent>) end;
 
   INListCarsIntentHandling = interface(IObjectiveC)
-    ['{905E39F4-8632-42C4-B0BA-7CF28F07312D}']
-    procedure confirmListCars(intent: INListCarsIntent; completion: TINListCarsIntentHandlingBlockMethod1); cdecl;
-    procedure handleListCars(intent: INListCarsIntent; completion: TINListCarsIntentHandlingBlockMethod1); cdecl;
+    ['{94FCCF8B-B876-497B-9013-296B40116FA9}']
+    procedure confirmListCars(intent: INListCarsIntent; completion: Pointer); cdecl;
+    procedure handleListCars(intent: INListCarsIntent; completion: Pointer); cdecl;
   end;
 
   INSaveProfileInCarIntentClass = interface(INIntentClass)
-    ['{AD83219A-A304-4BB8-BA82-0F2904603577}']
+    ['{AD5FACEF-C08B-43BE-BA86-59960385C1A0}']
   end;
 
   INSaveProfileInCarIntent = interface(INIntent)
-    ['{20A1E185-450C-4137-8F7E-E3153143C1DB}']
+    ['{D1D3BABF-2DC1-4D27-842C-9B56B68C8B54}']
     [MethodName('initWithProfileNumber:profileLabel:')]
     function initWithProfileNumberProfileLabel(profileNumber: NSNumber; profileLabel: NSString): Pointer; cdecl; // API_DEPRECATED("Use `-initWithProfileNumber:profileName:` method instead.", ios(10.0, 10.2))
     [MethodName('initWithProfileNumber:profileName:')]
@@ -1921,21 +1990,19 @@ type
   TINSaveProfileInCarIntent = class(TOCGenericImport<INSaveProfileInCarIntentClass, INSaveProfileInCarIntent>) end;
 
   INSaveProfileInCarIntentHandling = interface(IObjectiveC)
-    ['{28CD3055-DCE9-48F4-81A8-02544D7FE8E7}']
-    procedure confirmSaveProfileInCar(intent: INSaveProfileInCarIntent; completion: TINSaveProfileInCarIntentHandlingBlockMethod1); cdecl;
-    procedure handleSaveProfileInCar(intent: INSaveProfileInCarIntent; completion: TINSaveProfileInCarIntentHandlingBlockMethod1); cdecl;
-    procedure resolveProfileNameForSaveProfileInCar(intent: INSaveProfileInCarIntent;
-      withCompletion: TINSaveProfileInCarIntentHandlingBlockMethod3); cdecl;
-    procedure resolveProfileNumberForSaveProfileInCar(intent: INSaveProfileInCarIntent;
-      withCompletion: TINSaveProfileInCarIntentHandlingBlockMethod2); cdecl;
+    ['{D914F6FF-3902-4694-9E0F-0E5C0E53193F}']
+    procedure confirmSaveProfileInCar(intent: INSaveProfileInCarIntent; completion: Pointer); cdecl;
+    procedure handleSaveProfileInCar(intent: INSaveProfileInCarIntent; completion: Pointer); cdecl;
+    procedure resolveProfileNameForSaveProfileInCar(intent: INSaveProfileInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveProfileNumberForSaveProfileInCar(intent: INSaveProfileInCarIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetAudioSourceInCarIntentClass = interface(INIntentClass)
-    ['{88B90716-ABC8-4C29-B0CC-58A6F5ABF97E}']
+    ['{CEC6319B-40D9-4D16-A255-CC603539A307}']
   end;
 
   INSetAudioSourceInCarIntent = interface(INIntent)
-    ['{6FC7D262-5B3F-4E40-B755-63112869B192}']
+    ['{1ECD0A31-5C32-46DB-B61E-EEA1A4EA6035}']
     function audioSource: INCarAudioSource; cdecl;
     function initWithAudioSource(audioSource: INCarAudioSource; relativeAudioSourceReference: INRelativeReference): Pointer; cdecl;
     function relativeAudioSourceReference: INRelativeReference; cdecl;
@@ -1943,21 +2010,19 @@ type
   TINSetAudioSourceInCarIntent = class(TOCGenericImport<INSetAudioSourceInCarIntentClass, INSetAudioSourceInCarIntent>) end;
 
   INSetAudioSourceInCarIntentHandling = interface(IObjectiveC)
-    ['{57F9D4BD-1F55-46C5-B7D8-0BC82E83CBB5}']
-    procedure confirmSetAudioSourceInCar(intent: INSetAudioSourceInCarIntent; completion: TINSetAudioSourceInCarIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetAudioSourceInCar(intent: INSetAudioSourceInCarIntent; completion: TINSetAudioSourceInCarIntentHandlingBlockMethod1); cdecl;
-    procedure resolveAudioSourceForSetAudioSourceInCar(intent: INSetAudioSourceInCarIntent;
-      withCompletion: TINSetAudioSourceInCarIntentHandlingBlockMethod2); cdecl;
-    procedure resolveRelativeAudioSourceReferenceForSetAudioSourceInCar(intent: INSetAudioSourceInCarIntent;
-      withCompletion: TINSetAudioSourceInCarIntentHandlingBlockMethod3); cdecl;
+    ['{AD21211A-E75A-41F7-A47B-F33782A71FE3}']
+    procedure confirmSetAudioSourceInCar(intent: INSetAudioSourceInCarIntent; completion: Pointer); cdecl;
+    procedure handleSetAudioSourceInCar(intent: INSetAudioSourceInCarIntent; completion: Pointer); cdecl;
+    procedure resolveAudioSourceForSetAudioSourceInCar(intent: INSetAudioSourceInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRelativeAudioSourceReferenceForSetAudioSourceInCar(intent: INSetAudioSourceInCarIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetCarLockStatusIntentClass = interface(INIntentClass)
-    ['{2ABB0605-C8E2-406C-9DEA-DD767DEDB631}']
+    ['{303BC514-A256-4E1F-8BC0-8EF80B28C634}']
   end;
 
   INSetCarLockStatusIntent = interface(INIntent)
-    ['{8DE23AA2-523A-492C-9F25-B18DE05658C4}']
+    ['{03D6524C-AF68-4EB5-B24B-4CBDE4808567}']
     function carName: INSpeakableString; cdecl;
     function initWithLocked(locked: NSNumber; carName: INSpeakableString): Pointer; cdecl;
     function locked: NSNumber; cdecl;
@@ -1965,21 +2030,19 @@ type
   TINSetCarLockStatusIntent = class(TOCGenericImport<INSetCarLockStatusIntentClass, INSetCarLockStatusIntent>) end;
 
   INSetCarLockStatusIntentHandling = interface(IObjectiveC)
-    ['{41BB1F62-14C1-41E1-A1F2-0D60A28BE052}']
-    procedure confirmSetCarLockStatus(intent: INSetCarLockStatusIntent; completion: TINSetCarLockStatusIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetCarLockStatus(intent: INSetCarLockStatusIntent; completion: TINSetCarLockStatusIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCarNameForSetCarLockStatus(intent: INSetCarLockStatusIntent;
-      withCompletion: TINSetCarLockStatusIntentHandlingBlockMethod3); cdecl;
-    procedure resolveLockedForSetCarLockStatus(intent: INSetCarLockStatusIntent;
-      withCompletion: TINSetCarLockStatusIntentHandlingBlockMethod2); cdecl;
+    ['{3163492E-13CA-451C-BD0A-01B25EE8E932}']
+    procedure confirmSetCarLockStatus(intent: INSetCarLockStatusIntent; completion: Pointer); cdecl;
+    procedure handleSetCarLockStatus(intent: INSetCarLockStatusIntent; completion: Pointer); cdecl;
+    procedure resolveCarNameForSetCarLockStatus(intent: INSetCarLockStatusIntent; withCompletion: Pointer); cdecl;
+    procedure resolveLockedForSetCarLockStatus(intent: INSetCarLockStatusIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetClimateSettingsInCarIntentClass = interface(INIntentClass)
-    ['{4BDCF4B7-9F65-42F8-BA37-A92284EF6E57}']
+    ['{C09F5BE9-A376-4ADA-B17C-0D19540083CD}']
   end;
 
   INSetClimateSettingsInCarIntent = interface(INIntent)
-    ['{E6BAAFC6-8D6D-4A49-AB90-E7431E20F7D1}']
+    ['{9F2B0D41-35B1-4FB0-9203-CC098337030E}']
     function airCirculationMode: INCarAirCirculationMode; cdecl;
     function carName: INSpeakableString; cdecl;
     function climateZone: INCarSeat; cdecl;
@@ -1992,7 +2055,7 @@ type
     function initWithEnableFan(enableFan: NSNumber; enableAirConditioner: NSNumber; enableClimateControl: NSNumber; enableAutoMode: NSNumber;
       airCirculationMode: INCarAirCirculationMode; fanSpeedIndex: NSNumber; fanSpeedPercentage: NSNumber; relativeFanSpeedSetting: INRelativeSetting;
       temperature: NSMeasurement; relativeTemperatureSetting: INRelativeSetting; climateZone: INCarSeat;
-      carName: INSpeakableString): Pointer; overload; cdecl;
+        carName: INSpeakableString): Pointer; overload; cdecl;
     function initWithEnableFan(enableFan: NSNumber; enableAirConditioner: NSNumber; enableClimateControl: NSNumber; enableAutoMode: NSNumber;
       airCirculationMode: INCarAirCirculationMode; fanSpeedIndex: NSNumber; fanSpeedPercentage: NSNumber; relativeFanSpeedSetting: INRelativeSetting;
       temperature: NSMeasurement; relativeTemperatureSetting: INRelativeSetting; climateZone: INCarSeat): Pointer; overload; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("-initWithEnableFan:enableAirConditioner:enableClimateControl:enableAutoMode:airCirculationMode:fanSpeedIndex:fanSpeedPercentage:relativeFanSpeedSetting:temperature:relativeTemperatureSetting:", ios(10.0, 12.0))
@@ -2003,43 +2066,29 @@ type
   TINSetClimateSettingsInCarIntent = class(TOCGenericImport<INSetClimateSettingsInCarIntentClass, INSetClimateSettingsInCarIntent>) end;
 
   INSetClimateSettingsInCarIntentHandling = interface(IObjectiveC)
-    ['{1F34A0D7-EB87-40FF-8257-90C716D85420}']
-    procedure confirmSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      completion: TINSetClimateSettingsInCarIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      completion: TINSetClimateSettingsInCarIntentHandlingBlockMethod1); cdecl;
-    procedure resolveAirCirculationModeForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod3); cdecl;
-    procedure resolveCarNameForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod9); cdecl;
-    procedure resolveClimateZoneForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod8); cdecl;
-    procedure resolveEnableAirConditionerForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod2); cdecl;
-    procedure resolveEnableAutoModeForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod2); cdecl;
-    procedure resolveEnableClimateControlForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod2); cdecl;
-    procedure resolveEnableFanForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod2); cdecl;
-    procedure resolveFanSpeedIndexForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod4); cdecl;
-    procedure resolveFanSpeedPercentageForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod5); cdecl;
-    procedure resolveRelativeFanSpeedSettingForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod6); cdecl;
-    procedure resolveRelativeTemperatureSettingForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod6); cdecl;
-    procedure resolveTemperatureForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent;
-      withCompletion: TINSetClimateSettingsInCarIntentHandlingBlockMethod7); cdecl;
+    ['{FC3627FC-BF1F-4798-94D1-3A464923F9C7}']
+    procedure confirmSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; completion: Pointer); cdecl;
+    procedure handleSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; completion: Pointer); cdecl;
+    procedure resolveAirCirculationModeForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveCarNameForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveClimateZoneForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveEnableAirConditionerForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveEnableAutoModeForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveEnableClimateControlForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveEnableFanForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveFanSpeedIndexForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveFanSpeedPercentageForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRelativeFanSpeedSettingForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRelativeTemperatureSettingForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTemperatureForSetClimateSettingsInCar(intent: INSetClimateSettingsInCarIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetDefrosterSettingsInCarIntentClass = interface(INIntentClass)
-    ['{BD35C613-EA03-4439-8607-B5BA50CFE4BC}']
+    ['{F404E17A-DD79-4B8C-9957-4751D313FB7E}']
   end;
 
   INSetDefrosterSettingsInCarIntent = interface(INIntent)
-    ['{38045BBC-CDC5-4C0E-8936-6E9E478AAD59}']
+    ['{2132B731-A14B-4F09-80B1-7F5C9D805EDD}']
     function carName: INSpeakableString; cdecl;
     function defroster: INCarDefroster; cdecl;
     function enable: NSNumber; cdecl;
@@ -2049,25 +2098,20 @@ type
   TINSetDefrosterSettingsInCarIntent = class(TOCGenericImport<INSetDefrosterSettingsInCarIntentClass, INSetDefrosterSettingsInCarIntent>) end;
 
   INSetDefrosterSettingsInCarIntentHandling = interface(IObjectiveC)
-    ['{B051A1A3-88E0-484A-A295-57758CC3D61A}']
-    procedure confirmSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent;
-      completion: TINSetDefrosterSettingsInCarIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent;
-      completion: TINSetDefrosterSettingsInCarIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCarNameForSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent;
-      withCompletion: TINSetDefrosterSettingsInCarIntentHandlingBlockMethod4); cdecl;
-    procedure resolveDefrosterForSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent;
-      withCompletion: TINSetDefrosterSettingsInCarIntentHandlingBlockMethod3); cdecl;
-    procedure resolveEnableForSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent;
-      withCompletion: TINSetDefrosterSettingsInCarIntentHandlingBlockMethod2); cdecl;
+    ['{06147C45-3AB5-4B97-85DA-620EEAE79B0D}']
+    procedure confirmSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent; completion: Pointer); cdecl;
+    procedure handleSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent; completion: Pointer); cdecl;
+    procedure resolveCarNameForSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDefrosterForSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveEnableForSetDefrosterSettingsInCar(intent: INSetDefrosterSettingsInCarIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetProfileInCarIntentClass = interface(INIntentClass)
-    ['{8D4FE582-6E2B-4999-BB4F-C0259409B356}']
+    ['{AFC31B73-A98F-417A-831B-03F8B3CBA493}']
   end;
 
   INSetProfileInCarIntent = interface(INIntent)
-    ['{FF5CEF86-83B8-4B2E-BD14-4BB9736D7E82}']
+    ['{4CAE0D42-000D-4DE8-B21B-35E81B225356}']
     function carName: INSpeakableString; cdecl;
     function defaultProfile: NSNumber; cdecl;
     [MethodName('initWithProfileNumber:profileLabel:defaultProfile:')]
@@ -2084,24 +2128,21 @@ type
   TINSetProfileInCarIntent = class(TOCGenericImport<INSetProfileInCarIntentClass, INSetProfileInCarIntent>) end;
 
   INSetProfileInCarIntentHandling = interface(IObjectiveC)
-    ['{C8B15F23-BCB0-4FAC-B890-27DA927F1F22}']
-    procedure confirmSetProfileInCar(intent: INSetProfileInCarIntent; completion: TINSetProfileInCarIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetProfileInCar(intent: INSetProfileInCarIntent; completion: TINSetProfileInCarIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCarNameForSetProfileInCar(intent: INSetProfileInCarIntent; withCompletion: TINSetProfileInCarIntentHandlingBlockMethod4); cdecl;
-    procedure resolveDefaultProfileForSetProfileInCar(intent: INSetProfileInCarIntent;
-      withCompletion: TINSetProfileInCarIntentHandlingBlockMethod5); cdecl; // API_DEPRECATED("The property doesn't need to be resolved", ios(10.0, 11.0))
-    procedure resolveProfileNameForSetProfileInCar(intent: INSetProfileInCarIntent;
-      withCompletion: TINSetProfileInCarIntentHandlingBlockMethod3); cdecl;
-    procedure resolveProfileNumberForSetProfileInCar(intent: INSetProfileInCarIntent;
-      withCompletion: TINSetProfileInCarIntentHandlingBlockMethod2); cdecl;
+    ['{FC85B89D-8B02-491D-A247-F79E3C1D5EDE}']
+    procedure confirmSetProfileInCar(intent: INSetProfileInCarIntent; completion: Pointer); cdecl;
+    procedure handleSetProfileInCar(intent: INSetProfileInCarIntent; completion: Pointer); cdecl;
+    procedure resolveCarNameForSetProfileInCar(intent: INSetProfileInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDefaultProfileForSetProfileInCar(intent: INSetProfileInCarIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("The property doesn't need to be resolved", ios(10.0, 11.0))
+    procedure resolveProfileNameForSetProfileInCar(intent: INSetProfileInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveProfileNumberForSetProfileInCar(intent: INSetProfileInCarIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetSeatSettingsInCarIntentClass = interface(INIntentClass)
-    ['{4BB9B797-D051-413A-8D7C-9DA8681E41BD}']
+    ['{09FF833C-EF17-41E5-A674-4B8A2BE3448A}']
   end;
 
   INSetSeatSettingsInCarIntent = interface(INIntent)
-    ['{7D93FCB2-3027-4B63-A870-DF33C7C42761}']
+    ['{4183328B-5FFE-482D-8F46-D2B5D0E08420}']
     function carName: INSpeakableString; cdecl;
     function enableCooling: NSNumber; cdecl;
     function enableHeating: NSNumber; cdecl;
@@ -2117,103 +2158,96 @@ type
   TINSetSeatSettingsInCarIntent = class(TOCGenericImport<INSetSeatSettingsInCarIntentClass, INSetSeatSettingsInCarIntent>) end;
 
   INSetSeatSettingsInCarIntentHandling = interface(IObjectiveC)
-    ['{8536D177-1621-4FEC-A2C0-F1FC39CA8135}']
-    procedure confirmSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; completion: TINSetSeatSettingsInCarIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; completion: TINSetSeatSettingsInCarIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCarNameForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent;
-      withCompletion: TINSetSeatSettingsInCarIntentHandlingBlockMethod6); cdecl;
-    procedure resolveEnableCoolingForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent;
-      withCompletion: TINSetSeatSettingsInCarIntentHandlingBlockMethod2); cdecl;
-    procedure resolveEnableHeatingForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent;
-      withCompletion: TINSetSeatSettingsInCarIntentHandlingBlockMethod2); cdecl;
-    procedure resolveEnableMassageForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent;
-      withCompletion: TINSetSeatSettingsInCarIntentHandlingBlockMethod2); cdecl;
-    procedure resolveLevelForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent;
-      withCompletion: TINSetSeatSettingsInCarIntentHandlingBlockMethod4); cdecl;
-    procedure resolveRelativeLevelSettingForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent;
-      withCompletion: TINSetSeatSettingsInCarIntentHandlingBlockMethod5); cdecl;
-    procedure resolveSeatForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent;
-      withCompletion: TINSetSeatSettingsInCarIntentHandlingBlockMethod3); cdecl;
+    ['{824B2E6C-DF92-47BA-AD29-11DCE063A8C0}']
+    procedure confirmSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; completion: Pointer); cdecl;
+    procedure handleSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; completion: Pointer); cdecl;
+    procedure resolveCarNameForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveEnableCoolingForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveEnableHeatingForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveEnableMassageForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveLevelForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRelativeLevelSettingForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; withCompletion: Pointer); cdecl;
+    procedure resolveSeatForSetSeatSettingsInCar(intent: INSetSeatSettingsInCarIntent; withCompletion: Pointer); cdecl;
   end;
 
   INCancelWorkoutIntentClass = interface(INIntentClass)
-    ['{56191F4C-8821-4BC8-BF5C-34D458B49B08}']
+    ['{E557C932-DD3B-48E3-BB89-6EED269EB037}']
   end;
 
   INCancelWorkoutIntent = interface(INIntent)
-    ['{98B6836B-92F4-409C-A0CA-61DF384CAA4B}']
+    ['{50E65C8A-F543-4BD5-B576-8FB361AF70A1}']
     function initWithWorkoutName(workoutName: INSpeakableString): Pointer; cdecl;
     function workoutName: INSpeakableString; cdecl;
   end;
   TINCancelWorkoutIntent = class(TOCGenericImport<INCancelWorkoutIntentClass, INCancelWorkoutIntent>) end;
 
   INCancelWorkoutIntentHandling = interface(IObjectiveC)
-    ['{0EA52736-5357-4A7E-9D8E-CB0401F22FBC}']
-    procedure confirmCancelWorkout(intent: INCancelWorkoutIntent; completion: TINCancelWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure handleCancelWorkout(intent: INCancelWorkoutIntent; completion: TINCancelWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure resolveWorkoutNameForCancelWorkout(intent: INCancelWorkoutIntent; withCompletion: TINCancelWorkoutIntentHandlingBlockMethod2); cdecl;
+    ['{232E78F4-69ED-4FC4-AEEF-991D4982686C}']
+    procedure confirmCancelWorkout(intent: INCancelWorkoutIntent; completion: Pointer); cdecl;
+    procedure handleCancelWorkout(intent: INCancelWorkoutIntent; completion: Pointer); cdecl;
+    procedure resolveWorkoutNameForCancelWorkout(intent: INCancelWorkoutIntent; withCompletion: Pointer); cdecl;
   end;
 
   INEndWorkoutIntentClass = interface(INIntentClass)
-    ['{FC47E3D6-5DBF-4186-8CE8-24DA00167BA5}']
+    ['{97EF8C96-1E86-4955-AD37-07ECC6175A6C}']
   end;
 
   INEndWorkoutIntent = interface(INIntent)
-    ['{450C01D7-D414-4570-BDA0-6E898C20552B}']
+    ['{CAB286EF-DDC3-4CF4-B588-B08BCEDB9197}']
     function initWithWorkoutName(workoutName: INSpeakableString): Pointer; cdecl;
     function workoutName: INSpeakableString; cdecl;
   end;
   TINEndWorkoutIntent = class(TOCGenericImport<INEndWorkoutIntentClass, INEndWorkoutIntent>) end;
 
   INEndWorkoutIntentHandling = interface(IObjectiveC)
-    ['{3F683AC7-04E7-4D8C-9DCB-628C048CDD96}']
-    procedure confirmEndWorkout(intent: INEndWorkoutIntent; completion: TINEndWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure handleEndWorkout(intent: INEndWorkoutIntent; completion: TINEndWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure resolveWorkoutNameForEndWorkout(intent: INEndWorkoutIntent; withCompletion: TINEndWorkoutIntentHandlingBlockMethod2); cdecl;
+    ['{7D638386-CF8C-4D6F-BD49-58A06D4F4F68}']
+    procedure confirmEndWorkout(intent: INEndWorkoutIntent; completion: Pointer); cdecl;
+    procedure handleEndWorkout(intent: INEndWorkoutIntent; completion: Pointer); cdecl;
+    procedure resolveWorkoutNameForEndWorkout(intent: INEndWorkoutIntent; withCompletion: Pointer); cdecl;
   end;
 
   INPauseWorkoutIntentClass = interface(INIntentClass)
-    ['{F099C32A-3D00-4088-B15D-4FEAC3A71DF6}']
+    ['{BF9DB04F-2E27-4435-AE6E-332E74F81AA7}']
   end;
 
   INPauseWorkoutIntent = interface(INIntent)
-    ['{90D2B6A0-A5B9-4163-B6A9-721C42EC3CDF}']
+    ['{BAAAFFE3-2AE1-4DC3-AA6E-9C25DB9D2B72}']
     function initWithWorkoutName(workoutName: INSpeakableString): Pointer; cdecl;
     function workoutName: INSpeakableString; cdecl;
   end;
   TINPauseWorkoutIntent = class(TOCGenericImport<INPauseWorkoutIntentClass, INPauseWorkoutIntent>) end;
 
   INPauseWorkoutIntentHandling = interface(IObjectiveC)
-    ['{20720EF7-35E5-49D1-8101-FDBF6505BDCB}']
-    procedure confirmPauseWorkout(intent: INPauseWorkoutIntent; completion: TINPauseWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure handlePauseWorkout(intent: INPauseWorkoutIntent; completion: TINPauseWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure resolveWorkoutNameForPauseWorkout(intent: INPauseWorkoutIntent; withCompletion: TINPauseWorkoutIntentHandlingBlockMethod2); cdecl;
+    ['{524DC151-EF8A-4183-9DE9-840A84B0E3E2}']
+    procedure confirmPauseWorkout(intent: INPauseWorkoutIntent; completion: Pointer); cdecl;
+    procedure handlePauseWorkout(intent: INPauseWorkoutIntent; completion: Pointer); cdecl;
+    procedure resolveWorkoutNameForPauseWorkout(intent: INPauseWorkoutIntent; withCompletion: Pointer); cdecl;
   end;
 
   INResumeWorkoutIntentClass = interface(INIntentClass)
-    ['{ABC6C33E-C61C-46E7-80EA-E8D9A9CEEFE5}']
+    ['{7C92F4E3-1F27-4693-816D-A71285CB4DA8}']
   end;
 
   INResumeWorkoutIntent = interface(INIntent)
-    ['{60D07193-214D-4F81-8E9E-1927664159A8}']
+    ['{FA15848D-DD8C-4F70-866C-629AE1B1C2F8}']
     function initWithWorkoutName(workoutName: INSpeakableString): Pointer; cdecl;
     function workoutName: INSpeakableString; cdecl;
   end;
   TINResumeWorkoutIntent = class(TOCGenericImport<INResumeWorkoutIntentClass, INResumeWorkoutIntent>) end;
 
   INResumeWorkoutIntentHandling = interface(IObjectiveC)
-    ['{D953E034-3FFD-4D84-AFD0-FD6C049EF873}']
-    procedure confirmResumeWorkout(intent: INResumeWorkoutIntent; completion: TINResumeWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure handleResumeWorkout(intent: INResumeWorkoutIntent; completion: TINResumeWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure resolveWorkoutNameForResumeWorkout(intent: INResumeWorkoutIntent; withCompletion: TINResumeWorkoutIntentHandlingBlockMethod2); cdecl;
+    ['{CFC4C24D-137A-476E-BB18-38701B012D15}']
+    procedure confirmResumeWorkout(intent: INResumeWorkoutIntent; completion: Pointer); cdecl;
+    procedure handleResumeWorkout(intent: INResumeWorkoutIntent; completion: Pointer); cdecl;
+    procedure resolveWorkoutNameForResumeWorkout(intent: INResumeWorkoutIntent; withCompletion: Pointer); cdecl;
   end;
 
   INStartWorkoutIntentClass = interface(INIntentClass)
-    ['{DEDC8C31-20D4-489C-A43E-7DA035AA4998}']
+    ['{7D5054AF-B0F4-4EE1-86D3-6D41C3F16D56}']
   end;
 
   INStartWorkoutIntent = interface(INIntent)
-    ['{359D2C37-C72F-40C1-A941-A5CE1C63F210}']
+    ['{83DCA231-45FE-4BE9-A60D-0D2F3578BB85}']
     function goalValue: NSNumber; cdecl;
     function initWithWorkoutName(workoutName: INSpeakableString; goalValue: NSNumber; workoutGoalUnitType: INWorkoutGoalUnitType;
       workoutLocationType: INWorkoutLocationType; isOpenEnded: NSNumber): Pointer; cdecl;
@@ -2225,24 +2259,39 @@ type
   TINStartWorkoutIntent = class(TOCGenericImport<INStartWorkoutIntentClass, INStartWorkoutIntent>) end;
 
   INStartWorkoutIntentHandling = interface(IObjectiveC)
-    ['{D0EA85BB-DF4B-4464-A128-82329212F192}']
-    procedure confirmStartWorkout(intent: INStartWorkoutIntent; completion: TINStartWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure handleStartWorkout(intent: INStartWorkoutIntent; completion: TINStartWorkoutIntentHandlingBlockMethod1); cdecl;
-    procedure resolveGoalValueForStartWorkout(intent: INStartWorkoutIntent; withCompletion: TINStartWorkoutIntentHandlingBlockMethod3); cdecl;
-    procedure resolveIsOpenEndedForStartWorkout(intent: INStartWorkoutIntent; withCompletion: TINStartWorkoutIntentHandlingBlockMethod6); cdecl;
-    procedure resolveWorkoutGoalUnitTypeForStartWorkout(intent: INStartWorkoutIntent;
-      withCompletion: TINStartWorkoutIntentHandlingBlockMethod4); cdecl;
-    procedure resolveWorkoutLocationTypeForStartWorkout(intent: INStartWorkoutIntent;
-      withCompletion: TINStartWorkoutIntentHandlingBlockMethod5); cdecl;
-    procedure resolveWorkoutNameForStartWorkout(intent: INStartWorkoutIntent; withCompletion: TINStartWorkoutIntentHandlingBlockMethod2); cdecl;
+    ['{691556C1-39B0-4A76-BB8F-9BEE446FEFEE}']
+    procedure confirmStartWorkout(intent: INStartWorkoutIntent; completion: Pointer); cdecl;
+    procedure handleStartWorkout(intent: INStartWorkoutIntent; completion: Pointer); cdecl;
+    procedure resolveGoalValueForStartWorkout(intent: INStartWorkoutIntent; withCompletion: Pointer); cdecl;
+    procedure resolveIsOpenEndedForStartWorkout(intent: INStartWorkoutIntent; withCompletion: Pointer); cdecl;
+    procedure resolveWorkoutGoalUnitTypeForStartWorkout(intent: INStartWorkoutIntent; withCompletion: Pointer); cdecl;
+    procedure resolveWorkoutLocationTypeForStartWorkout(intent: INStartWorkoutIntent; withCompletion: Pointer); cdecl;
+    procedure resolveWorkoutNameForStartWorkout(intent: INStartWorkoutIntent; withCompletion: Pointer); cdecl;
+  end;
+
+  INShareFocusStatusIntentClass = interface(INIntentClass)
+    ['{6ABC0509-E293-4D9D-B7C9-5195C60B2468}']
+  end;
+
+  INShareFocusStatusIntent = interface(INIntent)
+    ['{1C7AC53E-6A50-4AB1-9419-3D4ED9BFB48E}']
+    function focusStatus: INFocusStatus; cdecl;
+    function initWithFocusStatus(focusStatus: INFocusStatus): Pointer; cdecl;
+  end;
+  TINShareFocusStatusIntent = class(TOCGenericImport<INShareFocusStatusIntentClass, INShareFocusStatusIntent>) end;
+
+  INShareFocusStatusIntentHandling = interface(IObjectiveC)
+    ['{E9FEE3B8-8827-49DB-A7D2-76BED2CC7C02}']
+    procedure confirmShareFocusStatus(intent: INShareFocusStatusIntent; completion: Pointer); cdecl;
+    procedure handleShareFocusStatus(intent: INShareFocusStatusIntent; completion: Pointer); cdecl;
   end;
 
   INAddMediaIntentClass = interface(INIntentClass)
-    ['{A7BFBFE4-99CB-40D5-8C8B-0957B93A8078}']
+    ['{84C5240E-4FBA-4F14-8BC8-E7086449AFF6}']
   end;
 
   INAddMediaIntent = interface(INIntent)
-    ['{21EB50ED-8662-43EA-B036-4B505E96B579}']
+    ['{C3DE4D13-8FC0-4CF3-85D3-B7BE4A35B638}']
     function initWithMediaItems(mediaItems: NSArray; mediaSearch: INMediaSearch; mediaDestination: INMediaDestination): Pointer; cdecl;
     function mediaDestination: INMediaDestination; cdecl;
     function mediaItems: NSArray; cdecl;
@@ -2251,19 +2300,19 @@ type
   TINAddMediaIntent = class(TOCGenericImport<INAddMediaIntentClass, INAddMediaIntent>) end;
 
   INAddMediaIntentHandling = interface(IObjectiveC)
-    ['{2B780EDE-5CBB-428D-9B4B-4B339CF8669C}']
-    procedure confirmAddMedia(intent: INAddMediaIntent; completion: TINAddMediaIntentHandlingBlockMethod1); cdecl;
-    procedure handleAddMedia(intent: INAddMediaIntent; completion: TINAddMediaIntentHandlingBlockMethod1); cdecl;
-    procedure resolveMediaDestinationForAddMedia(intent: INAddMediaIntent; withCompletion: TINAddMediaIntentHandlingBlockMethod3); cdecl;
-    procedure resolveMediaItemsForAddMedia(intent: INAddMediaIntent; withCompletion: TINAddMediaIntentHandlingBlockMethod2); cdecl;
+    ['{CBFB7C68-8B74-4B82-8112-EBDF07C66029}']
+    procedure confirmAddMedia(intent: INAddMediaIntent; completion: Pointer); cdecl;
+    procedure handleAddMedia(intent: INAddMediaIntent; completion: Pointer); cdecl;
+    procedure resolveMediaDestinationForAddMedia(intent: INAddMediaIntent; withCompletion: Pointer); cdecl;
+    procedure resolveMediaItemsForAddMedia(intent: INAddMediaIntent; withCompletion: Pointer); cdecl;
   end;
 
   INPlayMediaIntentClass = interface(INIntentClass)
-    ['{301FA935-D21D-4717-A10D-078FF642C96B}']
+    ['{F896B86F-5EE1-47F6-9B7F-69A6F79B7582}']
   end;
 
   INPlayMediaIntent = interface(INIntent)
-    ['{D8803082-9CA4-40AC-AA64-79D674190922}']
+    ['{BCC4A88A-C172-4188-BADD-6AAA7C5C0052}']
     function initWithMediaItems(mediaItems: NSArray; mediaContainer: INMediaItem; playShuffled: NSNumber; playbackRepeatMode: INPlaybackRepeatMode;
       resumePlayback: NSNumber; playbackQueueLocation: INPlaybackQueueLocation; playbackSpeed: NSNumber;
       mediaSearch: INMediaSearch): Pointer; overload; cdecl;
@@ -2281,23 +2330,23 @@ type
   TINPlayMediaIntent = class(TOCGenericImport<INPlayMediaIntentClass, INPlayMediaIntent>) end;
 
   INPlayMediaIntentHandling = interface(IObjectiveC)
-    ['{CA59553B-7E0C-4A62-9184-BE3E5E1DF606}']
-    procedure confirmPlayMedia(intent: INPlayMediaIntent; completion: TINPlayMediaIntentHandlingBlockMethod1); cdecl;
-    procedure handlePlayMedia(intent: INPlayMediaIntent; completion: TINPlayMediaIntentHandlingBlockMethod1); cdecl;
-    procedure resolveMediaItemsForPlayMedia(intent: INPlayMediaIntent; withCompletion: TINPlayMediaIntentHandlingBlockMethod2); cdecl;
-    procedure resolvePlaybackQueueLocationForPlayMedia(intent: INPlayMediaIntent; withCompletion: TINPlayMediaIntentHandlingBlockMethod5); cdecl;
-    procedure resolvePlaybackRepeatModeForPlayMedia(intent: INPlayMediaIntent; withCompletion: TINPlayMediaIntentHandlingBlockMethod4); cdecl;
-    procedure resolvePlaybackSpeedForPlayMedia(intent: INPlayMediaIntent; withCompletion: TINPlayMediaIntentHandlingBlockMethod6); cdecl;
-    procedure resolvePlayShuffledForPlayMedia(intent: INPlayMediaIntent; withCompletion: TINPlayMediaIntentHandlingBlockMethod3); cdecl;
-    procedure resolveResumePlaybackForPlayMedia(intent: INPlayMediaIntent; withCompletion: TINPlayMediaIntentHandlingBlockMethod3); cdecl;
+    ['{C7B31EDF-17FF-406F-82B6-FE03090909D3}']
+    procedure confirmPlayMedia(intent: INPlayMediaIntent; completion: Pointer); cdecl;
+    procedure handlePlayMedia(intent: INPlayMediaIntent; completion: Pointer); cdecl;
+    procedure resolveMediaItemsForPlayMedia(intent: INPlayMediaIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePlaybackQueueLocationForPlayMedia(intent: INPlayMediaIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePlaybackRepeatModeForPlayMedia(intent: INPlayMediaIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePlaybackSpeedForPlayMedia(intent: INPlayMediaIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePlayShuffledForPlayMedia(intent: INPlayMediaIntent; withCompletion: Pointer); cdecl;
+    procedure resolveResumePlaybackForPlayMedia(intent: INPlayMediaIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSearchForMediaIntentClass = interface(INIntentClass)
-    ['{48F6A003-226C-42B6-B0A1-6AB0E1818AE4}']
+    ['{A3DC5485-83AC-4493-BF0E-68A59F672AB2}']
   end;
 
   INSearchForMediaIntent = interface(INIntent)
-    ['{886DC984-71AD-4D9D-861A-256BF66472FA}']
+    ['{92E082B3-4E76-439F-8728-B938A10A0B9C}']
     function initWithMediaItems(mediaItems: NSArray; mediaSearch: INMediaSearch): Pointer; cdecl;
     function mediaItems: NSArray; cdecl;
     function mediaSearch: INMediaSearch; cdecl;
@@ -2305,18 +2354,18 @@ type
   TINSearchForMediaIntent = class(TOCGenericImport<INSearchForMediaIntentClass, INSearchForMediaIntent>) end;
 
   INSearchForMediaIntentHandling = interface(IObjectiveC)
-    ['{CED1265A-82D3-49E5-BA13-AB54D5547768}']
-    procedure confirmSearchForMedia(intent: INSearchForMediaIntent; completion: TINSearchForMediaIntentHandlingBlockMethod1); cdecl;
-    procedure handleSearchForMedia(intent: INSearchForMediaIntent; completion: TINSearchForMediaIntentHandlingBlockMethod1); cdecl;
-    procedure resolveMediaItemsForSearchForMedia(intent: INSearchForMediaIntent; withCompletion: TINSearchForMediaIntentHandlingBlockMethod2); cdecl;
+    ['{235C1EBE-8F0C-41C2-B8EB-E7C7DE651A8D}']
+    procedure confirmSearchForMedia(intent: INSearchForMediaIntent; completion: Pointer); cdecl;
+    procedure handleSearchForMedia(intent: INSearchForMediaIntent; completion: Pointer); cdecl;
+    procedure resolveMediaItemsForSearchForMedia(intent: INSearchForMediaIntent; withCompletion: Pointer); cdecl;
   end;
 
   INUpdateMediaAffinityIntentClass = interface(INIntentClass)
-    ['{5B64F828-B7B6-494D-B0EB-47E0EE582D6C}']
+    ['{75549258-C7F7-4820-AC82-483CED628C9E}']
   end;
 
   INUpdateMediaAffinityIntent = interface(INIntent)
-    ['{438454EC-C30D-4960-8100-D51E32D2B909}']
+    ['{F1CC49D8-40C7-4AB2-8E71-FB3B47C8CD81}']
     function affinityType: INMediaAffinityType; cdecl;
     function initWithMediaItems(mediaItems: NSArray; mediaSearch: INMediaSearch; affinityType: INMediaAffinityType): Pointer; cdecl;
     function mediaItems: NSArray; cdecl;
@@ -2325,21 +2374,19 @@ type
   TINUpdateMediaAffinityIntent = class(TOCGenericImport<INUpdateMediaAffinityIntentClass, INUpdateMediaAffinityIntent>) end;
 
   INUpdateMediaAffinityIntentHandling = interface(IObjectiveC)
-    ['{1FBAD1DA-5F7D-4941-8D73-FD5860F81B48}']
-    procedure confirmUpdateMediaAffinity(intent: INUpdateMediaAffinityIntent; completion: TINUpdateMediaAffinityIntentHandlingBlockMethod1); cdecl;
-    procedure handleUpdateMediaAffinity(intent: INUpdateMediaAffinityIntent; completion: TINUpdateMediaAffinityIntentHandlingBlockMethod1); cdecl;
-    procedure resolveAffinityTypeForUpdateMediaAffinity(intent: INUpdateMediaAffinityIntent;
-      withCompletion: TINUpdateMediaAffinityIntentHandlingBlockMethod3); cdecl;
-    procedure resolveMediaItemsForUpdateMediaAffinity(intent: INUpdateMediaAffinityIntent;
-      withCompletion: TINUpdateMediaAffinityIntentHandlingBlockMethod2); cdecl;
+    ['{1A47E403-CE76-4BFB-A185-69B1DD25ACA3}']
+    procedure confirmUpdateMediaAffinity(intent: INUpdateMediaAffinityIntent; completion: Pointer); cdecl;
+    procedure handleUpdateMediaAffinity(intent: INUpdateMediaAffinityIntent; completion: Pointer); cdecl;
+    procedure resolveAffinityTypeForUpdateMediaAffinity(intent: INUpdateMediaAffinityIntent; withCompletion: Pointer); cdecl;
+    procedure resolveMediaItemsForUpdateMediaAffinity(intent: INUpdateMediaAffinityIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetRadioStationIntentClass = interface(INIntentClass)
-    ['{F1F066C3-ED6D-494A-98E2-D8B488A32592}']
+    ['{A4090DE8-B11B-46ED-B78A-6CAAA9795FEF}']
   end;
 
   INSetRadioStationIntent = interface(INIntent)
-    ['{278FA397-9FC0-4E94-BEF5-314F583D7970}']
+    ['{89BEE3AF-C5EC-416E-82D0-38DA4DE4B0E0}']
     function channel: NSString; cdecl;
     function frequency: NSNumber; cdecl;
     function initWithRadioType(radioType: INRadioType; frequency: NSNumber; stationName: NSString; channel: NSString;
@@ -2351,26 +2398,22 @@ type
   TINSetRadioStationIntent = class(TOCGenericImport<INSetRadioStationIntentClass, INSetRadioStationIntent>) end;
 
   INSetRadioStationIntentHandling = interface(IObjectiveC)
-    ['{265008B3-F095-4541-B031-306EA0DEDEE8}']
-    procedure confirmSetRadioStation(intent: INSetRadioStationIntent; completion: TINSetRadioStationIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetRadioStation(intent: INSetRadioStationIntent; completion: TINSetRadioStationIntentHandlingBlockMethod1); cdecl;
-    procedure resolveChannelForSetRadioStation(intent: INSetRadioStationIntent; withCompletion: TINSetRadioStationIntentHandlingBlockMethod4); cdecl;
-    procedure resolveFrequencyForSetRadioStation(intent: INSetRadioStationIntent;
-      withCompletion: TINSetRadioStationIntentHandlingBlockMethod3); cdecl;
-    procedure resolvePresetNumberForSetRadioStation(intent: INSetRadioStationIntent;
-      withCompletion: TINSetRadioStationIntentHandlingBlockMethod5); cdecl;
-    procedure resolveRadioTypeForSetRadioStation(intent: INSetRadioStationIntent;
-      withCompletion: TINSetRadioStationIntentHandlingBlockMethod2); cdecl;
-    procedure resolveStationNameForSetRadioStation(intent: INSetRadioStationIntent;
-      withCompletion: TINSetRadioStationIntentHandlingBlockMethod4); cdecl;
+    ['{721482F9-0FD4-45B8-BD24-4F2B22B4F1C1}']
+    procedure confirmSetRadioStation(intent: INSetRadioStationIntent; completion: Pointer); cdecl;
+    procedure handleSetRadioStation(intent: INSetRadioStationIntent; completion: Pointer); cdecl;
+    procedure resolveChannelForSetRadioStation(intent: INSetRadioStationIntent; withCompletion: Pointer); cdecl;
+    procedure resolveFrequencyForSetRadioStation(intent: INSetRadioStationIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePresetNumberForSetRadioStation(intent: INSetRadioStationIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRadioTypeForSetRadioStation(intent: INSetRadioStationIntent; withCompletion: Pointer); cdecl;
+    procedure resolveStationNameForSetRadioStation(intent: INSetRadioStationIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSearchForMessagesIntentClass = interface(INIntentClass)
-    ['{22CE5A98-EF8F-4C19-9E14-6283B1B43BB2}']
+    ['{521BCC34-4D4D-4144-B89B-DF7385CF342E}']
   end;
 
   INSearchForMessagesIntent = interface(INIntent)
-    ['{69EC9DA5-FA2E-402E-B59B-7A339CCB40B5}']
+    ['{EC123A19-A6A8-46A0-92B1-0186731002A5}']
     function attributes: INMessageAttributeOptions; cdecl;
     function conversationIdentifiers: NSArray; cdecl;
     function conversationIdentifiersOperator: INConditionalOperator; cdecl;
@@ -2382,14 +2425,11 @@ type
     [MethodName('initWithRecipients:senders:searchTerms:attributes:dateTimeRange:identifiers:notificationIdentifiers:speakableGroupNames:conversationIdentifiers:')]
     function initWithRecipientsSenders(recipients: NSArray; senders: NSArray; searchTerms: NSArray; attributes: INMessageAttributeOptions;
       dateTimeRange: INDateComponentsRange; identifiers: NSArray; notificationIdentifiers: NSArray; speakableGroupNames: NSArray;
-      conversationIdentifiers: NSArray): Pointer; overload; cdecl;
-    [MethodName('initWithRecipients:senders:searchTerms:attributes:dateTimeRange:identifiers:notificationIdentifiers:groupNames:')]
-    function initWithRecipientsSenders(recipients: NSArray; senders: NSArray; searchTerms: NSArray; attributes: INMessageAttributeOptions;
-      dateTimeRange: INDateComponentsRange; identifiers: NSArray; notificationIdentifiers: NSArray; groupNames: NSArray): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 11.0), watchos(3.2, 4.0), macosx(10.12, 10.13))
-    [MethodName('initWithRecipients:senders:searchTerms:attributes:dateTimeRange:identifiers:notificationIdentifiers:speakableGroupNames:')]
-    function initWithRecipientsSenders2(recipients: NSArray; senders: NSArray; searchTerms: NSArray; attributes: INMessageAttributeOptions;
-      dateTimeRange: INDateComponentsRange; identifiers: NSArray; notificationIdentifiers: NSArray;
-      speakableGroupNames: NSArray): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(11.0, 12.0), watchos(4.0, 5.0), macosx(10.13, 10.14))
+      conversationIdentifiers: NSArray): Pointer; cdecl;
+    // [MethodName('initWithRecipients:senders:searchTerms:attributes:dateTimeRange:identifiers:notificationIdentifiers:groupNames:')]
+    // function initWithRecipientsSenders(recipients: NSArray; senders: NSArray; searchTerms: NSArray; attributes: INMessageAttributeOptions; dateTimeRange: INDateComponentsRange; identifiers: NSArray; notificationIdentifiers: NSArray; groupNames: NSArray): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 11.0), watchos(3.2, 4.0), macosx(10.12, 10.13))
+    // [MethodName('initWithRecipients:senders:searchTerms:attributes:dateTimeRange:identifiers:notificationIdentifiers:speakableGroupNames:')]
+    // function initWithRecipientsSenders(recipients: NSArray; senders: NSArray; searchTerms: NSArray; attributes: INMessageAttributeOptions; dateTimeRange: INDateComponentsRange; identifiers: NSArray; notificationIdentifiers: NSArray; speakableGroupNames: NSArray): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(11.0, 12.0), watchos(4.0, 5.0), macosx(10.13, 10.14))
     function notificationIdentifiers: NSArray; cdecl;
     function notificationIdentifiersOperator: INConditionalOperator; cdecl;
     function recipients: NSArray; cdecl;
@@ -2404,36 +2444,29 @@ type
   TINSearchForMessagesIntent = class(TOCGenericImport<INSearchForMessagesIntentClass, INSearchForMessagesIntent>) end;
 
   INSearchForMessagesIntentHandling = interface(IObjectiveC)
-    ['{CCB36AAB-AD53-43DD-8D31-CCCF678A240B}']
-    procedure confirmSearchForMessages(intent: INSearchForMessagesIntent; completion: TINSearchForMessagesIntentHandlingBlockMethod1); cdecl;
-    procedure handleSearchForMessages(intent: INSearchForMessagesIntent; completion: TINSearchForMessagesIntentHandlingBlockMethod1); cdecl;
-    procedure resolveAttributesForSearchForMessages(intent: INSearchForMessagesIntent;
-      withCompletion: TINSearchForMessagesIntentHandlingBlockMethod3); cdecl;
-    procedure resolveDateTimeRangeForSearchForMessages(intent: INSearchForMessagesIntent;
-      withCompletion: TINSearchForMessagesIntentHandlingBlockMethod4); cdecl;
-    procedure resolveGroupNamesForSearchForMessages(intent: INSearchForMessagesIntent;
-      withCompletion: TINSearchForMessagesIntentHandlingBlockMethod2); cdecl; // API_DEPRECATED("resolveGroupNamesForSearchForMessages:withCompletion: is deprecated. Use resolveSpeakableGroupNamesForSearchForMessages:withCompletion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
-    procedure resolveRecipientsForSearchForMessages(intent: INSearchForMessagesIntent;
-      withCompletion: TINSearchForMessagesIntentHandlingBlockMethod2); cdecl;
-    procedure resolveSendersForSearchForMessages(intent: INSearchForMessagesIntent;
-      withCompletion: TINSearchForMessagesIntentHandlingBlockMethod2); cdecl;
-    procedure resolveSpeakableGroupNamesForSearchForMessages(intent: INSearchForMessagesIntent;
-      withCompletion: TINSearchForMessagesIntentHandlingBlockMethod2); cdecl;
+    ['{FF1DB889-FC47-4FF4-ACBA-418F4B5EDF32}']
+    procedure confirmSearchForMessages(intent: INSearchForMessagesIntent; completion: Pointer); cdecl;
+    procedure handleSearchForMessages(intent: INSearchForMessagesIntent; completion: Pointer); cdecl;
+    procedure resolveAttributesForSearchForMessages(intent: INSearchForMessagesIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDateTimeRangeForSearchForMessages(intent: INSearchForMessagesIntent; withCompletion: Pointer); cdecl;
+    procedure resolveGroupNamesForSearchForMessages(intent: INSearchForMessagesIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolveGroupNamesForSearchForMessages:withCompletion: is deprecated. Use resolveSpeakableGroupNamesForSearchForMessages:withCompletion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
+    procedure resolveRecipientsForSearchForMessages(intent: INSearchForMessagesIntent; withCompletion: Pointer); cdecl;
+    procedure resolveSendersForSearchForMessages(intent: INSearchForMessagesIntent; withCompletion: Pointer); cdecl;
+    procedure resolveSpeakableGroupNamesForSearchForMessages(intent: INSearchForMessagesIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSendMessageIntentClass = interface(INIntentClass)
-    ['{312F5A69-6C54-4D23-A7DA-1FD4237D35D0}']
+    ['{2C3BA03A-446C-4935-B160-EFDDC86FBA59}']
   end;
 
   INSendMessageIntent = interface(INIntent)
-    ['{0BCD0547-EFA3-442E-B5CB-0BA43400ABDD}']
+    ['{B37BDD40-D4A2-4A6D-AF01-D26209BF4757}']
     function attachments: NSArray; cdecl;
     function content: NSString; cdecl;
     function conversationIdentifier: NSString; cdecl;
     function groupName: NSString; cdecl; // API_DEPRECATED("Use speakableGroupNames instead", ios(10.0, 11.0), watchos(3.2, 4.0))
     function initWithRecipients(recipients: NSArray; outgoingMessageType: INOutgoingMessageType; content: NSString;
-      speakableGroupName: INSpeakableString; conversationIdentifier: NSString; serviceName: NSString; sender: INPerson;
-      attachments: NSArray): Pointer; overload; cdecl;
+      speakableGroupName: INSpeakableString; conversationIdentifier: NSString; serviceName: NSString; sender: INPerson; attachments: NSArray): Pointer; overload; cdecl;
     function initWithRecipients(recipients: NSArray; content: NSString; groupName: NSString; serviceName: NSString;
       sender: INPerson): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 11.0), watchos(3.2, 4.0))
     function initWithRecipients(recipients: NSArray; content: NSString; speakableGroupName: INSpeakableString; conversationIdentifier: NSString;
@@ -2449,26 +2482,25 @@ type
   TINSendMessageIntent = class(TOCGenericImport<INSendMessageIntentClass, INSendMessageIntent>) end;
 
   INSendMessageIntentHandling = interface(IObjectiveC)
-    ['{6D4BE9CC-B909-4833-A45C-80FF72E908AB}']
-    procedure confirmSendMessage(intent: INSendMessageIntent; completion: TINSendMessageIntentHandlingBlockMethod1); cdecl;
-    procedure handleSendMessage(intent: INSendMessageIntent; completion: TINSendMessageIntentHandlingBlockMethod1); cdecl;
-    procedure resolveContentForSendMessage(intent: INSendMessageIntent; withCompletion: TINSendMessageIntentHandlingBlockMethod3); cdecl;
-    procedure resolveGroupNameForSendMessage(intent: INSendMessageIntent; withCompletion: TINSendMessageIntentHandlingBlockMethod3); cdecl; // API_DEPRECATED("resolveGroupNameForSendMessage:withCompletion: is deprecated. Use resolveSpeakableGroupNameForSendMessage:withCompletion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
-    procedure resolveOutgoingMessageTypeForSendMessage(intent: INSendMessageIntent; withCompletion: TINSendMessageIntentHandlingBlockMethod4); cdecl;
+    ['{6312316C-CFBC-4DB7-8142-EEE05C474BF8}']
+    procedure confirmSendMessage(intent: INSendMessageIntent; completion: Pointer); cdecl;
+    procedure handleSendMessage(intent: INSendMessageIntent; completion: Pointer); cdecl;
+    procedure resolveContentForSendMessage(intent: INSendMessageIntent; withCompletion: Pointer); cdecl;
+    procedure resolveGroupNameForSendMessage(intent: INSendMessageIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolveGroupNameForSendMessage:withCompletion: is deprecated. Use resolveSpeakableGroupNameForSendMessage:withCompletion: instead", ios(10.0, 11.0), macos(12.0, 12.0), watchos(3.2, 4.0))
+    procedure resolveOutgoingMessageTypeForSendMessage(intent: INSendMessageIntent; withCompletion: Pointer); cdecl;
     [MethodName('resolveRecipientsForSendMessage:completion:')]
-    procedure resolveRecipientsForSendMessageCompletion(intent: INSendMessageIntent; completion: TINSendMessageIntentHandlingBlockMethod2); cdecl;
+    procedure resolveRecipientsForSendMessageCompletion(intent: INSendMessageIntent; completion: Pointer); cdecl;
     [MethodName('resolveRecipientsForSendMessage:withCompletion:')]
-    procedure resolveRecipientsForSendMessageWithCompletion(intent: INSendMessageIntent;
-      withCompletion: TINSendMessageIntentHandlingBlockMethod2); cdecl; // API_DEPRECATED("resolveRecipientsForSendMessage:withCompletion: is deprecated. Use resolveRecipientsForSendMessage:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
-    procedure resolveSpeakableGroupNameForSendMessage(intent: INSendMessageIntent; withCompletion: TINSendMessageIntentHandlingBlockMethod5); cdecl;
+    procedure resolveRecipientsForSendMessageWithCompletion(intent: INSendMessageIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolveRecipientsForSendMessage:withCompletion: is deprecated. Use resolveRecipientsForSendMessage:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
+    procedure resolveSpeakableGroupNameForSendMessage(intent: INSendMessageIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetMessageAttributeIntentClass = interface(INIntentClass)
-    ['{1390C728-E799-4B6B-8B8F-4AF1D1B29CF2}']
+    ['{5BF70F9F-3ECE-4DC2-9227-3008FD3B19D0}']
   end;
 
   INSetMessageAttributeIntent = interface(INIntent)
-    ['{5713BA04-CB63-4A16-BABE-E566EF6D018B}']
+    ['{ADC16693-E396-42BB-8D6A-165E3269D80E}']
     function attribute: INMessageAttribute; cdecl;
     function identifiers: NSArray; cdecl;
     function initWithIdentifiers(identifiers: NSArray; attribute: INMessageAttribute): Pointer; cdecl;
@@ -2476,19 +2508,18 @@ type
   TINSetMessageAttributeIntent = class(TOCGenericImport<INSetMessageAttributeIntentClass, INSetMessageAttributeIntent>) end;
 
   INSetMessageAttributeIntentHandling = interface(IObjectiveC)
-    ['{960B3D08-295D-44DA-A3C8-9C04C114C063}']
-    procedure confirmSetMessageAttribute(intent: INSetMessageAttributeIntent; completion: TINSetMessageAttributeIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetMessageAttribute(intent: INSetMessageAttributeIntent; completion: TINSetMessageAttributeIntentHandlingBlockMethod1); cdecl;
-    procedure resolveAttributeForSetMessageAttribute(intent: INSetMessageAttributeIntent;
-      withCompletion: TINSetMessageAttributeIntentHandlingBlockMethod2); cdecl;
+    ['{D4143106-5EE0-4A1D-9A78-F01E89D886AA}']
+    procedure confirmSetMessageAttribute(intent: INSetMessageAttributeIntent; completion: Pointer); cdecl;
+    procedure handleSetMessageAttribute(intent: INSetMessageAttributeIntent; completion: Pointer); cdecl;
+    procedure resolveAttributeForSetMessageAttribute(intent: INSetMessageAttributeIntent; withCompletion: Pointer); cdecl;
   end;
 
   INAddTasksIntentClass = interface(INIntentClass)
-    ['{15549710-ED33-4E85-9D34-3D151C584029}']
+    ['{27098382-B94E-4946-8DC1-CE91F1B35566}']
   end;
 
   INAddTasksIntent = interface(INIntent)
-    ['{B5F2EBB3-81AD-4357-884E-81BCDB1ED959}']
+    ['{0B36A346-5497-444E-A0EC-0DB60A902A57}']
     function initWithTargetTaskList(targetTaskList: INTaskList; taskTitles: NSArray; spatialEventTrigger: INSpatialEventTrigger;
       temporalEventTrigger: INTemporalEventTrigger): Pointer; overload; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("-initWithTargetTaskList:taskTitles:spatialEventTrigger:temporalEventTrigger:priority:", ios(11.0, 13.0), watchos(4.0, 6.0))
     function initWithTargetTaskList(targetTaskList: INTaskList; taskTitles: NSArray; spatialEventTrigger: INSpatialEventTrigger;
@@ -2502,25 +2533,28 @@ type
   TINAddTasksIntent = class(TOCGenericImport<INAddTasksIntentClass, INAddTasksIntent>) end;
 
   INAddTasksIntentHandling = interface(IObjectiveC)
-    ['{D58F3527-16C0-410F-9868-5F607D585532}']
-    procedure confirmAddTasks(intent: INAddTasksIntent; completion: TINAddTasksIntentHandlingBlockMethod1); cdecl;
-    procedure handleAddTasks(intent: INAddTasksIntent; completion: TINAddTasksIntentHandlingBlockMethod1); cdecl;
-    procedure resolvePriorityForAddTasks(intent: INAddTasksIntent; withCompletion: TINAddTasksIntentHandlingBlockMethod8); cdecl;
-    procedure resolveSpatialEventTriggerForAddTasks(intent: INAddTasksIntent; withCompletion: TINAddTasksIntentHandlingBlockMethod5); cdecl;
-    procedure resolveTargetTaskListForAddTasks(intent: INAddTasksIntent; completion: TINAddTasksIntentHandlingBlockMethod3); overload; cdecl;
-    procedure resolveTargetTaskListForAddTasks(intent: INAddTasksIntent; withCompletion: TINAddTasksIntentHandlingBlockMethod2); overload; cdecl; // API_DEPRECATED("resolveTargetTaskListForAddTasks:withCompletion: is deprecated. Use resolveTargetTaskListForAddTasks:completion: instead", ios(11.0, 13.0), watchos(4.0, 6.0))
-    procedure resolveTaskTitlesForAddTasks(intent: INAddTasksIntent; withCompletion: TINAddTasksIntentHandlingBlockMethod4); cdecl;
-    procedure resolveTemporalEventTriggerForAddTasks(intent: INAddTasksIntent; completion: TINAddTasksIntentHandlingBlockMethod7); overload; cdecl;
-    procedure resolveTemporalEventTriggerForAddTasks(intent: INAddTasksIntent;
-      withCompletion: TINAddTasksIntentHandlingBlockMethod6); overload; cdecl; // API_DEPRECATED("resolveTemporalEventTriggerForAddTasks:withCompletion: is deprecated. Use resolveTemporalEventTriggerForAddTasks:completion: instead", ios(11.0, 13.0), watchos(4.0, 6.0))
+    ['{7824DE24-CEFC-4C27-8D10-A0CA4AEF5756}']
+    procedure confirmAddTasks(intent: INAddTasksIntent; completion: Pointer); cdecl;
+    procedure handleAddTasks(intent: INAddTasksIntent; completion: Pointer); cdecl;
+    procedure resolvePriorityForAddTasks(intent: INAddTasksIntent; withCompletion: Pointer); cdecl;
+    procedure resolveSpatialEventTriggerForAddTasks(intent: INAddTasksIntent; withCompletion: Pointer); cdecl;
+    [MethodName('resolveTargetTaskListForAddTasks:completion:')]
+    procedure resolveTargetTaskListForAddTasksCompletion(intent: INAddTasksIntent; completion: Pointer); cdecl;
+    [MethodName('resolveTargetTaskListForAddTasks:withCompletion:')]
+    procedure resolveTargetTaskListForAddTasksWithCompletion(intent: INAddTasksIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolveTargetTaskListForAddTasks:withCompletion: is deprecated. Use resolveTargetTaskListForAddTasks:completion: instead", ios(11.0, 13.0), watchos(4.0, 6.0))
+    procedure resolveTaskTitlesForAddTasks(intent: INAddTasksIntent; withCompletion: Pointer); cdecl;
+    [MethodName('resolveTemporalEventTriggerForAddTasks:completion:')]
+    procedure resolveTemporalEventTriggerForAddTasksCompletion(intent: INAddTasksIntent; completion: Pointer); cdecl;
+    [MethodName('resolveTemporalEventTriggerForAddTasks:withCompletion:')]
+    procedure resolveTemporalEventTriggerForAddTasksWithCompletion(intent: INAddTasksIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolveTemporalEventTriggerForAddTasks:withCompletion: is deprecated. Use resolveTemporalEventTriggerForAddTasks:completion: instead", ios(11.0, 13.0), watchos(4.0, 6.0))
   end;
 
   INAppendToNoteIntentClass = interface(INIntentClass)
-    ['{290DC467-570C-49D9-845D-EA4769D91E54}']
+    ['{08E51899-B392-407F-876D-432AABB0A4BD}']
   end;
 
   INAppendToNoteIntent = interface(INIntent)
-    ['{80250A94-4F20-4D9D-A68D-865E0FE8B65A}']
+    ['{268FFA12-26E9-4E7C-A2DD-6FD22964BB1A}']
     function content: INNoteContent; cdecl;
     function initWithTargetNote(targetNote: INNote; content: INNoteContent): Pointer; cdecl;
     function targetNote: INNote; cdecl;
@@ -2528,19 +2562,19 @@ type
   TINAppendToNoteIntent = class(TOCGenericImport<INAppendToNoteIntentClass, INAppendToNoteIntent>) end;
 
   INAppendToNoteIntentHandling = interface(IObjectiveC)
-    ['{AACF54F3-8D5A-4D66-8960-D5C672F91E2E}']
-    procedure confirmAppendToNote(intent: INAppendToNoteIntent; completion: TINAppendToNoteIntentHandlingBlockMethod1); cdecl;
-    procedure handleAppendToNote(intent: INAppendToNoteIntent; completion: TINAppendToNoteIntentHandlingBlockMethod1); cdecl;
-    procedure resolveContentForAppendToNote(intent: INAppendToNoteIntent; withCompletion: TINAppendToNoteIntentHandlingBlockMethod3); cdecl;
-    procedure resolveTargetNoteForAppendToNote(intent: INAppendToNoteIntent; withCompletion: TINAppendToNoteIntentHandlingBlockMethod2); cdecl;
+    ['{73064530-D741-4AFA-A941-B1D01502953F}']
+    procedure confirmAppendToNote(intent: INAppendToNoteIntent; completion: Pointer); cdecl;
+    procedure handleAppendToNote(intent: INAppendToNoteIntent; completion: Pointer); cdecl;
+    procedure resolveContentForAppendToNote(intent: INAppendToNoteIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTargetNoteForAppendToNote(intent: INAppendToNoteIntent; withCompletion: Pointer); cdecl;
   end;
 
   INCreateNoteIntentClass = interface(INIntentClass)
-    ['{FB1744E5-E85B-4FFD-844A-DF67407630EA}']
+    ['{C98F5546-2504-4A58-BB15-8E880F83FDE1}']
   end;
 
   INCreateNoteIntent = interface(INIntent)
-    ['{6CC2F717-23AD-4CE6-8EA4-C3A23E2F4F0E}']
+    ['{60050A07-C885-4503-ABC4-EF2B00ED3A95}']
     function content: INNoteContent; cdecl;
     function groupName: INSpeakableString; cdecl;
     function initWithTitle(title: INSpeakableString; content: INNoteContent; groupName: INSpeakableString): Pointer; cdecl;
@@ -2549,20 +2583,20 @@ type
   TINCreateNoteIntent = class(TOCGenericImport<INCreateNoteIntentClass, INCreateNoteIntent>) end;
 
   INCreateNoteIntentHandling = interface(IObjectiveC)
-    ['{A6FF7259-ECC2-4764-A2C7-426B3AC49FF9}']
-    procedure confirmCreateNote(intent: INCreateNoteIntent; completion: TINCreateNoteIntentHandlingBlockMethod1); cdecl;
-    procedure handleCreateNote(intent: INCreateNoteIntent; completion: TINCreateNoteIntentHandlingBlockMethod1); cdecl;
-    procedure resolveContentForCreateNote(intent: INCreateNoteIntent; withCompletion: TINCreateNoteIntentHandlingBlockMethod3); cdecl;
-    procedure resolveGroupNameForCreateNote(intent: INCreateNoteIntent; withCompletion: TINCreateNoteIntentHandlingBlockMethod2); cdecl;
-    procedure resolveTitleForCreateNote(intent: INCreateNoteIntent; withCompletion: TINCreateNoteIntentHandlingBlockMethod2); cdecl;
+    ['{F57D5D0B-E381-4E7F-B097-AADC31540F3F}']
+    procedure confirmCreateNote(intent: INCreateNoteIntent; completion: Pointer); cdecl;
+    procedure handleCreateNote(intent: INCreateNoteIntent; completion: Pointer); cdecl;
+    procedure resolveContentForCreateNote(intent: INCreateNoteIntent; withCompletion: Pointer); cdecl;
+    procedure resolveGroupNameForCreateNote(intent: INCreateNoteIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTitleForCreateNote(intent: INCreateNoteIntent; withCompletion: Pointer); cdecl;
   end;
 
   INCreateTaskListIntentClass = interface(INIntentClass)
-    ['{B649A92A-E144-4EB7-8F74-CA455BC84E1F}']
+    ['{56607C0E-48EC-4E5A-A73F-338D25000331}']
   end;
 
   INCreateTaskListIntent = interface(INIntent)
-    ['{97982953-516C-44C6-BC8E-B0F3F03C4BD4}']
+    ['{CD20A512-935D-494E-81DF-2FF447520379}']
     function groupName: INSpeakableString; cdecl;
     function initWithTitle(title: INSpeakableString; taskTitles: NSArray; groupName: INSpeakableString): Pointer; cdecl;
     function taskTitles: NSArray; cdecl;
@@ -2571,20 +2605,20 @@ type
   TINCreateTaskListIntent = class(TOCGenericImport<INCreateTaskListIntentClass, INCreateTaskListIntent>) end;
 
   INCreateTaskListIntentHandling = interface(IObjectiveC)
-    ['{59DDE9C3-4AA6-47C8-8287-6FE7255E1DCE}']
-    procedure confirmCreateTaskList(intent: INCreateTaskListIntent; completion: TINCreateTaskListIntentHandlingBlockMethod1); cdecl;
-    procedure handleCreateTaskList(intent: INCreateTaskListIntent; completion: TINCreateTaskListIntentHandlingBlockMethod1); cdecl;
-    procedure resolveGroupNameForCreateTaskList(intent: INCreateTaskListIntent; withCompletion: TINCreateTaskListIntentHandlingBlockMethod2); cdecl;
-    procedure resolveTaskTitlesForCreateTaskList(intent: INCreateTaskListIntent; withCompletion: TINCreateTaskListIntentHandlingBlockMethod3); cdecl;
-    procedure resolveTitleForCreateTaskList(intent: INCreateTaskListIntent; withCompletion: TINCreateTaskListIntentHandlingBlockMethod2); cdecl;
+    ['{29EE40E7-D208-416D-AE58-62113268922A}']
+    procedure confirmCreateTaskList(intent: INCreateTaskListIntent; completion: Pointer); cdecl;
+    procedure handleCreateTaskList(intent: INCreateTaskListIntent; completion: Pointer); cdecl;
+    procedure resolveGroupNameForCreateTaskList(intent: INCreateTaskListIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTaskTitlesForCreateTaskList(intent: INCreateTaskListIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTitleForCreateTaskList(intent: INCreateTaskListIntent; withCompletion: Pointer); cdecl;
   end;
 
   INDeleteTasksIntentClass = interface(INIntentClass)
-    ['{B3950966-417A-4E77-99A0-6089A9DB2655}']
+    ['{B6DFE3D1-69C0-40B3-B395-76E632557B76}']
   end;
 
   INDeleteTasksIntent = interface(INIntent)
-    ['{5BBE7026-96FD-4C53-9738-CAE826B6810F}']
+    ['{DEAF2155-A70A-4384-B725-2019E20D7F4D}']
     function all: NSNumber; cdecl;
     function initWithTaskList(taskList: INTaskList; tasks: NSArray; all: NSNumber): Pointer; cdecl;
     function taskList: INTaskList; cdecl;
@@ -2593,28 +2627,27 @@ type
   TINDeleteTasksIntent = class(TOCGenericImport<INDeleteTasksIntentClass, INDeleteTasksIntent>) end;
 
   INDeleteTasksIntentHandling = interface(IObjectiveC)
-    ['{32EA00A7-3932-45DD-9A56-CB739E174B50}']
-    procedure confirmDeleteTasks(intent: INDeleteTasksIntent; completion: TINDeleteTasksIntentHandlingBlockMethod1); cdecl;
-    procedure handleDeleteTasks(intent: INDeleteTasksIntent; completion: TINDeleteTasksIntentHandlingBlockMethod1); cdecl;
-    procedure resolveTaskListForDeleteTasks(intent: INDeleteTasksIntent; withCompletion: TINDeleteTasksIntentHandlingBlockMethod2); cdecl;
-    procedure resolveTasksForDeleteTasks(intent: INDeleteTasksIntent; withCompletion: TINDeleteTasksIntentHandlingBlockMethod3); cdecl;
+    ['{C6CA34B8-1A7B-4128-89D6-E8C0AF934C27}']
+    procedure confirmDeleteTasks(intent: INDeleteTasksIntent; completion: Pointer); cdecl;
+    procedure handleDeleteTasks(intent: INDeleteTasksIntent; completion: Pointer); cdecl;
+    procedure resolveTaskListForDeleteTasks(intent: INDeleteTasksIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTasksForDeleteTasks(intent: INDeleteTasksIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSearchForNotebookItemsIntentClass = interface(INIntentClass)
-    ['{BA53AB91-C404-4812-88E6-00BF8A03A573}']
+    ['{61607666-3224-4068-B01A-3B2C97F6A6A8}']
   end;
 
   INSearchForNotebookItemsIntent = interface(INIntent)
-    ['{BCE21C6E-1535-4F72-9E58-F995054E1C0E}']
+    ['{6746BB37-44BF-4DE5-9A0D-1925886F1338}']
     function content: NSString; cdecl;
     function dateSearchType: INDateSearchType; cdecl;
     function dateTime: INDateComponentsRange; cdecl;
     function initWithTitle(title: INSpeakableString; content: NSString; itemType: INNotebookItemType; status: INTaskStatus; location: CLPlacemark;
       locationSearchType: INLocationSearchType; dateTime: INDateComponentsRange; dateSearchType: INDateSearchType;
       notebookItemIdentifier: NSString): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(11.2, 13.0), watchos(4.2, 6.0))
-    function initWithTitle(title: INSpeakableString; content: NSString; itemType: INNotebookItemType; status: INTaskStatus;
-      location: CLPlacemark; locationSearchType: INLocationSearchType; dateTime: INDateComponentsRange;
-      dateSearchType: INDateSearchType): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(11.0, 11.2), watchos(4.0, 4.2))
+    function initWithTitle(title: INSpeakableString; content: NSString; itemType: INNotebookItemType; status: INTaskStatus; location: CLPlacemark;
+      locationSearchType: INLocationSearchType; dateTime: INDateComponentsRange; dateSearchType: INDateSearchType): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(11.0, 11.2), watchos(4.0, 4.2))
     function initWithTitle(title: INSpeakableString; content: NSString; itemType: INNotebookItemType; status: INTaskStatus; location: CLPlacemark;
       locationSearchType: INLocationSearchType; dateTime: INDateComponentsRange; dateSearchType: INDateSearchType;
       temporalEventTriggerTypes: INTemporalEventTriggerTypeOptions; taskPriority: INTaskPriority;
@@ -2631,39 +2664,27 @@ type
   TINSearchForNotebookItemsIntent = class(TOCGenericImport<INSearchForNotebookItemsIntentClass, INSearchForNotebookItemsIntent>) end;
 
   INSearchForNotebookItemsIntentHandling = interface(IObjectiveC)
-    ['{EAB459FA-D659-43ED-A090-416F692244EF}']
-    procedure confirmSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      completion: TINSearchForNotebookItemsIntentHandlingBlockMethod1); cdecl;
-    procedure handleSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      completion: TINSearchForNotebookItemsIntentHandlingBlockMethod1); cdecl;
-    procedure resolveContentForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod3); cdecl;
-    procedure resolveDateSearchTypeForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod9); cdecl;
-    procedure resolveDateTimeForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod8); cdecl;
-    procedure resolveItemTypeForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod4); cdecl;
-    procedure resolveLocationForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod6); cdecl;
-    procedure resolveLocationSearchTypeForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod7); cdecl;
-    procedure resolveStatusForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod5); cdecl;
-    procedure resolveTaskPriorityForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod11); cdecl;
-    procedure resolveTemporalEventTriggerTypesForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod10); cdecl;
-    procedure resolveTitleForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent;
-      withCompletion: TINSearchForNotebookItemsIntentHandlingBlockMethod2); cdecl;
+    ['{F32799FC-703C-4E0F-98E5-651A27ACA6C6}']
+    procedure confirmSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; completion: Pointer); cdecl;
+    procedure handleSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; completion: Pointer); cdecl;
+    procedure resolveContentForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDateSearchTypeForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDateTimeForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveItemTypeForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveLocationForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveLocationSearchTypeForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveStatusForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTaskPriorityForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTemporalEventTriggerTypesForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTitleForSearchForNotebookItems(intent: INSearchForNotebookItemsIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSetTaskAttributeIntentClass = interface(INIntentClass)
-    ['{E6BB461A-106B-4260-83EE-994B7A5C8C8E}']
+    ['{26E9E9A1-AF17-40E4-8E51-3665C2806822}']
   end;
 
   INSetTaskAttributeIntent = interface(INIntent)
-    ['{9C18C596-23F2-4B1F-8870-2B0E8956AD07}']
+    ['{91A59967-4628-4DB3-AD8B-57E0ED7CD3A3}']
     function initWithTargetTask(targetTask: INTask; status: INTaskStatus; spatialEventTrigger: INSpatialEventTrigger;
       temporalEventTrigger: INTemporalEventTrigger): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(11.0, 13.0), watchos(4.0, 6.0))
     function initWithTargetTask(targetTask: INTask; taskTitle: INSpeakableString; status: INTaskStatus; priority: INTaskPriority;
@@ -2678,30 +2699,26 @@ type
   TINSetTaskAttributeIntent = class(TOCGenericImport<INSetTaskAttributeIntentClass, INSetTaskAttributeIntent>) end;
 
   INSetTaskAttributeIntentHandling = interface(IObjectiveC)
-    ['{A9163067-83F2-4D72-9988-3D0E2D244312}']
-    procedure confirmSetTaskAttribute(intent: INSetTaskAttributeIntent; completion: TINSetTaskAttributeIntentHandlingBlockMethod1); cdecl;
-    procedure handleSetTaskAttribute(intent: INSetTaskAttributeIntent; completion: TINSetTaskAttributeIntentHandlingBlockMethod1); cdecl;
-    procedure resolvePriorityForSetTaskAttribute(intent: INSetTaskAttributeIntent;
-      withCompletion: TINSetTaskAttributeIntentHandlingBlockMethod5); cdecl;
-    procedure resolveSpatialEventTriggerForSetTaskAttribute(intent: INSetTaskAttributeIntent;
-      withCompletion: TINSetTaskAttributeIntentHandlingBlockMethod6); cdecl;
-    procedure resolveStatusForSetTaskAttribute(intent: INSetTaskAttributeIntent; withCompletion: TINSetTaskAttributeIntentHandlingBlockMethod4); cdecl;
-    procedure resolveTargetTaskForSetTaskAttribute(intent: INSetTaskAttributeIntent;
-      withCompletion: TINSetTaskAttributeIntentHandlingBlockMethod2); cdecl;
-    procedure resolveTaskTitleForSetTaskAttribute(intent: INSetTaskAttributeIntent;
-      withCompletion: TINSetTaskAttributeIntentHandlingBlockMethod3); cdecl;
-    procedure resolveTemporalEventTriggerForSetTaskAttribute(intent: INSetTaskAttributeIntent;
-      completion: TINSetTaskAttributeIntentHandlingBlockMethod8); overload; cdecl;
-    procedure resolveTemporalEventTriggerForSetTaskAttribute(intent: INSetTaskAttributeIntent;
-      withCompletion: TINSetTaskAttributeIntentHandlingBlockMethod7); overload; cdecl; // API_DEPRECATED("resolveTemporalEventTriggerForSetTaskAttribute:withCompletion: is deprecated. Use resolveTemporalEventTriggerForSetTaskAttribute:completion: instead", ios(11.0, 13.0), watchos(4.0, 6.0))
+    ['{516B4B9D-255E-4E03-8D7F-93659A0F373B}']
+    procedure confirmSetTaskAttribute(intent: INSetTaskAttributeIntent; completion: Pointer); cdecl;
+    procedure handleSetTaskAttribute(intent: INSetTaskAttributeIntent; completion: Pointer); cdecl;
+    procedure resolvePriorityForSetTaskAttribute(intent: INSetTaskAttributeIntent; withCompletion: Pointer); cdecl;
+    procedure resolveSpatialEventTriggerForSetTaskAttribute(intent: INSetTaskAttributeIntent; withCompletion: Pointer); cdecl;
+    procedure resolveStatusForSetTaskAttribute(intent: INSetTaskAttributeIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTargetTaskForSetTaskAttribute(intent: INSetTaskAttributeIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTaskTitleForSetTaskAttribute(intent: INSetTaskAttributeIntent; withCompletion: Pointer); cdecl;
+    [MethodName('resolveTemporalEventTriggerForSetTaskAttribute:completion:')]
+    procedure resolveTemporalEventTriggerForSetTaskAttributeCompletion(intent: INSetTaskAttributeIntent; completion: Pointer); cdecl;
+    [MethodName('resolveTemporalEventTriggerForSetTaskAttribute:withCompletion:')]
+    procedure resolveTemporalEventTriggerForSetTaskAttributeWithCompletion(intent: INSetTaskAttributeIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolveTemporalEventTriggerForSetTaskAttribute:withCompletion: is deprecated. Use resolveTemporalEventTriggerForSetTaskAttribute:completion: instead", ios(11.0, 13.0), watchos(4.0, 6.0))
   end;
 
   INSnoozeTasksIntentClass = interface(INIntentClass)
-    ['{11A2463F-F055-48DC-A04E-F5B98F6D2055}']
+    ['{0DD3EE57-ADAF-46C8-9BD6-B2BF84010039}']
   end;
 
   INSnoozeTasksIntent = interface(INIntent)
-    ['{DCF3FF82-D724-42E9-BB12-866B454A2B12}']
+    ['{BD3F74AC-496D-4DBA-9725-771ABE933D41}']
     function all: NSNumber; cdecl;
     function initWithTasks(tasks: NSArray; nextTriggerTime: INDateComponentsRange; all: NSNumber): Pointer; cdecl;
     function nextTriggerTime: INDateComponentsRange; cdecl;
@@ -2710,26 +2727,25 @@ type
   TINSnoozeTasksIntent = class(TOCGenericImport<INSnoozeTasksIntentClass, INSnoozeTasksIntent>) end;
 
   INSnoozeTasksIntentHandling = interface(IObjectiveC)
-    ['{058DE275-2828-4112-B31C-F966AC12C47F}']
-    procedure confirmSnoozeTasks(intent: INSnoozeTasksIntent; completion: TINSnoozeTasksIntentHandlingBlockMethod1); cdecl;
-    procedure handleSnoozeTasks(intent: INSnoozeTasksIntent; completion: TINSnoozeTasksIntentHandlingBlockMethod1); cdecl;
-    procedure resolveNextTriggerTimeForSnoozeTasks(intent: INSnoozeTasksIntent; withCompletion: TINSnoozeTasksIntentHandlingBlockMethod3); cdecl;
-    procedure resolveTasksForSnoozeTasks(intent: INSnoozeTasksIntent; withCompletion: TINSnoozeTasksIntentHandlingBlockMethod2); cdecl;
+    ['{4FA3FE47-B094-495C-ABE4-45CD4D7BCFE2}']
+    procedure confirmSnoozeTasks(intent: INSnoozeTasksIntent; completion: Pointer); cdecl;
+    procedure handleSnoozeTasks(intent: INSnoozeTasksIntent; completion: Pointer); cdecl;
+    procedure resolveNextTriggerTimeForSnoozeTasks(intent: INSnoozeTasksIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTasksForSnoozeTasks(intent: INSnoozeTasksIntent; withCompletion: Pointer); cdecl;
   end;
 
   INPayBillIntentClass = interface(INIntentClass)
-    ['{F5353894-1673-487E-9E67-75DF6140C322}']
+    ['{DD2296CB-E261-411D-9F5B-AE3314B28509}']
   end;
 
   INPayBillIntent = interface(INIntent)
-    ['{97493D33-F329-4EA5-A6F1-E0CE3DB7AC22}']
+    ['{CC08A18D-5E9A-4198-B025-13FBD7004A77}']
     function billPayee: INBillPayee; cdecl;
     function billType: INBillType; cdecl;
     function dueDate: INDateComponentsRange; cdecl;
     function fromAccount: INPaymentAccount; cdecl;
     function initWithBillPayee(billPayee: INBillPayee; fromAccount: INPaymentAccount; transactionAmount: INPaymentAmount;
-      transactionScheduledDate: INDateComponentsRange; transactionNote: NSString; billType: INBillType;
-      dueDate: INDateComponentsRange): Pointer; cdecl;
+      transactionScheduledDate: INDateComponentsRange; transactionNote: NSString; billType: INBillType; dueDate: INDateComponentsRange): Pointer; cdecl;
     function transactionAmount: INPaymentAmount; cdecl;
     function transactionNote: NSString; cdecl;
     function transactionScheduledDate: INDateComponentsRange; cdecl;
@@ -2737,24 +2753,24 @@ type
   TINPayBillIntent = class(TOCGenericImport<INPayBillIntentClass, INPayBillIntent>) end;
 
   INPayBillIntentHandling = interface(IObjectiveC)
-    ['{B675FFE4-94A4-479C-806D-4222F8274B4D}']
-    procedure confirmPayBill(intent: INPayBillIntent; completion: TINPayBillIntentHandlingBlockMethod1); cdecl;
-    procedure handlePayBill(intent: INPayBillIntent; completion: TINPayBillIntentHandlingBlockMethod1); cdecl;
-    procedure resolveBillPayeeForPayBill(intent: INPayBillIntent; withCompletion: TINPayBillIntentHandlingBlockMethod2); cdecl;
-    procedure resolveBillTypeForPayBill(intent: INPayBillIntent; withCompletion: TINPayBillIntentHandlingBlockMethod7); cdecl;
-    procedure resolveDueDateForPayBill(intent: INPayBillIntent; withCompletion: TINPayBillIntentHandlingBlockMethod5); cdecl;
-    procedure resolveFromAccountForPayBill(intent: INPayBillIntent; withCompletion: TINPayBillIntentHandlingBlockMethod3); cdecl;
-    procedure resolveTransactionAmountForPayBill(intent: INPayBillIntent; withCompletion: TINPayBillIntentHandlingBlockMethod4); cdecl;
-    procedure resolveTransactionNoteForPayBill(intent: INPayBillIntent; withCompletion: TINPayBillIntentHandlingBlockMethod6); cdecl;
-    procedure resolveTransactionScheduledDateForPayBill(intent: INPayBillIntent; withCompletion: TINPayBillIntentHandlingBlockMethod5); cdecl;
+    ['{E6502E10-9B7A-45FA-BEE1-411E89230369}']
+    procedure confirmPayBill(intent: INPayBillIntent; completion: Pointer); cdecl;
+    procedure handlePayBill(intent: INPayBillIntent; completion: Pointer); cdecl;
+    procedure resolveBillPayeeForPayBill(intent: INPayBillIntent; withCompletion: Pointer); cdecl;
+    procedure resolveBillTypeForPayBill(intent: INPayBillIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDueDateForPayBill(intent: INPayBillIntent; withCompletion: Pointer); cdecl;
+    procedure resolveFromAccountForPayBill(intent: INPayBillIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTransactionAmountForPayBill(intent: INPayBillIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTransactionNoteForPayBill(intent: INPayBillIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTransactionScheduledDateForPayBill(intent: INPayBillIntent; withCompletion: Pointer); cdecl;
   end;
 
   INRequestPaymentIntentClass = interface(INIntentClass)
-    ['{FF26167C-442B-4A67-AAEF-73FDDAA93759}']
+    ['{EAFB77EA-BD7A-4E6B-9AE1-CF349A0CEEE7}']
   end;
 
   INRequestPaymentIntent = interface(INIntent)
-    ['{71C8D3FC-AB9D-4336-A911-45526AC63CE9}']
+    ['{C3AD021C-5723-47D2-A88F-2CB02B4DD3E6}']
     function currencyAmount: INCurrencyAmount; cdecl;
     function initWithPayer(payer: INPerson; currencyAmount: INCurrencyAmount; note: NSString): Pointer; cdecl;
     function note: NSString; cdecl;
@@ -2763,26 +2779,26 @@ type
   TINRequestPaymentIntent = class(TOCGenericImport<INRequestPaymentIntentClass, INRequestPaymentIntent>) end;
 
   INRequestPaymentIntentHandling = interface(IObjectiveC)
-    ['{42CDDA16-AD6D-41A6-B9C2-1A9A28D55FE4}']
-    procedure confirmRequestPayment(intent: INRequestPaymentIntent; completion: TINRequestPaymentIntentHandlingBlockMethod1); cdecl;
-    procedure handleRequestPayment(intent: INRequestPaymentIntent; completion: TINRequestPaymentIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCurrencyAmountForRequestPayment(intent: INRequestPaymentIntent;
-      completion: TINRequestPaymentIntentHandlingBlockMethod5); overload; cdecl;
-    procedure resolveCurrencyAmountForRequestPayment(intent: INRequestPaymentIntent;
-      withCompletion: TINRequestPaymentIntentHandlingBlockMethod4); overload; cdecl; // API_DEPRECATED("resolveCurrencyAmountForRequestPayment:withCompletion: is deprecated. Use resolveCurrencyAmountForRequestPayment:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
-    procedure resolveNoteForRequestPayment(intent: INRequestPaymentIntent;
-      withCompletion: TINRequestPaymentIntentHandlingBlockMethod6); cdecl;
-    procedure resolvePayerForRequestPayment(intent: INRequestPaymentIntent; completion: TINRequestPaymentIntentHandlingBlockMethod3); overload; cdecl;
-    procedure resolvePayerForRequestPayment(intent: INRequestPaymentIntent;
-      withCompletion: TINRequestPaymentIntentHandlingBlockMethod2); overload; cdecl; // API_DEPRECATED("resolvePayerForRequestPayment:withCompletion: is deprecated. Use resolvePayerForRequestPayment:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
+    ['{F77AB608-C7B6-404A-B44A-48B125B83652}']
+    procedure confirmRequestPayment(intent: INRequestPaymentIntent; completion: Pointer); cdecl;
+    procedure handleRequestPayment(intent: INRequestPaymentIntent; completion: Pointer); cdecl;
+    [MethodName('resolveCurrencyAmountForRequestPayment:completion:')]
+    procedure resolveCurrencyAmountForRequestPaymentCompletion(intent: INRequestPaymentIntent; completion: Pointer); cdecl;
+    [MethodName('resolveCurrencyAmountForRequestPayment:withCompletion:')]
+    procedure resolveCurrencyAmountForRequestPaymentWithCompletion(intent: INRequestPaymentIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolveCurrencyAmountForRequestPayment:withCompletion: is deprecated. Use resolveCurrencyAmountForRequestPayment:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
+    procedure resolveNoteForRequestPayment(intent: INRequestPaymentIntent; withCompletion: Pointer); cdecl;
+    [MethodName('resolvePayerForRequestPayment:completion:')]
+    procedure resolvePayerForRequestPaymentCompletion(intent: INRequestPaymentIntent; completion: Pointer); cdecl;
+    [MethodName('resolvePayerForRequestPayment:withCompletion:')]
+    procedure resolvePayerForRequestPaymentWithCompletion(intent: INRequestPaymentIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolvePayerForRequestPayment:withCompletion: is deprecated. Use resolvePayerForRequestPayment:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
   end;
 
   INSearchForAccountsIntentClass = interface(INIntentClass)
-    ['{EA50B12D-F713-43D5-8B2F-6059379E9B3C}']
+    ['{42C0AC68-AA01-4613-A2B2-E6AEFB3B72F2}']
   end;
 
   INSearchForAccountsIntent = interface(INIntent)
-    ['{BA3610F1-1D0F-454B-9453-EB774367E25F}']
+    ['{D98C1DB7-E7D7-4C8C-9EC6-9F974D59D806}']
     function accountNickname: INSpeakableString; cdecl;
     function accountType: INAccountType; cdecl;
     function initWithAccountNickname(accountNickname: INSpeakableString; accountType: INAccountType; organizationName: INSpeakableString;
@@ -2793,25 +2809,21 @@ type
   TINSearchForAccountsIntent = class(TOCGenericImport<INSearchForAccountsIntentClass, INSearchForAccountsIntent>) end;
 
   INSearchForAccountsIntentHandling = interface(IObjectiveC)
-    ['{1E652618-1F23-491F-AFA2-8DB9EADB89EE}']
-    procedure confirmSearchForAccounts(intent: INSearchForAccountsIntent; completion: TINSearchForAccountsIntentHandlingBlockMethod1); cdecl;
-    procedure handleSearchForAccounts(intent: INSearchForAccountsIntent; completion: TINSearchForAccountsIntentHandlingBlockMethod1); cdecl;
-    procedure resolveAccountNicknameForSearchForAccounts(intent: INSearchForAccountsIntent;
-      withCompletion: TINSearchForAccountsIntentHandlingBlockMethod2); cdecl;
-    procedure resolveAccountTypeForSearchForAccounts(intent: INSearchForAccountsIntent;
-      withCompletion: TINSearchForAccountsIntentHandlingBlockMethod3); cdecl;
-    procedure resolveOrganizationNameForSearchForAccounts(intent: INSearchForAccountsIntent;
-      withCompletion: TINSearchForAccountsIntentHandlingBlockMethod2); cdecl;
-    procedure resolveRequestedBalanceTypeForSearchForAccounts(intent: INSearchForAccountsIntent;
-      withCompletion: TINSearchForAccountsIntentHandlingBlockMethod4); cdecl;
+    ['{43625D10-5377-4E20-98E9-C3132BE15CFD}']
+    procedure confirmSearchForAccounts(intent: INSearchForAccountsIntent; completion: Pointer); cdecl;
+    procedure handleSearchForAccounts(intent: INSearchForAccountsIntent; completion: Pointer); cdecl;
+    procedure resolveAccountNicknameForSearchForAccounts(intent: INSearchForAccountsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveAccountTypeForSearchForAccounts(intent: INSearchForAccountsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveOrganizationNameForSearchForAccounts(intent: INSearchForAccountsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRequestedBalanceTypeForSearchForAccounts(intent: INSearchForAccountsIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSearchForBillsIntentClass = interface(INIntentClass)
-    ['{54E5EFD8-74CA-4336-8549-9AEACF9C8F46}']
+    ['{5FC0612B-877A-427B-9731-504FA5C69564}']
   end;
 
   INSearchForBillsIntent = interface(INIntent)
-    ['{2E7728F9-B4E2-41C8-B46B-0717A212FF8F}']
+    ['{12C47B06-3A88-4571-9C3A-D93AEB6B4509}']
     function billPayee: INBillPayee; cdecl;
     function billType: INBillType; cdecl;
     function dueDateRange: INDateComponentsRange; cdecl;
@@ -2823,23 +2835,22 @@ type
   TINSearchForBillsIntent = class(TOCGenericImport<INSearchForBillsIntentClass, INSearchForBillsIntent>) end;
 
   INSearchForBillsIntentHandling = interface(IObjectiveC)
-    ['{7CB09591-C9E5-4242-AE56-87098FFF221A}']
-    procedure confirmSearchForBills(intent: INSearchForBillsIntent; completion: TINSearchForBillsIntentHandlingBlockMethod1); cdecl;
-    procedure handleSearchForBills(intent: INSearchForBillsIntent; completion: TINSearchForBillsIntentHandlingBlockMethod1); cdecl;
-    procedure resolveBillPayeeForSearchForBills(intent: INSearchForBillsIntent; withCompletion: TINSearchForBillsIntentHandlingBlockMethod2); cdecl;
-    procedure resolveBillTypeForSearchForBills(intent: INSearchForBillsIntent; withCompletion: TINSearchForBillsIntentHandlingBlockMethod4); cdecl;
-    procedure resolveDueDateRangeForSearchForBills(intent: INSearchForBillsIntent; withCompletion: TINSearchForBillsIntentHandlingBlockMethod3); cdecl;
-    procedure resolvePaymentDateRangeForSearchForBills(intent: INSearchForBillsIntent;
-      withCompletion: TINSearchForBillsIntentHandlingBlockMethod3); cdecl;
-    procedure resolveStatusForSearchForBills(intent: INSearchForBillsIntent; withCompletion: TINSearchForBillsIntentHandlingBlockMethod5); cdecl;
+    ['{E3A1CC99-8397-44C8-AE93-070263349A59}']
+    procedure confirmSearchForBills(intent: INSearchForBillsIntent; completion: Pointer); cdecl;
+    procedure handleSearchForBills(intent: INSearchForBillsIntent; completion: Pointer); cdecl;
+    procedure resolveBillPayeeForSearchForBills(intent: INSearchForBillsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveBillTypeForSearchForBills(intent: INSearchForBillsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDueDateRangeForSearchForBills(intent: INSearchForBillsIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePaymentDateRangeForSearchForBills(intent: INSearchForBillsIntent; withCompletion: Pointer); cdecl;
+    procedure resolveStatusForSearchForBills(intent: INSearchForBillsIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSendPaymentIntentClass = interface(INIntentClass)
-    ['{E7F5B896-A36C-4143-8145-997C27C42688}']
+    ['{A2CF0146-80FA-4E12-A8BB-2170512C9406}']
   end;
 
   INSendPaymentIntent = interface(INIntent)
-    ['{1EC81132-2954-4596-A374-39305E34E83D}']
+    ['{13CC5421-3285-4CB7-B6FA-73487A3DF13D}']
     function currencyAmount: INCurrencyAmount; cdecl;
     function initWithPayee(payee: INPerson; currencyAmount: INCurrencyAmount; note: NSString): Pointer; cdecl;
     function note: NSString; cdecl;
@@ -2848,24 +2859,26 @@ type
   TINSendPaymentIntent = class(TOCGenericImport<INSendPaymentIntentClass, INSendPaymentIntent>) end;
 
   INSendPaymentIntentHandling = interface(IObjectiveC)
-    ['{DE3E9502-606B-4BB2-9CCB-8DBC4CBA2DC2}']
-    procedure confirmSendPayment(intent: INSendPaymentIntent; completion: TINSendPaymentIntentHandlingBlockMethod1); cdecl;
-    procedure handleSendPayment(intent: INSendPaymentIntent; completion: TINSendPaymentIntentHandlingBlockMethod1); cdecl;
-    procedure resolveCurrencyAmountForSendPayment(intent: INSendPaymentIntent;
-      completion: TINSendPaymentIntentHandlingBlockMethod5); overload; cdecl;
-    procedure resolveCurrencyAmountForSendPayment(intent: INSendPaymentIntent;
-       withCompletion: TINSendPaymentIntentHandlingBlockMethod4); overload; cdecl; // API_DEPRECATED("resolveCurrencyAmountForSendPayment:withCompletion: is deprecated. Use resolveCurrencyAmountForSendPayment:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
-    procedure resolveNoteForSendPayment(intent: INSendPaymentIntent; withCompletion: TINSendPaymentIntentHandlingBlockMethod6); cdecl;
-    procedure resolvePayeeForSendPayment(intent: INSendPaymentIntent; completion: TINSendPaymentIntentHandlingBlockMethod3); overload; cdecl;
-    procedure resolvePayeeForSendPayment(intent: INSendPaymentIntent; withCompletion: TINSendPaymentIntentHandlingBlockMethod2); overload; cdecl; // API_DEPRECATED("resolvePayeeForSendPayment:withCompletion: is deprecated. Use resolvePayeeForSendPayment:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
+    ['{B9EC7396-B46C-4C8A-9352-C69FEA8DE5A8}']
+    procedure confirmSendPayment(intent: INSendPaymentIntent; completion: Pointer); cdecl;
+    procedure handleSendPayment(intent: INSendPaymentIntent; completion: Pointer); cdecl;
+    [MethodName('resolveCurrencyAmountForSendPayment:completion:')]
+    procedure resolveCurrencyAmountForSendPaymentCompletion(intent: INSendPaymentIntent; completion: Pointer); cdecl;
+    [MethodName('resolveCurrencyAmountForSendPayment:withCompletion:')]
+    procedure resolveCurrencyAmountForSendPaymentWithCompletion(intent: INSendPaymentIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolveCurrencyAmountForSendPayment:withCompletion: is deprecated. Use resolveCurrencyAmountForSendPayment:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
+    procedure resolveNoteForSendPayment(intent: INSendPaymentIntent; withCompletion: Pointer); cdecl;
+    [MethodName('resolvePayeeForSendPayment:completion:')]
+    procedure resolvePayeeForSendPaymentCompletion(intent: INSendPaymentIntent; completion: Pointer); cdecl;
+    [MethodName('resolvePayeeForSendPayment:withCompletion:')]
+    procedure resolvePayeeForSendPaymentWithCompletion(intent: INSendPaymentIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("resolvePayeeForSendPayment:withCompletion: is deprecated. Use resolvePayeeForSendPayment:completion: instead", ios(10.0, 11.0), watchos(3.2, 4.0))
   end;
 
   INTransferMoneyIntentClass = interface(INIntentClass)
-    ['{A5DEE7B7-E7C7-4E43-926B-A7D03E9D5928}']
+    ['{24A27321-5F73-4899-AD2D-125ADFCAB519}']
   end;
 
   INTransferMoneyIntent = interface(INIntent)
-    ['{8AEF1D0A-840E-40B8-8790-6C791A74E34D}']
+    ['{311A6E56-EE50-4326-8793-53EE15BBD770}']
     function fromAccount: INPaymentAccount; cdecl;
     function initWithFromAccount(fromAccount: INPaymentAccount; toAccount: INPaymentAccount; transactionAmount: INPaymentAmount;
       transactionScheduledDate: INDateComponentsRange; transactionNote: NSString): Pointer; cdecl;
@@ -2877,25 +2890,22 @@ type
   TINTransferMoneyIntent = class(TOCGenericImport<INTransferMoneyIntentClass, INTransferMoneyIntent>) end;
 
   INTransferMoneyIntentHandling = interface(IObjectiveC)
-    ['{5C1C27AD-CC92-429A-A265-4BB6CDF8C3B6}']
-    procedure confirmTransferMoney(intent: INTransferMoneyIntent; completion: TINTransferMoneyIntentHandlingBlockMethod1); cdecl;
-    procedure handleTransferMoney(intent: INTransferMoneyIntent; completion: TINTransferMoneyIntentHandlingBlockMethod1); cdecl;
-    procedure resolveFromAccountForTransferMoney(intent: INTransferMoneyIntent; withCompletion: TINTransferMoneyIntentHandlingBlockMethod2); cdecl;
-    procedure resolveToAccountForTransferMoney(intent: INTransferMoneyIntent; withCompletion: TINTransferMoneyIntentHandlingBlockMethod2); cdecl;
-    procedure resolveTransactionAmountForTransferMoney(intent: INTransferMoneyIntent;
-      withCompletion: TINTransferMoneyIntentHandlingBlockMethod3); cdecl;
-    procedure resolveTransactionNoteForTransferMoney(intent: INTransferMoneyIntent;
-      withCompletion: TINTransferMoneyIntentHandlingBlockMethod5); cdecl;
-    procedure resolveTransactionScheduledDateForTransferMoney(intent: INTransferMoneyIntent;
-      withCompletion: TINTransferMoneyIntentHandlingBlockMethod4); cdecl;
+    ['{F01BA7EB-B451-4B1F-8944-FF3AB3D788E1}']
+    procedure confirmTransferMoney(intent: INTransferMoneyIntent; completion: Pointer); cdecl;
+    procedure handleTransferMoney(intent: INTransferMoneyIntent; completion: Pointer); cdecl;
+    procedure resolveFromAccountForTransferMoney(intent: INTransferMoneyIntent; withCompletion: Pointer); cdecl;
+    procedure resolveToAccountForTransferMoney(intent: INTransferMoneyIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTransactionAmountForTransferMoney(intent: INTransferMoneyIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTransactionNoteForTransferMoney(intent: INTransferMoneyIntent; withCompletion: Pointer); cdecl;
+    procedure resolveTransactionScheduledDateForTransferMoney(intent: INTransferMoneyIntent; withCompletion: Pointer); cdecl;
   end;
 
   INSearchForPhotosIntentClass = interface(INIntentClass)
-    ['{1AFEC76A-612F-44A8-9E32-7D4499535322}']
+    ['{09E92D10-C9EC-40AB-8C2A-F3F20F123692}']
   end;
 
   INSearchForPhotosIntent = interface(INIntent)
-    ['{7D8EF797-3D5D-4B32-8F38-A3A15337AC79}']
+    ['{52C46AB0-C6B7-4946-AEE5-CCC5DFB0E3C5}']
     function albumName: NSString; cdecl;
     function dateCreated: INDateComponentsRange; cdecl;
     function excludedAttributes: INPhotoAttributeOptions; cdecl;
@@ -2911,26 +2921,22 @@ type
   TINSearchForPhotosIntent = class(TOCGenericImport<INSearchForPhotosIntentClass, INSearchForPhotosIntent>) end;
 
   INSearchForPhotosIntentHandling = interface(IObjectiveC)
-    ['{448778F1-E39C-49C7-9B06-E81CD3A1CAE2}']
-    procedure confirmSearchForPhotos(intent: INSearchForPhotosIntent; completion: TINSearchForPhotosIntentHandlingBlockMethod1); cdecl;
-    procedure handleSearchForPhotos(intent: INSearchForPhotosIntent; completion: TINSearchForPhotosIntentHandlingBlockMethod1); cdecl;
-    procedure resolveAlbumNameForSearchForPhotos(intent: INSearchForPhotosIntent; withCompletion: TINSearchForPhotosIntentHandlingBlockMethod4); cdecl;
-    procedure resolveDateCreatedForSearchForPhotos(intent: INSearchForPhotosIntent;
-      withCompletion: TINSearchForPhotosIntentHandlingBlockMethod2); cdecl;
-    procedure resolveLocationCreatedForSearchForPhotos(intent: INSearchForPhotosIntent;
-      withCompletion: TINSearchForPhotosIntentHandlingBlockMethod3); cdecl;
-    procedure resolvePeopleInPhotoForSearchForPhotos(intent: INSearchForPhotosIntent;
-      withCompletion: TINSearchForPhotosIntentHandlingBlockMethod5); cdecl;
-    procedure resolveSearchTermsForSearchForPhotos(intent: INSearchForPhotosIntent;
-      withCompletion: TINSearchForPhotosIntentHandlingBlockMethod5); cdecl;
+    ['{55E01987-9790-4A31-95EC-99067C8E18EC}']
+    procedure confirmSearchForPhotos(intent: INSearchForPhotosIntent; completion: Pointer); cdecl;
+    procedure handleSearchForPhotos(intent: INSearchForPhotosIntent; completion: Pointer); cdecl;
+    procedure resolveAlbumNameForSearchForPhotos(intent: INSearchForPhotosIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDateCreatedForSearchForPhotos(intent: INSearchForPhotosIntent; withCompletion: Pointer); cdecl;
+    procedure resolveLocationCreatedForSearchForPhotos(intent: INSearchForPhotosIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePeopleInPhotoForSearchForPhotos(intent: INSearchForPhotosIntent; withCompletion: Pointer); cdecl;
+    procedure resolveSearchTermsForSearchForPhotos(intent: INSearchForPhotosIntent; withCompletion: Pointer); cdecl; // API_DEPRECATED("", ios(11.0, 15.0), watchos(4.0, 8.0))
   end;
 
   INStartPhotoPlaybackIntentClass = interface(INIntentClass)
-    ['{BEC2BF26-5600-4299-92F1-C420270AD153}']
+    ['{BB2C5989-EEF5-42BF-84A9-36A6317A260D}']
   end;
 
   INStartPhotoPlaybackIntent = interface(INIntent)
-    ['{E092B985-8D02-4E1A-BFB9-C2921E59A1AE}']
+    ['{9A5F1F3E-4766-4BF2-9FBE-6B1EBF34F01D}']
     function albumName: NSString; cdecl;
     function dateCreated: INDateComponentsRange; cdecl;
     function excludedAttributes: INPhotoAttributeOptions; cdecl;
@@ -2946,25 +2952,21 @@ type
   TINStartPhotoPlaybackIntent = class(TOCGenericImport<INStartPhotoPlaybackIntentClass, INStartPhotoPlaybackIntent>) end;
 
   INStartPhotoPlaybackIntentHandling = interface(IObjectiveC)
-    ['{AD8D5EC0-3695-4F9D-9CA6-7B3F506E657A}']
-    procedure confirmStartPhotoPlayback(intent: INStartPhotoPlaybackIntent; completion: TINStartPhotoPlaybackIntentHandlingBlockMethod1); cdecl;
-    procedure handleStartPhotoPlayback(intent: INStartPhotoPlaybackIntent; completion: TINStartPhotoPlaybackIntentHandlingBlockMethod1); cdecl;
-    procedure resolveAlbumNameForStartPhotoPlayback(intent: INStartPhotoPlaybackIntent;
-      withCompletion: TINStartPhotoPlaybackIntentHandlingBlockMethod4); cdecl;
-    procedure resolveDateCreatedForStartPhotoPlayback(intent: INStartPhotoPlaybackIntent;
-      withCompletion: TINStartPhotoPlaybackIntentHandlingBlockMethod2); cdecl;
-    procedure resolveLocationCreatedForStartPhotoPlayback(intent: INStartPhotoPlaybackIntent;
-      withCompletion: TINStartPhotoPlaybackIntentHandlingBlockMethod3); cdecl;
-    procedure resolvePeopleInPhotoForStartPhotoPlayback(intent: INStartPhotoPlaybackIntent;
-      withCompletion: TINStartPhotoPlaybackIntentHandlingBlockMethod5); cdecl;
+    ['{6025F89E-8792-49A8-B37D-7A8FF9F23920}']
+    procedure confirmStartPhotoPlayback(intent: INStartPhotoPlaybackIntent; completion: Pointer); cdecl;
+    procedure handleStartPhotoPlayback(intent: INStartPhotoPlaybackIntent; completion: Pointer); cdecl;
+    procedure resolveAlbumNameForStartPhotoPlayback(intent: INStartPhotoPlaybackIntent; withCompletion: Pointer); cdecl;
+    procedure resolveDateCreatedForStartPhotoPlayback(intent: INStartPhotoPlaybackIntent; withCompletion: Pointer); cdecl;
+    procedure resolveLocationCreatedForStartPhotoPlayback(intent: INStartPhotoPlaybackIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePeopleInPhotoForStartPhotoPlayback(intent: INStartPhotoPlaybackIntent; withCompletion: Pointer); cdecl;
   end;
 
   INGetReservationDetailsIntentClass = interface(INIntentClass)
-    ['{2E5A6DCB-D460-4EE6-9CDA-3C54C4993B3D}']
+    ['{9A4F2B57-DBC1-4768-B9B6-9910ADFF9B28}']
   end;
 
   INGetReservationDetailsIntent = interface(INIntent)
-    ['{10BCBC75-8B4A-4ACB-B3CD-526DF2E1F413}']
+    ['{D9BED388-4A9D-4DBD-945B-FEFA82513FEB}']
     function initWithReservationContainerReference(reservationContainerReference: INSpeakableString;
       reservationItemReferences: NSArray): Pointer; cdecl;
     function reservationContainerReference: INSpeakableString; cdecl;
@@ -2973,33 +2975,33 @@ type
   TINGetReservationDetailsIntent = class(TOCGenericImport<INGetReservationDetailsIntentClass, INGetReservationDetailsIntent>) end;
 
   INGetRideStatusIntentClass = interface(INIntentClass)
-    ['{D0A6CE7F-A0D2-4309-9F94-1C8C734AC5C2}']
+    ['{A2042BBA-F69B-4D0D-9725-5CDF434503BB}']
   end;
 
   INGetRideStatusIntent = interface(INIntent)
-    ['{92B61BCB-06CF-4F65-B2F8-4979DF52940D}']
+    ['{FA0911C3-8E1E-4039-B97E-360611B011AB}']
   end;
   TINGetRideStatusIntent = class(TOCGenericImport<INGetRideStatusIntentClass, INGetRideStatusIntent>) end;
 
   INGetRideStatusIntentHandling = interface(IObjectiveC)
-    ['{0AC9771A-9BD1-4893-AC75-3716D9836484}']
-    procedure confirmGetRideStatus(intent: INGetRideStatusIntent; completion: TINGetRideStatusIntentHandlingBlockMethod1); cdecl;
-    procedure handleGetRideStatus(intent: INGetRideStatusIntent; completion: TINGetRideStatusIntentHandlingBlockMethod1); cdecl;
+    ['{2B2DB928-F00A-4D63-8D7A-F2318147487A}']
+    procedure confirmGetRideStatus(intent: INGetRideStatusIntent; completion: Pointer); cdecl;
+    procedure handleGetRideStatus(intent: INGetRideStatusIntent; completion: Pointer); cdecl;
     procedure startSendingUpdatesForGetRideStatus(intent: INGetRideStatusIntent; toObserver: Pointer); cdecl;
     procedure stopSendingUpdatesForGetRideStatus(intent: INGetRideStatusIntent); cdecl;
   end;
 
   INGetRideStatusIntentResponseObserver = interface(IObjectiveC)
-    ['{B054D8C9-A555-474B-8AA4-A49A6D5FF946}']
+    ['{8A336900-3834-45B5-97F8-819CDE7E119E}']
     procedure getRideStatusResponseDidUpdate(response: INGetRideStatusIntentResponse); cdecl;
   end;
 
   INListRideOptionsIntentClass = interface(INIntentClass)
-    ['{7A891637-5C8E-43BC-A544-A74FEDF640C8}']
+    ['{EC0D4900-FD2D-4BF4-82A7-73829FDCE867}']
   end;
 
   INListRideOptionsIntent = interface(INIntent)
-    ['{58882866-51D8-4C79-837C-98DDC59EB154}']
+    ['{516D2618-3C5C-41D8-A87F-6E81544AA062}']
     function dropOffLocation: CLPlacemark; cdecl;
     function initWithPickupLocation(pickupLocation: CLPlacemark; dropOffLocation: CLPlacemark): Pointer; cdecl;
     function pickupLocation: CLPlacemark; cdecl;
@@ -3007,21 +3009,19 @@ type
   TINListRideOptionsIntent = class(TOCGenericImport<INListRideOptionsIntentClass, INListRideOptionsIntent>) end;
 
   INListRideOptionsIntentHandling = interface(IObjectiveC)
-    ['{1DDD39B7-E6B3-441D-965C-5B0B964537F4}']
-    procedure confirmListRideOptions(intent: INListRideOptionsIntent; completion: TINListRideOptionsIntentHandlingBlockMethod1); cdecl;
-    procedure handleListRideOptions(intent: INListRideOptionsIntent; completion: TINListRideOptionsIntentHandlingBlockMethod1); cdecl;
-    procedure resolveDropOffLocationForListRideOptions(intent: INListRideOptionsIntent;
-      withCompletion: TINListRideOptionsIntentHandlingBlockMethod2); cdecl;
-    procedure resolvePickupLocationForListRideOptions(intent: INListRideOptionsIntent;
-      withCompletion: TINListRideOptionsIntentHandlingBlockMethod2); cdecl;
+    ['{1E09DF5C-9952-4C86-9E7B-EA67B0DFE13B}']
+    procedure confirmListRideOptions(intent: INListRideOptionsIntent; completion: Pointer); cdecl;
+    procedure handleListRideOptions(intent: INListRideOptionsIntent; completion: Pointer); cdecl;
+    procedure resolveDropOffLocationForListRideOptions(intent: INListRideOptionsIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePickupLocationForListRideOptions(intent: INListRideOptionsIntent; withCompletion: Pointer); cdecl;
   end;
 
   INRequestRideIntentClass = interface(INIntentClass)
-    ['{8B855198-1DA6-427B-9730-9DF58FAAB0EA}']
+    ['{13D08599-6C40-4A92-920F-E04CF71A1DDC}']
   end;
 
   INRequestRideIntent = interface(INIntent)
-    ['{3CAE0374-7752-4E66-91F4-AB0475A93485}']
+    ['{00EBC970-B64A-44F3-B3D0-1DA555FEDCE3}']
     function dropOffLocation: CLPlacemark; cdecl;
     function initWithPickupLocation(pickupLocation: CLPlacemark; dropOffLocation: CLPlacemark; rideOptionName: INSpeakableString;
       partySize: NSNumber; paymentMethod: INPaymentMethod): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 10.3))
@@ -3036,39 +3036,39 @@ type
   TINRequestRideIntent = class(TOCGenericImport<INRequestRideIntentClass, INRequestRideIntent>) end;
 
   INRequestRideIntentHandling = interface(IObjectiveC)
-    ['{150F2E38-A465-4511-A9B4-BA30DC3FDF8C}']
-    procedure confirmRequestRide(intent: INRequestRideIntent; completion: TINRequestRideIntentHandlingBlockMethod1); cdecl;
-    procedure handleRequestRide(intent: INRequestRideIntent; completion: TINRequestRideIntentHandlingBlockMethod1); cdecl;
-    procedure resolveDropOffLocationForRequestRide(intent: INRequestRideIntent; withCompletion: TINRequestRideIntentHandlingBlockMethod2); cdecl;
-    procedure resolvePartySizeForRequestRide(intent: INRequestRideIntent; withCompletion: TINRequestRideIntentHandlingBlockMethod4); cdecl;
-    procedure resolvePickupLocationForRequestRide(intent: INRequestRideIntent; withCompletion: TINRequestRideIntentHandlingBlockMethod2); cdecl;
-    procedure resolveRideOptionNameForRequestRide(intent: INRequestRideIntent; withCompletion: TINRequestRideIntentHandlingBlockMethod3); cdecl;
-    procedure resolveScheduledPickupTimeForRequestRide(intent: INRequestRideIntent; withCompletion: TINRequestRideIntentHandlingBlockMethod5); cdecl;
+    ['{717380C2-030E-415B-A99C-7B81A25235F9}']
+    procedure confirmRequestRide(intent: INRequestRideIntent; completion: Pointer); cdecl;
+    procedure handleRequestRide(intent: INRequestRideIntent; completion: Pointer); cdecl;
+    procedure resolveDropOffLocationForRequestRide(intent: INRequestRideIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePartySizeForRequestRide(intent: INRequestRideIntent; withCompletion: Pointer); cdecl;
+    procedure resolvePickupLocationForRequestRide(intent: INRequestRideIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRideOptionNameForRequestRide(intent: INRequestRideIntent; withCompletion: Pointer); cdecl;
+    procedure resolveScheduledPickupTimeForRequestRide(intent: INRequestRideIntent; withCompletion: Pointer); cdecl;
   end;
 
   INCancelRideIntentClass = interface(INIntentClass)
-    ['{EAFD5565-A6DD-4E29-8463-A0391391FADF}']
+    ['{3BCDA8E1-4F6A-4EF7-91EC-12E382CDA26E}']
   end;
 
   INCancelRideIntent = interface(INIntent)
-    ['{FDACA211-7802-4F00-9578-99673C562591}']
+    ['{E97C0FE3-25E4-4CFF-90B9-A53C5BFBFEF5}']
     function initWithRideIdentifier(rideIdentifier: NSString): Pointer; cdecl;
     function rideIdentifier: NSString; cdecl;
   end;
   TINCancelRideIntent = class(TOCGenericImport<INCancelRideIntentClass, INCancelRideIntent>) end;
 
   INCancelRideIntentHandling = interface(IObjectiveC)
-    ['{6738E4DA-8398-4B47-AEEA-CE00D6FEE667}']
-    procedure confirmCancelRide(intent: INCancelRideIntent; completion: TINCancelRideIntentHandlingBlockMethod1); cdecl;
-    procedure handleCancelRide(intent: INCancelRideIntent; completion: TINCancelRideIntentHandlingBlockMethod1); cdecl;
+    ['{8723A27F-0011-4CE5-9118-AC11B961A647}']
+    procedure confirmCancelRide(intent: INCancelRideIntent; completion: Pointer); cdecl;
+    procedure handleCancelRide(intent: INCancelRideIntent; completion: Pointer); cdecl;
   end;
 
   INSendRideFeedbackIntentClass = interface(INIntentClass)
-    ['{6C7E5D85-E4C0-49FE-BF92-11280A132DD2}']
+    ['{E4734DFC-0713-4229-9855-472492418F07}']
   end;
 
   INSendRideFeedbackIntent = interface(INIntent)
-    ['{5CC3636B-EEF5-481B-AAD7-2C6231F2F396}']
+    ['{65E6D156-62D1-41DA-9133-252F268EA970}']
     function initWithRideIdentifier(rideIdentifier: NSString): Pointer; cdecl;
     function rating: NSNumber; cdecl;
     function rideIdentifier: NSString; cdecl;
@@ -3079,84 +3079,82 @@ type
   TINSendRideFeedbackIntent = class(TOCGenericImport<INSendRideFeedbackIntentClass, INSendRideFeedbackIntent>) end;
 
   INSendRideFeedbackIntentHandling = interface(IObjectiveC)
-    ['{185ABB04-71B4-477F-A710-6EDCEAA3360E}']
-    procedure confirmSendRideFeedback(sendRideFeedbackIntent: INSendRideFeedbackIntent;
-      completion: TINSendRideFeedbackIntentHandlingBlockMethod1); cdecl;
-    procedure handleSendRideFeedback(sendRideFeedbackintent: INSendRideFeedbackIntent;
-      completion: TINSendRideFeedbackIntentHandlingBlockMethod1); cdecl;
+    ['{18BE26BA-4354-4AD0-808F-9E6B280F2D63}']
+    procedure confirmSendRideFeedback(sendRideFeedbackIntent: INSendRideFeedbackIntent; completion: Pointer); cdecl;
+    procedure handleSendRideFeedback(sendRideFeedbackintent: INSendRideFeedbackIntent; completion: Pointer); cdecl;
   end;
 
   INGetVisualCodeIntentClass = interface(INIntentClass)
-    ['{AF182984-7F25-476C-8708-6CD63286D27A}']
+    ['{E7E0F115-BEDA-4C08-A780-A22AC2CC3915}']
   end;
 
   INGetVisualCodeIntent = interface(INIntent)
-    ['{E27F98C3-C1CF-4869-89F7-3CDA980F88E6}']
+    ['{F3A8D568-9C81-4836-B906-17C6D6AFF00C}']
     function initWithVisualCodeType(visualCodeType: INVisualCodeType): Pointer; cdecl;
     function visualCodeType: INVisualCodeType; cdecl;
   end;
   TINGetVisualCodeIntent = class(TOCGenericImport<INGetVisualCodeIntentClass, INGetVisualCodeIntent>) end;
 
   INGetVisualCodeIntentHandling = interface(IObjectiveC)
-    ['{8D2562CA-D71C-4C7F-A16F-0CED0A1F77B2}']
-    procedure confirmGetVisualCode(intent: INGetVisualCodeIntent; completion: TINGetVisualCodeIntentHandlingBlockMethod1); cdecl;
-    procedure handleGetVisualCode(intent: INGetVisualCodeIntent; completion: TINGetVisualCodeIntentHandlingBlockMethod1); cdecl;
-    procedure resolveVisualCodeTypeForGetVisualCode(intent: INGetVisualCodeIntent; withCompletion: TINGetVisualCodeIntentHandlingBlockMethod2); cdecl;
+    ['{D08B7EF3-6A12-4F36-BF1F-93A4DC9E758E}']
+    procedure confirmGetVisualCode(intent: INGetVisualCodeIntent; completion: Pointer); cdecl;
+    procedure handleGetVisualCode(intent: INGetVisualCodeIntent; completion: Pointer); cdecl;
+    procedure resolveVisualCodeTypeForGetVisualCode(intent: INGetVisualCodeIntent; withCompletion: Pointer); cdecl;
   end;
 
   INCallsDomainHandling = interface(IObjectiveC)
-    ['{1978DC61-76BF-4D48-B797-DC8D532153D5}']
+    ['{DA9F4076-E164-414C-9598-B273A0C6DD6A}']
   end;
 
   INCarCommandsDomainHandling = interface(IObjectiveC)
-    ['{73F27F5F-1238-4EA6-8B8F-FA023B3D843E}']
+    ['{5BD0C920-5B1D-485B-9040-6A1E70CAC649}']
   end;
 
   INCarPlayDomainHandling = interface(IObjectiveC)
-    ['{6570DEB2-6C55-40BF-9D92-BFFB1D54AED5}']
+    ['{99913F81-F7DF-4B09-8CEE-AB788FD6B765}']
   end;
 
   INWorkoutsDomainHandling = interface(IObjectiveC)
-    ['{595A9672-08B7-438B-BDE5-4EB236BFE7E7}']
+    ['{998CAF49-4F02-4B04-953D-33F71CDA2EC2}']
   end;
 
   INRadioDomainHandling = interface(IObjectiveC)
-    ['{D91E4BE8-FEC9-47E7-B890-0560F3B506FA}']
+    ['{1F16FF0E-A686-46A2-881B-E6E51DA6903E}']
   end;
 
   INMessagesDomainHandling = interface(IObjectiveC)
-    ['{91F2CFD1-0E50-4D16-BE66-0D66001435AE}']
+    ['{C51BB669-597B-4800-AB3D-5C4D67FEECE9}']
   end;
 
   INPaymentsDomainHandling = interface(IObjectiveC)
-    ['{3978F0A8-0AA8-424A-816E-11B95637B22A}']
+    ['{1EA68B24-1859-44E0-BB40-55C1E348A01E}']
   end;
 
   INPhotosDomainHandling = interface(IObjectiveC)
-    ['{21601ADC-7C93-417C-9B89-20B0D61E1DF1}']
+    ['{EF067A61-C555-4AAB-AB2A-43A233DABD44}']
   end;
 
   INRidesharingDomainHandling = interface(IObjectiveC)
-    ['{78B2BD00-BDC7-45D3-9EB7-8E4A09EE2674}']
+    ['{8EEF4B2A-560F-437A-B145-8A801DB54AEE}']
   end;
 
   INNotebookDomainHandling = interface(IObjectiveC)
-    ['{7D282830-7621-4F64-8538-7258C0B3B480}']
+    ['{334C2127-E1D5-4046-A6C6-2C653F9777BE}']
   end;
 
   INVisualCodeDomainHandling = interface(IObjectiveC)
-    ['{64DB16F9-D6F2-4A5B-B6E6-837EE35E059E}']
+    ['{C7DABB55-3D73-45CF-B6AB-E0F725D3F53C}']
   end;
 
   INInteractionClass = interface(NSObjectClass)
-    ['{E29670AC-D02C-4A00-8516-FD31F74CE8F3}']
+    ['{A0D72AD0-4D6D-4299-AF77-AA68D2982E8E}']
     {class} procedure deleteAllInteractionsWithCompletion(completion: TINInteractionBlockMethod1); cdecl;
     {class} procedure deleteInteractionsWithGroupIdentifier(groupIdentifier: NSString; completion: TINInteractionBlockMethod1); cdecl;
     {class} procedure deleteInteractionsWithIdentifiers(identifiers: NSArray; completion: TINInteractionBlockMethod1); cdecl;
   end;
 
   INInteraction = interface(NSObject)
-    ['{37637F7E-6757-47ED-93FE-D4FEBE5E8246}']
+    ['{2501C4EE-F168-4600-BF1B-1FB81BA3BEBC}']
     function dateInterval: NSDateInterval; cdecl;
     function direction: INInteractionDirection; cdecl;
     procedure donateInteractionWithCompletion(completion: TINInteractionBlockMethod1); cdecl;
@@ -3175,7 +3173,7 @@ type
   TINInteraction = class(TOCGenericImport<INInteractionClass, INInteraction>) end;
 
   INSpeakable = interface(IObjectiveC)
-    ['{43B26E01-0981-4053-99D9-A59029924CF9}']
+    ['{F44B32DA-93D7-4E35-8085-8F81B539692E}']
     function alternativeSpeakableMatches: NSArray; cdecl;
     function identifier: NSString; cdecl; // API_DEPRECATED("Please use vocabularyIdentifier", ios(10.0, 11.0), watchos(3.2, 4.0))
     function pronunciationHint: NSString; cdecl;
@@ -3184,12 +3182,12 @@ type
   end;
 
   INParameterClass = interface(NSObjectClass)
-    ['{2471B1A5-AB53-4B99-80A8-18F5107BB2D7}']
+    ['{1EC57131-0EFC-4B03-8999-5EE54AD079A6}']
     {class} function parameterForClass(aClass: Pointer; keyPath: NSString): Pointer; cdecl;
   end;
 
   INParameter = interface(NSObject)
-    ['{7FFECFCF-3B29-4001-92AB-9A1073D37538}']
+    ['{6F4DA1DE-6DBC-40E6-86C4-701D812FAA9C}']
     function indexForSubKeyPath(subKeyPath: NSString): NSUInteger; cdecl;
     function isEqualToParameter(parameter: INParameter): Boolean; cdecl;
     function parameterClass: Pointer; cdecl;
@@ -3199,11 +3197,11 @@ type
   TINParameter = class(TOCGenericImport<INParameterClass, INParameter>) end;
 
   INObjectSectionClass = interface(NSObjectClass)
-    ['{78A8C240-9BE2-4FE2-875D-64FAAA6AC029}']
+    ['{B42BB7A9-19FA-45EE-B7C2-F6280A72F8B6}']
   end;
 
   INObjectSection = interface(NSObject)
-    ['{0896F0B9-FA7E-4452-871C-0BFE3B56FD43}']
+    ['{574CB53D-658A-4D7D-A651-C440B6756117}']
     function initWithTitle(title: NSString; items: NSArray): Pointer; cdecl;
     function items: NSArray; cdecl;
     function title: NSString; cdecl;
@@ -3211,11 +3209,11 @@ type
   TINObjectSection = class(TOCGenericImport<INObjectSectionClass, INObjectSection>) end;
 
   INObjectCollectionClass = interface(NSObjectClass)
-    ['{3FF4BF7C-9D16-45F1-8A61-9044DDF4B778}']
+    ['{00D8FEF5-C7F9-4FDB-B24D-F25699A56FCC}']
   end;
 
   INObjectCollection = interface(NSObject)
-    ['{CA77DD69-1035-498B-B1D6-FA8E194DA71B}']
+    ['{8A91ED7B-2E49-40A0-A49A-DEF13EC6F07F}']
     function allItems: NSArray; cdecl;
     function initWithItems(items: NSArray): Pointer; cdecl;
     function initWithSections(sections: NSArray): Pointer; cdecl;
@@ -3225,12 +3223,36 @@ type
   end;
   TINObjectCollection = class(TOCGenericImport<INObjectCollectionClass, INObjectCollection>) end;
 
+  INAnswerCallIntentResponseClass = interface(INIntentResponseClass)
+    ['{76179579-6B78-47F6-8C04-0971A62393B2}']
+  end;
+
+  INAnswerCallIntentResponse = interface(INIntentResponse)
+    ['{9360B31D-FA35-423C-8F6C-D507C7A7CA5D}']
+    function callRecords: NSArray; cdecl;
+    function code: INAnswerCallIntentResponseCode; cdecl;
+    function initWithCode(code: INAnswerCallIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
+    procedure setCallRecords(callRecords: NSArray); cdecl;
+  end;
+  TINAnswerCallIntentResponse = class(TOCGenericImport<INAnswerCallIntentResponseClass, INAnswerCallIntentResponse>) end;
+
+  INHangUpCallIntentResponseClass = interface(INIntentResponseClass)
+    ['{A075B0DF-D680-4DAC-9F95-4C76B587999A}']
+  end;
+
+  INHangUpCallIntentResponse = interface(INIntentResponse)
+    ['{FFAD8DFC-F308-4C45-805A-F3D65CD7FBF0}']
+    function code: INHangUpCallIntentResponseCode; cdecl;
+    function initWithCode(code: INHangUpCallIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
+  end;
+  TINHangUpCallIntentResponse = class(TOCGenericImport<INHangUpCallIntentResponseClass, INHangUpCallIntentResponse>) end;
+
   INSearchCallHistoryIntentResponseClass = interface(INIntentResponseClass)
-    ['{8CDE4175-C4B3-48CD-A80C-039666157675}']
+    ['{3A73BB33-CFD1-44B8-BC44-1C0D70099880}']
   end;
 
   INSearchCallHistoryIntentResponse = interface(INIntentResponse)
-    ['{FA753BC8-3664-44E2-9B72-DFF2A969CB8E}']
+    ['{51DA06B0-D860-4B4C-987D-83838CCEFFE3}']
     function callRecords: NSArray; cdecl;
     function code: INSearchCallHistoryIntentResponseCode; cdecl;
     function initWithCode(code: INSearchCallHistoryIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3239,44 +3261,44 @@ type
   TINSearchCallHistoryIntentResponse = class(TOCGenericImport<INSearchCallHistoryIntentResponseClass, INSearchCallHistoryIntentResponse>) end;
 
   INStartAudioCallIntentResponseClass = interface(INIntentResponseClass)
-    ['{80817A39-1005-49B2-8F7F-EADCD06D7F72}']
+    ['{87D1154F-B961-438A-AD34-0B4649B4CD33}']
   end;
 
   INStartAudioCallIntentResponse = interface(INIntentResponse)
-    ['{E0F26E10-F8F9-4E65-A839-A1AE4EBF4A0B}']
+    ['{175E0574-BD3F-4009-894D-B87AF78E1948}']
     function code: INStartAudioCallIntentResponseCode; cdecl;
     function initWithCode(code: INStartAudioCallIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINStartAudioCallIntentResponse = class(TOCGenericImport<INStartAudioCallIntentResponseClass, INStartAudioCallIntentResponse>) end;
 
   INStartCallIntentResponseClass = interface(INIntentResponseClass)
-    ['{228AC6BE-C609-43B2-9EE0-1B6F1AC264B5}']
+    ['{C4428AC1-A9F7-48E6-86A3-85CF45F6092A}']
   end;
 
   INStartCallIntentResponse = interface(INIntentResponse)
-    ['{282142D0-CC3A-4A80-9D8C-08F386F88B21}']
+    ['{44EBA66F-2727-4A0F-9FB0-0CCE606E6717}']
     function code: INStartCallIntentResponseCode; cdecl;
     function initWithCode(code: INStartCallIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINStartCallIntentResponse = class(TOCGenericImport<INStartCallIntentResponseClass, INStartCallIntentResponse>) end;
 
   INStartVideoCallIntentResponseClass = interface(INIntentResponseClass)
-    ['{687BE75A-7005-4DF3-9EA3-7C1D64F8CAB8}']
+    ['{FC920A64-83DA-4CC0-8C5A-C12CEA19E0B6}']
   end;
 
   INStartVideoCallIntentResponse = interface(INIntentResponse)
-    ['{8FA4B427-C197-44BF-A9CA-E55AF270EC58}']
+    ['{6ED776DF-0F11-4FB6-82B3-78E82E247750}']
     function code: INStartVideoCallIntentResponseCode; cdecl;
     function initWithCode(code: INStartVideoCallIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINStartVideoCallIntentResponse = class(TOCGenericImport<INStartVideoCallIntentResponseClass, INStartVideoCallIntentResponse>) end;
 
   INActivateCarSignalIntentResponseClass = interface(INIntentResponseClass)
-    ['{199F4EE8-AE25-43C9-B34B-589948CE0048}']
+    ['{FF582985-7862-4891-96A5-0E0AB8A7FA0F}']
   end;
 
   INActivateCarSignalIntentResponse = interface(INIntentResponse)
-    ['{259BE8CF-670A-4715-8B87-2C887D23CEEE}']
+    ['{C32D63D3-E81A-43D7-B64B-4019C2AF583E}']
     function code: INActivateCarSignalIntentResponseCode; cdecl;
     function initWithCode(code: INActivateCarSignalIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     procedure setSignals(signals: INCarSignalOptions); cdecl;
@@ -3285,11 +3307,11 @@ type
   TINActivateCarSignalIntentResponse = class(TOCGenericImport<INActivateCarSignalIntentResponseClass, INActivateCarSignalIntentResponse>) end;
 
   INGetCarLockStatusIntentResponseClass = interface(INIntentResponseClass)
-    ['{4C7C4873-ACCC-497B-BF7D-65A740E93142}']
+    ['{5F767E3A-2B71-4CDE-9C2E-C4DAD7FEBAE5}']
   end;
 
   INGetCarLockStatusIntentResponse = interface(INIntentResponse)
-    ['{58A9B07F-6D3A-493C-923E-5A9773F71914}']
+    ['{A0AFDCD0-2D2E-4726-9B13-6BE8A25258F4}']
     function code: INGetCarLockStatusIntentResponseCode; cdecl;
     function initWithCode(code: INGetCarLockStatusIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function locked: NSNumber; cdecl;
@@ -3298,11 +3320,11 @@ type
   TINGetCarLockStatusIntentResponse = class(TOCGenericImport<INGetCarLockStatusIntentResponseClass, INGetCarLockStatusIntentResponse>) end;
 
   INGetCarPowerLevelStatusIntentResponseClass = interface(INIntentResponseClass)
-    ['{4687F9D6-FE9C-41E6-802D-0737F3612A8A}']
+    ['{D97BAF13-FE42-4CD6-BD30-F7DE355EC475}']
   end;
 
   INGetCarPowerLevelStatusIntentResponse = interface(INIntentResponse)
-    ['{EAD1B6D5-03E3-48B5-B476-1B063FD887B5}']
+    ['{0819235F-2788-4B6D-80C7-385E941C03F1}']
     function activeConnector: INCarChargingConnectorType; cdecl;
     function carIdentifier: NSString; cdecl;
     function chargePercentRemaining: NSNumber; cdecl;
@@ -3346,11 +3368,11 @@ type
     INGetCarPowerLevelStatusIntentResponse>) end;
 
   INListCarsIntentResponseClass = interface(INIntentResponseClass)
-    ['{317A3F79-2F20-4F64-92CE-5E41F863BD7D}']
+    ['{90494B83-55E6-456C-8398-4569B1C1C4CE}']
   end;
 
   INListCarsIntentResponse = interface(INIntentResponse)
-    ['{1A94CCFD-108A-441D-B41A-E6563AF6E75D}']
+    ['{30BCAC93-7167-43EE-82C0-FE114F6549FC}']
     function cars: NSArray; cdecl;
     function code: INListCarsIntentResponseCode; cdecl;
     function initWithCode(code: INListCarsIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3359,44 +3381,44 @@ type
   TINListCarsIntentResponse = class(TOCGenericImport<INListCarsIntentResponseClass, INListCarsIntentResponse>) end;
 
   INSaveProfileInCarIntentResponseClass = interface(INIntentResponseClass)
-    ['{3E5391A6-C126-400F-A282-94ED239DD972}']
+    ['{CFC200B2-34D8-49CA-9A36-B836878D04C6}']
   end;
 
   INSaveProfileInCarIntentResponse = interface(INIntentResponse)
-    ['{893E210C-441E-4913-935E-3C6BC226636C}']
+    ['{E5D35B12-7A82-4139-86DA-D5D3B50B0A65}']
     function code: INSaveProfileInCarIntentResponseCode; cdecl;
     function initWithCode(code: INSaveProfileInCarIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINSaveProfileInCarIntentResponse = class(TOCGenericImport<INSaveProfileInCarIntentResponseClass, INSaveProfileInCarIntentResponse>) end;
 
   INSetAudioSourceInCarIntentResponseClass = interface(INIntentResponseClass)
-    ['{6BAA35F8-B748-4150-A9F1-04AD753781DD}']
+    ['{583F55CA-DA31-4623-A31F-5F95E107FC2E}']
   end;
 
   INSetAudioSourceInCarIntentResponse = interface(INIntentResponse)
-    ['{E7BD5D4B-DA52-4E63-9E34-C38CD9E36BD1}']
+    ['{3756ACE0-F09F-4EB1-9782-5D9F974414ED}']
     function code: INSetAudioSourceInCarIntentResponseCode; cdecl;
     function initWithCode(code: INSetAudioSourceInCarIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINSetAudioSourceInCarIntentResponse = class(TOCGenericImport<INSetAudioSourceInCarIntentResponseClass, INSetAudioSourceInCarIntentResponse>) end;
 
   INSetCarLockStatusIntentResponseClass = interface(INIntentResponseClass)
-    ['{C92B817E-5212-49E3-8306-531745807812}']
+    ['{25EEBF62-AD3E-4861-98B6-C158D31D3D41}']
   end;
 
   INSetCarLockStatusIntentResponse = interface(INIntentResponse)
-    ['{D410D32B-E900-4542-B694-E951D863333B}']
+    ['{DFCC182D-A6DD-4041-A4F2-2398FD38D279}']
     function code: INSetCarLockStatusIntentResponseCode; cdecl;
     function initWithCode(code: INSetCarLockStatusIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINSetCarLockStatusIntentResponse = class(TOCGenericImport<INSetCarLockStatusIntentResponseClass, INSetCarLockStatusIntentResponse>) end;
 
   INSetClimateSettingsInCarIntentResponseClass = interface(INIntentResponseClass)
-    ['{E3A092F0-978C-4A0D-93F0-E9F68CEE5B1F}']
+    ['{5570422F-B6BE-4B51-B3FD-6AF1714E7C0E}']
   end;
 
   INSetClimateSettingsInCarIntentResponse = interface(INIntentResponse)
-    ['{F93DFB39-5AB1-4C4F-8ED1-606DB5AB76F1}']
+    ['{5D0ED466-C4A0-48B1-9726-C77555235984}']
     function code: INSetClimateSettingsInCarIntentResponseCode; cdecl;
     function initWithCode(code: INSetClimateSettingsInCarIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
@@ -3404,11 +3426,11 @@ type
     INSetClimateSettingsInCarIntentResponse>) end;
 
   INSetDefrosterSettingsInCarIntentResponseClass = interface(INIntentResponseClass)
-    ['{0B1A5390-8221-49EE-B7F8-54F1ECF56E86}']
+    ['{3B158203-7EF0-49B1-8530-6588D57CB55F}']
   end;
 
   INSetDefrosterSettingsInCarIntentResponse = interface(INIntentResponse)
-    ['{8D712B54-5108-4E4E-8014-F53C57A3EBA3}']
+    ['{92EC5BE7-95A1-410D-8D00-2860A32E3AC2}']
     function code: INSetDefrosterSettingsInCarIntentResponseCode; cdecl;
     function initWithCode(code: INSetDefrosterSettingsInCarIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
@@ -3416,99 +3438,110 @@ type
     INSetDefrosterSettingsInCarIntentResponse>) end;
 
   INSetProfileInCarIntentResponseClass = interface(INIntentResponseClass)
-    ['{AB1A985A-80F4-4343-B5F7-8AAD30DD88AC}']
+    ['{A9C450A5-155F-4B0A-96F9-74CE405A1689}']
   end;
 
   INSetProfileInCarIntentResponse = interface(INIntentResponse)
-    ['{7424A192-F4EB-4829-A4A0-34776B13645E}']
+    ['{8DCF9ED1-71BA-4839-B3A1-B5CF2C661A21}']
     function code: INSetProfileInCarIntentResponseCode; cdecl;
     function initWithCode(code: INSetProfileInCarIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINSetProfileInCarIntentResponse = class(TOCGenericImport<INSetProfileInCarIntentResponseClass, INSetProfileInCarIntentResponse>) end;
 
   INSetSeatSettingsInCarIntentResponseClass = interface(INIntentResponseClass)
-    ['{591F3DA4-C471-4096-BE27-0B45B1E8BBB8}']
+    ['{944276B8-2A5D-4001-AA81-5CA134174F26}']
   end;
 
   INSetSeatSettingsInCarIntentResponse = interface(INIntentResponse)
-    ['{F6AF3180-4E6D-4F70-8C25-1D3A822BB332}']
+    ['{F7FACAFA-48B7-4B13-9804-1B957562810E}']
     function code: INSetSeatSettingsInCarIntentResponseCode; cdecl;
     function initWithCode(code: INSetSeatSettingsInCarIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINSetSeatSettingsInCarIntentResponse = class(TOCGenericImport<INSetSeatSettingsInCarIntentResponseClass, INSetSeatSettingsInCarIntentResponse>) end;
 
   INCancelWorkoutIntentResponseClass = interface(INIntentResponseClass)
-    ['{342E9EB3-7004-4758-9F72-292D269909E9}']
+    ['{A9DA3939-5180-4A71-BB94-00E51ED5BD7F}']
   end;
 
   INCancelWorkoutIntentResponse = interface(INIntentResponse)
-    ['{1D0037E2-5770-4A3F-BC01-5D5B6E1CA5B6}']
+    ['{8F48AFFC-B574-4695-9B1F-0FD3B13E11F9}']
     function code: INCancelWorkoutIntentResponseCode; cdecl;
     function initWithCode(code: INCancelWorkoutIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINCancelWorkoutIntentResponse = class(TOCGenericImport<INCancelWorkoutIntentResponseClass, INCancelWorkoutIntentResponse>) end;
 
   INEndWorkoutIntentResponseClass = interface(INIntentResponseClass)
-    ['{AFF30457-A38E-4EAA-96AF-F10A4FAE5658}']
+    ['{F13E35E2-A743-444F-88D1-4AAB6A73AC5E}']
   end;
 
   INEndWorkoutIntentResponse = interface(INIntentResponse)
-    ['{C1C2C03F-BFD3-4E28-ACD8-8DDD93E47866}']
+    ['{C3F3F537-5CC0-426B-9EBC-7D918A6BD784}']
     function code: INEndWorkoutIntentResponseCode; cdecl;
     function initWithCode(code: INEndWorkoutIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINEndWorkoutIntentResponse = class(TOCGenericImport<INEndWorkoutIntentResponseClass, INEndWorkoutIntentResponse>) end;
 
   INPauseWorkoutIntentResponseClass = interface(INIntentResponseClass)
-    ['{184C3D2B-1D88-4C85-8F80-34338689AF4D}']
+    ['{DB49F049-4401-418F-AB8D-B171232C0C73}']
   end;
 
   INPauseWorkoutIntentResponse = interface(INIntentResponse)
-    ['{DCED72D0-335D-4B46-8162-CBBF1475AC97}']
+    ['{37D12083-E4C7-4CFA-B3F7-A477D4DF39BD}']
     function code: INPauseWorkoutIntentResponseCode; cdecl;
     function initWithCode(code: INPauseWorkoutIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINPauseWorkoutIntentResponse = class(TOCGenericImport<INPauseWorkoutIntentResponseClass, INPauseWorkoutIntentResponse>) end;
 
   INResumeWorkoutIntentResponseClass = interface(INIntentResponseClass)
-    ['{6C3DB8CD-5341-4BBC-BA9E-9422AC494482}']
+    ['{361A6C04-8D01-467A-9BAF-4AEC0EA8EF86}']
   end;
 
   INResumeWorkoutIntentResponse = interface(INIntentResponse)
-    ['{662FEDA8-5E2D-4A56-A3E2-CE3FE288F590}']
+    ['{868D37B9-E634-4848-BA89-477FC4CFC368}']
     function code: INResumeWorkoutIntentResponseCode; cdecl;
     function initWithCode(code: INResumeWorkoutIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINResumeWorkoutIntentResponse = class(TOCGenericImport<INResumeWorkoutIntentResponseClass, INResumeWorkoutIntentResponse>) end;
 
   INStartWorkoutIntentResponseClass = interface(INIntentResponseClass)
-    ['{3823C576-A2FC-4DFB-8DD0-CD78D33B9972}']
+    ['{D9B88DEC-FA74-4C18-9032-E2F39C8C6C4C}']
   end;
 
   INStartWorkoutIntentResponse = interface(INIntentResponse)
-    ['{7EB7451E-7D40-4FA9-A773-CC96D5D084A7}']
+    ['{7EDA07B7-10E6-4BF5-AB29-3364BAB3359A}']
     function code: INStartWorkoutIntentResponseCode; cdecl;
     function initWithCode(code: INStartWorkoutIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINStartWorkoutIntentResponse = class(TOCGenericImport<INStartWorkoutIntentResponseClass, INStartWorkoutIntentResponse>) end;
 
+  INShareFocusStatusIntentResponseClass = interface(INIntentResponseClass)
+    ['{00BA6B15-BBCA-4E1C-A03C-6FC489E2408A}']
+  end;
+
+  INShareFocusStatusIntentResponse = interface(INIntentResponse)
+    ['{3DB7B059-1EFA-48DD-9C44-5E6DB52E81BC}']
+    function code: INShareFocusStatusIntentResponseCode; cdecl;
+    function initWithCode(code: INShareFocusStatusIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
+  end;
+  TINShareFocusStatusIntentResponse = class(TOCGenericImport<INShareFocusStatusIntentResponseClass, INShareFocusStatusIntentResponse>) end;
+
   INAddMediaIntentResponseClass = interface(INIntentResponseClass)
-    ['{E75B5835-0A62-4B0A-AEE4-727E4904A679}']
+    ['{2EDA985B-881A-4F78-BE68-8057F2F67D52}']
   end;
 
   INAddMediaIntentResponse = interface(INIntentResponse)
-    ['{FB0C2D2C-9967-462D-B219-F6B5AEC79B07}']
+    ['{1844A54C-78B4-46A7-9FFA-898C5FEA2C50}']
     function code: INAddMediaIntentResponseCode; cdecl;
     function initWithCode(code: INAddMediaIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINAddMediaIntentResponse = class(TOCGenericImport<INAddMediaIntentResponseClass, INAddMediaIntentResponse>) end;
 
   INPlayMediaIntentResponseClass = interface(INIntentResponseClass)
-    ['{A770403E-1B72-4A5A-8323-6CF187F09E5C}']
+    ['{637D8079-89C1-4F6B-A580-79470CED277F}']
   end;
 
   INPlayMediaIntentResponse = interface(INIntentResponse)
-    ['{72417F8D-0262-4E33-BDFE-5091FE99FBFE}']
+    ['{2ED85831-F0C7-4759-B04F-4241A09618DB}']
     function code: INPlayMediaIntentResponseCode; cdecl;
     function initWithCode(code: INPlayMediaIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function nowPlayingInfo: NSDictionary; cdecl;
@@ -3517,11 +3550,11 @@ type
   TINPlayMediaIntentResponse = class(TOCGenericImport<INPlayMediaIntentResponseClass, INPlayMediaIntentResponse>) end;
 
   INSearchForMediaIntentResponseClass = interface(INIntentResponseClass)
-    ['{88C5091C-B4BE-4766-B433-03A19398D7DD}']
+    ['{38ACFEC5-4F1D-421A-94DD-21F0F0662661}']
   end;
 
   INSearchForMediaIntentResponse = interface(INIntentResponse)
-    ['{A0010987-44D2-459E-9261-8FDA022DDB1F}']
+    ['{84A78467-4DBA-47BD-82AA-E2DCA505FC08}']
     function code: INSearchForMediaIntentResponseCode; cdecl;
     function initWithCode(code: INSearchForMediaIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function mediaItems: NSArray; cdecl;
@@ -3530,33 +3563,33 @@ type
   TINSearchForMediaIntentResponse = class(TOCGenericImport<INSearchForMediaIntentResponseClass, INSearchForMediaIntentResponse>) end;
 
   INUpdateMediaAffinityIntentResponseClass = interface(INIntentResponseClass)
-    ['{0A88DDC2-8F50-47F8-825B-0A8D49FC424C}']
+    ['{74162DBC-70D6-4C10-86D6-37D863E2C3AF}']
   end;
 
   INUpdateMediaAffinityIntentResponse = interface(INIntentResponse)
-    ['{C6207D5C-8B84-46EB-9D3D-55892EEE1A5F}']
+    ['{82A41AEB-6954-4B7B-BF9E-826A182C05D7}']
     function code: INUpdateMediaAffinityIntentResponseCode; cdecl;
     function initWithCode(code: INUpdateMediaAffinityIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINUpdateMediaAffinityIntentResponse = class(TOCGenericImport<INUpdateMediaAffinityIntentResponseClass, INUpdateMediaAffinityIntentResponse>) end;
 
   INSetRadioStationIntentResponseClass = interface(INIntentResponseClass)
-    ['{DEF80991-F3EC-4985-8017-DD6A0D2A4D7A}']
+    ['{4274D31A-88DE-458F-9C1C-594D6DE6F424}']
   end;
 
   INSetRadioStationIntentResponse = interface(INIntentResponse)
-    ['{C5ACC441-6341-46B2-9862-8CCE4EFE3901}']
+    ['{44186C67-FB19-481E-9863-2F94C623587C}']
     function code: INSetRadioStationIntentResponseCode; cdecl;
     function initWithCode(code: INSetRadioStationIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINSetRadioStationIntentResponse = class(TOCGenericImport<INSetRadioStationIntentResponseClass, INSetRadioStationIntentResponse>) end;
 
   INSearchForMessagesIntentResponseClass = interface(INIntentResponseClass)
-    ['{A40525E2-DD56-406A-B317-4991F4B47303}']
+    ['{1B31BE5C-08AD-47DD-8701-93385022760B}']
   end;
 
   INSearchForMessagesIntentResponse = interface(INIntentResponse)
-    ['{6AF295A2-28FE-482F-91A9-DB58A66795F5}']
+    ['{45342E71-3257-47B3-9A48-14B8A2FD753E}']
     function code: INSearchForMessagesIntentResponseCode; cdecl;
     function initWithCode(code: INSearchForMessagesIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function messages: NSArray; cdecl;
@@ -3565,35 +3598,37 @@ type
   TINSearchForMessagesIntentResponse = class(TOCGenericImport<INSearchForMessagesIntentResponseClass, INSearchForMessagesIntentResponse>) end;
 
   INSendMessageIntentResponseClass = interface(INIntentResponseClass)
-    ['{28146FF1-13FB-4CBC-B175-9DF6C1D4E41E}']
+    ['{39DAF1A4-FE52-4BF1-8509-0088D2341349}']
   end;
 
   INSendMessageIntentResponse = interface(INIntentResponse)
-    ['{4EB849CA-5BC4-4F4E-B66D-99AA9984EBDB}']
+    ['{3002A322-3D38-4908-889A-8746CB6B4813}']
     function code: INSendMessageIntentResponseCode; cdecl;
     function initWithCode(code: INSendMessageIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
-    function sentMessage: INMessage; cdecl;
-    procedure setSentMessage(sentMessage: INMessage); cdecl;
+    function sentMessage: INMessage; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("sentMessages", ios(10.3, 16.0), watchos(3.2, 9.0))
+    function sentMessages: NSArray; cdecl;
+    procedure setSentMessage(sentMessage: INMessage); cdecl; // API_DEPRECATED_WITH_REPLACEMENT("sentMessages", ios(10.3, 16.0), watchos(3.2, 9.0))
+    procedure setSentMessages(sentMessages: NSArray); cdecl;
   end;
   TINSendMessageIntentResponse = class(TOCGenericImport<INSendMessageIntentResponseClass, INSendMessageIntentResponse>) end;
 
   INSetMessageAttributeIntentResponseClass = interface(INIntentResponseClass)
-    ['{14FC2C01-1A89-48C2-82EA-16EC8EE77161}']
+    ['{00530C54-362D-49AF-94F7-C4753F4E9F87}']
   end;
 
   INSetMessageAttributeIntentResponse = interface(INIntentResponse)
-    ['{6B77DDBA-63FD-4E63-9836-5E840BEFCF32}']
+    ['{119F0BA0-9A6D-4511-AC46-14372ECE3909}']
     function code: INSetMessageAttributeIntentResponseCode; cdecl;
     function initWithCode(code: INSetMessageAttributeIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINSetMessageAttributeIntentResponse = class(TOCGenericImport<INSetMessageAttributeIntentResponseClass, INSetMessageAttributeIntentResponse>) end;
 
   INAddTasksIntentResponseClass = interface(INIntentResponseClass)
-    ['{8F67C1BC-4EAA-418B-9C08-DB34D1D2A325}']
+    ['{6C2EA069-8855-421E-910C-1878E5901F6F}']
   end;
 
   INAddTasksIntentResponse = interface(INIntentResponse)
-    ['{5A1BF125-7BE5-4A04-B9E7-7E2DF6BDAD5E}']
+    ['{AF36E187-3380-44CF-A2A6-45A8CFD3E3EA}']
     function addedTasks: NSArray; cdecl;
     function code: INAddTasksIntentResponseCode; cdecl;
     function initWithCode(code: INAddTasksIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3604,11 +3639,11 @@ type
   TINAddTasksIntentResponse = class(TOCGenericImport<INAddTasksIntentResponseClass, INAddTasksIntentResponse>) end;
 
   INAppendToNoteIntentResponseClass = interface(INIntentResponseClass)
-    ['{976C38B3-1A3B-4E29-A1E5-6CCDA4EDCE91}']
+    ['{ACF35278-56F4-4603-B72E-C1DAAC358F0B}']
   end;
 
   INAppendToNoteIntentResponse = interface(INIntentResponse)
-    ['{A6A09C1E-CF41-4F2B-9DD7-97D9DA9E558F}']
+    ['{94F8D637-0753-46D3-85BB-6EB31FEC3838}']
     function code: INAppendToNoteIntentResponseCode; cdecl;
     function initWithCode(code: INAppendToNoteIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function note: INNote; cdecl;
@@ -3617,11 +3652,11 @@ type
   TINAppendToNoteIntentResponse = class(TOCGenericImport<INAppendToNoteIntentResponseClass, INAppendToNoteIntentResponse>) end;
 
   INCreateNoteIntentResponseClass = interface(INIntentResponseClass)
-    ['{B396CF92-5B51-4B77-9610-9A6269029F92}']
+    ['{1C8B61A1-9F3F-44A5-816E-B5BCD60420E2}']
   end;
 
   INCreateNoteIntentResponse = interface(INIntentResponse)
-    ['{A6F73783-7D76-43D4-BF62-B9DF56978035}']
+    ['{F59E4A54-4A92-4A3F-A374-9477A21D1F4E}']
     function code: INCreateNoteIntentResponseCode; cdecl;
     function createdNote: INNote; cdecl;
     function initWithCode(code: INCreateNoteIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3630,11 +3665,11 @@ type
   TINCreateNoteIntentResponse = class(TOCGenericImport<INCreateNoteIntentResponseClass, INCreateNoteIntentResponse>) end;
 
   INCreateTaskListIntentResponseClass = interface(INIntentResponseClass)
-    ['{A92E7AFF-04E0-43CD-9D08-1122785127E0}']
+    ['{A470DC0C-E1D8-4B9A-A66C-9E4D28DDFA47}']
   end;
 
   INCreateTaskListIntentResponse = interface(INIntentResponse)
-    ['{A2C9B42B-B1E8-4CF7-982E-7767CBE056E9}']
+    ['{28985EEF-92AF-475D-98AD-FDADB8A9B46B}']
     function code: INCreateTaskListIntentResponseCode; cdecl;
     function createdTaskList: INTaskList; cdecl;
     function initWithCode(code: INCreateTaskListIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3643,11 +3678,11 @@ type
   TINCreateTaskListIntentResponse = class(TOCGenericImport<INCreateTaskListIntentResponseClass, INCreateTaskListIntentResponse>) end;
 
   INDeleteTasksIntentResponseClass = interface(INIntentResponseClass)
-    ['{06A13EA2-5CC0-4BC7-8651-B779A767ADB1}']
+    ['{42C39BBA-F53D-4BE8-9A13-B4A561E6730F}']
   end;
 
   INDeleteTasksIntentResponse = interface(INIntentResponse)
-    ['{C125967A-56A3-4018-97D3-C5C1088F52F6}']
+    ['{0FB0425B-2E3A-428F-B713-D05BCD022819}']
     function code: INDeleteTasksIntentResponseCode; cdecl;
     function deletedTasks: NSArray; cdecl;
     function initWithCode(code: INDeleteTasksIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3656,11 +3691,11 @@ type
   TINDeleteTasksIntentResponse = class(TOCGenericImport<INDeleteTasksIntentResponseClass, INDeleteTasksIntentResponse>) end;
 
   INSearchForNotebookItemsIntentResponseClass = interface(INIntentResponseClass)
-    ['{FC044015-74EA-4945-9272-2E3BC32AE00F}']
+    ['{77A4F6D3-8D18-44B1-BC8E-16429FBA01F6}']
   end;
 
   INSearchForNotebookItemsIntentResponse = interface(INIntentResponse)
-    ['{24D75C9C-89EA-4AE4-A979-98C25BA5FE49}']
+    ['{EA7AD8A7-03B2-4A9C-B526-606440CC5EF8}']
     function code: INSearchForNotebookItemsIntentResponseCode; cdecl;
     function initWithCode(code: INSearchForNotebookItemsIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function notes: NSArray; cdecl;
@@ -3676,11 +3711,11 @@ type
     INSearchForNotebookItemsIntentResponse>) end;
 
   INSetTaskAttributeIntentResponseClass = interface(INIntentResponseClass)
-    ['{6FCBAAEA-E5E4-4C89-9E67-C25271032044}']
+    ['{AED2726F-F33B-4A27-89B0-A3EFCC92988A}']
   end;
 
   INSetTaskAttributeIntentResponse = interface(INIntentResponse)
-    ['{B1D78A23-72A6-489B-A70A-441BCE4B0FF7}']
+    ['{DA238A07-512D-468A-83E2-A3A670431B74}']
     function code: INSetTaskAttributeIntentResponseCode; cdecl;
     function initWithCode(code: INSetTaskAttributeIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function modifiedTask: INTask; cdecl;
@@ -3689,11 +3724,11 @@ type
   TINSetTaskAttributeIntentResponse = class(TOCGenericImport<INSetTaskAttributeIntentResponseClass, INSetTaskAttributeIntentResponse>) end;
 
   INSnoozeTasksIntentResponseClass = interface(INIntentResponseClass)
-    ['{81309FE7-9C41-4707-B7C1-341BA71B42D4}']
+    ['{1181D4E7-FE76-472F-8C98-EBE575B2DCC6}']
   end;
 
   INSnoozeTasksIntentResponse = interface(INIntentResponse)
-    ['{E77C89F2-8162-409A-92E0-09159A6D4298}']
+    ['{7F80BBF9-18EC-416C-B944-075CFD875BC5}']
     function code: INSnoozeTasksIntentResponseCode; cdecl;
     function initWithCode(code: INSnoozeTasksIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     procedure setSnoozedTasks(snoozedTasks: NSArray); cdecl;
@@ -3702,11 +3737,11 @@ type
   TINSnoozeTasksIntentResponse = class(TOCGenericImport<INSnoozeTasksIntentResponseClass, INSnoozeTasksIntentResponse>) end;
 
   INPayBillIntentResponseClass = interface(INIntentResponseClass)
-    ['{48CF0B7F-8095-4C6A-81FE-38A3E9A2F635}']
+    ['{0E7419EA-E7EC-4D60-A443-DE59953E18FE}']
   end;
 
   INPayBillIntentResponse = interface(INIntentResponse)
-    ['{5150039F-1A95-441C-B067-E92AC657237F}']
+    ['{FEA95954-C467-4168-B4C3-1BC135811FC1}']
     function billDetails: INBillDetails; cdecl;
     function code: INPayBillIntentResponseCode; cdecl;
     function fromAccount: INPaymentAccount; cdecl;
@@ -3723,11 +3758,11 @@ type
   TINPayBillIntentResponse = class(TOCGenericImport<INPayBillIntentResponseClass, INPayBillIntentResponse>) end;
 
   INRequestPaymentIntentResponseClass = interface(INIntentResponseClass)
-    ['{454A7440-09E9-46D3-85D7-63041D14D206}']
+    ['{8DB1E49F-AD3A-4ECD-B233-8CE614DB8D40}']
   end;
 
   INRequestPaymentIntentResponse = interface(INIntentResponse)
-    ['{28BA0C27-E3A3-4D62-AB47-C52B6FDEC9CF}']
+    ['{30207288-C771-4DC2-8FB7-CC426879FC91}']
     function code: INRequestPaymentIntentResponseCode; cdecl;
     function initWithCode(code: INRequestPaymentIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function paymentRecord: INPaymentRecord; cdecl;
@@ -3736,11 +3771,11 @@ type
   TINRequestPaymentIntentResponse = class(TOCGenericImport<INRequestPaymentIntentResponseClass, INRequestPaymentIntentResponse>) end;
 
   INSearchForAccountsIntentResponseClass = interface(INIntentResponseClass)
-    ['{055C4E60-C776-4685-9D4D-CE4FAF0253CA}']
+    ['{8BA224FB-B156-4125-967D-D8707A386555}']
   end;
 
   INSearchForAccountsIntentResponse = interface(INIntentResponse)
-    ['{B72D5270-A745-4489-9EFC-3A76EC300F8D}']
+    ['{FBEED5A5-9D3A-4EC4-92A3-0A4BE5B00A5E}']
     function accounts: NSArray; cdecl;
     function code: INSearchForAccountsIntentResponseCode; cdecl;
     function initWithCode(code: INSearchForAccountsIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3749,11 +3784,11 @@ type
   TINSearchForAccountsIntentResponse = class(TOCGenericImport<INSearchForAccountsIntentResponseClass, INSearchForAccountsIntentResponse>) end;
 
   INSearchForBillsIntentResponseClass = interface(INIntentResponseClass)
-    ['{5DA0B992-CF4E-482A-8572-24C6655B8501}']
+    ['{28E7DF80-A96D-4A5D-B26D-3D9F9016BF83}']
   end;
 
   INSearchForBillsIntentResponse = interface(INIntentResponse)
-    ['{20B5B083-C687-4953-AE92-A9744E4052B2}']
+    ['{3E9C26B2-DF35-45ED-AB12-B2F941BBE732}']
     function bills: NSArray; cdecl;
     function code: INSearchForBillsIntentResponseCode; cdecl;
     function initWithCode(code: INSearchForBillsIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3762,11 +3797,11 @@ type
   TINSearchForBillsIntentResponse = class(TOCGenericImport<INSearchForBillsIntentResponseClass, INSearchForBillsIntentResponse>) end;
 
   INSendPaymentIntentResponseClass = interface(INIntentResponseClass)
-    ['{7CD00CB7-F693-4707-B2D8-E87C143FD103}']
+    ['{9FBE1BCF-F69D-4184-B24B-94B98C7F2F09}']
   end;
 
   INSendPaymentIntentResponse = interface(INIntentResponse)
-    ['{78452436-DD2C-4B90-A317-B115DE987B0C}']
+    ['{BE2382C2-7BD2-4158-B42B-AB6C5CDEA4ED}']
     function code: INSendPaymentIntentResponseCode; cdecl;
     function initWithCode(code: INSendPaymentIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function paymentRecord: INPaymentRecord; cdecl;
@@ -3775,11 +3810,11 @@ type
   TINSendPaymentIntentResponse = class(TOCGenericImport<INSendPaymentIntentResponseClass, INSendPaymentIntentResponse>) end;
 
   INTransferMoneyIntentResponseClass = interface(INIntentResponseClass)
-    ['{CAFCC194-5AF6-4C46-AA51-B8B8D584EED0}']
+    ['{74D01FC1-BE1E-47B9-A107-AC86956A88CA}']
   end;
 
   INTransferMoneyIntentResponse = interface(INIntentResponse)
-    ['{4247275D-6FEE-4A62-BA20-C3D1127A9A69}']
+    ['{26474D5A-D52D-4C93-9DCC-BAD4A76BED7C}']
     function code: INTransferMoneyIntentResponseCode; cdecl;
     function fromAccount: INPaymentAccount; cdecl;
     function initWithCode(code: INTransferMoneyIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3798,11 +3833,11 @@ type
   TINTransferMoneyIntentResponse = class(TOCGenericImport<INTransferMoneyIntentResponseClass, INTransferMoneyIntentResponse>) end;
 
   INSearchForPhotosIntentResponseClass = interface(INIntentResponseClass)
-    ['{6363024A-3CEE-48ED-B9ED-7AE4C9DB95B2}']
+    ['{14EAA915-3200-4BDD-8B40-27DE3DC10F38}']
   end;
 
   INSearchForPhotosIntentResponse = interface(INIntentResponse)
-    ['{D31857FB-38D7-4251-9224-21F9AB13320E}']
+    ['{7E270276-1CF2-4CB6-A1E0-2783B1888D02}']
     function code: INSearchForPhotosIntentResponseCode; cdecl;
     function initWithCode(code: INSearchForPhotosIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function searchResultsCount: NSNumber; cdecl;
@@ -3811,11 +3846,11 @@ type
   TINSearchForPhotosIntentResponse = class(TOCGenericImport<INSearchForPhotosIntentResponseClass, INSearchForPhotosIntentResponse>) end;
 
   INStartPhotoPlaybackIntentResponseClass = interface(INIntentResponseClass)
-    ['{81C75704-D438-4D40-80DE-8454CE713253}']
+    ['{97E2E783-B6EE-4A2C-8424-320D72FCDFB7}']
   end;
 
   INStartPhotoPlaybackIntentResponse = interface(INIntentResponse)
-    ['{A3D0FC8E-E935-47C5-AE39-FF8813E50DCB}']
+    ['{AE22BAA5-086B-4731-BAB3-06724F16C060}']
     function code: INStartPhotoPlaybackIntentResponseCode; cdecl;
     function initWithCode(code: INStartPhotoPlaybackIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function searchResultsCount: NSNumber; cdecl;
@@ -3824,11 +3859,11 @@ type
   TINStartPhotoPlaybackIntentResponse = class(TOCGenericImport<INStartPhotoPlaybackIntentResponseClass, INStartPhotoPlaybackIntentResponse>) end;
 
   INGetReservationDetailsIntentResponseClass = interface(INIntentResponseClass)
-    ['{4FC2D3E5-C9E6-4093-AF6E-969806EBFD19}']
+    ['{A14A038E-2624-4C98-9E07-0AFA4E7D4034}']
   end;
 
   INGetReservationDetailsIntentResponse = interface(INIntentResponse)
-    ['{08B6E178-6925-4CE6-ADAB-2959C3D5892A}']
+    ['{3586A0D4-DC9D-4930-9D9F-1332CEB3B5BC}']
     function code: INGetReservationDetailsIntentResponseCode; cdecl;
     function initWithCode(code: INGetReservationDetailsIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function reservations: NSArray; cdecl;
@@ -3838,11 +3873,11 @@ type
     INGetReservationDetailsIntentResponse>) end;
 
   INGetRideStatusIntentResponseClass = interface(INIntentResponseClass)
-    ['{BB3483AB-57A2-452B-9553-5039FE70D4F4}']
+    ['{A6BDC0AE-D231-41D3-B612-76A4EF7C77D7}']
   end;
 
   INGetRideStatusIntentResponse = interface(INIntentResponse)
-    ['{D2D2AEC2-6097-48AD-839C-AAFC99055513}']
+    ['{4494FBE4-5A94-4D4D-9427-84C3A08D80F9}']
     function code: INGetRideStatusIntentResponseCode; cdecl;
     function initWithCode(code: INGetRideStatusIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function rideStatus: INRideStatus; cdecl;
@@ -3851,11 +3886,11 @@ type
   TINGetRideStatusIntentResponse = class(TOCGenericImport<INGetRideStatusIntentResponseClass, INGetRideStatusIntentResponse>) end;
 
   INListRideOptionsIntentResponseClass = interface(INIntentResponseClass)
-    ['{DCBF2AD3-706A-4A4D-B257-D73A971BCC62}']
+    ['{5FF2984B-274F-4353-8D93-5B6FCEE04940}']
   end;
 
   INListRideOptionsIntentResponse = interface(INIntentResponse)
-    ['{95103387-8C66-48ED-B374-A0282C32F12F}']
+    ['{24E15237-DA2C-4428-AEE6-360BD88F3110}']
     function code: INListRideOptionsIntentResponseCode; cdecl;
     function expirationDate: NSDate; cdecl;
     function initWithCode(code: INListRideOptionsIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
@@ -3868,11 +3903,11 @@ type
   TINListRideOptionsIntentResponse = class(TOCGenericImport<INListRideOptionsIntentResponseClass, INListRideOptionsIntentResponse>) end;
 
   INRequestRideIntentResponseClass = interface(INIntentResponseClass)
-    ['{92BD196C-DA7D-4A52-8F19-D4877C3B4675}']
+    ['{C0BC2B0D-FEAA-470A-B1D2-ED7A57A8975C}']
   end;
 
   INRequestRideIntentResponse = interface(INIntentResponse)
-    ['{A024B02D-55B4-4D7C-AC0B-A2D26F40413B}']
+    ['{F2D90B35-ED66-4289-8304-75B0A74371C4}']
     function code: INRequestRideIntentResponseCode; cdecl;
     function initWithCode(code: INRequestRideIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     function rideStatus: INRideStatus; cdecl;
@@ -3881,11 +3916,11 @@ type
   TINRequestRideIntentResponse = class(TOCGenericImport<INRequestRideIntentResponseClass, INRequestRideIntentResponse>) end;
 
   INCancelRideIntentResponseClass = interface(INIntentResponseClass)
-    ['{CEF4FCDD-B772-4A66-8494-2EC0EB3D14AB}']
+    ['{00465366-F2B1-4EFB-B7CE-66F3D0F0A26D}']
   end;
 
   INCancelRideIntentResponse = interface(INIntentResponse)
-    ['{DB06E1BE-7A47-4F9F-B95D-62D989C0B1D2}']
+    ['{D874606E-45E3-4294-A60E-B44BF9607D39}']
     function cancellationFee: INCurrencyAmount; cdecl;
     function cancellationFeeThreshold: NSDateComponents; cdecl;
     function code: INCancelRideIntentResponseCode; cdecl;
@@ -3896,22 +3931,22 @@ type
   TINCancelRideIntentResponse = class(TOCGenericImport<INCancelRideIntentResponseClass, INCancelRideIntentResponse>) end;
 
   INSendRideFeedbackIntentResponseClass = interface(INIntentResponseClass)
-    ['{B877752D-80B3-4AA6-B450-5903A386C3E6}']
+    ['{FF23F012-964D-49B4-8D5B-9BEA0B534BC8}']
   end;
 
   INSendRideFeedbackIntentResponse = interface(INIntentResponse)
-    ['{3120260F-8C42-41CF-B422-3C16602AC44E}']
+    ['{D254EA76-C424-4BFC-AADD-C3E30EBE946F}']
     function code: INSendRideFeedbackIntentResponseCode; cdecl;
     function initWithCode(code: INSendRideFeedbackIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
   end;
   TINSendRideFeedbackIntentResponse = class(TOCGenericImport<INSendRideFeedbackIntentResponseClass, INSendRideFeedbackIntentResponse>) end;
 
   INGetVisualCodeIntentResponseClass = interface(INIntentResponseClass)
-    ['{46A62955-E30D-4248-84C2-455FE0B7373E}']
+    ['{9E66511B-FB25-4F71-A7D9-D4D97A4BDD6C}']
   end;
 
   INGetVisualCodeIntentResponse = interface(INIntentResponse)
-    ['{6E8F8A39-F679-477B-878D-FB9DE6EAC057}']
+    ['{7864B3A9-57AE-4117-931A-3F066511DB78}']
     function code: INGetVisualCodeIntentResponseCode; cdecl;
     function initWithCode(code: INGetVisualCodeIntentResponseCode; userActivity: NSUserActivity): Pointer; cdecl;
     procedure setVisualCodeImage(visualCodeImage: INImage); cdecl;
@@ -3920,7 +3955,7 @@ type
   TINGetVisualCodeIntentResponse = class(TOCGenericImport<INGetVisualCodeIntentResponseClass, INGetVisualCodeIntentResponse>) end;
 
   INAccountTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{17D710F5-2C16-4B4B-8B18-824EB20A25F1}']
+    ['{192AD6EF-C655-44D7-8014-6E9C170D9EEA}']
     {class} function confirmationRequiredWithAccountTypeToConfirm(accountTypeToConfirm: INAccountType): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INAccountType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithAccountTypeToConfirm:", ios(11.0, 11.0), watchos(4.0, 4.0))
     {class} function successWithResolvedAccountType(resolvedAccountType: INAccountType): Pointer; cdecl;
@@ -3928,36 +3963,36 @@ type
   end;
 
   INAccountTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{0AD20AAC-A441-46EC-87DE-0AA3696CC051}']
+    ['{BB5850DC-12BB-4BA5-AFBA-E7EF80F3E303}']
   end;
   TINAccountTypeResolutionResult = class(TOCGenericImport<INAccountTypeResolutionResultClass, INAccountTypeResolutionResult>) end;
 
   INMediaDestinationResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{ED7E0CAC-2139-4F94-A49B-5DCE5EB37131}']
+    ['{7EBC8552-11A1-40AE-9AE8-6ECFDBABBFBF}']
     {class} function confirmationRequiredWithMediaDestinationToConfirm(mediaDestinationToConfirm: INMediaDestination): Pointer; cdecl;
     {class} function disambiguationWithMediaDestinationsToDisambiguate(mediaDestinationsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedMediaDestination(resolvedMediaDestination: INMediaDestination): Pointer; cdecl;
   end;
 
   INMediaDestinationResolutionResult = interface(INIntentResolutionResult)
-    ['{CA43DC36-13DC-414B-B348-0E1F0135021E}']
+    ['{70C5E9E0-69F1-43CA-BE09-7C7DE70496A7}']
   end;
   TINMediaDestinationResolutionResult = class(TOCGenericImport<INMediaDestinationResolutionResultClass, INMediaDestinationResolutionResult>) end;
 
   INAddMediaMediaDestinationResolutionResultClass = interface(INMediaDestinationResolutionResultClass)
-    ['{21C03C5B-A2EB-4887-9803-665025685060}']
+    ['{831584AA-DD54-48F8-B09F-CD3584821DDD}']
     {class} function unsupportedForReason(reason: INAddMediaMediaDestinationUnsupportedReason): Pointer; cdecl;
   end;
 
   INAddMediaMediaDestinationResolutionResult = interface(INMediaDestinationResolutionResult)
-    ['{31E094B7-B935-428C-BD45-300E149BAF98}']
+    ['{FABB5DFD-5178-437E-AC7C-4EE01F5AFCDB}']
     function initWithMediaDestinationResolutionResult(mediaDestinationResolutionResult: INMediaDestinationResolutionResult): Pointer; cdecl;
   end;
   TINAddMediaMediaDestinationResolutionResult = class(TOCGenericImport<INAddMediaMediaDestinationResolutionResultClass,
     INAddMediaMediaDestinationResolutionResult>) end;
 
   INMediaItemResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{906F9D7F-A73B-4344-88E0-61E6CCBD6B62}']
+    ['{2CEB7E1A-381D-4550-AD33-30390A782EF6}']
     {class} function confirmationRequiredWithMediaItemToConfirm(mediaItemToConfirm: INMediaItem): Pointer; cdecl;
     {class} function disambiguationWithMediaItemsToDisambiguate(mediaItemsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successesWithResolvedMediaItems(resolvedMediaItems: NSArray): NSArray; cdecl;
@@ -3965,78 +4000,78 @@ type
   end;
 
   INMediaItemResolutionResult = interface(INIntentResolutionResult)
-    ['{ED7E7590-56FB-4965-9AB4-BF21CA9B52D3}']
+    ['{2CF54AFD-1AF2-4750-BF5D-B3D075747496}']
   end;
   TINMediaItemResolutionResult = class(TOCGenericImport<INMediaItemResolutionResultClass, INMediaItemResolutionResult>) end;
 
   INAddMediaMediaItemResolutionResultClass = interface(INMediaItemResolutionResultClass)
-    ['{4DDF847F-0A20-43F9-A7DF-520B9562E930}']
+    ['{22C67AAD-BA29-4155-AA6A-E9D24DA657CA}']
     {class} function successesWithResolvedMediaItems(resolvedMediaItems: NSArray): NSArray; cdecl;
     {class} function unsupportedForReason(reason: INAddMediaMediaItemUnsupportedReason): Pointer; cdecl;
   end;
 
   INAddMediaMediaItemResolutionResult = interface(INMediaItemResolutionResult)
-    ['{AB6F0279-5033-441C-8589-4BA8D0638F8A}']
+    ['{AFFC7206-1C5F-4AAB-8BFC-13CA707CEEF4}']
     function initWithMediaItemResolutionResult(mediaItemResolutionResult: INMediaItemResolutionResult): Pointer; cdecl;
   end;
   TINAddMediaMediaItemResolutionResult = class(TOCGenericImport<INAddMediaMediaItemResolutionResultClass, INAddMediaMediaItemResolutionResult>) end;
 
   INTaskListResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{2DC0032D-D65B-4EC3-B624-0F34FD6259A5}']
+    ['{FB7B2BC0-148A-4ECA-9583-BC4E3F79436C}']
     {class} function confirmationRequiredWithTaskListToConfirm(taskListToConfirm: INTaskList): Pointer; cdecl;
     {class} function disambiguationWithTaskListsToDisambiguate(taskListsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedTaskList(resolvedTaskList: INTaskList): Pointer; cdecl;
   end;
 
   INTaskListResolutionResult = interface(INIntentResolutionResult)
-    ['{D8D183AB-DBE9-4B03-B865-585889EE4363}']
+    ['{BCFB96D4-9D4E-48F2-9BC4-3BD4EC9FF3BE}']
   end;
   TINTaskListResolutionResult = class(TOCGenericImport<INTaskListResolutionResultClass, INTaskListResolutionResult>) end;
 
   INAddTasksTargetTaskListResolutionResultClass = interface(INTaskListResolutionResultClass)
-    ['{960B3829-AC23-48A3-B5CC-4358996D0413}']
+    ['{D7AD9254-4935-4486-B333-7407B24B8C8C}']
     {class} function confirmationRequiredWithTaskListToConfirm(taskListToConfirm: INTaskList;
       forReason: INAddTasksTargetTaskListConfirmationReason): Pointer; cdecl;
   end;
 
   INAddTasksTargetTaskListResolutionResult = interface(INTaskListResolutionResult)
-    ['{0F42ACDB-877B-4774-8F4E-D0B6EEF08A70}']
+    ['{C3EB2AB5-EDE4-4B72-868D-A1B47ADAED2D}']
     function initWithTaskListResolutionResult(taskListResolutionResult: INTaskListResolutionResult): Pointer; cdecl;
   end;
   TINAddTasksTargetTaskListResolutionResult = class(TOCGenericImport<INAddTasksTargetTaskListResolutionResultClass,
     INAddTasksTargetTaskListResolutionResult>) end;
 
   INTemporalEventTriggerResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{14C08DA2-2289-49AC-8069-415EF91CC201}']
+    ['{FC32CB32-932F-4049-B51B-A846B4B5EC47}']
     {class} function confirmationRequiredWithTemporalEventTriggerToConfirm(temporalEventTriggerToConfirm: INTemporalEventTrigger): Pointer; cdecl;
     {class} function disambiguationWithTemporalEventTriggersToDisambiguate(temporalEventTriggersToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedTemporalEventTrigger(resolvedTemporalEventTrigger: INTemporalEventTrigger): Pointer; cdecl;
   end;
 
   INTemporalEventTriggerResolutionResult = interface(INIntentResolutionResult)
-    ['{A7B3D2E0-22F1-4421-BBE4-62A6A68F9D38}']
+    ['{0D1581C4-6323-4990-8422-1D0F951CB2AD}']
   end;
   TINTemporalEventTriggerResolutionResult = class(TOCGenericImport<INTemporalEventTriggerResolutionResultClass,
     INTemporalEventTriggerResolutionResult>) end;
 
   INAddTasksTemporalEventTriggerResolutionResultClass = interface(INTemporalEventTriggerResolutionResultClass)
-    ['{88440081-6482-4333-BD7A-4262AE739472}']
+    ['{E43B7743-296E-4B1C-90CB-E26B383B882F}']
     {class} function unsupportedForReason(reason: INAddTasksTemporalEventTriggerUnsupportedReason): Pointer; cdecl;
   end;
 
   INAddTasksTemporalEventTriggerResolutionResult = interface(INTemporalEventTriggerResolutionResult)
-    ['{63C02BE4-3F6F-4A8C-A3F4-59C1096A45B2}']
+    ['{083A239D-7FA2-425F-BC12-6024BF130C16}']
     function initWithTemporalEventTriggerResolutionResult(temporalEventTriggerResolutionResult: INTemporalEventTriggerResolutionResult): Pointer; cdecl;
   end;
   TINAddTasksTemporalEventTriggerResolutionResult = class(TOCGenericImport<INAddTasksTemporalEventTriggerResolutionResultClass,
     INAddTasksTemporalEventTriggerResolutionResult>) end;
 
   INAirlineClass = interface(NSObjectClass)
-    ['{5D5BEB41-A98D-4477-AE5F-B817A1A58308}']
+    ['{52DCF574-894F-4BEB-B437-CA8D1FE32AB1}']
   end;
 
   INAirline = interface(NSObject)
-    ['{FBADDA3B-FCB0-4D84-809D-AF151B551BBE}']
+    ['{AFAA1357-FE3D-45D1-9231-CC555AFB7688}']
     function iataCode: NSString; cdecl;
     function icaoCode: NSString; cdecl;
     function initWithName(name: NSString; iataCode: NSString; icaoCode: NSString): Pointer; cdecl;
@@ -4045,11 +4080,11 @@ type
   TINAirline = class(TOCGenericImport<INAirlineClass, INAirline>) end;
 
   INAirportClass = interface(NSObjectClass)
-    ['{C0250A55-7E9C-425B-A70D-20FCEA5C9B54}']
+    ['{C828C12D-D177-4D2F-ACDE-FB3921E34476}']
   end;
 
   INAirport = interface(NSObject)
-    ['{1E5B8D2C-C06E-4225-B9C1-B60459475400}']
+    ['{46B63DFD-91FC-4897-8238-FC171F19E54C}']
     function iataCode: NSString; cdecl;
     function icaoCode: NSString; cdecl;
     function initWithName(name: NSString; iataCode: NSString; icaoCode: NSString): Pointer; cdecl;
@@ -4058,11 +4093,11 @@ type
   TINAirport = class(TOCGenericImport<INAirportClass, INAirport>) end;
 
   INAirportGateClass = interface(NSObjectClass)
-    ['{2FDB2D3F-9C6F-48C6-9C18-8C065143D38E}']
+    ['{8AE4D1DE-FFD3-498C-9BCA-44C6CE35F59E}']
   end;
 
   INAirportGate = interface(NSObject)
-    ['{9CB4FBAE-6B56-41A5-BC92-B475AF0632D6}']
+    ['{05F06EA1-5A77-4968-87E2-730D5D5C8DBD}']
     function airport: INAirport; cdecl;
     function gate: NSString; cdecl;
     function initWithAirport(airport: INAirport; terminal: NSString; gate: NSString): Pointer; cdecl;
@@ -4071,22 +4106,22 @@ type
   TINAirportGate = class(TOCGenericImport<INAirportGateClass, INAirportGate>) end;
 
   INBalanceTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{9EBD428E-024C-4323-A391-4EAE36E1053E}']
+    ['{89779901-29F0-4663-BA1A-39958F45CB44}']
     {class} function confirmationRequiredWithBalanceTypeToConfirm(balanceTypeToConfirm: INBalanceType): Pointer; cdecl;
     {class} function successWithResolvedBalanceType(resolvedBalanceType: INBalanceType): Pointer; cdecl;
   end;
 
   INBalanceTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{070BDD61-59FD-47F8-A153-4AA92F9BBA2A}']
+    ['{3F8C5E67-10B0-475D-9B4E-782A6DCE0E75}']
   end;
   TINBalanceTypeResolutionResult = class(TOCGenericImport<INBalanceTypeResolutionResultClass, INBalanceTypeResolutionResult>) end;
 
   INBillDetailsClass = interface(NSObjectClass)
-    ['{1D604EA8-3CE9-46BB-85D4-1C594A852DBD}']
+    ['{153348D8-9D6C-4BD3-A304-457933A57BA3}']
   end;
 
   INBillDetails = interface(NSObject)
-    ['{AA615821-FCC8-4FC2-90B2-A12866C3DE80}']
+    ['{408FCF82-0AFC-4649-8C48-FF99DE0E474C}']
     function amountDue: INCurrencyAmount; cdecl;
     function billPayee: INBillPayee; cdecl;
     function billType: INBillType; cdecl;
@@ -4109,11 +4144,11 @@ type
   TINBillDetails = class(TOCGenericImport<INBillDetailsClass, INBillDetails>) end;
 
   INBillPayeeClass = interface(NSObjectClass)
-    ['{12827868-67CA-4380-9774-CECF5B85CE21}']
+    ['{DE9FBC69-BC5B-4B3F-9F48-86A0535A2CEA}']
   end;
 
   INBillPayee = interface(NSObject)
-    ['{25A72D7E-F7C3-42D4-BBCF-66747A8311AC}']
+    ['{4EFE5EB9-DE0F-4167-AE7B-80F1D7AC6E3E}']
     function accountNumber: NSString; cdecl;
     function initWithNickname(nickname: INSpeakableString; number: NSString; organizationName: INSpeakableString): Pointer; cdecl;
     function nickname: INSpeakableString; cdecl;
@@ -4122,19 +4157,19 @@ type
   TINBillPayee = class(TOCGenericImport<INBillPayeeClass, INBillPayee>) end;
 
   INBillPayeeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{8398350C-8CCF-488D-90ED-3F411A078C81}']
+    ['{FBCD2B19-B067-4721-9BAC-977989D7537E}']
     {class} function confirmationRequiredWithBillPayeeToConfirm(billPayeeToConfirm: INBillPayee): Pointer; cdecl;
     {class} function disambiguationWithBillPayeesToDisambiguate(billPayeesToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedBillPayee(resolvedBillPayee: INBillPayee): Pointer; cdecl;
   end;
 
   INBillPayeeResolutionResult = interface(INIntentResolutionResult)
-    ['{54F4D43A-EF2D-416C-ADC2-A0EA7E64F34D}']
+    ['{B0A5E371-33A6-4FD6-B408-F6864E088869}']
   end;
   TINBillPayeeResolutionResult = class(TOCGenericImport<INBillPayeeResolutionResultClass, INBillPayeeResolutionResult>) end;
 
   INBillTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{853E3A13-B786-4C95-A808-A0969D2A1FFE}']
+    ['{A3DF7C3B-449A-4E09-8345-E9B9B5F5A199}']
     {class} function confirmationRequiredWithBillTypeToConfirm(billTypeToConfirm: INBillType): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INBillType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithBillTypeToConfirm:", ios(10.3, 11.0), watchos(3.2, 4.0))
     {class} function successWithResolvedBillType(resolvedBillType: INBillType): Pointer; cdecl;
@@ -4142,16 +4177,16 @@ type
   end;
 
   INBillTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{A8ADF85A-65A2-40D4-B676-B0487C12AF9D}']
+    ['{7107A016-1533-4B0E-B31B-26D621DEB52D}']
   end;
   TINBillTypeResolutionResult = class(TOCGenericImport<INBillTypeResolutionResultClass, INBillTypeResolutionResult>) end;
 
   INBoatTripClass = interface(NSObjectClass)
-    ['{B4D0D4E6-C7B1-495D-844D-FA431DF9D660}']
+    ['{5C42EE67-ABCA-4638-B987-25338E677FCD}']
   end;
 
   INBoatTrip = interface(NSObject)
-    ['{9808ACF7-16D0-487B-9886-34D8808FA9E4}']
+    ['{AB88A6B6-EFAA-4D6D-A4D2-A55983C4E890}']
     function arrivalBoatTerminalLocation: CLPlacemark; cdecl;
     function boatName: NSString; cdecl;
     function boatNumber: NSString; cdecl;
@@ -4164,11 +4199,11 @@ type
   TINBoatTrip = class(TOCGenericImport<INBoatTripClass, INBoatTrip>) end;
 
   INBusTripClass = interface(NSObjectClass)
-    ['{FBB3A3D0-5833-440B-A11D-A6933267CD69}']
+    ['{DF928B2D-254C-4BF0-80D6-15F94E5076DE}']
   end;
 
   INBusTrip = interface(NSObject)
-    ['{9862E7B2-AB23-4A48-BD92-36320FB26632}']
+    ['{669D2DAF-5880-4E7B-8144-C11E968A9C92}']
     function arrivalBusStopLocation: CLPlacemark; cdecl;
     function arrivalPlatform: NSString; cdecl;
     function busName: NSString; cdecl;
@@ -4184,34 +4219,34 @@ type
   TINBusTrip = class(TOCGenericImport<INBusTripClass, INBusTrip>) end;
 
   INCallCapabilityResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{BA099CA2-C751-4580-9DEE-51CD4D5D0463}']
+    ['{4E5C03E3-3B38-4124-A087-158B92E79A27}']
     {class} function confirmationRequiredWithCallCapabilityToConfirm(callCapabilityToConfirm: INCallCapability): Pointer; cdecl;
     {class} function successWithResolvedCallCapability(resolvedCallCapability: INCallCapability): Pointer; cdecl;
   end;
 
   INCallCapabilityResolutionResult = interface(INIntentResolutionResult)
-    ['{F4E4EC2F-6FA2-44E6-9BB6-372E5DDF748B}']
+    ['{D7E83EAB-E7AE-428B-BE7E-19819A80E8FB}']
   end;
   TINCallCapabilityResolutionResult = class(TOCGenericImport<INCallCapabilityResolutionResultClass, INCallCapabilityResolutionResult>) end;
 
   INCallDestinationTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{BA52258F-5D0E-433E-AA1C-8C875113CEDD}']
+    ['{7DCCA341-B76F-4D3C-A638-F5C416FBFB37}']
     {class} function confirmationRequiredWithCallDestinationTypeToConfirm(callDestinationTypeToConfirm: INCallDestinationType): Pointer; cdecl;
     {class} function successWithResolvedCallDestinationType(resolvedCallDestinationType: INCallDestinationType): Pointer; cdecl;
   end;
 
   INCallDestinationTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{C5563402-82BB-49B7-886C-B98DA945CB46}']
+    ['{3DC627AC-6E87-470C-931B-2B3559663CEA}']
   end;
   TINCallDestinationTypeResolutionResult = class(TOCGenericImport<INCallDestinationTypeResolutionResultClass,
     INCallDestinationTypeResolutionResult>) end;
 
   INCallGroupClass = interface(NSObjectClass)
-    ['{55BAEB7A-B05B-4153-A6FB-0BBB84CEC109}']
+    ['{8ACC283A-72E5-4C79-9976-497B25502092}']
   end;
 
   INCallGroup = interface(NSObject)
-    ['{C147FF5F-4839-4C60-955D-35A82850D568}']
+    ['{3F7525F3-168B-4B55-A1A0-954D85FD510F}']
     function groupId: NSString; cdecl;
     function groupName: NSString; cdecl;
     function initWithGroupName(groupName: NSString; groupId: NSString): Pointer; cdecl;
@@ -4219,14 +4254,14 @@ type
   TINCallGroup = class(TOCGenericImport<INCallGroupClass, INCallGroup>) end;
 
   INCallRecordClass = interface(NSObjectClass)
-    ['{2E9D1164-5EFE-44C6-9BA0-CCAB13EE07E0}']
+    ['{4CAFB77F-077C-4E7E-AD01-DE39E213CC3A}']
   end;
 
   INCallRecord = interface(NSObject)
-    ['{63CC8CAF-086D-4152-AA27-35D71D449384}']
+    ['{B402306E-FE0F-4631-822A-3D6BF6DE93CE}']
     function callCapability: INCallCapability; cdecl;
     function callDuration: NSNumber; cdecl;
-    function caller: INPerson; cdecl; // API_DEPRECATED("", ios(11.0, 14.5), watchos(4.0, 7.3))
+    function caller: INPerson; cdecl; // API_DEPRECATED("", ios(11.0, 14.5), macos(12.0, 12.0), watchos(4.0, 7.3))
     function callRecordType: INCallRecordType; cdecl;
     function dateCreated: NSDate; cdecl;
     function identifier: NSString; cdecl;
@@ -4248,11 +4283,11 @@ type
   TINCallRecord = class(TOCGenericImport<INCallRecordClass, INCallRecord>) end;
 
   INCallRecordFilterClass = interface(NSObjectClass)
-    ['{90B39C5B-BFA0-4FF3-A9B6-23B1B563D1AB}']
+    ['{BD55F06E-659F-4A68-BCB9-4752CC5E3DEF}']
   end;
 
   INCallRecordFilter = interface(NSObject)
-    ['{5ABD4F47-062E-46E0-80C3-E908825C9787}']
+    ['{22E05FEA-B427-4002-AE08-EB346AF0E262}']
     function callCapability: INCallCapability; cdecl;
     function callTypes: INCallRecordTypeOptions; cdecl;
     function initWithParticipants(participants: NSArray; callTypes: INCallRecordTypeOptions; callCapability: INCallCapability): Pointer; cdecl;
@@ -4261,50 +4296,46 @@ type
   TINCallRecordFilter = class(TOCGenericImport<INCallRecordFilterClass, INCallRecordFilter>) end;
 
   INCallRecordResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{5CAD6C30-6B39-4735-BCFC-41C957060CE8}']
+    ['{996ADC62-F111-4BA8-8B63-4AA9556A3995}']
     {class} function confirmationRequiredWithCallRecordToConfirm(callRecordToConfirm: INCallRecord): Pointer; cdecl;
     {class} function disambiguationWithCallRecordsToDisambiguate(callRecordsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedCallRecord(resolvedCallRecord: INCallRecord): Pointer; cdecl;
   end;
 
   INCallRecordResolutionResult = interface(INIntentResolutionResult)
-    ['{F227A1B8-BAF4-41CB-B3E7-BA32C0046DF3}']
+    ['{DB5EA8BA-B67F-4282-B715-E00BCC0533C1}']
   end;
   TINCallRecordResolutionResult = class(TOCGenericImport<INCallRecordResolutionResultClass, INCallRecordResolutionResult>) end;
 
   INCallRecordTypeOptionsResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{A5C5FF2B-45E4-4F29-805F-6AB2C0D98FEC}']
+    ['{E44EF3CE-D4ED-44D9-9125-3CB97E7E3829}']
     {class} function confirmationRequiredWithCallRecordTypeOptionsToConfirm(callRecordTypeOptionsToConfirm: INCallRecordTypeOptions): Pointer; cdecl;
-    {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INCallRecordTypeOptions): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithCallRecordTypeOptionsToConfirm:", ios(11.0, 11.0), watchos(4.0, 4.0))
     {class} function successWithResolvedCallRecordTypeOptions(resolvedCallRecordTypeOptions: INCallRecordTypeOptions): Pointer; cdecl;
-    {class} function successWithResolvedValue(resolvedValue: INCallRecordTypeOptions): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+successWithResolvedCallRecordTypeOptions:", ios(11.0, 11.0), watchos(4.0, 4.0))
   end;
 
   INCallRecordTypeOptionsResolutionResult = interface(INIntentResolutionResult)
-    ['{25CB5E9D-998B-4AEC-8138-27685DFD9BC1}']
+    ['{0ED891D2-C7DF-480F-8C70-20D801CAA8A5}']
   end;
   TINCallRecordTypeOptionsResolutionResult = class(TOCGenericImport<INCallRecordTypeOptionsResolutionResultClass,
     INCallRecordTypeOptionsResolutionResult>) end;
 
   INCallRecordTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{95AC5D9D-6510-4452-9D91-B2EDCCE73005}']
+    ['{C82E7EA8-7146-401E-8A76-A19B2FDF242C}']
     {class} function confirmationRequiredWithCallRecordTypeToConfirm(callRecordTypeToConfirm: INCallRecordType): Pointer; cdecl;
-    {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INCallRecordType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithCallRecordTypeToConfirm:", ios(11.0, 11.0), watchos(4.0, 4.0))
     {class} function successWithResolvedCallRecordType(resolvedCallRecordType: INCallRecordType): Pointer; cdecl;
-    {class} function successWithResolvedValue(resolvedValue: INCallRecordType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+successWithResolvedCallRecordType:", ios(11.0, 11.0), watchos(4.0, 4.0))
   end;
 
   INCallRecordTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{FF44B240-2C0C-4F3F-8AEF-B2543AF8784A}']
+    ['{EC496434-2C7E-4678-9AE2-7236E7A67D36}']
   end;
   TINCallRecordTypeResolutionResult = class(TOCGenericImport<INCallRecordTypeResolutionResultClass, INCallRecordTypeResolutionResult>) end;
 
   INCarClass = interface(NSObjectClass)
-    ['{5BDD2FD9-C0F7-48EB-BCF4-23B1DA0DB823}']
+    ['{31ACEB29-4B23-494E-9359-37EF70B40251}']
   end;
 
   INCar = interface(NSObject)
-    ['{00D1598D-ED14-4D6B-B287-E7A533F6C1BE}']
+    ['{B6593657-FD7C-4187-AD3F-B7CBB2F7BAF4}']
     function carIdentifier: NSString; cdecl;
     function color: CGColorRef; cdecl;
     function displayName: NSString; cdecl;
@@ -4321,7 +4352,7 @@ type
   TINCar = class(TOCGenericImport<INCarClass, INCar>) end;
 
   INCarAirCirculationModeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{877994FB-421E-4EB7-9D8F-67083C3B5CDE}']
+    ['{7C8245F2-EFC2-4256-9AC2-95498B3FE626}']
     {class} function confirmationRequiredWithCarAirCirculationModeToConfirm(carAirCirculationModeToConfirm: INCarAirCirculationMode): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INCarAirCirculationMode): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithCarAirCirculationModeToConfirm:", ios(10.0, 11.0))
     {class} function successWithResolvedCarAirCirculationMode(resolvedCarAirCirculationMode: INCarAirCirculationMode): Pointer; cdecl;
@@ -4329,13 +4360,13 @@ type
   end;
 
   INCarAirCirculationModeResolutionResult = interface(INIntentResolutionResult)
-    ['{3DA014D1-9A0B-42BB-9755-F1D59E09BD98}']
+    ['{BC232C46-C5FD-4CC6-9536-806E30789BF7}']
   end;
   TINCarAirCirculationModeResolutionResult = class(TOCGenericImport<INCarAirCirculationModeResolutionResultClass,
     INCarAirCirculationModeResolutionResult>) end;
 
   INCarAudioSourceResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{4D9BEFB1-F2BF-4289-868F-A574CCA68D97}']
+    ['{94AF9797-EAAA-4A63-8F5D-40D19B4E9C87}']
     {class} function confirmationRequiredWithCarAudioSourceToConfirm(carAudioSourceToConfirm: INCarAudioSource): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INCarAudioSource): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithCarAudioSourceToConfirm:", ios(10.0, 11.0))
     {class} function successWithResolvedCarAudioSource(resolvedCarAudioSource: INCarAudioSource): Pointer; cdecl;
@@ -4343,12 +4374,12 @@ type
   end;
 
   INCarAudioSourceResolutionResult = interface(INIntentResolutionResult)
-    ['{CF4E22DA-25F1-4694-87EE-1C255F0480B0}']
+    ['{FE7C0CB2-5878-4DB9-B496-4FD75A942030}']
   end;
   TINCarAudioSourceResolutionResult = class(TOCGenericImport<INCarAudioSourceResolutionResultClass, INCarAudioSourceResolutionResult>) end;
 
   INCarDefrosterResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{254AFE8E-AAAD-45FA-92AA-10E1BCD597AA}']
+    ['{5D265FD7-0655-4DBF-A6F9-D921EEB57635}']
     {class} function confirmationRequiredWithCarDefrosterToConfirm(carDefrosterToConfirm: INCarDefroster): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INCarDefroster): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithCarDefrosterToConfirm:", ios(10.0, 11.0))
     {class} function successWithResolvedCarDefroster(resolvedCarDefroster: INCarDefroster): Pointer; cdecl;
@@ -4356,16 +4387,16 @@ type
   end;
 
   INCarDefrosterResolutionResult = interface(INIntentResolutionResult)
-    ['{10C1356E-4A29-4665-B09B-0A842B43AC9F}']
+    ['{FAA8D470-781F-459A-B1A7-37A6A1956A59}']
   end;
   TINCarDefrosterResolutionResult = class(TOCGenericImport<INCarDefrosterResolutionResultClass, INCarDefrosterResolutionResult>) end;
 
   INCarHeadUnitClass = interface(NSObjectClass)
-    ['{F54E37D1-A950-45F8-A24D-85168AB95570}']
+    ['{B2AA7A3F-EB17-4536-894A-7749A9E472A8}']
   end;
 
   INCarHeadUnit = interface(NSObject)
-    ['{C40A971C-B4E4-475F-9F8C-BB2E2858CE9C}']
+    ['{4D973AD3-1C97-4EB3-B31D-AB0B7A9BCC0E}']
     function bluetoothIdentifier: NSString; cdecl;
     function iAP2Identifier: NSString; cdecl;
     function initWithBluetoothIdentifier(bluetoothIdentifier: NSString; iAP2Identifier: NSString): Pointer; cdecl;
@@ -4373,7 +4404,7 @@ type
   TINCarHeadUnit = class(TOCGenericImport<INCarHeadUnitClass, INCarHeadUnit>) end;
 
   INCarSeatResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{0D08E6B5-93DB-4E3F-BF91-9B6CE6E07839}']
+    ['{9072E0AE-DFE2-48CD-98C7-4496EA466A67}']
     {class} function confirmationRequiredWithCarSeatToConfirm(carSeatToConfirm: INCarSeat): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INCarSeat): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithCarSeatToConfirm:", ios(10.0, 11.0))
     {class} function successWithResolvedCarSeat(resolvedCarSeat: INCarSeat): Pointer; cdecl;
@@ -4381,12 +4412,12 @@ type
   end;
 
   INCarSeatResolutionResult = interface(INIntentResolutionResult)
-    ['{249DC267-6C0A-4B8F-9384-0F15D5EF8541}']
+    ['{1E11F7B9-8360-451D-B49D-3327CC0FE845}']
   end;
   TINCarSeatResolutionResult = class(TOCGenericImport<INCarSeatResolutionResultClass, INCarSeatResolutionResult>) end;
 
   INCarSignalOptionsResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{5BCC0F6F-7860-4C7B-9639-3FB6FE8008B8}']
+    ['{82204BA8-E2C0-41C0-850E-0F6FCA60BCDE}']
     {class} function confirmationRequiredWithCarSignalOptionsToConfirm(carSignalOptionsToConfirm: INCarSignalOptions): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INCarSignalOptions): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithCarSignalOptionsToConfirm:", ios(10.3, 11.0), watchos(3.2, 4.0))
     {class} function successWithResolvedCarSignalOptions(resolvedCarSignalOptions: INCarSignalOptions): Pointer; cdecl;
@@ -4394,86 +4425,86 @@ type
   end;
 
   INCarSignalOptionsResolutionResult = interface(INIntentResolutionResult)
-    ['{18F7B33F-4FEC-41A7-961F-B6C3C24D301D}']
+    ['{85755EB5-B4C6-40AB-A94D-0A681ECD41CA}']
   end;
   TINCarSignalOptionsResolutionResult = class(TOCGenericImport<INCarSignalOptionsResolutionResultClass, INCarSignalOptionsResolutionResult>) end;
 
   INCurrencyAmountResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{2B09ECCE-844B-463E-8642-082EE869732F}']
+    ['{9474D2C0-0B7C-4813-857A-4915454E792A}']
     {class} function confirmationRequiredWithCurrencyAmountToConfirm(currencyAmountToConfirm: INCurrencyAmount): Pointer; cdecl;
     {class} function disambiguationWithCurrencyAmountsToDisambiguate(currencyAmountsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedCurrencyAmount(resolvedCurrencyAmount: INCurrencyAmount): Pointer; cdecl;
   end;
 
   INCurrencyAmountResolutionResult = interface(INIntentResolutionResult)
-    ['{821204DB-FC7B-4E8C-9C65-F20138C42492}']
+    ['{AA280662-4653-42B8-8596-E39ACDC7E285}']
   end;
   TINCurrencyAmountResolutionResult = class(TOCGenericImport<INCurrencyAmountResolutionResultClass, INCurrencyAmountResolutionResult>) end;
 
   INDateSearchTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{49B327D3-3BB3-4DE3-8C73-76CC8AEE4846}']
+    ['{6084100E-5217-4D61-91B4-E181075350C4}']
     {class} function confirmationRequiredWithDateSearchTypeToConfirm(dateSearchTypeToConfirm: INDateSearchType): Pointer; cdecl;
     {class} function successWithResolvedDateSearchType(resolvedDateSearchType: INDateSearchType): Pointer; cdecl;
   end;
 
   INDateSearchTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{0C3F0CB1-7DC8-46A5-8BCD-AE20A3F0DEDA}']
+    ['{707D8A50-0167-4F85-A054-43A82A101C5F}']
   end;
   TINDateSearchTypeResolutionResult = class(TOCGenericImport<INDateSearchTypeResolutionResultClass, INDateSearchTypeResolutionResult>) end;
 
   INDeleteTasksTaskListResolutionResultClass = interface(INTaskListResolutionResultClass)
-    ['{2D4C537B-9F4B-43B4-8AC3-AB90BB1B8993}']
+    ['{FA38154F-BA0B-47C5-B7F8-28DB941FACEF}']
     {class} function unsupportedForReason(reason: INDeleteTasksTaskListUnsupportedReason): Pointer; cdecl;
   end;
 
   INDeleteTasksTaskListResolutionResult = interface(INTaskListResolutionResult)
-    ['{CDB5BEDE-71B0-47D5-93D4-08A7AC812FDD}']
+    ['{FDF739C1-2868-4E9B-889A-2F6402595963}']
     function initWithTaskListResolutionResult(taskListResolutionResult: INTaskListResolutionResult): Pointer; cdecl;
   end;
   TINDeleteTasksTaskListResolutionResult = class(TOCGenericImport<INDeleteTasksTaskListResolutionResultClass,
     INDeleteTasksTaskListResolutionResult>) end;
 
   INTaskResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{0209BB5F-E174-4618-888F-AE4815248957}']
+    ['{76689D16-B2A3-44B9-A70B-B1AE52FA936A}']
     {class} function confirmationRequiredWithTaskToConfirm(taskToConfirm: INTask): Pointer; cdecl;
     {class} function disambiguationWithTasksToDisambiguate(tasksToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedTask(resolvedTask: INTask): Pointer; cdecl;
   end;
 
   INTaskResolutionResult = interface(INIntentResolutionResult)
-    ['{6DC708ED-6958-4C06-9779-C810043C61B2}']
+    ['{A914BF0E-9831-4803-B3AB-6CF9D70CBE71}']
   end;
   TINTaskResolutionResult = class(TOCGenericImport<INTaskResolutionResultClass, INTaskResolutionResult>) end;
 
   INDeleteTasksTaskResolutionResultClass = interface(INTaskResolutionResultClass)
-    ['{B0B7EC87-C14F-44C1-AFC7-C982DD9BC0E6}']
+    ['{091A27CB-4E60-45ED-B6AF-34C7063DC25C}']
     {class} function unsupportedForReason(reason: INDeleteTasksTaskUnsupportedReason): Pointer; cdecl;
   end;
 
   INDeleteTasksTaskResolutionResult = interface(INTaskResolutionResult)
-    ['{669F09D0-8A9C-418C-AA85-D9907B21D640}']
+    ['{A094D39D-76F1-4945-9ADE-C25D7AB7C1F6}']
     function initWithTaskResolutionResult(taskResolutionResult: INTaskResolutionResult): Pointer; cdecl;
   end;
   TINDeleteTasksTaskResolutionResult = class(TOCGenericImport<INDeleteTasksTaskResolutionResultClass, INDeleteTasksTaskResolutionResult>) end;
 
   INFileResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{E57BE154-6297-4581-833D-8F7A449CFEFC}']
+    ['{B61B6E2F-C391-41E6-BA25-29D888293DAF}']
     {class} function confirmationRequiredWithFileToConfirm(fileToConfirm: INFile): Pointer; cdecl;
     {class} function disambiguationWithFilesToDisambiguate(filesToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedFile(resolvedFile: INFile): Pointer; cdecl;
   end;
 
   INFileResolutionResult = interface(INIntentResolutionResult)
-    ['{FCC768BC-FC41-47CC-90C6-532990EA6AC4}']
+    ['{FD7C09A7-C3C2-4072-B76E-9FD7A1CC8E44}']
   end;
   TINFileResolutionResult = class(TOCGenericImport<INFileResolutionResultClass, INFileResolutionResult>) end;
 
   INFlightClass = interface(NSObjectClass)
-    ['{BCDF52B9-845F-4722-8A95-56144A8E83E5}']
+    ['{2858AFDA-9954-40F9-A5FC-5285B532A8D0}']
   end;
 
   INFlight = interface(NSObject)
-    ['{5909001A-0377-4239-B902-C2CD85BC6E0C}']
+    ['{949BEB44-DBBA-4F67-B8C4-DA517E099004}']
     function airline: INAirline; cdecl;
     function arrivalAirportGate: INAirportGate; cdecl;
     function boardingTime: INDateComponentsRange; cdecl;
@@ -4485,47 +4516,58 @@ type
   end;
   TINFlight = class(TOCGenericImport<INFlightClass, INFlight>) end;
 
+  INFocusStatusClass = interface(NSObjectClass)
+    ['{8C80423B-D03B-42E3-8A65-98432DB2EAE5}']
+  end;
+
+  INFocusStatus = interface(NSObject)
+    ['{E8595E89-6739-4F49-8E74-63C9885BD2D6}']
+    function initWithIsFocused(isFocused: NSNumber): Pointer; cdecl;
+    function isFocused: NSNumber; cdecl;
+  end;
+  TINFocusStatus = class(TOCGenericImport<INFocusStatusClass, INFocusStatus>) end;
+
   INLocationSearchTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{AA8FE334-B9B5-45FC-A9CB-37A7AB26F0F7}']
+    ['{FBCA47DA-377E-45EC-80F2-5FF95E4C4F08}']
     {class} function confirmationRequiredWithLocationSearchTypeToConfirm(locationSearchTypeToConfirm: INLocationSearchType): Pointer; cdecl;
     {class} function successWithResolvedLocationSearchType(resolvedLocationSearchType: INLocationSearchType): Pointer; cdecl;
   end;
 
   INLocationSearchTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{DF442765-5BCC-4B78-845F-9F906A8A7579}']
+    ['{1E43D89E-94B6-419A-BA28-013D7866F018}']
   end;
   TINLocationSearchTypeResolutionResult = class(TOCGenericImport<INLocationSearchTypeResolutionResultClass, INLocationSearchTypeResolutionResult>) end;
 
   INMediaAffinityTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{8CC518DB-0A5D-4B4A-A9E0-3F55715F056A}']
+    ['{6463E0E4-D56B-4F63-9FC4-D57DCD1AD58A}']
     {class} function confirmationRequiredWithMediaAffinityTypeToConfirm(mediaAffinityTypeToConfirm: INMediaAffinityType): Pointer; cdecl;
     {class} function successWithResolvedMediaAffinityType(resolvedMediaAffinityType: INMediaAffinityType): Pointer; cdecl;
   end;
 
   INMediaAffinityTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{C6A90211-36A2-480C-ADEC-33772C8FDB9A}']
+    ['{CF9FF705-5A41-4A82-A637-626DF2C4BBC5}']
   end;
   TINMediaAffinityTypeResolutionResult = class(TOCGenericImport<INMediaAffinityTypeResolutionResultClass, INMediaAffinityTypeResolutionResult>) end;
 
   INMediaDestinationClass = interface(NSObjectClass)
-    ['{9FC5DADF-70F4-4671-A4F4-062F67929CE9}']
+    ['{912F1660-19C8-4D64-9322-E986CA22C1E8}']
     {class} function libraryDestination: Pointer; cdecl;
     {class} function playlistDestinationWithName(playlistName: NSString): Pointer; cdecl;
   end;
 
   INMediaDestination = interface(NSObject)
-    ['{547D61E2-0B74-4531-83E7-9EF3C984FA17}']
+    ['{36903945-3889-45CE-BBA2-BBB7715D9FC8}']
     function mediaDestinationType: INMediaDestinationType; cdecl;
     function playlistName: NSString; cdecl;
   end;
   TINMediaDestination = class(TOCGenericImport<INMediaDestinationClass, INMediaDestination>) end;
 
   INMediaSearchClass = interface(NSObjectClass)
-    ['{FC299B4E-F97C-44BE-85F9-F3C2A5ACC4F0}']
+    ['{68A41B7E-0142-463C-8B94-A2B329AD9272}']
   end;
 
   INMediaSearch = interface(NSObject)
-    ['{AFC3CB74-7881-449E-8C2C-C9E6C6931011}']
+    ['{90A53BB3-1D15-4B6C-AB8F-AD81838338A4}']
     function activityNames: NSArray; cdecl; // API_DEPRECATED("Use `moodNames` property instead.", ios(13.0, 13.0), watchos(6.0, 6.0))
     function albumName: NSString; cdecl;
     function artistName: NSString; cdecl;
@@ -4544,7 +4586,7 @@ type
   TINMediaSearch = class(TOCGenericImport<INMediaSearchClass, INMediaSearch>) end;
 
   INMessageAttributeOptionsResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{A79D8DB7-518C-41DE-9A39-49026729D959}']
+    ['{BCA16752-E4A6-4734-B901-71FFA6D930E3}']
     {class} function confirmationRequiredWithMessageAttributeOptionsToConfirm(messageAttributeOptionsToConfirm: INMessageAttributeOptions): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INMessageAttributeOptions): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithMessageAttributeOptionsToConfirm:", ios(10.0, 11.0), watchos(3.2, 4.0))
     {class} function successWithResolvedMessageAttributeOptions(resolvedMessageAttributeOptions: INMessageAttributeOptions): Pointer; cdecl;
@@ -4552,13 +4594,13 @@ type
   end;
 
   INMessageAttributeOptionsResolutionResult = interface(INIntentResolutionResult)
-    ['{4C6BF666-187D-4002-AD0F-6F4E9FA2D946}']
+    ['{972AE862-7B31-44E7-96BE-E29D6608B572}']
   end;
   TINMessageAttributeOptionsResolutionResult = class(TOCGenericImport<INMessageAttributeOptionsResolutionResultClass,
     INMessageAttributeOptionsResolutionResult>) end;
 
   INMessageAttributeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{27A7D592-A008-4B1E-B48D-69193671F3E6}']
+    ['{CC0C2EE5-67C8-4E7F-A143-C9819172017F}']
     {class} function confirmationRequiredWithMessageAttributeToConfirm(messageAttributeToConfirm: INMessageAttribute): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INMessageAttribute): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithMessageAttributeToConfirm:", ios(10.0, 11.0), watchos(3.2, 4.0))
     {class} function successWithResolvedMessageAttribute(resolvedMessageAttribute: INMessageAttribute): Pointer; cdecl;
@@ -4566,16 +4608,16 @@ type
   end;
 
   INMessageAttributeResolutionResult = interface(INIntentResolutionResult)
-    ['{039ED95F-3C00-4775-9350-01783FB9FF97}']
+    ['{DB9C7FD1-9199-4E0D-AA11-A40607FE1D2A}']
   end;
   TINMessageAttributeResolutionResult = class(TOCGenericImport<INMessageAttributeResolutionResultClass, INMessageAttributeResolutionResult>) end;
 
   INNoteClass = interface(NSObjectClass)
-    ['{5686D806-BEFA-463C-8131-E64CC3A8A509}']
+    ['{4EF95E8B-5D12-436B-9326-F3E4FAA9E05C}']
   end;
 
   INNote = interface(NSObject)
-    ['{2570EF9B-17F6-4B6F-AE8C-59E950AFD3D1}']
+    ['{711D16AA-4357-45DC-AC9F-2236D6DC456B}']
     function contents: NSArray; cdecl;
     function createdDateComponents: NSDateComponents; cdecl;
     function groupName: INSpeakableString; cdecl;
@@ -4588,77 +4630,77 @@ type
   TINNote = class(TOCGenericImport<INNoteClass, INNote>) end;
 
   INNoteContentResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{87D28612-E7AE-4D30-B3D3-C378AFC9284F}']
+    ['{83A8A0F5-2EA5-4B98-AD38-71A15002577E}']
     {class} function confirmationRequiredWithNoteContentToConfirm(noteContentToConfirm: INNoteContent): Pointer; cdecl;
     {class} function disambiguationWithNoteContentsToDisambiguate(noteContentsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedNoteContent(resolvedNoteContent: INNoteContent): Pointer; cdecl;
   end;
 
   INNoteContentResolutionResult = interface(INIntentResolutionResult)
-    ['{B477F863-985F-409A-BB33-99C191CFDD20}']
+    ['{2E6AFE66-240C-498F-BD5D-B9ED5EC21F84}']
   end;
   TINNoteContentResolutionResult = class(TOCGenericImport<INNoteContentResolutionResultClass, INNoteContentResolutionResult>) end;
 
   INNoteContentTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{AFB35040-4A89-490D-9D6F-27FD951716C4}']
+    ['{C960A187-A835-4CD9-A4C8-EED529384751}']
     {class} function confirmationRequiredWithNoteContentTypeToConfirm(noteContentTypeToConfirm: INNoteContentType): Pointer; cdecl;
     {class} function successWithResolvedNoteContentType(resolvedNoteContentType: INNoteContentType): Pointer; cdecl;
   end;
 
   INNoteContentTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{C53C4D75-9117-4444-9E41-C1E3BC67658D}']
+    ['{C5C63D58-7B08-4BF1-95E2-84D85DB83398}']
   end;
   TINNoteContentTypeResolutionResult = class(TOCGenericImport<INNoteContentTypeResolutionResultClass, INNoteContentTypeResolutionResult>) end;
 
   INNoteResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{F23E4881-B552-4945-B4E5-9C062B12F7FF}']
+    ['{76ECABC9-B230-447F-97B9-D4680FCD0DA0}']
     {class} function confirmationRequiredWithNoteToConfirm(noteToConfirm: INNote): Pointer; cdecl;
     {class} function disambiguationWithNotesToDisambiguate(notesToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedNote(resolvedNote: INNote): Pointer; cdecl;
   end;
 
   INNoteResolutionResult = interface(INIntentResolutionResult)
-    ['{94EF44B3-A689-447E-B0D9-C43D5E9FC1F1}']
+    ['{3BD8CE62-26C8-4940-A746-EC089D37CC8B}']
   end;
   TINNoteResolutionResult = class(TOCGenericImport<INNoteResolutionResultClass, INNoteResolutionResult>) end;
 
   INNotebookItemTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{1D4AA195-9B42-4753-817D-1FAC2D7147CE}']
+    ['{414A753E-533A-4EC6-9E43-3E8B09E31B23}']
     {class} function confirmationRequiredWithNotebookItemTypeToConfirm(notebookItemTypeToConfirm: INNotebookItemType): Pointer; cdecl;
     {class} function disambiguationWithNotebookItemTypesToDisambiguate(notebookItemTypesToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedNotebookItemType(resolvedNotebookItemType: INNotebookItemType): Pointer; cdecl;
   end;
 
   INNotebookItemTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{EFC64DAF-DCC7-4098-A835-F0B329355B49}']
+    ['{2756CBC5-43ED-4711-9D43-C2D16C5F9307}']
   end;
   TINNotebookItemTypeResolutionResult = class(TOCGenericImport<INNotebookItemTypeResolutionResultClass, INNotebookItemTypeResolutionResult>) end;
 
   INOutgoingMessageTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{F4747AAD-D626-4464-9272-6C62E956ABC3}']
+    ['{BD22D59A-3E3F-49BC-9DAE-0CF83CE21053}']
     {class} function confirmationRequiredWithOutgoingMessageTypeToConfirm(outgoingMessageTypeToConfirm: INOutgoingMessageType): Pointer; cdecl;
     {class} function successWithResolvedOutgoingMessageType(resolvedOutgoingMessageType: INOutgoingMessageType): Pointer; cdecl;
   end;
 
   INOutgoingMessageTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{689886F3-B97F-4DE2-AA63-499F2B7EEA46}']
+    ['{5F408B53-9AC8-47C2-B91D-CD25D0D5D8A5}']
   end;
   TINOutgoingMessageTypeResolutionResult = class(TOCGenericImport<INOutgoingMessageTypeResolutionResultClass,
     INOutgoingMessageTypeResolutionResult>) end;
 
   INPaymentAccountClass = interface(NSObjectClass)
-    ['{67B7CCC5-B4FC-405A-B782-E1C4DCB4376A}']
+    ['{7264155D-84FF-4581-A761-529F71AC298D}']
   end;
 
   INPaymentAccount = interface(NSObject)
-    ['{12018A18-9A50-434D-88E3-EB2E26B0ECB1}']
+    ['{E3A2873C-1A45-411E-ADE0-47B9538FF75B}']
     function accountNumber: NSString; cdecl;
     function accountType: INAccountType; cdecl;
     function balance: INBalanceAmount; cdecl;
     function initWithNickname(nickname: INSpeakableString; number: NSString; accountType: INAccountType;
       organizationName: INSpeakableString): Pointer; overload; cdecl; // API_DEPRECATED("Please use 'initWithNickname:number:accountType:organizationName:balance:secondaryBalance:' instead", ios(10.3, 11.0), watchos(3.2, 4.0))
-    function initWithNickname(nickname: INSpeakableString; number: NSString; accountType: INAccountType;
-      organizationName: INSpeakableString; balance: INBalanceAmount; secondaryBalance: INBalanceAmount): Pointer; overload; cdecl;
+    function initWithNickname(nickname: INSpeakableString; number: NSString; accountType: INAccountType; organizationName: INSpeakableString;
+      balance: INBalanceAmount; secondaryBalance: INBalanceAmount): Pointer; overload; cdecl;
     function nickname: INSpeakableString; cdecl;
     function organizationName: INSpeakableString; cdecl;
     function secondaryBalance: INBalanceAmount; cdecl;
@@ -4666,23 +4708,23 @@ type
   TINPaymentAccount = class(TOCGenericImport<INPaymentAccountClass, INPaymentAccount>) end;
 
   INPaymentAccountResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{9DECD4E4-94D7-4872-AD28-47133754034B}']
+    ['{FEDC5B2A-9AE2-470F-B1F2-C3AC0121BF08}']
     {class} function confirmationRequiredWithPaymentAccountToConfirm(paymentAccountToConfirm: INPaymentAccount): Pointer; cdecl;
     {class} function disambiguationWithPaymentAccountsToDisambiguate(paymentAccountsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedPaymentAccount(resolvedPaymentAccount: INPaymentAccount): Pointer; cdecl;
   end;
 
   INPaymentAccountResolutionResult = interface(INIntentResolutionResult)
-    ['{10731B4C-5929-4239-AB23-47316623C789}']
+    ['{9842E83C-2082-4912-85C5-A8DD11E4ECB8}']
   end;
   TINPaymentAccountResolutionResult = class(TOCGenericImport<INPaymentAccountResolutionResultClass, INPaymentAccountResolutionResult>) end;
 
   INPaymentAmountClass = interface(NSObjectClass)
-    ['{2A70F23D-76F5-47C3-9D26-0105521EBA9D}']
+    ['{67BD0FD1-B3A3-4997-BEF6-1D5DFAF9C0EC}']
   end;
 
   INPaymentAmount = interface(NSObject)
-    ['{5BD546D8-C2D3-42CE-B1C5-9C3E5552027F}']
+    ['{A6780B73-90EF-424C-BEA2-3332105AA4A0}']
     function amount: INCurrencyAmount; cdecl;
     function amountType: INAmountType; cdecl;
     function initWithAmountType(amountType: INAmountType; amount: INCurrencyAmount): Pointer; cdecl;
@@ -4690,25 +4732,24 @@ type
   TINPaymentAmount = class(TOCGenericImport<INPaymentAmountClass, INPaymentAmount>) end;
 
   INPaymentAmountResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{34D87D32-F047-4372-AF1F-FCD99B843B95}']
+    ['{52C39BD7-5648-4F18-8451-18D76A47CFAF}']
     {class} function confirmationRequiredWithPaymentAmountToConfirm(paymentAmountToConfirm: INPaymentAmount): Pointer; cdecl;
     {class} function disambiguationWithPaymentAmountsToDisambiguate(paymentAmountsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedPaymentAmount(resolvedPaymentAmount: INPaymentAmount): Pointer; cdecl;
   end;
 
   INPaymentAmountResolutionResult = interface(INIntentResolutionResult)
-    ['{6E4AE9B0-9C60-487C-AA6A-A6891E55120D}']
+    ['{37B2A93A-2BAD-4CA8-9280-CD3558B73226}']
   end;
   TINPaymentAmountResolutionResult = class(TOCGenericImport<INPaymentAmountResolutionResultClass, INPaymentAmountResolutionResult>) end;
 
   INPaymentMethodClass = interface(NSObjectClass)
-    ['{0D49D1D5-EE0B-463E-99B0-16303720A5C3}']
+    ['{CDD3481D-EB92-471A-A2A5-2F495F5512D3}']
     {class} function applePayPaymentMethod: Pointer; cdecl;
   end;
 
   INPaymentMethod = interface(NSObject)
-    ['{7C29C7A8-1EC1-46C6-A4C1-465056F8CFA6}']
-    [MethodName('type')]
+    ['{54AA05E4-6CBF-4A13-8BA8-1EA3C7642A49}']
     function &type: INPaymentMethodType; cdecl;
     function icon: INImage; cdecl;
     function identificationHint: NSString; cdecl;
@@ -4718,23 +4759,23 @@ type
   TINPaymentMethod = class(TOCGenericImport<INPaymentMethodClass, INPaymentMethod>) end;
 
   INPaymentMethodResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{F75DCB71-5893-4734-95A8-894C8D0C647D}']
+    ['{205BA0D2-F002-407F-9413-DBF5901F8A47}']
     {class} function confirmationRequiredWithPaymentMethodToConfirm(paymentMethodToConfirm: INPaymentMethod): Pointer; cdecl;
     {class} function disambiguationWithPaymentMethodsToDisambiguate(paymentMethodsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedPaymentMethod(resolvedPaymentMethod: INPaymentMethod): Pointer; cdecl;
   end;
 
   INPaymentMethodResolutionResult = interface(INIntentResolutionResult)
-    ['{A4E19CD8-625F-4437-878F-1E43FCA383CD}']
+    ['{3BCF7857-019B-46BC-A0F8-448CF2C57F2B}']
   end;
   TINPaymentMethodResolutionResult = class(TOCGenericImport<INPaymentMethodResolutionResultClass, INPaymentMethodResolutionResult>) end;
 
   INPaymentRecordClass = interface(NSObjectClass)
-    ['{3C601F4E-1967-4A7E-B619-F4488F938150}']
+    ['{9CD91A31-1373-47D3-A95E-BC32948D864C}']
   end;
 
   INPaymentRecord = interface(NSObject)
-    ['{57D13247-CD84-4F0D-B10A-87A46C498526}']
+    ['{1928385E-DACE-4F87-B9B2-6BF5EA7B7AE5}']
     function currencyAmount: INCurrencyAmount; cdecl;
     function feeAmount: INCurrencyAmount; cdecl;
     function initWithPayee(payee: INPerson; payer: INPerson; currencyAmount: INCurrencyAmount; paymentMethod: INPaymentMethod; note: NSString;
@@ -4750,7 +4791,7 @@ type
   TINPaymentRecord = class(TOCGenericImport<INPaymentRecordClass, INPaymentRecord>) end;
 
   INPaymentStatusResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{3D94C730-4F54-4FA1-AF3D-BA2C377D7B74}']
+    ['{470FE120-10D0-4AFA-B0CD-BE1E488630B6}']
     {class} function confirmationRequiredWithPaymentStatusToConfirm(paymentStatusToConfirm: INPaymentStatus): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INPaymentStatus): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithPaymentStatusToConfirm:", ios(10.0, 11.0), watchos(3.2, 4.0))
     {class} function successWithResolvedPaymentStatus(resolvedPaymentStatus: INPaymentStatus): Pointer; cdecl;
@@ -4758,70 +4799,70 @@ type
   end;
 
   INPaymentStatusResolutionResult = interface(INIntentResolutionResult)
-    ['{34FA1359-2C70-4BC0-A95F-6C4D0D576831}']
+    ['{18E70D47-0081-453D-98B1-498CA54C2FDE}']
   end;
   TINPaymentStatusResolutionResult = class(TOCGenericImport<INPaymentStatusResolutionResultClass, INPaymentStatusResolutionResult>) end;
 
   INPlayMediaMediaItemResolutionResultClass = interface(INMediaItemResolutionResultClass)
-    ['{D5F0FC58-478B-4410-8CA8-B5A64BB36290}']
+    ['{2CE83543-3D43-4E9D-8C6A-88E927B26BCD}']
     {class} function successesWithResolvedMediaItems(resolvedMediaItems: NSArray): NSArray; cdecl;
     {class} function unsupportedForReason(reason: INPlayMediaMediaItemUnsupportedReason): Pointer; cdecl;
   end;
 
   INPlayMediaMediaItemResolutionResult = interface(INMediaItemResolutionResult)
-    ['{7B20981F-8D95-479B-849E-3C9770922665}']
+    ['{20F25F42-8DA8-408F-8A5A-17328BBC83CF}']
     function initWithMediaItemResolutionResult(mediaItemResolutionResult: INMediaItemResolutionResult): Pointer; cdecl;
   end;
   TINPlayMediaMediaItemResolutionResult = class(TOCGenericImport<INPlayMediaMediaItemResolutionResultClass, INPlayMediaMediaItemResolutionResult>) end;
 
   INDoubleResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{5DECA2DA-9F41-4F79-8C75-5938D7136681}']
+    ['{D4E9C74D-4BBF-4131-9C90-8FB11FE8AE05}']
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: NSNumber): Pointer; cdecl;
     {class} function successWithResolvedValue(resolvedValue: Double): Pointer; cdecl;
   end;
 
   INDoubleResolutionResult = interface(INIntentResolutionResult)
-    ['{C2EFC61B-6F65-4B66-BBC5-AC5F51C53FF5}']
+    ['{FE2683AF-692C-45C8-89AF-6D002FF712CF}']
   end;
   TINDoubleResolutionResult = class(TOCGenericImport<INDoubleResolutionResultClass, INDoubleResolutionResult>) end;
 
   INPlayMediaPlaybackSpeedResolutionResultClass = interface(INDoubleResolutionResultClass)
-    ['{B7E153CA-7121-4C5F-AC4B-F0B0A7C1DF29}']
+    ['{000ECFF6-F888-4D07-B5BC-C9E0BBC76FEB}']
     {class} function unsupportedForReason(reason: INPlayMediaPlaybackSpeedUnsupportedReason): Pointer; cdecl;
   end;
 
   INPlayMediaPlaybackSpeedResolutionResult = interface(INDoubleResolutionResult)
-    ['{C8145284-E839-45B7-9442-F20A0F5A824C}']
+    ['{2F83B88E-3E0F-4409-8F71-568566E47BD1}']
     function initWithDoubleResolutionResult(doubleResolutionResult: INDoubleResolutionResult): Pointer; cdecl;
   end;
   TINPlayMediaPlaybackSpeedResolutionResult = class(TOCGenericImport<INPlayMediaPlaybackSpeedResolutionResultClass,
     INPlayMediaPlaybackSpeedResolutionResult>) end;
 
   INPlaybackQueueLocationResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{50CC12E7-95D6-4E2B-B7BC-4EF23DA894DA}']
+    ['{61D47899-4D51-48E0-858C-91553924C020}']
     {class} function confirmationRequiredWithPlaybackQueueLocationToConfirm(playbackQueueLocationToConfirm: INPlaybackQueueLocation): Pointer; cdecl;
     {class} function successWithResolvedPlaybackQueueLocation(resolvedPlaybackQueueLocation: INPlaybackQueueLocation): Pointer; cdecl;
   end;
 
   INPlaybackQueueLocationResolutionResult = interface(INIntentResolutionResult)
-    ['{942B7451-62E1-4B8A-B6E7-C0C870E39EB7}']
+    ['{2074CF1C-3E59-48F4-8C40-3BB1DBFD6F11}']
   end;
   TINPlaybackQueueLocationResolutionResult = class(TOCGenericImport<INPlaybackQueueLocationResolutionResultClass,
     INPlaybackQueueLocationResolutionResult>) end;
 
   INPlaybackRepeatModeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{E54DE98B-2B8C-427C-BD7C-FA4D1A0ED1C4}']
+    ['{BC50B82C-AE78-493B-9F03-8D590821074E}']
     {class} function confirmationRequiredWithPlaybackRepeatModeToConfirm(playbackRepeatModeToConfirm: INPlaybackRepeatMode): Pointer; cdecl;
     {class} function successWithResolvedPlaybackRepeatMode(resolvedPlaybackRepeatMode: INPlaybackRepeatMode): Pointer; cdecl;
   end;
 
   INPlaybackRepeatModeResolutionResult = interface(INIntentResolutionResult)
-    ['{4A407A9B-89F8-423D-896D-19BFF0D09E3C}']
+    ['{E3F83A93-C77A-43D0-A1F7-242022376101}']
   end;
   TINPlaybackRepeatModeResolutionResult = class(TOCGenericImport<INPlaybackRepeatModeResolutionResultClass, INPlaybackRepeatModeResolutionResult>) end;
 
   INRadioTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{5A790201-C11F-4C6C-BAD0-A6A41C4FCBB7}']
+    ['{8E56C5FC-1DB8-4D40-9ADB-14604BD61AC1}']
     {class} function confirmationRequiredWithRadioTypeToConfirm(radioTypeToConfirm: INRadioType): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INRadioType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithRadioTypeToConfirm:", ios(10.0, 11.0))
     {class} function successWithResolvedRadioType(resolvedRadioType: INRadioType): Pointer; cdecl;
@@ -4829,12 +4870,12 @@ type
   end;
 
   INRadioTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{0BBAFE17-C25C-4EBD-9FAE-252A42D151FC}']
+    ['{D3A21ED6-08E4-4B68-910D-F8259A68DD7A}']
   end;
   TINRadioTypeResolutionResult = class(TOCGenericImport<INRadioTypeResolutionResultClass, INRadioTypeResolutionResult>) end;
 
   INRelativeReferenceResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{307165D8-D438-45F0-96AF-A8C33BEFD6F5}']
+    ['{2487AE83-AFA0-460B-8989-72B0020D64E3}']
     {class} function confirmationRequiredWithRelativeReferenceToConfirm(relativeReferenceToConfirm: INRelativeReference): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INRelativeReference): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithRelativeReferenceToConfirm:", ios(10.0, 11.0))
     {class} function successWithResolvedRelativeReference(resolvedRelativeReference: INRelativeReference): Pointer; cdecl;
@@ -4842,12 +4883,12 @@ type
   end;
 
   INRelativeReferenceResolutionResult = interface(INIntentResolutionResult)
-    ['{7B8F9FA8-DAF2-4B7D-8E94-91196BE97A7B}']
+    ['{55534A53-BA7E-4FBF-8754-7F4F07975511}']
   end;
   TINRelativeReferenceResolutionResult = class(TOCGenericImport<INRelativeReferenceResolutionResultClass, INRelativeReferenceResolutionResult>) end;
 
   INRelativeSettingResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{A4E89CAB-274F-488F-80A3-665759AD07CA}']
+    ['{DC6DC2F4-A24B-401F-8F35-81B3A24927DB}']
     {class} function confirmationRequiredWithRelativeSettingToConfirm(relativeSettingToConfirm: INRelativeSetting): Pointer; cdecl;
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INRelativeSetting): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithRelativeSettingToConfirm:", ios(10.0, 11.0))
     {class} function successWithResolvedRelativeSetting(resolvedRelativeSetting: INRelativeSetting): Pointer; cdecl;
@@ -4855,17 +4896,16 @@ type
   end;
 
   INRelativeSettingResolutionResult = interface(INIntentResolutionResult)
-    ['{F6138A75-3C79-4734-A93F-C6090150C8BB}']
+    ['{536439F1-97ED-4FD2-8D35-5AAE4CBAD0BD}']
   end;
   TINRelativeSettingResolutionResult = class(TOCGenericImport<INRelativeSettingResolutionResultClass, INRelativeSettingResolutionResult>) end;
 
   INRentalCarClass = interface(NSObjectClass)
-    ['{38E38A9E-8AF0-423D-8018-D134336A05BD}']
+    ['{E45E00E9-D6D8-47CE-8461-006239CFA41F}']
   end;
 
   INRentalCar = interface(NSObject)
-    ['{710477C4-B8EC-4185-8C1B-0AE104AD0392}']
-    [MethodName('type')]
+    ['{6B4C8F12-9CD6-49FE-9AFF-ABFEBD42EC20}']
     function &type: NSString; cdecl;
     function initWithRentalCompanyName(rentalCompanyName: NSString; &type: NSString; make: NSString; model: NSString;
       rentalCarDescription: NSString): Pointer; cdecl;
@@ -4877,60 +4917,60 @@ type
   TINRentalCar = class(TOCGenericImport<INRentalCarClass, INRentalCar>) end;
 
   INRequestPaymentCurrencyAmountResolutionResultClass = interface(INCurrencyAmountResolutionResultClass)
-    ['{4BE1CBA8-852E-4222-A824-20AFFD7C1B88}']
+    ['{1C981625-2859-46C6-B9F5-BBE33FCFEF79}']
     {class} function unsupportedForReason(reason: INRequestPaymentCurrencyAmountUnsupportedReason): Pointer; cdecl;
   end;
 
   INRequestPaymentCurrencyAmountResolutionResult = interface(INCurrencyAmountResolutionResult)
-    ['{004B5CCA-8024-477B-83E2-4438D89D670C}']
+    ['{FDDE38B2-A6DF-4341-B449-36E4281CD01C}']
     function initWithCurrencyAmountResolutionResult(currencyAmountResolutionResult: INCurrencyAmountResolutionResult): Pointer; cdecl;
   end;
   TINRequestPaymentCurrencyAmountResolutionResult = class(TOCGenericImport<INRequestPaymentCurrencyAmountResolutionResultClass,
     INRequestPaymentCurrencyAmountResolutionResult>) end;
 
   INPersonResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{6FC5D058-4348-4237-9009-F430F83BC3FF}']
+    ['{2CE42095-38F6-41E8-8A0E-45FEF712BC6B}']
     {class} function confirmationRequiredWithPersonToConfirm(personToConfirm: INPerson): Pointer; cdecl;
     {class} function disambiguationWithPeopleToDisambiguate(peopleToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedPerson(resolvedPerson: INPerson): Pointer; cdecl;
   end;
 
   INPersonResolutionResult = interface(INIntentResolutionResult)
-    ['{14A4051B-41A7-48CF-99C8-4E3690184C20}']
+    ['{BD51E702-3370-423F-ABD5-F5ADBE27FA1E}']
   end;
   TINPersonResolutionResult = class(TOCGenericImport<INPersonResolutionResultClass, INPersonResolutionResult>) end;
 
   INRequestPaymentPayerResolutionResultClass = interface(INPersonResolutionResultClass)
-    ['{2582FC81-1E5C-4B43-8233-01973D3644C0}']
+    ['{F412E665-09D8-451A-A21B-A7E02232CBAB}']
     {class} function unsupportedForReason(reason: INRequestPaymentPayerUnsupportedReason): Pointer; cdecl;
   end;
 
   INRequestPaymentPayerResolutionResult = interface(INPersonResolutionResult)
-    ['{7D36B1AB-EBF9-4BBC-B74E-B2B2BA60964B}']
+    ['{BC2F75DC-089F-48A5-9CF6-8C29DC4F6223}']
     function initWithPersonResolutionResult(personResolutionResult: INPersonResolutionResult): Pointer; cdecl;
   end;
   TINRequestPaymentPayerResolutionResult = class(TOCGenericImport<INRequestPaymentPayerResolutionResultClass,
     INRequestPaymentPayerResolutionResult>) end;
 
   INSearchForMediaMediaItemResolutionResultClass = interface(INMediaItemResolutionResultClass)
-    ['{C3233A38-DEE2-44D8-BF64-4D6688F45A0D}']
+    ['{CAB79B4F-8F68-4A4F-BB0B-A27E9E151632}']
     {class} function successesWithResolvedMediaItems(resolvedMediaItems: NSArray): NSArray; cdecl;
     {class} function unsupportedForReason(reason: INSearchForMediaMediaItemUnsupportedReason): Pointer; cdecl;
   end;
 
   INSearchForMediaMediaItemResolutionResult = interface(INMediaItemResolutionResult)
-    ['{062ED448-24AE-4C1A-8BC6-1F1386AB1E66}']
+    ['{0E2AF437-B5EB-4C92-82AF-3BEA3173C7F5}']
     function initWithMediaItemResolutionResult(mediaItemResolutionResult: INMediaItemResolutionResult): Pointer; cdecl;
   end;
   TINSearchForMediaMediaItemResolutionResult = class(TOCGenericImport<INSearchForMediaMediaItemResolutionResultClass,
     INSearchForMediaMediaItemResolutionResult>) end;
 
   INSeatClass = interface(NSObjectClass)
-    ['{EBB5ED5E-DFF3-45C0-A29E-78FE06DA4C59}']
+    ['{CDB7192F-91C2-4CF1-81B7-D86DE7BF825D}']
   end;
 
   INSeat = interface(NSObject)
-    ['{EAB1A079-D89B-4C1A-86A0-3957E0AE924F}']
+    ['{8BA08CE3-807D-4B03-A906-25C00C462773}']
     function initWithSeatSection(seatSection: NSString; seatRow: NSString; seatNumber: NSString; seatingType: NSString): Pointer; cdecl;
     function seatingType: NSString; cdecl;
     function seatNumber: NSString; cdecl;
@@ -4940,69 +4980,69 @@ type
   TINSeat = class(TOCGenericImport<INSeatClass, INSeat>) end;
 
   INSendMessageRecipientResolutionResultClass = interface(INPersonResolutionResultClass)
-    ['{D8F6A01C-67FE-4FF6-BAE9-369AB68BA8F0}']
+    ['{0BAE52BD-EACE-4212-83B1-8247E7A359A6}']
     {class} function unsupportedForReason(reason: INSendMessageRecipientUnsupportedReason): Pointer; cdecl;
   end;
 
   INSendMessageRecipientResolutionResult = interface(INPersonResolutionResult)
-    ['{6973D516-553E-4725-AA01-324B94A285E6}']
+    ['{7E30D412-44B2-43CC-8A87-63845593EC96}']
     function initWithPersonResolutionResult(personResolutionResult: INPersonResolutionResult): Pointer; cdecl;
   end;
   TINSendMessageRecipientResolutionResult = class(TOCGenericImport<INSendMessageRecipientResolutionResultClass,
     INSendMessageRecipientResolutionResult>) end;
 
   INSendPaymentCurrencyAmountResolutionResultClass = interface(INCurrencyAmountResolutionResultClass)
-    ['{1B1A327C-619B-4B5C-9DF8-39D0066765DB}']
+    ['{95D4046A-94DA-4F4F-91D0-2A74265BCEEE}']
     {class} function unsupportedForReason(reason: INSendPaymentCurrencyAmountUnsupportedReason): Pointer; cdecl;
   end;
 
   INSendPaymentCurrencyAmountResolutionResult = interface(INCurrencyAmountResolutionResult)
-    ['{DEE45482-3714-41D7-B489-26740584C63D}']
+    ['{ADBAC7DE-5BB3-4134-8373-4A773EB6C0E5}']
     function initWithCurrencyAmountResolutionResult(currencyAmountResolutionResult: INCurrencyAmountResolutionResult): Pointer; cdecl;
   end;
   TINSendPaymentCurrencyAmountResolutionResult = class(TOCGenericImport<INSendPaymentCurrencyAmountResolutionResultClass,
     INSendPaymentCurrencyAmountResolutionResult>) end;
 
   INSendPaymentPayeeResolutionResultClass = interface(INPersonResolutionResultClass)
-    ['{268B25B8-298E-4CE0-BC69-521A9F627AD7}']
+    ['{8112EEA0-1965-454D-9FFD-C9B8CADBFF0C}']
     {class} function unsupportedForReason(reason: INSendPaymentPayeeUnsupportedReason): Pointer; cdecl;
   end;
 
   INSendPaymentPayeeResolutionResult = interface(INPersonResolutionResult)
-    ['{DC4E0271-9A65-4AFA-947C-FC9A3457C1E9}']
+    ['{9346003E-0C77-450C-9F75-B217B51F62BE}']
     function initWithPersonResolutionResult(personResolutionResult: INPersonResolutionResult): Pointer; cdecl;
   end;
   TINSendPaymentPayeeResolutionResult = class(TOCGenericImport<INSendPaymentPayeeResolutionResultClass, INSendPaymentPayeeResolutionResult>) end;
 
   INSetTaskAttributeTemporalEventTriggerResolutionResultClass = interface(INTemporalEventTriggerResolutionResultClass)
-    ['{FFF4ECAA-E31A-4694-ACE0-2885EA0B6D5A}']
+    ['{3931EABF-385B-4F57-8C72-337121547C2E}']
     {class} function unsupportedForReason(reason: INSetTaskAttributeTemporalEventTriggerUnsupportedReason): Pointer; cdecl;
   end;
 
   INSetTaskAttributeTemporalEventTriggerResolutionResult = interface(INTemporalEventTriggerResolutionResult)
-    ['{94F03CB5-BCB3-4CE6-AD37-A1D68A1BB890}']
+    ['{01826D26-6E0E-4AEC-A33D-BEC5391C5E2D}']
     function initWithTemporalEventTriggerResolutionResult(temporalEventTriggerResolutionResult: INTemporalEventTriggerResolutionResult): Pointer; cdecl;
   end;
   TINSetTaskAttributeTemporalEventTriggerResolutionResult = class(TOCGenericImport<INSetTaskAttributeTemporalEventTriggerResolutionResultClass,
     INSetTaskAttributeTemporalEventTriggerResolutionResult>) end;
 
   INSnoozeTasksTaskResolutionResultClass = interface(INTaskResolutionResultClass)
-    ['{8156CBF8-75EB-4D20-AE0D-161FAF172978}']
+    ['{0B7C414B-BC66-4729-BB6F-FAD533B60188}']
     {class} function unsupportedForReason(reason: INSnoozeTasksTaskUnsupportedReason): Pointer; cdecl;
   end;
 
   INSnoozeTasksTaskResolutionResult = interface(INTaskResolutionResult)
-    ['{C0A9E6C0-CE83-4101-8131-CE91B25477F2}']
+    ['{4E0405C9-D98C-4B79-A301-646549591265}']
     function initWithTaskResolutionResult(taskResolutionResult: INTaskResolutionResult): Pointer; cdecl;
   end;
   TINSnoozeTasksTaskResolutionResult = class(TOCGenericImport<INSnoozeTasksTaskResolutionResultClass, INSnoozeTasksTaskResolutionResult>) end;
 
   INSpatialEventTriggerClass = interface(NSObjectClass)
-    ['{D05F2102-4CF6-41F8-B7D3-C1B34E2CF127}']
+    ['{CE109A9F-1671-4F23-B6DE-DA553657816B}']
   end;
 
   INSpatialEventTrigger = interface(NSObject)
-    ['{406CAE90-6CA9-405F-8C4B-CF34706071A4}']
+    ['{20F20B6C-E636-4385-8858-A7B3B06FDDC1}']
     function event: INSpatialEvent; cdecl;
     function initWithPlacemark(placemark: CLPlacemark; event: INSpatialEvent): Pointer; cdecl;
     function placemark: CLPlacemark; cdecl;
@@ -5010,59 +5050,59 @@ type
   TINSpatialEventTrigger = class(TOCGenericImport<INSpatialEventTriggerClass, INSpatialEventTrigger>) end;
 
   INSpatialEventTriggerResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{EE6BEE40-63C9-4FC6-9FDD-180A038E75F4}']
+    ['{0CA59825-2F16-4A84-8E52-766D67E97C8D}']
     {class} function confirmationRequiredWithSpatialEventTriggerToConfirm(spatialEventTriggerToConfirm: INSpatialEventTrigger): Pointer; cdecl;
     {class} function disambiguationWithSpatialEventTriggersToDisambiguate(spatialEventTriggersToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedSpatialEventTrigger(resolvedSpatialEventTrigger: INSpatialEventTrigger): Pointer; cdecl;
   end;
 
   INSpatialEventTriggerResolutionResult = interface(INIntentResolutionResult)
-    ['{C35722AE-54DE-4B60-9A18-4680A945E93A}']
+    ['{CCB002DB-60A0-4ECC-8B51-4BC4C74B124E}']
   end;
   TINSpatialEventTriggerResolutionResult = class(TOCGenericImport<INSpatialEventTriggerResolutionResultClass,
     INSpatialEventTriggerResolutionResult>) end;
 
   INStartCallCallCapabilityResolutionResultClass = interface(INCallCapabilityResolutionResultClass)
-    ['{5DC02CC8-7860-459B-B0F7-036439FB42C7}']
+    ['{CE8CF740-A3F2-4225-8586-2403C1D161DC}']
     {class} function unsupportedForReason(reason: INStartCallCallCapabilityUnsupportedReason): Pointer; cdecl;
   end;
 
   INStartCallCallCapabilityResolutionResult = interface(INCallCapabilityResolutionResult)
-    ['{A92383EB-0992-4F83-A4D4-119CEEB6AC90}']
+    ['{EDC5521E-D9B5-46AC-AD28-089C6E509E3D}']
     function initWithCallCapabilityResolutionResult(callCapabilityResolutionResult: INCallCapabilityResolutionResult): Pointer; cdecl;
   end;
   TINStartCallCallCapabilityResolutionResult = class(TOCGenericImport<INStartCallCallCapabilityResolutionResultClass,
     INStartCallCallCapabilityResolutionResult>) end;
 
   INStartCallCallRecordToCallBackResolutionResultClass = interface(INCallRecordResolutionResultClass)
-    ['{82BC70B9-E2AB-48B0-8AF8-4327CDAAFFFB}']
+    ['{AB68E98C-2463-4F89-A6C9-A0FE29F271A1}']
     {class} function unsupportedForReason(reason: INStartCallCallRecordToCallBackUnsupportedReason): Pointer; cdecl;
   end;
 
   INStartCallCallRecordToCallBackResolutionResult = interface(INCallRecordResolutionResult)
-    ['{536B5258-867F-4081-91CB-E871858AD455}']
+    ['{7C1F9460-FFE2-4BBA-BE44-F359C3557A57}']
     function initWithCallRecordResolutionResult(callRecordResolutionResult: INCallRecordResolutionResult): Pointer; cdecl;
   end;
   TINStartCallCallRecordToCallBackResolutionResult = class(TOCGenericImport<INStartCallCallRecordToCallBackResolutionResultClass,
     INStartCallCallRecordToCallBackResolutionResult>) end;
 
   INStartCallContactResolutionResultClass = interface(INPersonResolutionResultClass)
-    ['{E838B5C9-AC5A-4738-91CB-F489BDD0DB20}']
+    ['{8CB49321-2E65-46A0-A95C-2E4E31322EDB}']
     {class} function unsupportedForReason(reason: INStartCallContactUnsupportedReason): Pointer; cdecl;
   end;
 
   INStartCallContactResolutionResult = interface(INPersonResolutionResult)
-    ['{48604515-3FF2-408F-B172-59BF610258A6}']
+    ['{FFE50A01-4F8A-463A-AE5C-89C3E9255F9D}']
     function initWithPersonResolutionResult(personResolutionResult: INPersonResolutionResult): Pointer; cdecl;
   end;
   TINStartCallContactResolutionResult = class(TOCGenericImport<INStartCallContactResolutionResultClass, INStartCallContactResolutionResult>) end;
 
   INTaskClass = interface(NSObjectClass)
-    ['{EC882752-349F-4F60-AA3A-2B0BFB7BFB27}']
+    ['{E43AF0C8-C4A3-4FF1-A3CA-90F4842120F6}']
   end;
 
   INTask = interface(NSObject)
-    ['{F4BF8073-75AC-47A8-8AEF-5EB29B46D74E}']
+    ['{DF48E4F0-757A-4ECB-9399-26AD18951F7C}']
     function createdDateComponents: NSDateComponents; cdecl;
     function identifier: NSString; cdecl;
     function initWithTitle(title: INSpeakableString; status: INTaskStatus; taskType: INTaskType; spatialEventTrigger: INSpatialEventTrigger;
@@ -5082,11 +5122,11 @@ type
   TINTask = class(TOCGenericImport<INTaskClass, INTask>) end;
 
   INTaskListClass = interface(NSObjectClass)
-    ['{F8C90BEE-B3FD-4321-81CE-789A3F15B374}']
+    ['{F0C2F4E1-A16C-45F3-87DB-5826708DF059}']
   end;
 
   INTaskList = interface(NSObject)
-    ['{8ABE86B1-C732-490F-862E-265FA042CDE8}']
+    ['{D956F632-7217-434F-BB53-7D44CCDD6408}']
     function createdDateComponents: NSDateComponents; cdecl;
     function groupName: INSpeakableString; cdecl;
     function identifier: NSString; cdecl;
@@ -5099,56 +5139,56 @@ type
   TINTaskList = class(TOCGenericImport<INTaskListClass, INTaskList>) end;
 
   INTaskPriorityResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{1A90A421-C123-4D03-868F-FCA03FFBC87E}']
+    ['{E4C6C538-D569-43A5-A0F6-8373EE1E89C8}']
     {class} function confirmationRequiredWithTaskPriorityToConfirm(taskPriorityToConfirm: INTaskPriority): Pointer; cdecl;
     {class} function successWithResolvedTaskPriority(resolvedTaskPriority: INTaskPriority): Pointer; cdecl;
   end;
 
   INTaskPriorityResolutionResult = interface(INIntentResolutionResult)
-    ['{9AA3D3EE-7256-410F-A9A1-7F1CB667653F}']
+    ['{1714E87D-5E8D-48F5-A510-FC05500673AD}']
   end;
   TINTaskPriorityResolutionResult = class(TOCGenericImport<INTaskPriorityResolutionResultClass, INTaskPriorityResolutionResult>) end;
 
   INTaskStatusResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{6A9AAE5E-8D40-4233-A773-92C4C0A543E2}']
+    ['{43D5F957-ADF5-4C84-8EE3-29A5F21EEC6C}']
     {class} function confirmationRequiredWithTaskStatusToConfirm(taskStatusToConfirm: INTaskStatus): Pointer; cdecl;
     {class} function successWithResolvedTaskStatus(resolvedTaskStatus: INTaskStatus): Pointer; cdecl;
   end;
 
   INTaskStatusResolutionResult = interface(INIntentResolutionResult)
-    ['{F8747278-B936-4935-BAC7-A10F908CF9F3}']
+    ['{EFFFB36A-DDDA-4FBE-AEBC-1C86E9C30C3B}']
   end;
   TINTaskStatusResolutionResult = class(TOCGenericImport<INTaskStatusResolutionResultClass, INTaskStatusResolutionResult>) end;
 
   INTemporalEventTriggerClass = interface(NSObjectClass)
-    ['{B3AF5393-EAE4-45FF-877B-783F635E467A}']
+    ['{08DE0143-173B-49DB-80FD-429DF71D2018}']
   end;
 
   INTemporalEventTrigger = interface(NSObject)
-    ['{A8766B28-F357-4B05-A86B-96F76A3E855F}']
+    ['{D02C96E0-CE41-435C-BA02-C46298329F8F}']
     function dateComponentsRange: INDateComponentsRange; cdecl;
     function initWithDateComponentsRange(dateComponentsRange: INDateComponentsRange): Pointer; cdecl;
   end;
   TINTemporalEventTrigger = class(TOCGenericImport<INTemporalEventTriggerClass, INTemporalEventTrigger>) end;
 
   INTemporalEventTriggerTypeOptionsResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{00779A55-F56D-45B8-8C58-33DA82FAFCF5}']
+    ['{89727DDC-0D4A-4048-B049-FBDE74E7E498}']
     {class} function confirmationRequiredWithTemporalEventTriggerTypeOptionsToConfirm(temporalEventTriggerTypeOptionsToConfirm: INTemporalEventTriggerTypeOptions): Pointer; cdecl;
     {class} function successWithResolvedTemporalEventTriggerTypeOptions(resolvedTemporalEventTriggerTypeOptions: INTemporalEventTriggerTypeOptions): Pointer; cdecl;
   end;
 
   INTemporalEventTriggerTypeOptionsResolutionResult = interface(INIntentResolutionResult)
-    ['{9346BB9E-6C3E-4A40-9488-598A5E8E2EF0}']
+    ['{C4AC8B06-B807-402C-AB78-C2830AB34E69}']
   end;
   TINTemporalEventTriggerTypeOptionsResolutionResult = class(TOCGenericImport<INTemporalEventTriggerTypeOptionsResolutionResultClass,
     INTemporalEventTriggerTypeOptionsResolutionResult>) end;
 
   INTicketedEventClass = interface(NSObjectClass)
-    ['{C05E0BB2-0201-4618-9B8F-D8E823DA956F}']
+    ['{F3823B76-C195-4B9B-AE06-996694869C79}']
   end;
 
   INTicketedEvent = interface(NSObject)
-    ['{A145F428-B722-4088-B50E-2C25598F2D77}']
+    ['{3B73FEA6-6057-4C48-9F35-3D34D144A118}']
     function category: INTicketedEventCategory; cdecl;
     function eventDuration: INDateComponentsRange; cdecl;
     function initWithCategory(category: INTicketedEventCategory; name: NSString; eventDuration: INDateComponentsRange;
@@ -5159,11 +5199,11 @@ type
   TINTicketedEvent = class(TOCGenericImport<INTicketedEventClass, INTicketedEvent>) end;
 
   INTrainTripClass = interface(NSObjectClass)
-    ['{78821986-09C9-44C1-810F-A3D14BE10984}']
+    ['{018E403A-751D-4BA7-A092-BA733F2C8D89}']
   end;
 
   INTrainTrip = interface(NSObject)
-    ['{E77DFBBA-9687-46D0-85D7-7AE4A2FC2F53}']
+    ['{57F54299-5B0D-4909-B548-991CBCBBB2A3}']
     function arrivalPlatform: NSString; cdecl;
     function arrivalStationLocation: CLPlacemark; cdecl;
     function departurePlatform: NSString; cdecl;
@@ -5179,31 +5219,31 @@ type
   TINTrainTrip = class(TOCGenericImport<INTrainTripClass, INTrainTrip>) end;
 
   INUpdateMediaAffinityMediaItemResolutionResultClass = interface(INMediaItemResolutionResultClass)
-    ['{DDCE1381-F501-4BF4-8005-61B202D0A785}']
+    ['{C5E20907-A35A-4DDD-96D8-A1088673E5F4}']
     {class} function successesWithResolvedMediaItems(resolvedMediaItems: NSArray): NSArray; cdecl;
     {class} function unsupportedForReason(reason: INUpdateMediaAffinityMediaItemUnsupportedReason): Pointer; cdecl;
   end;
 
   INUpdateMediaAffinityMediaItemResolutionResult = interface(INMediaItemResolutionResult)
-    ['{9B49D3A5-B40A-4D05-80C8-846698F127FF}']
+    ['{E13D0765-949A-4546-A2D4-72869AEE90FE}']
     function initWithMediaItemResolutionResult(mediaItemResolutionResult: INMediaItemResolutionResult): Pointer; cdecl;
   end;
   TINUpdateMediaAffinityMediaItemResolutionResult = class(TOCGenericImport<INUpdateMediaAffinityMediaItemResolutionResultClass,
     INUpdateMediaAffinityMediaItemResolutionResult>) end;
 
   INVisualCodeTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{989EF6EA-77E3-4DE6-AB15-C266A98F5E1F}']
+    ['{E4CF3551-457E-41DC-932B-99508E831B53}']
     {class} function confirmationRequiredWithVisualCodeTypeToConfirm(visualCodeTypeToConfirm: INVisualCodeType): Pointer; cdecl;
     {class} function successWithResolvedVisualCodeType(resolvedVisualCodeType: INVisualCodeType): Pointer; cdecl;
   end;
 
   INVisualCodeTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{EBE65766-299E-410A-9B7B-8F4353F388E4}']
+    ['{8F55E7B8-2424-4F1C-85E3-4BA5B14FD259}']
   end;
   TINVisualCodeTypeResolutionResult = class(TOCGenericImport<INVisualCodeTypeResolutionResultClass, INVisualCodeTypeResolutionResult>) end;
 
   INWorkoutGoalUnitTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{E0A75439-D3B0-4BA4-8ED0-F20672B19C0C}']
+    ['{47DC2F77-2861-4086-9295-FA7E359D1A97}']
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INWorkoutGoalUnitType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithWorkoutGoalUnitTypeToConfirm:", ios(10.0, 11.0), watchos(3.2, 4.0))
     {class} function confirmationRequiredWithWorkoutGoalUnitTypeToConfirm(workoutGoalUnitTypeToConfirm: INWorkoutGoalUnitType): Pointer; cdecl;
     {class} function successWithResolvedValue(resolvedValue: INWorkoutGoalUnitType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+successWithResolvedWorkoutGoalUnitType:", ios(10.0, 11.0), watchos(3.2, 4.0))
@@ -5211,13 +5251,13 @@ type
   end;
 
   INWorkoutGoalUnitTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{216F51AF-B45E-4C66-8BD9-13D1E741D737}']
+    ['{347C20B0-ED76-45A1-ADD1-96FA5EE92B12}']
   end;
   TINWorkoutGoalUnitTypeResolutionResult = class(TOCGenericImport<INWorkoutGoalUnitTypeResolutionResultClass,
     INWorkoutGoalUnitTypeResolutionResult>) end;
 
   INWorkoutLocationTypeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{91F49F45-C17B-483D-930A-0CE199B7B552}']
+    ['{E70329E7-2EF1-4C6E-B530-D06BC6FDFB56}']
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: INWorkoutLocationType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+confirmationRequiredWithWorkoutLocationTypeToConfirm:", ios(10.0, 11.0), watchos(3.2, 4.0))
     {class} function confirmationRequiredWithWorkoutLocationTypeToConfirm(workoutLocationTypeToConfirm: INWorkoutLocationType): Pointer; cdecl;
     {class} function successWithResolvedValue(resolvedValue: INWorkoutLocationType): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("+successWithResolvedWorkoutLocationType:", ios(10.0, 11.0), watchos(3.2, 4.0))
@@ -5225,29 +5265,53 @@ type
   end;
 
   INWorkoutLocationTypeResolutionResult = interface(INIntentResolutionResult)
-    ['{1461930D-3071-4CBA-8661-32EF0C8EBAF3}']
+    ['{6F8AC2B4-CF66-4C44-90F2-BE3A31A792B0}']
   end;
   TINWorkoutLocationTypeResolutionResult = class(TOCGenericImport<INWorkoutLocationTypeResolutionResultClass,
-   INWorkoutLocationTypeResolutionResult>) end;
+    INWorkoutLocationTypeResolutionResult>) end;
+
+  INIntentDonationMetadataClass = interface(NSObjectClass)
+    ['{3EA4DFE1-216F-4ACF-8D95-9F184424ABFE}']
+  end;
+
+  INIntentDonationMetadata = interface(NSObject)
+    ['{C9275265-71D7-43AF-88F8-89F2BB9E8C10}']
+  end;
+  TINIntentDonationMetadata = class(TOCGenericImport<INIntentDonationMetadataClass, INIntentDonationMetadata>) end;
+
+  INSendMessageIntentDonationMetadataClass = interface(INIntentDonationMetadataClass)
+    ['{3F43FE2A-AF6B-4B67-82EB-44270F76AAEF}']
+  end;
+
+  INSendMessageIntentDonationMetadata = interface(INIntentDonationMetadata)
+    ['{0CFE08B1-8D1C-4C7D-A870-8AA0BDBA9511}']
+    function isReplyToCurrentUser: Boolean; cdecl;
+    function mentionsCurrentUser: Boolean; cdecl;
+    function notifyRecipientAnyway: Boolean; cdecl;
+    function recipientCount: NSUInteger; cdecl;
+    procedure setMentionsCurrentUser(mentionsCurrentUser: Boolean); cdecl;
+    procedure setNotifyRecipientAnyway(notifyRecipientAnyway: Boolean); cdecl;
+    procedure setRecipientCount(recipientCount: NSUInteger); cdecl;
+    procedure setReplyToCurrentUser(replyToCurrentUser: Boolean); cdecl;
+  end;
+  TINSendMessageIntentDonationMetadata = class(TOCGenericImport<INSendMessageIntentDonationMetadataClass, INSendMessageIntentDonationMetadata>) end;
 
   INExtensionClass = interface(NSObjectClass)
-    ['{346F8EA0-D75B-4B8F-880E-7B310639B9D6}']
+    ['{687377D9-17B0-4A8F-B17D-E08A273A7AAF}']
   end;
 
   INExtension = interface(NSObject)
-    ['{E1DDEB9A-446B-4B98-A415-C5CA87737227}']
+    ['{51360959-517B-4AB3-A5EA-0C83AA5BB9DD}']
   end;
   TINExtension = class(TOCGenericImport<INExtensionClass, INExtension>) end;
 
   INPersonHandleClass = interface(NSObjectClass)
-    ['{40E1367A-581C-41A7-8F8A-A0F968912696}']
+    ['{B230232D-3B23-4D28-86AE-FEB5CAA251B3}']
   end;
 
   INPersonHandle = interface(NSObject)
-    ['{80940CDC-0DE5-4D14-BF7C-D9DB529C0218}']
-    [MethodName('label')]
+    ['{477F5A18-50B8-4400-BBB2-83ABD8A53F9C}']
     function &label: INPersonHandleLabel; cdecl;
-    [MethodName('type')]
     function &type: INPersonHandleType; cdecl;
     function initWithValue(value: NSString; &type: INPersonHandleType): Pointer; overload; cdecl;
     function initWithValue(value: NSString; &type: INPersonHandleType; &label: INPersonHandleLabel): Pointer; overload; cdecl;
@@ -5256,11 +5320,11 @@ type
   TINPersonHandle = class(TOCGenericImport<INPersonHandleClass, INPersonHandle>) end;
 
   INCurrencyAmountClass = interface(NSObjectClass)
-    ['{43E4F5C7-79F7-4BB7-BFF5-98F300E24B57}']
+    ['{AF39FD79-DFC5-4968-87CF-EA961307BB5A}']
   end;
 
   INCurrencyAmount = interface(NSObject)
-    ['{3AF2D84C-B117-4766-8965-656A8838BA82}']
+    ['{26989B18-EF18-4E65-BE56-C2676C06AA90}']
     function amount: NSDecimalNumber; cdecl;
     function currencyCode: NSString; cdecl;
     function initWithAmount(amount: NSDecimalNumber; currencyCode: NSString): Pointer; cdecl;
@@ -5268,11 +5332,11 @@ type
   TINCurrencyAmount = class(TOCGenericImport<INCurrencyAmountClass, INCurrencyAmount>) end;
 
   INDateComponentsRangeClass = interface(NSObjectClass)
-    ['{4B59A364-764D-4241-8946-4DF577A36828}']
+    ['{2C59ED54-1E45-47C7-8921-00DCBF8BA6A2}']
   end;
 
   INDateComponentsRange = interface(NSObject)
-    ['{0732F4EE-1B98-4382-A434-64A3F3455810}']
+    ['{B225F374-D39B-44E8-B04C-B195689218FB}']
     function EKRecurrenceRule: EKRecurrenceRule; cdecl;
     function endDateComponents: NSDateComponents; cdecl;
     function initWithEKRecurrenceRule(recurrenceRule: EKRecurrenceRule): Pointer; cdecl;
@@ -5285,7 +5349,7 @@ type
   TINDateComponentsRange = class(TOCGenericImport<INDateComponentsRangeClass, INDateComponentsRange>) end;
 
   INImageClass = interface(NSObjectClass)
-    ['{EE0ADEC9-4965-410C-975A-E3C43810A1E6}']
+    ['{99F66A84-32B2-4DB9-8035-803156A79D10}']
     {class} function imageNamed(name: NSString): Pointer; cdecl;
     {class} function imageWithImageData(imageData: NSData): Pointer; cdecl;
     {class} function imageWithURL(URL: NSURL; width: Double; height: Double): Pointer; overload; cdecl;
@@ -5294,16 +5358,16 @@ type
   end;
 
   INImage = interface(NSObject)
-    ['{1B83BE11-87A9-4270-827A-8D7987E102C0}']
+    ['{9CF4D743-2854-4053-A596-3CD6E664B5BF}']
   end;
   TINImage = class(TOCGenericImport<INImageClass, INImage>) end;
 
   INSpeakableStringClass = interface(NSObjectClass)
-    ['{F0739DB6-7CA6-41BC-A469-7F61D4D4C4DB}']
+    ['{3D91E95A-8A13-4675-9B93-B4C9AA68ED08}']
   end;
 
   INSpeakableString = interface(NSObject)
-    ['{8EDD0557-0BDA-40BA-AE1A-38967C31129E}']
+    ['{D3C8404F-B67A-4430-B22C-105296F9D3BA}']
     function initWithIdentifier(identifier: NSString; spokenPhrase: NSString; pronunciationHint: NSString): Pointer; cdecl; // API_DEPRECATED("Please use -initWithVocabularyIdentifier:spokenPhrase:pronunciationHint:", ios(10.0, 11.0), watchos(3.2, 4.0))
     function initWithSpokenPhrase(spokenPhrase: NSString): Pointer; cdecl;
     function initWithVocabularyIdentifier(vocabularyIdentifier: NSString; spokenPhrase: NSString; pronunciationHint: NSString): Pointer; cdecl;
@@ -5311,11 +5375,11 @@ type
   TINSpeakableString = class(TOCGenericImport<INSpeakableStringClass, INSpeakableString>) end;
 
   INObjectClass = interface(NSObjectClass)
-    ['{7FC4D61C-CB71-4253-B970-6AF31CDF7266}']
+    ['{98EA542C-E768-4EDE-81BB-CABFDC27F7B7}']
   end;
 
   INObject = interface(NSObject)
-    ['{2891ABD8-2A4A-4FB2-8D11-947439AF2954}']
+    ['{5C1FD66A-0CE1-417B-B595-D346F7C7AA53}']
     function alternativeSpeakableMatches: NSArray; cdecl;
     function displayImage: INImage; cdecl;
     function displayString: NSString; cdecl;
@@ -5335,29 +5399,42 @@ type
   TINObject = class(TOCGenericImport<INObjectClass, INObject>) end;
 
   INPersonClass = interface(NSObjectClass)
-    ['{B32DBAD9-6224-4700-946E-9E0D65EF2C09}']
+    ['{EEA3C216-62C1-4FF2-8D4D-5E1FB28C8205}']
   end;
 
   INPerson = interface(NSObject)
-    ['{DB168B5A-0348-4EDF-9185-2EAA108A7892}']
+    ['{114FFDD2-2384-45D2-ABFF-24CBC1142E3F}']
     function aliases: NSArray; cdecl;
     function contactIdentifier: NSString; cdecl;
     function customIdentifier: NSString; cdecl;
     function displayName: NSString; cdecl;
     function handle: NSString; cdecl; // API_DEPRECATED("Use personHandle instead", ios(10.0, 10.0), macos(10.12, 10.12))
     function image: INImage; cdecl;
+    function initWithHandle(handle: NSString; nameComponents: NSPersonNameComponents; contactIdentifier: NSString): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 10.0), macos(10.12, 10.12))
+    function initWithHandle(handle: NSString; displayName: NSString; contactIdentifier: NSString): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 10.0), macos(10.12, 10.12))
     function initWithHandle(handle: NSString; nameComponents: NSPersonNameComponents; displayName: NSString; image: INImage;
       contactIdentifier: NSString): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 10.0), macos(10.12, 10.12))
-    function initWithHandle(handle: NSString; displayName: NSString; contactIdentifier: NSString): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 10.0), macos(10.12, 10.12))
-    function initWithHandle(handle: NSString; nameComponents: NSPersonNameComponents; contactIdentifier: NSString): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 10.0), macos(10.12, 10.12))
-    function initWithPersonHandle(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString; image: INImage;
-      contactIdentifier: NSString; customIdentifier: NSString): Pointer; overload; cdecl;
-    function initWithPersonHandle(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString; image: INImage;
-      contactIdentifier: NSString; customIdentifier: NSString; aliases: NSArray; suggestionType: INPersonSuggestionType): Pointer; overload; cdecl;
-    function initWithPersonHandle(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString; image: INImage;
-      contactIdentifier: NSString; customIdentifier: NSString; relationship: INPersonRelationship): Pointer; overload; cdecl;
-    function initWithPersonHandle(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString; image: INImage;
-      contactIdentifier: NSString; customIdentifier: NSString; isMe: Boolean): Pointer; overload; cdecl;
+    [MethodName('initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:aliases:suggestionType:')]
+    function initWithPersonHandleNameComponents(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString;
+      image: INImage; contactIdentifier: NSString; customIdentifier: NSString; aliases: NSArray;
+      suggestionType: INPersonSuggestionType): Pointer; overload; cdecl;
+    [MethodName('initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:')]
+    function initWithPersonHandleNameComponents(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString;
+      image: INImage; contactIdentifier: NSString; customIdentifier: NSString): Pointer; overload; cdecl;
+    [MethodName('initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isContactSuggestion:suggestionType:')]
+    function initWithPersonHandleNameComponents(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString;
+      image: INImage; contactIdentifier: NSString; customIdentifier: NSString; isContactSuggestion: Boolean;
+      suggestionType: INPersonSuggestionType): Pointer; overload; cdecl;
+    [MethodName('initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isMe:suggestionType:')]
+    function initWithPersonHandleNameComponentsIsMe(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString;
+      image: INImage; contactIdentifier: NSString; customIdentifier: NSString; isMe: Boolean; suggestionType: INPersonSuggestionType): Pointer; cdecl;
+    [MethodName('initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:isMe:')]
+    function initWithPersonHandleNameComponents(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString;
+      image: INImage; contactIdentifier: NSString; customIdentifier: NSString; isMe: Boolean): Pointer; overload; cdecl;
+    [MethodName('initWithPersonHandle:nameComponents:displayName:image:contactIdentifier:customIdentifier:relationship:')]
+    function initWithPersonHandleNameComponents(personHandle: INPersonHandle; nameComponents: NSPersonNameComponents; displayName: NSString;
+      image: INImage; contactIdentifier: NSString; customIdentifier: NSString; relationship: INPersonRelationship): Pointer; overload; cdecl;
+    function isContactSuggestion: Boolean; cdecl;
     function isMe: Boolean; cdecl;
     function nameComponents: NSPersonNameComponents; cdecl;
     function personHandle: INPersonHandle; cdecl;
@@ -5368,11 +5445,11 @@ type
   TINPerson = class(TOCGenericImport<INPersonClass, INPerson>) end;
 
   INRecurrenceRuleClass = interface(NSObjectClass)
-    ['{D3770C29-D10F-409A-882B-8279CD713B35}']
+    ['{0F57F32F-D02B-457D-A8F9-20F5A3CAB811}']
   end;
 
   INRecurrenceRule = interface(NSObject)
-    ['{D51716A5-8205-4E75-ABF7-926DCBAC5684}']
+    ['{82FD2260-E23F-45E4-86DB-F14C97777F09}']
     function frequency: INRecurrenceFrequency; cdecl;
     function initWithInterval(interval: NSUInteger; frequency: INRecurrenceFrequency;
       weeklyRecurrenceDays: INDayOfWeekOptions): Pointer; overload; cdecl;
@@ -5383,265 +5460,271 @@ type
   TINRecurrenceRule = class(TOCGenericImport<INRecurrenceRuleClass, INRecurrenceRule>) end;
 
   INFileClass = interface(NSObjectClass)
-    ['{1302EB50-8D4E-4503-91D6-45A6365BF680}']
+    ['{033E76D2-1EC8-4383-B25E-C80F947FA464}']
     {class} function fileWithData(data: NSData; filename: NSString; typeIdentifier: NSString): INFile; cdecl;
     {class} function fileWithFileURL(fileURL: NSURL; filename: NSString; typeIdentifier: NSString): INFile; cdecl;
   end;
 
   INFile = interface(NSObject)
-    ['{976F68B8-2DC9-418A-9F9E-7014B08A6BCD}']
+    ['{142EEFE8-9396-48E1-9173-FD6C5DC0D705}']
     function data: NSData; cdecl;
     function filename: NSString; cdecl;
     function fileURL: NSURL; cdecl;
+    function removedOnCompletion: Boolean; cdecl;
     procedure setFilename(filename: NSString); cdecl;
+    procedure setRemovedOnCompletion(removedOnCompletion: Boolean); cdecl;
     function typeIdentifier: NSString; cdecl;
   end;
   TINFile = class(TOCGenericImport<INFileClass, INFile>) end;
 
   INBooleanResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{BC9F6C2D-4D4C-4358-954C-9133B6A039F4}']
+    ['{2B4908AB-81C2-42BE-A56C-715A2184998A}']
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: NSNumber): Pointer; cdecl;
     {class} function successWithResolvedValue(resolvedValue: Boolean): Pointer; cdecl;
   end;
 
   INBooleanResolutionResult = interface(INIntentResolutionResult)
-    ['{3B6CFEDF-020B-4E2D-AB70-5061A85B3BDA}']
+    ['{5DBD3567-EF38-4FE0-AC23-7A1B2A7A8491}']
   end;
   TINBooleanResolutionResult = class(TOCGenericImport<INBooleanResolutionResultClass, INBooleanResolutionResult>) end;
 
   INDateComponentsRangeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{BF0125FC-8749-4384-8991-34634F1F082F}']
+    ['{0B78E9F3-A147-4DF3-B58C-CB31E2710E80}']
     {class} function confirmationRequiredWithDateComponentsRangeToConfirm(dateComponentsRangeToConfirm: INDateComponentsRange): Pointer; cdecl;
     {class} function disambiguationWithDateComponentsRangesToDisambiguate(dateComponentsRangesToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedDateComponentsRange(resolvedDateComponentsRange: INDateComponentsRange): Pointer; cdecl;
   end;
 
   INDateComponentsRangeResolutionResult = interface(INIntentResolutionResult)
-    ['{2FCF3506-FA25-4EBD-8CB0-9092BCE0F908}']
+    ['{D35E91A5-20D5-4474-B3A3-21839FC40382}']
   end;
   TINDateComponentsRangeResolutionResult = class(TOCGenericImport<INDateComponentsRangeResolutionResultClass,
     INDateComponentsRangeResolutionResult>) end;
 
   INIntegerResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{8444F152-5DF4-4474-AE30-5A3F201D0EEE}']
+    ['{CD120469-BCAC-4C8A-91C1-5A592297A9EC}']
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: NSNumber): Pointer; cdecl;
     {class} function successWithResolvedValue(resolvedValue: NSInteger): Pointer; cdecl;
   end;
 
   INIntegerResolutionResult = interface(INIntentResolutionResult)
-    ['{D2925657-7F4E-4D71-BD21-8338B23FFC56}']
+    ['{EF75EC77-7624-4166-876D-57E5B7D9D34D}']
   end;
   TINIntegerResolutionResult = class(TOCGenericImport<INIntegerResolutionResultClass, INIntegerResolutionResult>) end;
 
   INPlacemarkResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{130635DF-2902-401C-B622-096CF263A6D3}']
+    ['{8AED7374-37B5-4DAB-9C5A-D06806662965}']
     {class} function confirmationRequiredWithPlacemarkToConfirm(placemarkToConfirm: CLPlacemark): Pointer; cdecl;
     {class} function disambiguationWithPlacemarksToDisambiguate(placemarksToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedPlacemark(resolvedPlacemark: CLPlacemark): Pointer; cdecl;
   end;
 
   INPlacemarkResolutionResult = interface(INIntentResolutionResult)
-    ['{3354EDDD-7118-4768-8C8F-A5536D6CD341}']
+    ['{02D3A32E-6006-4A0A-BC96-D81C2E0091E3}']
   end;
   TINPlacemarkResolutionResult = class(TOCGenericImport<INPlacemarkResolutionResultClass, INPlacemarkResolutionResult>) end;
 
   INSpeakableStringResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{C1C67BAE-C68B-4B30-BF29-5E9E70D9F569}']
+    ['{E784D7FF-5859-4BA0-B0A4-6FB6EF5B8FDC}']
     {class} function confirmationRequiredWithStringToConfirm(stringToConfirm: INSpeakableString): Pointer; cdecl;
     {class} function disambiguationWithStringsToDisambiguate(stringsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedString(resolvedString: INSpeakableString): Pointer; cdecl;
   end;
 
   INSpeakableStringResolutionResult = interface(INIntentResolutionResult)
-    ['{B1A6D220-EF78-4757-B1C1-9AF54908DD9D}']
+    ['{74D12320-6300-4150-A5CF-A51A4B612540}']
   end;
   TINSpeakableStringResolutionResult = class(TOCGenericImport<INSpeakableStringResolutionResultClass, INSpeakableStringResolutionResult>) end;
 
   INStringResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{D89F2DE8-245A-4C50-B15B-B94364230678}']
+    ['{E2378482-27EF-4DDE-A4FD-C961C0A7714F}']
     {class} function confirmationRequiredWithStringToConfirm(stringToConfirm: NSString): Pointer; cdecl;
     {class} function disambiguationWithStringsToDisambiguate(stringsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedString(resolvedString: NSString): Pointer; cdecl;
   end;
 
   INStringResolutionResult = interface(INIntentResolutionResult)
-    ['{32F9855A-86C7-4047-AAF8-A5CB9264A6CD}']
+    ['{E3B7E075-396B-46D4-9AE6-D20133237255}']
   end;
   TINStringResolutionResult = class(TOCGenericImport<INStringResolutionResultClass, INStringResolutionResult>) end;
 
   INTemperatureResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{932BB306-40FE-4E9B-B5A4-EB2AFB3C8ACB}']
+    ['{3834A728-A4E5-4552-92BE-00407596FD6C}']
     {class} function confirmationRequiredWithTemperatureToConfirm(temperatureToConfirm: NSMeasurement): Pointer; cdecl;
     {class} function disambiguationWithTemperaturesToDisambiguate(temperaturesToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedTemperature(resolvedTemperature: NSMeasurement): Pointer; cdecl;
   end;
 
   INTemperatureResolutionResult = interface(INIntentResolutionResult)
-    ['{29A348AD-D269-42CC-AFD2-3E0C68ECF9C8}']
+    ['{B9E94A39-2520-4C63-A3DE-FD250785BFD7}']
   end;
   TINTemperatureResolutionResult = class(TOCGenericImport<INTemperatureResolutionResultClass, INTemperatureResolutionResult>) end;
 
   INDateComponentsResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{D9B90AAD-1FEB-4BB1-BC73-20321C21E050}']
+    ['{8E0472C5-17D8-4E10-B298-3D10724D6A61}']
     {class} function confirmationRequiredWithDateComponentsToConfirm(dateComponentsToConfirm: NSDateComponents): Pointer; cdecl;
     {class} function disambiguationWithDateComponentsToDisambiguate(dateComponentsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedDateComponents(resolvedDateComponents: NSDateComponents): Pointer; cdecl;
   end;
 
   INDateComponentsResolutionResult = interface(INIntentResolutionResult)
-    ['{E5D3CB92-C2BA-43B7-93BA-3F86E155FBC9}']
+    ['{33EA529F-93B4-43CD-935E-6327F44AC305}']
   end;
   TINDateComponentsResolutionResult = class(TOCGenericImport<INDateComponentsResolutionResultClass, INDateComponentsResolutionResult>) end;
 
   INRestaurantResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{2CDB32D3-6854-4A7D-9225-5D0F1310ABE8}']
+    ['{FB830C2A-8746-4CF0-8BD6-7D3C6C9D0FA2}']
     {class} function confirmationRequiredWithRestaurantToConfirm(restaurantToConfirm: INRestaurant): Pointer; cdecl;
     {class} function disambiguationWithRestaurantsToDisambiguate(restaurantsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedRestaurant(resolvedRestaurant: INRestaurant): Pointer; cdecl;
   end;
 
   INRestaurantResolutionResult = interface(INIntentResolutionResult)
-    ['{CC57A20E-5793-460B-B76A-8D77BAA81AF8}']
+    ['{DD163DAD-09F5-402D-8F9B-8A32661C924A}']
   end;
   TINRestaurantResolutionResult = class(TOCGenericImport<INRestaurantResolutionResultClass, INRestaurantResolutionResult>) end;
 
   INRestaurantGuestResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{AE52E6B8-9002-43C4-84F7-AE78EFC11AFB}']
+    ['{2DF5F24A-2C7C-408A-B707-44F902EAEFB0}']
     {class} function confirmationRequiredWithRestaurantGuestToConfirm(restaurantGuestToConfirm: INRestaurantGuest): Pointer; cdecl;
     {class} function disambiguationWithRestaurantGuestsToDisambiguate(restaurantGuestsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedRestaurantGuest(resolvedRestaurantGuest: INRestaurantGuest): Pointer; cdecl;
   end;
 
   INRestaurantGuestResolutionResult = interface(INIntentResolutionResult)
-    ['{A20D42E4-1C72-4A3D-9A61-B4C260F5032E}']
+    ['{5954EE67-AE46-4655-B54C-9069A4061816}']
   end;
   TINRestaurantGuestResolutionResult = class(TOCGenericImport<INRestaurantGuestResolutionResultClass, INRestaurantGuestResolutionResult>) end;
 
   INURLResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{AFBD1A7B-8BEE-4D39-ACC7-2A11820D5A58}']
+    ['{A68D0D49-04A7-4820-956B-E4562F3D4AA5}']
     {class} function confirmationRequiredWithURLToConfirm(urlToConfirm: NSURL): Pointer; cdecl;
     {class} function disambiguationWithURLsToDisambiguate(urlsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedURL(resolvedURL: NSURL): Pointer; cdecl;
   end;
 
   INURLResolutionResult = interface(INIntentResolutionResult)
-    ['{E3BE944D-FF51-490D-A29F-52A4896CDA16}']
+    ['{A16C7B66-BE51-4B71-942F-3359EB62E926}']
   end;
   TINURLResolutionResult = class(TOCGenericImport<INURLResolutionResultClass, INURLResolutionResult>) end;
 
   INLengthResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{A98E750A-0DB1-4BF0-9172-4466F4F96499}']
+    ['{BD10C66B-045C-46AC-9014-A38277B2CE3F}']
     {class} function confirmationRequiredWithLengthToConfirm(lengthToConfirm: NSMeasurement): Pointer; cdecl;
     {class} function disambiguationWithLengthsToDisambiguate(lengthsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedLength(resolvedLength: NSMeasurement): Pointer; cdecl;
   end;
 
   INLengthResolutionResult = interface(INIntentResolutionResult)
-    ['{1DB177C8-DE2C-4CEE-B2F7-40AF96802C25}']
+    ['{7FDDD3F4-C7B1-42DD-97CF-8067966A1DD1}']
   end;
   TINLengthResolutionResult = class(TOCGenericImport<INLengthResolutionResultClass, INLengthResolutionResult>) end;
 
   INMassResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{7ACDBF64-0D07-43E7-83FB-C751348B327C}']
+    ['{7E035E52-3A1C-4928-B16A-95C13AD705CB}']
     {class} function confirmationRequiredWithMassToConfirm(massToConfirm: NSMeasurement): Pointer; cdecl;
     {class} function disambiguationWithMassToDisambiguate(massToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedMass(resolvedMass: NSMeasurement): Pointer; cdecl;
   end;
 
   INMassResolutionResult = interface(INIntentResolutionResult)
-    ['{204DEC66-72E1-46B6-AC3E-A6BE02D87461}']
+    ['{6A0DC4C8-B7F6-4440-BAC1-A26624D0F5CA}']
   end;
   TINMassResolutionResult = class(TOCGenericImport<INMassResolutionResultClass, INMassResolutionResult>) end;
 
   INVolumeResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{B4C9643B-A943-4C5A-ACF7-3093B3BA69F0}']
+    ['{AB48C91A-3848-4CAE-AB2C-2C9479597775}']
     {class} function confirmationRequiredWithVolumeToConfirm(volumeToConfirm: NSMeasurement): Pointer; cdecl;
     {class} function disambiguationWithVolumeToDisambiguate(volumeToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedVolume(resolvedVolume: NSMeasurement): Pointer; cdecl;
   end;
 
   INVolumeResolutionResult = interface(INIntentResolutionResult)
-    ['{667B32D1-CECC-4CAA-826E-1D9EAEC67E9D}']
+    ['{B875D5C2-133C-4263-863B-FDB4EEFD54DA}']
   end;
   TINVolumeResolutionResult = class(TOCGenericImport<INVolumeResolutionResultClass, INVolumeResolutionResult>) end;
 
   INSpeedResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{FF69685A-EE79-4639-B3BE-35AF9BE82B7B}']
+    ['{44931984-5D59-46BD-B85F-EE88CFDF56B9}']
     {class} function confirmationRequiredWithSpeedToConfirm(speedToConfirm: NSMeasurement): Pointer; cdecl;
     {class} function disambiguationWithSpeedToDisambiguate(speedToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedSpeed(resolvedSpeed: NSMeasurement): Pointer; cdecl;
   end;
 
   INSpeedResolutionResult = interface(INIntentResolutionResult)
-    ['{65E0B424-26FE-440F-8DFC-EBEBA063FA5B}']
+    ['{F4E29290-388E-4BD4-B874-6B8B2A4A382F}']
   end;
   TINSpeedResolutionResult = class(TOCGenericImport<INSpeedResolutionResultClass, INSpeedResolutionResult>) end;
 
   INEnergyResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{6EBAD6D1-7AB7-4C17-9880-FFA9DE086AA7}']
+    ['{F0326077-A1C3-45C5-B4C1-A60233B1F63A}']
     {class} function confirmationRequiredWithEnergyToConfirm(energyToConfirm: NSMeasurement): Pointer; cdecl;
     {class} function disambiguationWithEnergyToDisambiguate(energyToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedEnergy(resolvedEnergy: NSMeasurement): Pointer; cdecl;
   end;
 
   INEnergyResolutionResult = interface(INIntentResolutionResult)
-    ['{02B0DAD6-9D48-4AF0-8FAD-29A14F12F75F}']
+    ['{32309802-904F-4FC2-8A21-A37B3C805081}']
   end;
   TINEnergyResolutionResult = class(TOCGenericImport<INEnergyResolutionResultClass, INEnergyResolutionResult>) end;
 
   INEnumResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{1FAB10D7-6FA9-4FF1-9231-E849BB13BC21}']
+    ['{AD7CB237-3BAC-466B-B3F3-E9CE50D900B1}']
     {class} function confirmationRequiredWithValueToConfirm(valueToConfirm: NSInteger): Pointer; cdecl;
     {class} function successWithResolvedValue(resolvedValue: NSInteger): Pointer; cdecl;
   end;
 
   INEnumResolutionResult = interface(INIntentResolutionResult)
-    ['{628E7DAA-E51E-4292-8468-457E232FC73D}']
+    ['{88FEC144-DE17-4BE1-806A-E7C4DA8CB15C}']
   end;
   TINEnumResolutionResult = class(TOCGenericImport<INEnumResolutionResultClass, INEnumResolutionResult>) end;
 
   INObjectResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{1E0E807B-B048-40C0-9B2C-91EBACB9A9DF}']
+    ['{10E0D27F-76CF-46A2-A9C6-3AE1028D0469}']
     {class} function confirmationRequiredWithObjectToConfirm(objectToConfirm: INObject): Pointer; cdecl;
     {class} function disambiguationWithObjectsToDisambiguate(objectsToDisambiguate: NSArray): Pointer; cdecl;
     {class} function successWithResolvedObject(resolvedObject: INObject): Pointer; cdecl;
   end;
 
   INObjectResolutionResult = interface(INIntentResolutionResult)
-    ['{7F11E381-B98E-4D2E-915D-AA182C3D287D}']
+    ['{E5C9A2BF-3B21-41AD-A28E-4C05C4CF74EE}']
   end;
   TINObjectResolutionResult = class(TOCGenericImport<INObjectResolutionResultClass, INObjectResolutionResult>) end;
 
   INTimeIntervalResolutionResultClass = interface(INIntentResolutionResultClass)
-    ['{417E442C-C5B1-4453-BDF0-94CD0D955DF3}']
+    ['{DEFB53BE-9FDD-485B-AD38-54C13EBD942E}']
     {class} function confirmationRequiredWithTimeIntervalToConfirm(timeIntervalToConfirm: NSTimeInterval): Pointer; cdecl;
     {class} function successWithResolvedTimeInterval(resolvedTimeInterval: NSTimeInterval): Pointer; cdecl;
   end;
 
   INTimeIntervalResolutionResult = interface(INIntentResolutionResult)
-    ['{D344C555-21C9-4D99-87FC-F1B84E1C092B}']
+    ['{ED5237ED-471A-4F30-96DE-327E560E2A50}']
   end;
   TINTimeIntervalResolutionResult = class(TOCGenericImport<INTimeIntervalResolutionResultClass, INTimeIntervalResolutionResult>) end;
 
   INMessageClass = interface(NSObjectClass)
-    ['{AB4A1C9F-18C6-4185-85A3-C0F148D39A65}']
+    ['{954247B0-F02E-47B0-B801-4798015CD7B1}']
   end;
 
   INMessage = interface(NSObject)
-    ['{DCA8E68A-FF77-4816-B1A1-1F29A8378F17}']
+    ['{86A2192F-A935-49C3-8D5F-9EC54289250B}']
+    function audioMessageFile: INFile; cdecl;
     function content: NSString; cdecl;
     function conversationIdentifier: NSString; cdecl;
     function dateSent: NSDate; cdecl;
     function groupName: INSpeakableString; cdecl;
     function identifier: NSString; cdecl;
     function initWithIdentifier(identifier: NSString; conversationIdentifier: NSString; content: NSString; dateSent: NSDate; sender: INPerson;
-      recipients: NSArray; groupName: INSpeakableString; messageType: INMessageType; serviceName: NSString): Pointer; overload; cdecl;
+      recipients: NSArray; groupName: INSpeakableString; messageType: INMessageType; serviceName: NSString;
+      audioMessageFile: INFile): Pointer; overload; cdecl;
     function initWithIdentifier(identifier: NSString; conversationIdentifier: NSString; content: NSString; dateSent: NSDate; sender: INPerson;
       recipients: NSArray; groupName: INSpeakableString; messageType: INMessageType): Pointer; overload; cdecl;
-    function initWithIdentifier(identifier: NSString; conversationIdentifier: NSString; content: NSString; dateSent: NSDate; sender: INPerson;
-      recipients: NSArray; messageType: INMessageType): Pointer; overload; cdecl;
     function initWithIdentifier(identifier: NSString; content: NSString; dateSent: NSDate; sender: INPerson;
       recipients: NSArray): Pointer; overload; cdecl;
+    function initWithIdentifier(identifier: NSString; conversationIdentifier: NSString; content: NSString; dateSent: NSDate; sender: INPerson;
+      recipients: NSArray; messageType: INMessageType): Pointer; overload; cdecl;
+    function initWithIdentifier(identifier: NSString; conversationIdentifier: NSString; content: NSString; dateSent: NSDate; sender: INPerson;
+      recipients: NSArray; groupName: INSpeakableString; messageType: INMessageType; serviceName: NSString): Pointer; overload; cdecl;
     function messageType: INMessageType; cdecl;
     function recipients: NSArray; cdecl;
     function sender: INPerson; cdecl;
@@ -5650,22 +5733,22 @@ type
   TINMessage = class(TOCGenericImport<INMessageClass, INMessage>) end;
 
   INSendMessageAttachmentClass = interface(NSObjectClass)
-    ['{F2F90DF2-7289-4AFF-8DED-04F46FC62541}']
+    ['{BA52AD62-5477-49B9-8CBA-5C57B2C53EF1}']
     {class} function attachmentWithAudioMessageFile(audioMessageFile: INFile): INSendMessageAttachment; cdecl;
   end;
 
   INSendMessageAttachment = interface(NSObject)
-    ['{5BEF52E1-2F3D-4AA4-8664-F2C0D9C7B3B1}']
+    ['{464AE6CB-DFA7-4F17-8447-02CF214699C5}']
     function audioMessageFile: INFile; cdecl;
   end;
   TINSendMessageAttachment = class(TOCGenericImport<INSendMessageAttachmentClass, INSendMessageAttachment>) end;
 
   INBalanceAmountClass = interface(NSObjectClass)
-    ['{9ABA2EA9-7240-4938-A485-5A1863EDBC54}']
+    ['{CC0629DB-E307-44DB-986F-2665F81D5DC0}']
   end;
 
   INBalanceAmount = interface(NSObject)
-    ['{5B40130C-37B9-49FD-B419-D50B14FFFC0F}']
+    ['{5EB64EE4-32B7-49A0-8673-A558C2512638}']
     function amount: NSDecimalNumber; cdecl;
     function balanceType: INBalanceType; cdecl;
     function currencyCode: NSString; cdecl;
@@ -5675,11 +5758,11 @@ type
   TINBalanceAmount = class(TOCGenericImport<INBalanceAmountClass, INBalanceAmount>) end;
 
   INPriceRangeClass = interface(NSObjectClass)
-    ['{56227661-F2EC-4F9C-A62E-485A5E51E719}']
+    ['{A8F526E3-EF6C-4DBD-8B80-D6E40E230C0B}']
   end;
 
   INPriceRange = interface(NSObject)
-    ['{F945C9FE-9F4C-45E9-A342-FD5B690C9675}']
+    ['{BA3362DA-7A17-4544-8E99-B36C6A344D8E}']
     function currencyCode: NSString; cdecl;
     function initWithMaximumPrice(maximumPrice: NSDecimalNumber; currencyCode: NSString): Pointer; cdecl;
     function initWithMinimumPrice(minimumPrice: NSDecimalNumber; currencyCode: NSString): Pointer; cdecl;
@@ -5691,11 +5774,11 @@ type
   TINPriceRange = class(TOCGenericImport<INPriceRangeClass, INPriceRange>) end;
 
   INRideOptionClass = interface(NSObjectClass)
-    ['{10680D0D-F8D1-44A7-8897-4BF793F1EC28}']
+    ['{5D61D408-9BE4-4B76-BF56-0EB7A041A3B8}']
   end;
 
   INRideOption = interface(NSObject)
-    ['{09D7AF6C-6245-4555-9743-395C49996CB3}']
+    ['{AF32329B-0AF1-46DE-8DAA-892FB69269B6}']
     function availablePartySizeOptions: NSArray; cdecl;
     function availablePartySizeOptionsSelectionPrompt: NSString; cdecl;
     function disclaimerMessage: NSString; cdecl;
@@ -5726,11 +5809,11 @@ type
   TINRideOption = class(TOCGenericImport<INRideOptionClass, INRideOption>) end;
 
   INRideStatusClass = interface(NSObjectClass)
-    ['{F90A771E-38A7-4A52-9E93-B1468B857122}']
+    ['{41E45574-E555-4977-9A17-5D0E2E9C7609}']
   end;
 
   INRideStatus = interface(NSObject)
-    ['{EBDA6289-8817-4966-967A-07AD6622A272}']
+    ['{3B97B7BA-8429-464B-8C6C-4CA482F6D33E}']
     function additionalActionActivities: NSArray; cdecl;
     function completionStatus: INRideCompletionStatus; cdecl;
     function driver: INRideDriver; cdecl;
@@ -5765,11 +5848,11 @@ type
   TINRideStatus = class(TOCGenericImport<INRideStatusClass, INRideStatus>) end;
 
   INRideDriverClass = interface(INPersonClass)
-    ['{BBDDF7EE-84A1-499E-9CB1-4AD2CC972A43}']
+    ['{9BDDEA7A-66D1-4895-A34F-9B1080397696}']
   end;
 
   INRideDriver = interface(INPerson)
-    ['{34FCF69D-33A5-4FBE-BC30-799A0E578042}']
+    ['{A9093AB8-177A-48A5-B941-E11F180E7BA9}']
     function initWithHandle(handle: NSString; displayName: NSString; image: INImage; rating: NSString;
       phoneNumber: NSString): Pointer; overload; cdecl; // API_DEPRECATED("Use the designated initializer instead", ios(10.0, 10.0))
     function initWithHandle(handle: NSString; nameComponents: NSPersonNameComponents; image: INImage; rating: NSString;
@@ -5784,11 +5867,11 @@ type
   TINRideDriver = class(TOCGenericImport<INRideDriverClass, INRideDriver>) end;
 
   INRideVehicleClass = interface(NSObjectClass)
-    ['{6D57EBD0-8D30-4ED7-B049-98243B4AEC32}']
+    ['{5506D182-0582-4CD0-B556-046331AA7DC2}']
   end;
 
   INRideVehicle = interface(NSObject)
-    ['{26AB1ED3-49EA-4FA5-9730-152DC6AD3EA6}']
+    ['{D2B8CAC3-EC72-4EA2-AEBC-8F30E4EC4743}']
     function location: CLLocation; cdecl;
     function manufacturer: NSString; cdecl;
     function mapAnnotationImage: INImage; cdecl;
@@ -5803,11 +5886,11 @@ type
   TINRideVehicle = class(TOCGenericImport<INRideVehicleClass, INRideVehicle>) end;
 
   INRideFareLineItemClass = interface(NSObjectClass)
-    ['{B82B96D8-25ED-4091-B766-6E2196A99163}']
+    ['{CCEE4C8C-8DAF-47FF-8AD4-4FC068306C61}']
   end;
 
   INRideFareLineItem = interface(NSObject)
-    ['{977AE3F1-0BF5-4CC9-980A-5AE69BCBB5C6}']
+    ['{2C284A98-061B-49B5-82B1-CB7D7256C6E8}']
     function currencyCode: NSString; cdecl;
     function initWithTitle(title: NSString; price: NSDecimalNumber; currencyCode: NSString): Pointer; cdecl;
     function price: NSDecimalNumber; cdecl;
@@ -5816,11 +5899,11 @@ type
   TINRideFareLineItem = class(TOCGenericImport<INRideFareLineItemClass, INRideFareLineItem>) end;
 
   INRidePartySizeOptionClass = interface(NSObjectClass)
-    ['{5F735B02-02BF-4D3E-8E10-5AB1051A22BE}']
+    ['{0CD2558C-3AB8-467E-86DD-754D4E58C94F}']
   end;
 
   INRidePartySizeOption = interface(NSObject)
-    ['{B4B00E60-68F7-4C0E-AA8E-DE54DF3C5BB2}']
+    ['{9E2EA987-FC51-4F9E-B445-71E8F7CEC566}']
     function initWithPartySizeRange(partySizeRange: NSRange; sizeDescription: NSString; priceRange: INPriceRange): Pointer; cdecl;
     function partySizeRange: NSRange; cdecl;
     function priceRange: INPriceRange; cdecl;
@@ -5829,7 +5912,7 @@ type
   TINRidePartySizeOption = class(TOCGenericImport<INRidePartySizeOptionClass, INRidePartySizeOption>) end;
 
   INRideCompletionStatusClass = interface(NSObjectClass)
-    ['{791E5D40-598A-46E1-9B8D-8DD7F8E33FA7}']
+    ['{EFE57BC2-088D-4104-9AC2-248E8E9FF3B8}']
     {class} function canceledByService: Pointer; cdecl;
     {class} function canceledByUser: Pointer; cdecl;
     {class} function canceledMissedPickup: Pointer; cdecl;
@@ -5840,7 +5923,7 @@ type
   end;
 
   INRideCompletionStatus = interface(NSObject)
-    ['{631A156B-77CE-434F-829C-3C988497BA99}']
+    ['{C8C2DB47-0C6D-47FD-94C0-4E268B985BD1}']
     function completionUserActivity: NSUserActivity; cdecl;
     function defaultTippingOptions: NSSet; cdecl;
     function feedbackType: INRideFeedbackTypeOptions; cdecl;
@@ -5855,31 +5938,27 @@ type
   TINRideCompletionStatus = class(TOCGenericImport<INRideCompletionStatusClass, INRideCompletionStatus>) end;
 
   INReservationClass = interface(NSObjectClass)
-    ['{AB4FE241-DAB6-46FD-BB99-BF260DCDE480}']
+    ['{F8B77F68-E9B0-4AD2-B4ED-E0816A254EF0}']
   end;
 
   INReservation = interface(NSObject)
-    ['{5141E36E-D0FF-4762-857F-E280E1180D70}']
+    ['{9F9F5B92-0602-48FA-8F05-2BE18776C44B}']
     function actions: NSArray; cdecl;
     function bookingTime: NSDate; cdecl;
     function itemReference: INSpeakableString; cdecl;
     function reservationHolderName: NSString; cdecl;
     function reservationNumber: NSString; cdecl;
     function reservationStatus: INReservationStatus; cdecl;
-    [MethodName('URL')]
-    function URL: NSURL; overload; cdecl;
-    [MethodName('url')]
-    function URL2: NSURL; overload; cdecl; // API_DEPRECATED("Use URL instead", ios(14.0, 14.0), macos(10.16, 11.0), watchos(7.0, 7.0))
+    function URL: NSURL; cdecl;
   end;
   TINReservation = class(TOCGenericImport<INReservationClass, INReservation>) end;
 
   INReservationActionClass = interface(NSObjectClass)
-    ['{BCAF6741-DB3F-4F91-9620-A099341B70B0}']
+    ['{9643EA88-F05E-454E-9193-470A66E9E8EA}']
   end;
 
   INReservationAction = interface(NSObject)
-    ['{03B67819-A050-421C-9E44-193D9213D19D}']
-    [MethodName('type')]
+    ['{E0342511-CE8F-4315-937F-D82A737122A6}']
     function &type: INReservationActionType; cdecl;
     function initWithType(&type: INReservationActionType; validDuration: INDateComponentsRange; userActivity: NSUserActivity): Pointer; cdecl;
     function userActivity: NSUserActivity; cdecl;
@@ -5888,11 +5967,11 @@ type
   TINReservationAction = class(TOCGenericImport<INReservationActionClass, INReservationAction>) end;
 
   INFlightReservationClass = interface(INReservationClass)
-    ['{CC3A8B89-9D10-4E64-91FA-898B63185478}']
+    ['{3F2A3E91-7B7F-40F2-972F-3A57F9A0D305}']
   end;
 
   INFlightReservation = interface(INReservation)
-    ['{716A781C-FF0D-48A8-B17C-2BAB9EF15EFB}']
+    ['{9803FF6E-F8CE-481A-9C28-D1B8BBA726A6}']
     function flight: INFlight; cdecl;
     function initWithItemReference(itemReference: INSpeakableString; reservationNumber: NSString; bookingTime: NSDate;
       reservationStatus: INReservationStatus; reservationHolderName: NSString; actions: NSArray; reservedSeat: INSeat;
@@ -5905,11 +5984,11 @@ type
   TINFlightReservation = class(TOCGenericImport<INFlightReservationClass, INFlightReservation>) end;
 
   INLodgingReservationClass = interface(INReservationClass)
-    ['{46AE0E8C-25CE-423C-8433-54ECA9FB4E6A}']
+    ['{AB00C270-8B39-455C-B489-5088D26427B6}']
   end;
 
   INLodgingReservation = interface(INReservation)
-    ['{77C4D90F-4780-4717-B492-3D8306EAB32D}']
+    ['{FF3AC175-938F-4F29-BCF7-56F95283465D}']
     function initWithItemReference(itemReference: INSpeakableString; reservationNumber: NSString; bookingTime: NSDate;
       reservationStatus: INReservationStatus; reservationHolderName: NSString; actions: NSArray; URL: NSURL; lodgingBusinessLocation: CLPlacemark;
       reservationDuration: INDateComponentsRange; numberOfAdults: NSNumber; numberOfChildren: NSNumber): Pointer; overload; cdecl;
@@ -5924,11 +6003,11 @@ type
   TINLodgingReservation = class(TOCGenericImport<INLodgingReservationClass, INLodgingReservation>) end;
 
   INRentalCarReservationClass = interface(INReservationClass)
-    ['{502F6C4A-452A-416F-93CD-AE0FF8BDCF20}']
+    ['{3E365229-62F6-4123-BCC0-A15F8D6B69E0}']
   end;
 
   INRentalCarReservation = interface(INReservation)
-    ['{7D7CAC14-20B5-425A-AFAC-F7F0E890A49D}']
+    ['{E2162F17-735A-467B-8BDF-799AD189CFDA}']
     function dropOffLocation: CLPlacemark; cdecl;
     function initWithItemReference(itemReference: INSpeakableString; reservationNumber: NSString; bookingTime: NSDate;
       reservationStatus: INReservationStatus; reservationHolderName: NSString; actions: NSArray; rentalCar: INRentalCar;
@@ -5943,11 +6022,11 @@ type
   TINRentalCarReservation = class(TOCGenericImport<INRentalCarReservationClass, INRentalCarReservation>) end;
 
   INRestaurantReservationClass = interface(INReservationClass)
-    ['{698D42D3-4E3F-4C2B-B11D-D749050788BE}']
+    ['{B7C1A276-1AF1-41B7-9C82-2208FBB7BADE}']
   end;
 
   INRestaurantReservation = interface(INReservation)
-    ['{E84BC428-02A5-4092-BCF9-A0A3CC284F0D}']
+    ['{FE6C264B-7285-492D-83E0-43748C5988F6}']
     function initWithItemReference(itemReference: INSpeakableString; reservationNumber: NSString; bookingTime: NSDate;
       reservationStatus: INReservationStatus; reservationHolderName: NSString; actions: NSArray; reservationDuration: INDateComponentsRange;
       partySize: NSNumber; restaurantLocation: CLPlacemark): Pointer; overload; cdecl;
@@ -5961,11 +6040,11 @@ type
   TINRestaurantReservation = class(TOCGenericImport<INRestaurantReservationClass, INRestaurantReservation>) end;
 
   INTicketedEventReservationClass = interface(INReservationClass)
-    ['{7707EE61-A862-47F5-8B77-91EA7E91ECE2}']
+    ['{6CD72C68-B527-4AA5-9F95-0325E1E65C0F}']
   end;
 
   INTicketedEventReservation = interface(INReservation)
-    ['{F8BB0C3A-F373-4A4D-A5CA-F29DB764C00E}']
+    ['{89E7094D-140A-423A-BAA0-E52861518DA5}']
     function event: INTicketedEvent; cdecl;
     function initWithItemReference(itemReference: INSpeakableString; reservationNumber: NSString; bookingTime: NSDate;
       reservationStatus: INReservationStatus; reservationHolderName: NSString; actions: NSArray; reservedSeat: INSeat;
@@ -5978,11 +6057,11 @@ type
   TINTicketedEventReservation = class(TOCGenericImport<INTicketedEventReservationClass, INTicketedEventReservation>) end;
 
   INTrainReservationClass = interface(INReservationClass)
-    ['{238A4D18-1DF1-4566-85B2-9475B283C3E9}']
+    ['{4B394B8F-B7F9-4F2D-9A75-1133DB852AC8}']
   end;
 
   INTrainReservation = interface(INReservation)
-    ['{A048AC53-9866-48FD-AD3D-8A5AEEF8DAD2}']
+    ['{7BF6BAE3-5EDB-4FF6-8F01-5910A74F627F}']
     function initWithItemReference(itemReference: INSpeakableString; reservationNumber: NSString; bookingTime: NSDate;
       reservationStatus: INReservationStatus; reservationHolderName: NSString; actions: NSArray; reservedSeat: INSeat;
       trainTrip: INTrainTrip): Pointer; overload; cdecl;
@@ -5995,11 +6074,11 @@ type
   TINTrainReservation = class(TOCGenericImport<INTrainReservationClass, INTrainReservation>) end;
 
   INBusReservationClass = interface(INReservationClass)
-    ['{E14FD9AC-3D84-4D6C-8E43-C2953BEEEE38}']
+    ['{BB4D7127-497B-460C-9015-730617C95751}']
   end;
 
   INBusReservation = interface(INReservation)
-    ['{AFE9CB25-A985-4CF0-A9F4-C3D3A351B2D0}']
+    ['{9F5EC37C-B015-4D35-BDD4-195601E565B8}']
     function busTrip: INBusTrip; cdecl;
     function initWithItemReference(itemReference: INSpeakableString; reservationNumber: NSString; bookingTime: NSDate;
       reservationStatus: INReservationStatus; reservationHolderName: NSString; actions: NSArray; URL: NSURL; reservedSeat: INSeat;
@@ -6009,11 +6088,11 @@ type
   TINBusReservation = class(TOCGenericImport<INBusReservationClass, INBusReservation>) end;
 
   INBoatReservationClass = interface(INReservationClass)
-    ['{40E426DC-C168-4321-9CDC-E0928F06E54B}']
+    ['{CB2F16E8-A5B7-493B-8496-C10C57ECC808}']
   end;
 
   INBoatReservation = interface(INReservation)
-    ['{89F61700-0ADD-43EE-A5DD-0183259459E9}']
+    ['{0FC51BAC-4444-4DE1-84DF-565907E44C5C}']
     function boatTrip: INBoatTrip; cdecl;
     function initWithItemReference(itemReference: INSpeakableString; reservationNumber: NSString; bookingTime: NSDate;
       reservationStatus: INReservationStatus; reservationHolderName: NSString; actions: NSArray; URL: NSURL; reservedSeat: INSeat;
@@ -6023,11 +6102,11 @@ type
   TINBoatReservation = class(TOCGenericImport<INBoatReservationClass, INBoatReservation>) end;
 
   INRestaurantGuestClass = interface(INPersonClass)
-    ['{FB7F176F-F79E-46BE-9497-4290FEA0958B}']
+    ['{156972CD-3A01-4E96-9EBA-02067974AD43}']
   end;
 
   INRestaurantGuest = interface(INPerson)
-    ['{FF1A5F59-B1EB-4A23-B3C9-D8C8F1DF5886}']
+    ['{C00B855B-0E49-4ABF-A439-7FFC9446EF55}']
     function emailAddress: NSString; cdecl;
     function initWithNameComponents(nameComponents: NSPersonNameComponents; phoneNumber: NSString; emailAddress: NSString): Pointer; cdecl;
     function phoneNumber: NSString; cdecl;
@@ -6037,11 +6116,11 @@ type
   TINRestaurantGuest = class(TOCGenericImport<INRestaurantGuestClass, INRestaurantGuest>) end;
 
   INTermsAndConditionsClass = interface(NSObjectClass)
-    ['{64B26BBF-F082-417B-B23F-E4996FBF4CCB}']
+    ['{901DEA14-2E9E-48DD-A814-761A2F450845}']
   end;
 
   INTermsAndConditions = interface(NSObject)
-    ['{A3DF583B-A2CE-438C-8E95-1B7AFF6E7B5E}']
+    ['{A35231D1-1C21-4216-B156-DE825CF9B5B2}']
     function initWithLocalizedTermsAndConditionsText(localizedTermsAndConditionsText: NSString; privacyPolicyURL: NSURL;
       termsAndConditionsURL: NSURL): Pointer; cdecl;
     function localizedTermsAndConditionsText: NSString; cdecl;
@@ -6051,11 +6130,11 @@ type
   TINTermsAndConditions = class(TOCGenericImport<INTermsAndConditionsClass, INTermsAndConditions>) end;
 
   INRestaurantGuestDisplayPreferencesClass = interface(NSObjectClass)
-    ['{73EB29C5-FCD5-447F-9243-034766B4D5E9}']
+    ['{A49E96E2-A76E-4DEF-9100-0F9A98BB888D}']
   end;
 
   INRestaurantGuestDisplayPreferences = interface(NSObject)
-    ['{302F226C-C874-486B-B8B4-0FF8ED23FF6D}']
+    ['{BC599E81-F915-4FDD-8BD8-E68F13E70629}']
     function emailAddressEditable: Boolean; cdecl;
     function emailAddressFieldShouldBeDisplayed: Boolean; cdecl;
     function nameEditable: Boolean; cdecl;
@@ -6076,11 +6155,11 @@ type
   TINRestaurantGuestDisplayPreferences = class(TOCGenericImport<INRestaurantGuestDisplayPreferencesClass, INRestaurantGuestDisplayPreferences>) end;
 
   INRestaurantClass = interface(NSObjectClass)
-    ['{D350C568-5078-4520-AB11-129CEE7628D6}']
+    ['{E3F259B7-05AB-4109-AF6B-2CD17710C9AE}']
   end;
 
   INRestaurant = interface(NSObject)
-    ['{86883415-0E10-4A03-8A00-2B21C654FAF6}']
+    ['{A896DE40-9351-4386-BBC6-EDDC01748220}']
     function initWithLocation(location: CLLocation; name: NSString; vendorIdentifier: NSString; restaurantIdentifier: NSString): Pointer; cdecl;
     function location: CLLocation; cdecl;
     function name: NSString; cdecl;
@@ -6094,11 +6173,11 @@ type
   TINRestaurant = class(TOCGenericImport<INRestaurantClass, INRestaurant>) end;
 
   INRestaurantOfferClass = interface(NSObjectClass)
-    ['{DF162BAA-FB28-4554-9C66-18921C42056E}']
+    ['{CFC42F88-856C-443E-8406-121BD8A99E5D}']
   end;
 
   INRestaurantOffer = interface(NSObject)
-    ['{D168C20E-41C9-4BC0-88EC-D4EF7B995C9F}']
+    ['{BEACE27B-1F70-490C-98A2-A0F81A0C83E8}']
     function offerDetailText: NSString; cdecl;
     function offerIdentifier: NSString; cdecl;
     function offerTitleText: NSString; cdecl;
@@ -6109,11 +6188,11 @@ type
   TINRestaurantOffer = class(TOCGenericImport<INRestaurantOfferClass, INRestaurantOffer>) end;
 
   INRestaurantReservationBookingClass = interface(NSObjectClass)
-    ['{1724B4C2-F278-4021-8557-83181486BF9B}']
+    ['{2C3A22B5-74F2-4CE3-BCEA-D3297D98D23C}']
   end;
 
   INRestaurantReservationBooking = interface(NSObject)
-    ['{8C357ABD-EC69-40BA-909F-7D206810B534}']
+    ['{BFA6C342-8306-4EE5-B8E9-DFC863DCDDCD}']
     function bookingDate: NSDate; cdecl;
     function bookingDescription: NSString; cdecl;
     function bookingIdentifier: NSString; cdecl;
@@ -6141,11 +6220,11 @@ type
   TINRestaurantReservationBooking = class(TOCGenericImport<INRestaurantReservationBookingClass, INRestaurantReservationBooking>) end;
 
   INRestaurantReservationUserBookingClass = interface(INRestaurantReservationBookingClass)
-    ['{775950C5-6B26-412D-A374-C94C2B906404}']
+    ['{A8C90405-FB55-4EB8-8CD5-0C3B479DE748}']
   end;
 
   INRestaurantReservationUserBooking = interface(INRestaurantReservationBooking)
-    ['{0E9B19AA-BCDE-4A92-AF34-C2DCCBA7264A}']
+    ['{511C37B0-AE9E-4FAC-99D4-C61133BC0565}']
     function advisementText: NSString; cdecl;
     function dateStatusModified: NSDate; cdecl;
     function guest: INRestaurantGuest; cdecl;
@@ -6164,11 +6243,11 @@ type
   TINRestaurantReservationUserBooking = class(TOCGenericImport<INRestaurantReservationUserBookingClass, INRestaurantReservationUserBooking>) end;
 
   INBookRestaurantReservationIntentClass = interface(INIntentClass)
-    ['{554B1EF1-DE82-467E-A929-84E6BF41F861}']
+    ['{BC4E3C59-F61C-4C77-89DD-028AEAFD6354}']
   end;
 
   INBookRestaurantReservationIntent = interface(INIntent)
-    ['{E42269E0-60E8-4C75-93C2-8FF616B65309}']
+    ['{67058441-AC2A-4531-98EC-C9A773B4522E}']
     function bookingDateComponents: NSDateComponents; cdecl;
     function bookingIdentifier: NSString; cdecl;
     function guest: INRestaurantGuest; cdecl;
@@ -6189,29 +6268,23 @@ type
   TINBookRestaurantReservationIntent = class(TOCGenericImport<INBookRestaurantReservationIntentClass, INBookRestaurantReservationIntent>) end;
 
   INBookRestaurantReservationIntentHandling = interface(IObjectiveC)
-    ['{CD5B4246-E7DB-4DE0-8E13-A7957EBDA23A}']
-    procedure confirmBookRestaurantReservation(intent: INBookRestaurantReservationIntent;
-      completion: TINBookRestaurantReservationIntentHandlingBlockMethod1); cdecl;
-    procedure handleBookRestaurantReservation(intent: INBookRestaurantReservationIntent;
-      completion: TINBookRestaurantReservationIntentHandlingBlockMethod1); cdecl;
-    procedure resolveBookingDateComponentsForBookRestaurantReservation(intent: INBookRestaurantReservationIntent;
-      withCompletion: TINBookRestaurantReservationIntentHandlingBlockMethod3); cdecl;
-    procedure resolveGuestForBookRestaurantReservation(intent: INBookRestaurantReservationIntent;
-      withCompletion: TINBookRestaurantReservationIntentHandlingBlockMethod5); cdecl;
+    ['{5D6692ED-2B37-4518-B2C7-5CA0758D2591}']
+    procedure confirmBookRestaurantReservation(intent: INBookRestaurantReservationIntent; completion: Pointer); cdecl;
+    procedure handleBookRestaurantReservation(intent: INBookRestaurantReservationIntent; completion: Pointer); cdecl;
+    procedure resolveBookingDateComponentsForBookRestaurantReservation(intent: INBookRestaurantReservationIntent; withCompletion: Pointer); cdecl;
+    procedure resolveGuestForBookRestaurantReservation(intent: INBookRestaurantReservationIntent; withCompletion: Pointer); cdecl;
     procedure resolveGuestProvidedSpecialRequestTextForBookRestaurantReservation(intent: INBookRestaurantReservationIntent;
-      withCompletion: TINBookRestaurantReservationIntentHandlingBlockMethod6); cdecl;
-    procedure resolvePartySizeForBookRestaurantReservation(intent: INBookRestaurantReservationIntent;
-      withCompletion: TINBookRestaurantReservationIntentHandlingBlockMethod4); cdecl;
-    procedure resolveRestaurantForBookRestaurantReservation(intent: INBookRestaurantReservationIntent;
-      withCompletion: TINBookRestaurantReservationIntentHandlingBlockMethod2); cdecl;
+      withCompletion: Pointer); cdecl;
+    procedure resolvePartySizeForBookRestaurantReservation(intent: INBookRestaurantReservationIntent; withCompletion: Pointer); cdecl;
+    procedure resolveRestaurantForBookRestaurantReservation(intent: INBookRestaurantReservationIntent; withCompletion: Pointer); cdecl;
   end;
 
   INGetAvailableRestaurantReservationBookingsIntentClass = interface(INIntentClass)
-    ['{74C345AB-9592-4C7D-9F04-3E67DE566B45}']
+    ['{F1399403-9638-44A6-8B02-FA05A862CA0B}']
   end;
 
   INGetAvailableRestaurantReservationBookingsIntent = interface(INIntent)
-    ['{D294A208-906E-460A-80F2-717B79A5CC01}']
+    ['{3F9F3F66-256E-42BD-B9D9-A473976AFFBE}']
     function earliestBookingDateForResults: NSDate; cdecl;
     function initWithRestaurant(restaurant: INRestaurant; partySize: NSUInteger; preferredBookingDateComponents: NSDateComponents;
       maximumNumberOfResults: NSNumber; earliestBookingDateForResults: NSDate; latestBookingDateForResults: NSDate): Pointer; cdecl;
@@ -6231,25 +6304,22 @@ type
     INGetAvailableRestaurantReservationBookingsIntent>) end;
 
   INGetAvailableRestaurantReservationBookingsIntentHandling = interface(IObjectiveC)
-    ['{0044AC27-6B34-455B-A366-60640635E8AD}']
-    procedure confirmGetAvailableRestaurantReservationBookings(intent: INGetAvailableRestaurantReservationBookingsIntent;
-      completion: TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod1); cdecl;
-    procedure handleGetAvailableRestaurantReservationBookings(intent: INGetAvailableRestaurantReservationBookingsIntent;
-      completion: TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod1); cdecl;
+    ['{458B2A09-911A-4B14-82D4-8F5D4C6A1F7C}']
+    procedure confirmGetAvailableRestaurantReservationBookings(intent: INGetAvailableRestaurantReservationBookingsIntent; completion: Pointer); cdecl;
+    procedure handleGetAvailableRestaurantReservationBookings(intent: INGetAvailableRestaurantReservationBookingsIntent; completion: Pointer); cdecl;
     procedure resolvePartySizeForGetAvailableRestaurantReservationBookings(intent: INGetAvailableRestaurantReservationBookingsIntent;
-      withCompletion: TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod3); cdecl;
-    procedure resolvePreferredBookingDateComponentsForGetAvailableRestaurantReservationBookings(intent: INGetAvailableRestaurantReservationBookingsIntent;
-      withCompletion: TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod4); cdecl;
+      withCompletion: Pointer); cdecl;
+    procedure resolvePreferredBookingDateComponentsForGetAvailableRestaurantReservationBookings(intent: INGetAvailableRestaurantReservationBookingsIntent; withCompletion: Pointer); cdecl;
     procedure resolveRestaurantForGetAvailableRestaurantReservationBookings(intent: INGetAvailableRestaurantReservationBookingsIntent;
-      withCompletion: TINGetAvailableRestaurantReservationBookingsIntentHandlingBlockMethod2); cdecl;
+      withCompletion: Pointer); cdecl;
   end;
 
   INGetUserCurrentRestaurantReservationBookingsIntentClass = interface(INIntentClass)
-    ['{FF745430-6F00-4750-97DB-D89BB7F81B18}']
+    ['{D6E5A173-4B82-4D51-924E-A37EEBE56327}']
   end;
 
   INGetUserCurrentRestaurantReservationBookingsIntent = interface(INIntent)
-    ['{93251F53-A63E-4725-A494-ACABF12D9D16}']
+    ['{C3188458-7706-4F59-9B8B-127B2BF5CC29}']
     function earliestBookingDateForResults: NSDate; cdecl;
     function initWithRestaurant(restaurant: INRestaurant; reservationIdentifier: NSString; maximumNumberOfResults: NSNumber;
       earliestBookingDateForResults: NSDate): Pointer; cdecl;
@@ -6265,58 +6335,51 @@ type
     INGetUserCurrentRestaurantReservationBookingsIntent>) end;
 
   INGetUserCurrentRestaurantReservationBookingsIntentHandling = interface(IObjectiveC)
-    ['{678E13D5-6C1F-4DEB-A8EF-6EF0694DD7E7}']
-    procedure confirmGetUserCurrentRestaurantReservationBookings(intent: INGetUserCurrentRestaurantReservationBookingsIntent;
-      completion: TINGetUserCurrentRestaurantReservationBookingsIntentHandlingBlockMethod1); cdecl;
-    procedure handleGetUserCurrentRestaurantReservationBookings(intent: INGetUserCurrentRestaurantReservationBookingsIntent;
-      completion: TINGetUserCurrentRestaurantReservationBookingsIntentHandlingBlockMethod1); cdecl;
+    ['{58A554A4-9F44-4A22-814A-66099B9C9783}']
+    procedure confirmGetUserCurrentRestaurantReservationBookings(intent: INGetUserCurrentRestaurantReservationBookingsIntent; completion: Pointer); cdecl;
+    procedure handleGetUserCurrentRestaurantReservationBookings(intent: INGetUserCurrentRestaurantReservationBookingsIntent; completion: Pointer); cdecl;
     procedure resolveRestaurantForGetUserCurrentRestaurantReservationBookings(intent: INGetUserCurrentRestaurantReservationBookingsIntent;
-      withCompletion: TINGetUserCurrentRestaurantReservationBookingsIntentHandlingBlockMethod2); cdecl;
+      withCompletion: Pointer); cdecl;
   end;
 
   INGetAvailableRestaurantReservationBookingDefaultsIntentClass = interface(INIntentClass)
-    ['{041673E7-3FC8-48A8-92D6-4EBFC81F92EC}']
+    ['{912E53CD-526C-415D-BB8D-ACB4217D697F}']
   end;
 
   INGetAvailableRestaurantReservationBookingDefaultsIntent = interface(INIntent)
-    ['{0615A0AA-8F4F-4BC3-B686-EBF503413D42}']
+    ['{5B780E24-00A9-4C7B-83E9-218D419573AB}']
     function initWithRestaurant(restaurant: INRestaurant): Pointer; cdecl;
     function restaurant: INRestaurant; cdecl;
     procedure setRestaurant(restaurant: INRestaurant); cdecl;
   end;
-  TINGetAvailableRestaurantReservationBookingDefaultsIntent = class(TOCGenericImport<INGetAvailableRestaurantReservationBookingDefaultsIntentClass,
-    INGetAvailableRestaurantReservationBookingDefaultsIntent>) end;
+  TINGetAvailableRestaurantReservationBookingDefaultsIntent = class(TOCGenericImport<INGetAvailableRestaurantReservationBookingDefaultsIntentClass, INGetAvailableRestaurantReservationBookingDefaultsIntent>) end;
 
   INGetAvailableRestaurantReservationBookingDefaultsIntentHandling = interface(IObjectiveC)
-    ['{F9024E01-703C-4A49-A229-76ED27FAEF95}']
-    procedure confirmGetAvailableRestaurantReservationBookingDefaults(intent: INGetAvailableRestaurantReservationBookingDefaultsIntent;
-      completion: TINGetAvailableRestaurantReservationBookingDefaultsIntentHandlingBlockMethod1); cdecl;
-    procedure handleGetAvailableRestaurantReservationBookingDefaults(intent: INGetAvailableRestaurantReservationBookingDefaultsIntent;
-      completion: TINGetAvailableRestaurantReservationBookingDefaultsIntentHandlingBlockMethod1); cdecl;
-    procedure resolveRestaurantForGetAvailableRestaurantReservationBookingDefaults(intent: INGetAvailableRestaurantReservationBookingDefaultsIntent;
-      withCompletion: TINGetAvailableRestaurantReservationBookingDefaultsIntentHandlingBlockMethod2); cdecl;
+    ['{68B6E14B-4032-4E36-9BF3-335713459667}']
+    procedure confirmGetAvailableRestaurantReservationBookingDefaults(intent: INGetAvailableRestaurantReservationBookingDefaultsIntent; completion: Pointer); cdecl;
+    procedure handleGetAvailableRestaurantReservationBookingDefaults(intent: INGetAvailableRestaurantReservationBookingDefaultsIntent; completion: Pointer); cdecl;
+    procedure resolveRestaurantForGetAvailableRestaurantReservationBookingDefaults(intent: INGetAvailableRestaurantReservationBookingDefaultsIntent; withCompletion: Pointer); cdecl;
   end;
 
   INBookRestaurantReservationIntentResponseClass = interface(INIntentResponseClass)
-    ['{BFF7D1C7-A532-4FF9-8E54-0A29FB2688AF}']
+    ['{9F6DCE8B-FDBA-4511-AB09-B6DB61A8EFBE}']
   end;
 
   INBookRestaurantReservationIntentResponse = interface(INIntentResponse)
-    ['{073D855B-AE15-45EC-9197-19C7426DD4DC}']
+    ['{488BC27E-B819-49EC-8991-9C283BBFF56D}']
     function code: INBookRestaurantReservationIntentCode; cdecl;
     function initWithCode(code: INBookRestaurantReservationIntentCode; userActivity: NSUserActivity): Pointer; cdecl;
     procedure setUserBooking(userBooking: INRestaurantReservationUserBooking); cdecl;
     function userBooking: INRestaurantReservationUserBooking; cdecl;
   end;
-  TINBookRestaurantReservationIntentResponse = class(TOCGenericImport<INBookRestaurantReservationIntentResponseClass,
-    INBookRestaurantReservationIntentResponse>) end;
+  TINBookRestaurantReservationIntentResponse = class(TOCGenericImport<INBookRestaurantReservationIntentResponseClass, INBookRestaurantReservationIntentResponse>) end;
 
   INGetAvailableRestaurantReservationBookingsIntentResponseClass = interface(INIntentResponseClass)
-    ['{669AF24D-B0C9-44F7-B9D4-7DEF9FC899E4}']
+    ['{14F0501E-52D1-425F-ADD7-38EFA7EA6AF3}']
   end;
 
   INGetAvailableRestaurantReservationBookingsIntentResponse = interface(INIntentResponse)
-    ['{7A88179E-F8B6-4F06-835D-632A73BE8399}']
+    ['{553D6068-B01D-4B0B-86E5-64A2A3021E9B}']
     function availableBookings: NSArray; cdecl;
     function code: INGetAvailableRestaurantReservationBookingsIntentCode; cdecl;
     function initWithAvailableBookings(availableBookings: NSArray; code: INGetAvailableRestaurantReservationBookingsIntentCode;
@@ -6332,11 +6395,11 @@ type
     INGetAvailableRestaurantReservationBookingsIntentResponse>) end;
 
   INGetUserCurrentRestaurantReservationBookingsIntentResponseClass = interface(INIntentResponseClass)
-    ['{54DA9552-4CF1-4A54-923C-FCF9C94513D5}']
+    ['{4350AE75-A7C2-4FDA-9343-CF4B0D7267B8}']
   end;
 
   INGetUserCurrentRestaurantReservationBookingsIntentResponse = interface(INIntentResponse)
-    ['{206E25F1-26F1-4BD3-833A-287C4BE20F25}']
+    ['{46C01E75-243B-4890-8664-9E42B39B2D9F}']
     function code: INGetUserCurrentRestaurantReservationBookingsIntentResponseCode; cdecl;
     function initWithUserCurrentBookings(userCurrentBookings: NSArray; code: INGetUserCurrentRestaurantReservationBookingsIntentResponseCode;
       userActivity: NSUserActivity): Pointer; cdecl;
@@ -6347,11 +6410,11 @@ type
     INGetUserCurrentRestaurantReservationBookingsIntentResponse>) end;
 
   INGetAvailableRestaurantReservationBookingDefaultsIntentResponseClass = interface(INIntentResponseClass)
-    ['{F838D58A-7551-4095-BF45-8F8889518065}']
+    ['{6C32E5F5-80F7-4064-8F07-C037628FE4DB}']
   end;
 
   INGetAvailableRestaurantReservationBookingDefaultsIntentResponse = interface(INIntentResponse)
-    ['{C89F5B83-3910-4A3C-99A9-BD51CA0A6FC1}']
+    ['{EBB56008-CF4B-441A-B523-86E04FD5BA66}']
     function code: INGetAvailableRestaurantReservationBookingDefaultsIntentResponseCode; cdecl;
     function defaultBookingDate: NSDate; cdecl;
     function defaultPartySize: NSUInteger; cdecl;
@@ -6368,26 +6431,26 @@ type
     INGetAvailableRestaurantReservationBookingDefaultsIntentResponse>) end;
 
   INGetRestaurantGuestIntentClass = interface(INIntentClass)
-    ['{DFC9A4F5-1ECA-484D-BE99-65E885DFC238}']
+    ['{C5CE3D9A-FB70-40BC-AE4D-B022F971AB91}']
   end;
 
   INGetRestaurantGuestIntent = interface(INIntent)
-    ['{3949BD95-5209-4A45-AB6A-DA16E0438FD1}']
+    ['{BEF45E56-16F4-4F43-A420-838319B0F289}']
   end;
   TINGetRestaurantGuestIntent = class(TOCGenericImport<INGetRestaurantGuestIntentClass, INGetRestaurantGuestIntent>) end;
 
   INGetRestaurantGuestIntentHandling = interface(IObjectiveC)
-    ['{098CE933-5C28-4BEA-A070-303B2830BC7D}']
-    procedure confirmGetRestaurantGuest(guestIntent: INGetRestaurantGuestIntent; completion: TINGetRestaurantGuestIntentHandlingBlockMethod1); cdecl;
-    procedure handleGetRestaurantGuest(intent: INGetRestaurantGuestIntent; completion: TINGetRestaurantGuestIntentHandlingBlockMethod1); cdecl;
+    ['{78E60A7C-CA1C-4CAC-A404-CAE0A0364E54}']
+    procedure confirmGetRestaurantGuest(guestIntent: INGetRestaurantGuestIntent; completion: Pointer); cdecl;
+    procedure handleGetRestaurantGuest(intent: INGetRestaurantGuestIntent; completion: Pointer); cdecl;
   end;
 
   INGetRestaurantGuestIntentResponseClass = interface(INIntentResponseClass)
-    ['{57120CB1-4A2A-4175-AA72-8E0E3B6D2E6E}']
+    ['{142E264D-F5FB-4D89-A5DF-C176EDFF1D9F}']
   end;
 
   INGetRestaurantGuestIntentResponse = interface(INIntentResponse)
-    ['{419F316E-F42E-46A3-9D0C-A38969800400}']
+    ['{9F5F2407-6A2A-46CF-A604-F4B11006AC04}']
     function code: INGetRestaurantGuestIntentResponseCode; cdecl;
     function guest: INRestaurantGuest; cdecl;
     function guestDisplayPreferences: INRestaurantGuestDisplayPreferences; cdecl;
@@ -6398,12 +6461,12 @@ type
   TINGetRestaurantGuestIntentResponse = class(TOCGenericImport<INGetRestaurantGuestIntentResponseClass, INGetRestaurantGuestIntentResponse>) end;
 
   INVocabularyClass = interface(NSObjectClass)
-    ['{47EAAA25-FBAF-46EF-A144-8D1D50F53FFE}']
+    ['{015210B7-1CC5-4DDF-9785-A46619C1AC33}']
     {class} function sharedVocabulary: Pointer; cdecl;
   end;
 
   INVocabulary = interface(NSObject)
-    ['{6807BEF3-FDE2-4489-9AC8-37099388FE88}']
+    ['{00AF50C3-0C31-4017-B574-91B135B5051A}']
     procedure removeAllVocabularyStrings; cdecl;
     procedure setVocabulary(vocabulary: NSOrderedSet; ofType: INVocabularyStringType); cdecl;
     procedure setVocabularyStrings(vocabulary: NSOrderedSet; ofType: INVocabularyStringType); cdecl;
@@ -6411,45 +6474,58 @@ type
   TINVocabulary = class(TOCGenericImport<INVocabularyClass, INVocabulary>) end;
 
   INUpcomingMediaManagerClass = interface(NSObjectClass)
-    ['{8E2F0F33-8E79-47FF-8C6D-5BDCBCF41B64}']
+    ['{3BDF204E-9E40-4335-81C1-036322DDEBE1}']
     {class} function sharedManager: INUpcomingMediaManager; cdecl;
   end;
 
   INUpcomingMediaManager = interface(NSObject)
-    ['{4925AC5A-F693-4A70-A7A4-7C5CADC982A4}']
+    ['{4D8DDB78-FA5D-4E56-AB04-F58D56434B70}']
     procedure setPredictionMode(mode: INUpcomingMediaPredictionMode; forType: INMediaItemType); cdecl;
     procedure setSuggestedMediaIntents(intents: NSOrderedSet); cdecl;
   end;
   TINUpcomingMediaManager = class(TOCGenericImport<INUpcomingMediaManagerClass, INUpcomingMediaManager>) end;
 
   INPreferencesClass = interface(NSObjectClass)
-    ['{E3CF7093-B287-4A9F-8BD3-3F2C4C3E83F9}']
+    ['{7C10A86A-5774-4A28-9440-4E28BF6B0540}']
     {class} procedure requestSiriAuthorization(handler: TINPreferencesBlockMethod1); cdecl;
     {class} function siriAuthorizationStatus: INSiriAuthorizationStatus; cdecl;
     {class} function siriLanguageCode: NSString; cdecl;
   end;
 
   INPreferences = interface(NSObject)
-    ['{1EC8AA9B-2A15-474C-89B3-17B09DC136A8}']
+    ['{58FFCF17-7AD6-4084-927E-015CE6C58119}']
   end;
   TINPreferences = class(TOCGenericImport<INPreferencesClass, INPreferences>) end;
 
+  INFocusStatusCenterClass = interface(NSObjectClass)
+    ['{EFAC5C92-9030-47A1-9E14-2071F9CF927D}']
+    {class} function defaultCenter: INFocusStatusCenter; cdecl;
+  end;
+
+  INFocusStatusCenter = interface(NSObject)
+    ['{662211E1-2939-4D74-AF43-C1B64D1E50DE}']
+    function authorizationStatus: INFocusStatusAuthorizationStatus; cdecl;
+    function focusStatus: INFocusStatus; cdecl;
+    procedure requestAuthorizationWithCompletionHandler(completionHandler: TINFocusStatusCenterBlockMethod1); cdecl;
+  end;
+  TINFocusStatusCenter = class(TOCGenericImport<INFocusStatusCenterClass, INFocusStatusCenter>) end;
+
   INUserContextClass = interface(NSObjectClass)
-    ['{F80DE226-CCE3-4981-99C9-B86C16DF29B5}']
+    ['{FE5E7B51-D9BF-4281-B8B0-32B9D21B853D}']
   end;
 
   INUserContext = interface(NSObject)
-    ['{D9D01F18-F295-4582-8E27-D5C7C7A72B33}']
+    ['{515AB712-D11D-45A1-812D-9CD516D12AF1}']
     procedure becomeCurrent; cdecl;
   end;
   TINUserContext = class(TOCGenericImport<INUserContextClass, INUserContext>) end;
 
   INMediaUserContextClass = interface(INUserContextClass)
-    ['{03E06D66-6750-4D59-811C-1FDA891C3B3A}']
+    ['{B552BFDB-1472-4869-94F5-24931EB16AF1}']
   end;
 
   INMediaUserContext = interface(INUserContext)
-    ['{EC1AF574-D9F6-4CC0-9F24-627CE8781BA7}']
+    ['{0CD3B02B-9E11-46FC-A981-D2A9F046A935}']
     function numberOfLibraryItems: NSNumber; cdecl;
     procedure setNumberOfLibraryItems(numberOfLibraryItems: NSNumber); cdecl;
     procedure setSubscriptionStatus(subscriptionStatus: INMediaUserContextSubscriptionStatus); cdecl;
@@ -6458,51 +6534,51 @@ type
   TINMediaUserContext = class(TOCGenericImport<INMediaUserContextClass, INMediaUserContext>) end;
 
   INNoteContentClass = interface(NSObjectClass)
-    ['{4C2A0E30-A64B-48B2-84D9-953AABBBC223}']
+    ['{06C53C54-D300-4AC1-ADB7-641F42766AEC}']
   end;
 
   INNoteContent = interface(NSObject)
-    ['{ADBE2432-EF1D-4B02-BF43-BAF81D5FB7E2}']
+    ['{87877B50-94BC-4F58-BF96-6B37BAC7E02A}']
   end;
   TINNoteContent = class(TOCGenericImport<INNoteContentClass, INNoteContent>) end;
 
   INTextNoteContentClass = interface(INNoteContentClass)
-    ['{FC852D54-B3BB-4D6B-9CC0-6389B73C960A}']
+    ['{63751C1E-7121-44AC-A379-1A4FA76061B3}']
   end;
 
   INTextNoteContent = interface(INNoteContent)
-    ['{E892A564-57F1-4C8D-B875-53F614702461}']
+    ['{36F2B5B1-B221-42D2-94F0-708F6C2BBF2E}']
     function initWithText(text: NSString): Pointer; cdecl;
     function text: NSString; cdecl;
   end;
   TINTextNoteContent = class(TOCGenericImport<INTextNoteContentClass, INTextNoteContent>) end;
 
   INImageNoteContentClass = interface(INNoteContentClass)
-    ['{E6CF95B2-7ED7-4872-A880-FA1D407B57F9}']
+    ['{F74BB4F5-7697-46C3-AAAF-ABDDE4D5599D}']
   end;
 
   INImageNoteContent = interface(INNoteContent)
-    ['{6DFDE172-4EA5-4865-8D27-F2B3DC842E00}']
+    ['{3762CE90-1383-41CF-AAF4-43D166E95134}']
     function image: INImage; cdecl;
     function initWithImage(image: INImage): Pointer; cdecl;
   end;
   TINImageNoteContent = class(TOCGenericImport<INImageNoteContentClass, INImageNoteContent>) end;
 
   INRelevanceProviderClass = interface(NSObjectClass)
-    ['{9521F9DC-9F23-40AA-8387-B624EF9B91C7}']
+    ['{0B1B4460-2A7E-4882-A415-9C352B0DD93F}']
   end;
 
   INRelevanceProvider = interface(NSObject)
-    ['{2CDEF496-23E3-4F03-A351-796F8D9D4021}']
+    ['{2190B245-2675-46B3-85AC-C9EA4D04BFFC}']
   end;
   TINRelevanceProvider = class(TOCGenericImport<INRelevanceProviderClass, INRelevanceProvider>) end;
 
   INDateRelevanceProviderClass = interface(INRelevanceProviderClass)
-    ['{2B863DD7-B314-4941-9C6F-43BD2B78BB1D}']
+    ['{B102698D-874A-4321-99BD-07EF8F870534}']
   end;
 
   INDateRelevanceProvider = interface(INRelevanceProvider)
-    ['{7B4A40A2-2A61-4FDF-BD99-618FF2E88C90}']
+    ['{6718518A-4983-4682-B1D7-D1FF94492148}']
     function endDate: NSDate; cdecl;
     function initWithStartDate(startDate: NSDate; endDate: NSDate): Pointer; cdecl;
     function startDate: NSDate; cdecl;
@@ -6510,33 +6586,33 @@ type
   TINDateRelevanceProvider = class(TOCGenericImport<INDateRelevanceProviderClass, INDateRelevanceProvider>) end;
 
   INLocationRelevanceProviderClass = interface(INRelevanceProviderClass)
-    ['{AED2B295-0C11-42A2-88D2-F3038D7C5DFF}']
+    ['{39B7831D-8E65-4BAF-99E7-B4CF83D7EAAF}']
   end;
 
   INLocationRelevanceProvider = interface(INRelevanceProvider)
-    ['{C983B2AB-F68C-4E34-A6FC-DA022F517AF1}']
+    ['{267E8E24-9BD3-4A49-9505-B26EDF4FC325}']
     function initWithRegion(region: CLRegion): Pointer; cdecl;
     function region: CLRegion; cdecl;
   end;
   TINLocationRelevanceProvider = class(TOCGenericImport<INLocationRelevanceProviderClass, INLocationRelevanceProvider>) end;
 
   INDailyRoutineRelevanceProviderClass = interface(INRelevanceProviderClass)
-    ['{04929DB7-0EA8-45E6-A5FF-99573EFD9DCB}']
+    ['{D67C7FAB-2C8A-457E-B9BC-1BDB915516BC}']
   end;
 
   INDailyRoutineRelevanceProvider = interface(INRelevanceProvider)
-    ['{43A91406-FC47-4F7B-BD65-9D9C4D1B9E98}']
+    ['{C5E240B3-22DE-48B4-A709-42A668544C5A}']
     function initWithSituation(situation: INDailyRoutineSituation): Pointer; cdecl;
     function situation: INDailyRoutineSituation; cdecl;
   end;
   TINDailyRoutineRelevanceProvider = class(TOCGenericImport<INDailyRoutineRelevanceProviderClass, INDailyRoutineRelevanceProvider>) end;
 
   INDefaultCardTemplateClass = interface(NSObjectClass)
-    ['{708DCC63-8460-4535-AFAE-674EB83CE3B9}']
+    ['{8D2C7C80-060E-4A50-AD14-1F5571227731}']
   end;
 
   INDefaultCardTemplate = interface(NSObject)
-    ['{F2C1312F-7F10-4577-B12E-DB81C8941CAF}']
+    ['{767D14F2-2C9F-445F-AC91-E482AB6DD333}']
     function image: INImage; cdecl;
     function initWithTitle(title: NSString): Pointer; cdecl;
     procedure setImage(image: INImage); cdecl;
@@ -6548,12 +6624,12 @@ type
   TINDefaultCardTemplate = class(TOCGenericImport<INDefaultCardTemplateClass, INDefaultCardTemplate>) end;
 
   INShortcutClass = interface(NSObjectClass)
-    ['{1775CB23-5E6E-4387-8333-49FF0F55C09D}']
+    ['{DDDCB054-EC08-4B52-8E91-549D847E0F18}']
     {class} function new: Pointer; cdecl;
   end;
 
   INShortcut = interface(NSObject)
-    ['{700BCC03-BC58-4531-A402-B56473256F2C}']
+    ['{4E92037B-E93C-43F4-B767-79F6AFAAA1B6}']
     function initWithIntent(intent: INIntent): Pointer; cdecl;
     function initWithUserActivity(userActivity: NSUserActivity): Pointer; cdecl;
     function intent: INIntent; cdecl;
@@ -6562,40 +6638,42 @@ type
   TINShortcut = class(TOCGenericImport<INShortcutClass, INShortcut>) end;
 
   INRelevantShortcutClass = interface(NSObjectClass)
-    ['{876FC156-82A4-4716-9546-AE70E2F936A5}']
+    ['{2FA31DBE-B89C-4948-A7BE-B7280A2B00B4}']
   end;
 
   INRelevantShortcut = interface(NSObject)
-    ['{C59AE168-9DBE-4E3B-A720-B621EC705E66}']
+    ['{BFB1A3A6-EA46-45D6-8CB2-B3C3175CD1B6}']
     function initWithShortcut(shortcut: INShortcut): Pointer; cdecl;
     function relevanceProviders: NSArray; cdecl;
     procedure setRelevanceProviders(relevanceProviders: NSArray); cdecl;
     procedure setShortcutRole(shortcutRole: INRelevantShortcutRole); cdecl;
     procedure setWatchTemplate(watchTemplate: INDefaultCardTemplate); cdecl;
+    procedure setWidgetKind(widgetKind: NSString); cdecl;
     function shortcut: INShortcut; cdecl;
     function shortcutRole: INRelevantShortcutRole; cdecl;
     function watchTemplate: INDefaultCardTemplate; cdecl;
+    function widgetKind: NSString; cdecl;
   end;
   TINRelevantShortcut = class(TOCGenericImport<INRelevantShortcutClass, INRelevantShortcut>) end;
 
   INRelevantShortcutStoreClass = interface(NSObjectClass)
-    ['{AA134637-F1C7-412B-84F1-6557B0CA1EDD}']
+    ['{1E2DDC23-5734-477B-8500-C11916383BA7}']
     {class} function defaultStore: INRelevantShortcutStore; cdecl;
   end;
 
   INRelevantShortcutStore = interface(NSObject)
-    ['{E5D5A3F3-8535-4FD5-B29C-D279AB9ACCD5}']
+    ['{E9DC5F2F-E790-4033-9239-7CFCE4C2739E}']
     procedure setRelevantShortcuts(shortcuts: NSArray; completionHandler: TINRelevantShortcutStoreBlockMethod1); cdecl;
   end;
   TINRelevantShortcutStore = class(TOCGenericImport<INRelevantShortcutStoreClass, INRelevantShortcutStore>) end;
 
   INVoiceShortcutClass = interface(NSObjectClass)
-    ['{BCD3D74F-63A1-4214-A658-940D9D396F00}']
+    ['{26C9B775-7D7E-4735-8F65-6C9DF14390F0}']
     {class} function new: Pointer; cdecl;
   end;
 
   INVoiceShortcut = interface(NSObject)
-    ['{6B9FEF15-8D6B-4B0F-8489-15FF606A773A}']
+    ['{84604C7F-0736-4138-A519-92C7228D3D7A}']
     function identifier: NSUUID; cdecl;
     function invocationPhrase: NSString; cdecl;
     function shortcut: INShortcut; cdecl;
@@ -6603,13 +6681,13 @@ type
   TINVoiceShortcut = class(TOCGenericImport<INVoiceShortcutClass, INVoiceShortcut>) end;
 
   INVoiceShortcutCenterClass = interface(NSObjectClass)
-    ['{ACF9EC12-9BD0-4DBE-9470-7754F811BD52}']
+    ['{301FBD76-C6C5-4786-A18E-029217E565B9}']
     {class} function new: Pointer; cdecl;
     {class} function sharedCenter: INVoiceShortcutCenter; cdecl;
   end;
 
   INVoiceShortcutCenter = interface(NSObject)
-    ['{444C718D-C383-418E-A1AA-B9D9318B261F}']
+    ['{C7DEACEC-CD8B-4DFE-9C54-F1536672A560}']
     procedure getAllVoiceShortcutsWithCompletion(completionHandler: TINVoiceShortcutCenterBlockMethod1); cdecl;
     procedure getVoiceShortcutWithIdentifier(identifier: NSUUID; completion: TINVoiceShortcutCenterBlockMethod2); cdecl;
     procedure setShortcutSuggestions(suggestions: NSArray); cdecl;
@@ -6617,12 +6695,11 @@ type
   TINVoiceShortcutCenter = class(TOCGenericImport<INVoiceShortcutCenterClass, INVoiceShortcutCenter>) end;
 
   INMediaItemClass = interface(NSObjectClass)
-    ['{DEE836C9-23D6-45B6-A73D-BB2F6E54376D}']
+    ['{7DB67492-7554-4B20-8AA1-5246DE3D3420}']
   end;
 
   INMediaItem = interface(NSObject)
-    ['{C31A56CA-2EC3-4878-874F-9FF55F5669BF}']
-    [MethodName('type')]
+    ['{A4D86FD4-15E3-4449-8930-9F54E58B8B09}']
     function &type: INMediaItemType; cdecl;
     function artist: NSString; cdecl;
     function artwork: INImage; cdecl;
@@ -6635,12 +6712,13 @@ type
   TINMediaItem = class(TOCGenericImport<INMediaItemClass, INMediaItem>) end;
 
 function IntentsVersionNumber: Double;
-// Exported const IntentsVersionString has an unsupported type: const unsigned char []
 function INIntentErrorDomain: NSString;
 function INStartAudioCallIntentIdentifier: NSString;
 function INStartVideoCallIntentIdentifier: NSString;
 function INSearchCallHistoryIntentIdentifier: NSString;
 function INStartCallIntentIdentifier: NSString;
+function INAnswerCallIntentIdentifier: NSString;
+function INHangUpCallIntentIdentifier: NSString;
 function INSetAudioSourceInCarIntentIdentifier: NSString;
 function INSetClimateSettingsInCarIntentIdentifier: NSString;
 function INSetDefrosterSettingsInCarIntentIdentifier: NSString;
@@ -6722,10 +6800,7 @@ const
 implementation
 
 uses
-  // Posix
-  Posix.Dlfcn,
-  // DW
-  DW.Macapi.Helpers;
+  Posix.Dlfcn;
 
 var
   IntentsModule: THandle;
@@ -6758,6 +6833,16 @@ end;
 function INStartCallIntentIdentifier: NSString;
 begin
   Result := CocoaNSStringConst(libIntents, 'INStartCallIntentIdentifier');
+end;
+
+function INAnswerCallIntentIdentifier: NSString;
+begin
+  Result := CocoaNSStringConst(libIntents, 'INAnswerCallIntentIdentifier');
+end;
+
+function INHangUpCallIntentIdentifier: NSString;
+begin
+  Result := CocoaNSStringConst(libIntents, 'INHangUpCallIntentIdentifier');
 end;
 
 function INSetAudioSourceInCarIntentIdentifier: NSString;
@@ -7134,6 +7219,6 @@ initialization
   IntentsModule := dlopen(MarshaledAString(libIntents), RTLD_LAZY);
 
 finalization
-  dlclose(IntentsModule)
+  dlclose(IntentsModule);
 
 end.
