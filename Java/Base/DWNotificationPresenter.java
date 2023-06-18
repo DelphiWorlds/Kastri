@@ -11,12 +11,15 @@ package com.delphiworlds.kastri;
  *                                                     *
  *******************************************************/
 
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -91,6 +94,21 @@ public class DWNotificationPresenter
       channelId = intent.getStringExtra("channel_id");
     return channelId;
   }
+
+  private static String getDefaultChannelId(NotificationManager notificationManager) {
+    String channelId = "default";
+    NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
+    if (channel == null) {
+      channel = new NotificationChannel(channelId, "Default notifications", 4);
+      channel.enableLights(true);
+      channel.enableVibration(true);
+      channel.setLightColor(Color.GREEN);
+      channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+      channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
+      notificationManager.createNotificationChannel(channel);
+    }
+    return channel.getId();
+  }
   
   public static void presentNotification(Context context, Intent intent, String channelId, int iconId) {
     mUniqueId++;
@@ -101,7 +119,10 @@ public class DWNotificationPresenter
     String body = intent.hasExtra("body") ? intent.getStringExtra("body") : "";
     String imageUrl = intent.hasExtra("imageUrl") ? intent.getStringExtra("imageUrl") : "";
     RemoteViews remoteViews = getCustomContentView(context, title, body, imageUrl);
-    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, DWNotificationPresenter.getChannelId(intent, channelId))
+    NotificationManager notificationManager = (NotificationManager)context.getSystemService("notification");
+    String notificationChannelId = DWNotificationPresenter.getChannelId(intent, channelId);
+    notificationChannelId = (notificationChannelId != null) ? notificationChannelId : getDefaultChannelId(notificationManager);
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationChannelId)
       .setContentTitle(title)
       .setContentText(body)
       .setSmallIcon(iconId)
@@ -114,7 +135,6 @@ public class DWNotificationPresenter
       builder = builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle()).setCustomContentView(remoteViews);
     if (intent.hasExtra("isFullScreen"))
       builder = builder.setFullScreenIntent(pendingIntent, true); 
-    NotificationManager notificationManager = (NotificationManager)context.getSystemService("notification");
     notificationManager.notify(mUniqueId, builder.build());
   }
 }
