@@ -1,0 +1,14 @@
+[
+  {
+    "default" : { 
+      "title" : "Start At Boot",
+      "body" : "Please tap this notification to start the application" 
+    }
+  },
+  {
+    "fr_FR" : {
+      "title" : "Démarrer au démarrage",
+      "body" : "Veuillez appuyer sur cette notification pour démarrer l'application"
+    } 
+  }
+]

@@ -513,6 +513,20 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="Resources\res\raw\startupnotification.json" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\raw</RemoteDir>
+                        <RemoteName>startupnotification.json</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Resources\res\raw\startupnotification.json" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\raw</RemoteDir>
+                        <RemoteName>startupnotification.json</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Win32\Debug\AndroidStartAtBootD11.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
