@@ -315,6 +315,7 @@ end;
 
 procedure TAndroidAdMobBannerAd.AdLoaded;
 begin
+  AdControl.Height := GetAdSize.getHeight;
   AdControl.DoAdLoaded;
 end;
 

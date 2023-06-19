@@ -194,6 +194,7 @@ end;
 
 procedure TiOSAdMobBannerAd.AdLoaded;
 begin
+  AdControl.Height := GetAdSize.size.height;
   AdControl.DoAdLoaded;
 end;
 
