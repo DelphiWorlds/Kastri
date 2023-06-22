@@ -67,6 +67,7 @@ type
     procedure Navigate(const AURL: string); override;
     procedure ResetZoom; override;
     procedure SetAllowZoom(const AValue: Boolean); override;
+    procedure SetInitialScale(const AValue: Integer); override;
     function WebViewTouch(const AView: JView; const AEvent: JMotionEvent): Boolean;
   public
     constructor Create(const AWebBrowserExt: TWebBrowserExt); override;
@@ -189,6 +190,12 @@ procedure TPlatformWebBrowserExt.SetAllowZoom(const AValue: Boolean);
 begin
   if FWebView <> nil then
     FWebView.getSettings.setUseWideViewPort(AValue);
+end;
+
+procedure TPlatformWebBrowserExt.SetInitialScale(const AValue: Integer);
+begin
+  if FWebView <> nil then
+    FWebView.setInitialScale(AValue);
 end;
 
 procedure TPlatformWebBrowserExt.ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc);

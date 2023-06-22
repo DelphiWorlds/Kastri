@@ -77,6 +77,7 @@ type
     procedure Navigate(const AURL: string); virtual;
     procedure ResetZoom; virtual;
     procedure SetAllowZoom(const AValue: Boolean); virtual;
+    procedure SetInitialScale(const AValue: Integer); virtual;
   public
     constructor Create(const AWebBrowserExt: TWebBrowserExt); virtual;
     property Browser: TWebBrowser read GetBrowser;
@@ -102,6 +103,7 @@ type
     procedure Navigate(const AURL: string);
     procedure ResetZoom;
     procedure SetAllowZoom(const AValue: Boolean);
+    procedure SetInitialScale(const AValue: Integer);
     property OnElementClick: TElementClickEvent read FOnElementClick write FOnElementClick;
   end;
 
@@ -308,6 +310,11 @@ begin
   //
 end;
 
+procedure TCustomPlatformWebBrowserExt.SetInitialScale(const AValue: Integer);
+begin
+  //
+end;
+
 { TWebBrowserExt }
 
 procedure TWebBrowserExt.CaptureBitmap(const AHandler: TCaptureBitmapProc);
@@ -362,6 +369,11 @@ end;
 procedure TWebBrowserExt.SetAllowZoom(const AValue: Boolean);
 begin
   FPlatformWebBrowserExt.SetAllowZoom(AValue);
+end;
+
+procedure TWebBrowserExt.SetInitialScale(const AValue: Integer);
+begin
+  FPlatformWebBrowserExt.SetInitialScale(AValue);
 end;
 
 end.
