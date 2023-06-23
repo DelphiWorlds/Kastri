@@ -6,7 +6,7 @@ unit DW.Firebase.Analytics.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -25,8 +25,8 @@ type
   TPlatformFirebaseAnalytics = class(TCustomPlatformFirebaseAnalytics)
   private
     FAnalytics: JFirebaseAnalytics;
-    function GetNativeConsentStatus(const AConsentStatus: TConsentStatus): JFirebaseAnalytics_ConsentStatus;
-    function GetNativeConsentType(const AConsentType: TConsentType): JFirebaseAnalytics_ConsentType;
+    // function GetNativeConsentStatus(const AConsentStatus: TConsentStatus): JFirebaseAnalytics_ConsentStatus;
+    // function GetNativeConsentType(const AConsentType: TConsentType): JFirebaseAnalytics_ConsentType;
     function GetNativeEvent(const AEvent: TAnalyticsEvent): JString;
     function GetNativeEventParam(const AEventParam: TAnalyticsEventParam): JString;
     function GetNativeEventParams(const AEventParams: TEventParams): JBundle;
@@ -60,6 +60,7 @@ begin
   FAnalytics := TJFirebaseAnalytics.JavaClass.getInstance(TAndroidHelper.Context);
 end;
 
+(*
 function TPlatformFirebaseAnalytics.GetNativeConsentStatus(const AConsentStatus: TConsentStatus): JFirebaseAnalytics_ConsentStatus;
 begin
   case AConsentStatus of
@@ -83,6 +84,7 @@ begin
     Result := nil;
   end;
 end;
+*)
 
 function TPlatformFirebaseAnalytics.GetNativeEvent(const AEvent: TAnalyticsEvent): JString;
 begin

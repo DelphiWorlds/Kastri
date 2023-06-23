@@ -1,0 +1,22 @@
+<manifest xmlns:merge="http://www.delphiworlds.com/xmlns/merge" xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <activity merge:update="add"
+      android:name="com.google.android.play.core.missingsplits.PlayCoreMissingSplitsActivity" 
+      android:enabled="false" 
+      android:exported="false" 
+      android:process=":playcore_missing_splits_activity" 
+      android:launchMode="singleInstance" 
+      android:stateNotNeeded="true"/>
+    <activity merge:update="add"
+      android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity" 
+      android:enabled="false" 
+      android:exported="false" 
+      android:stateNotNeeded="true" 
+      android:process=":playcore_dialog_wrapper_activity" 
+      android:theme="@android:style/Theme.NoTitleBar"/>
+    <service merge:update="add"
+      android:name="com.google.android.play.core.assetpacks.AssetPackExtractionService" 
+      android:enabled="false" 
+      android:exported="true"/>
+  </application>
+</manifest>

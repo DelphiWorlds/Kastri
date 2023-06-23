@@ -1,5 +1,18 @@
 unit DW.AppStoreCheck;
 
+{*******************************************************}
+{                                                       }
+{                      Kastri                           }
+{                                                       }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  which is located in the root folder of this library  }
+{                                                       }
+{*******************************************************}
+
+{$I DW.GlobalDefines.inc}
+
 interface
 
 type
@@ -42,7 +55,8 @@ type
 implementation
 
 uses
-  System.SysUtils, System.Classes, System.Net.HttpClient, System.JSON, System.DateUtils;
+  // RTL
+  System.SysUtils, System.Classes, System.Net.HttpClient, System.JSON, System.DateUtils, System.Generics.Collections;
 
 const
   cITunesQueryURLTemplate = 'https://itunes.apple.com/lookup?id=%s';

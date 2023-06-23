@@ -1,0 +1,125 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 822
+  ClientWidth = 650
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object BottomLayout: TLayout
+    Align = Bottom
+    Padding.Left = 6.000000000000000000
+    Padding.Top = 6.000000000000000000
+    Padding.Right = 6.000000000000000000
+    Padding.Bottom = 6.000000000000000000
+    Position.Y = 772.000000000000000000
+    Size.Width = 650.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object ExecJSButton: TButton
+      Align = Left
+      Margins.Right = 12.000000000000000000
+      Position.X = 193.000000000000000000
+      Position.Y = 6.000000000000000000
+      Size.Width = 99.000000000000000000
+      Size.Height = 38.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'Exec JS'
+      OnClick = ExecJSButtonClick
+    end
+    object PrintButton: TButton
+      Action = PrintAction
+      Align = Right
+      Enabled = True
+      ImageIndex = -1
+      Margins.Right = 12.000000000000000000
+      Position.X = 533.000000000000000000
+      Position.Y = 6.000000000000000000
+      Size.Width = 99.000000000000000000
+      Size.Height = 38.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+    end
+    object DownloadButton: TButton
+      Align = Left
+      Margins.Right = 12.000000000000000000
+      Position.X = 6.000000000000000000
+      Position.Y = 6.000000000000000000
+      Size.Width = 175.000000000000000000
+      Size.Height = 38.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Download Test'
+      OnClick = DownloadButtonClick
+    end
+  end
+  object WebBrowser: TWebBrowser
+    Align = Client
+    Size.Width = 650.000000000000000000
+    Size.Height = 599.000000000000000000
+    Size.PlatformDefault = False
+    WindowsEngine = EdgeOnly
+    OnDidFinishLoad = WebBrowserDidFinishLoad
+  end
+  object TopLayout: TLayout
+    Align = Top
+    Padding.Left = 6.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 6.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Size.Width = 650.000000000000000000
+    Size.Height = 49.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object GoButton: TButton
+      Align = Right
+      Margins.Left = 12.000000000000000000
+      Position.X = 545.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 99.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Go'
+      OnClick = GoButtonClick
+    end
+    object URLEdit: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = VertCenter
+      TabOrder = 1
+      Text = 
+        'https://web.ics.purdue.edu/~gchopra/class/public/pages/webdesign' +
+        '/05_simple.html'
+      Position.X = 6.000000000000000000
+      Position.Y = 10.000000000000000000
+      Size.Width = 527.000000000000000000
+      Size.Height = 28.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
+  object Memo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Bottom
+    Position.Y = 648.000000000000000000
+    Size.Width = 650.000000000000000000
+    Size.Height = 124.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Viewport.Width = 646.000000000000000000
+    Viewport.Height = 120.000000000000000000
+  end
+  object ActionList: TActionList
+    Left = 140
+    Top = 157
+    object PrintAction: TAction
+      Text = 'Print..'
+      OnExecute = PrintActionExecute
+      OnUpdate = PrintActionUpdate
+    end
+  end
+end

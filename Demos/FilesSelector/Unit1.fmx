@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 637
-  ClientWidth = 493
+  ClientHeight = 712
+  ClientWidth = 600
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -15,8 +15,8 @@ object Form1: TForm1
     Padding.Right = 4.000000000000000000
     Padding.Bottom = 4.000000000000000000
     Margins.Top = 4.000000000000000000
-    Position.Y = 528.000000000000000000
-    Size.Width = 493.000000000000000000
+    Position.Y = 603.000000000000000000
+    Size.Width = 600.000000000000000000
     Size.Height = 109.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
@@ -25,7 +25,7 @@ object Form1: TForm1
       Margins.Bottom = 4.000000000000000000
       Position.X = 4.000000000000000000
       Position.Y = 4.000000000000000000
-      Size.Width = 485.000000000000000000
+      Size.Width = 592.000000000000000000
       Size.Height = 21.000000000000000000
       Size.PlatformDefault = False
       Text = 'Display Name:'
@@ -36,7 +36,7 @@ object Form1: TForm1
       Margins.Bottom = 4.000000000000000000
       Position.X = 4.000000000000000000
       Position.Y = 29.000000000000000000
-      Size.Width = 485.000000000000000000
+      Size.Width = 592.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
@@ -49,75 +49,77 @@ object Form1: TForm1
       Padding.Bottom = 4.000000000000000000
       Position.X = 4.000000000000000000
       Position.Y = 60.000000000000000000
-      Size.Width = 485.000000000000000000
+      Size.Width = 592.000000000000000000
       Size.Height = 45.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
-      object SelectImagesButton: TButton
-        Align = Left
-        Position.X = 4.000000000000000000
-        Position.Y = 4.000000000000000000
-        Size.Width = 120.000000000000000000
-        Size.Height = 37.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 2
-        Text = 'Pics'
-        OnClick = SelectImagesButtonClick
-      end
-      object SelectImagesAndMoviesButton: TButton
-        Align = Left
+      object SelectButton: TButton
+        Align = Right
         Margins.Left = 12.000000000000000000
-        Position.X = 136.000000000000000000
+        Position.X = 454.000000000000000000
         Position.Y = 4.000000000000000000
-        Size.Width = 120.000000000000000000
-        Size.Height = 37.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 1
-        Text = 'Pics and Movies'
-        OnClick = SelectImagesAndMoviesButtonClick
-      end
-      object SelectTextButton: TButton
-        Align = Left
-        Margins.Left = 12.000000000000000000
-        Position.X = 268.000000000000000000
-        Position.Y = 4.000000000000000000
-        Size.Width = 120.000000000000000000
+        Size.Width = 134.000000000000000000
         Size.Height = 37.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
-        Text = 'Text'
-        OnClick = SelectTextButtonClick
+        Text = 'Select'
+        OnClick = SelectButtonClick
+      end
+      object SelectTypesLayout: TLayout
+        Align = Client
+        Size.Width = 438.000000000000000000
+        Size.Height = 37.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object SelectTypesComboBox: TComboBox
+          Align = VertCenter
+          Items.Strings = (
+            'Images'
+            'Images & Movies'
+            'Text'
+            'Photos')
+          ItemIndex = 0
+          Position.Y = 7.000000000000000000
+          Size.Width = 438.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+        end
       end
     end
   end
   object TabControl: TTabControl
     Align = Client
-    Size.Width = 493.000000000000000000
-    Size.Height = 524.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 599.000000000000000000
     Size.PlatformDefault = False
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     TabPosition = PlatformDefault
     Sizes = (
-      493s
-      498s
-      493s
-      498s)
+      600s
+      573s
+      600s
+      573s
+      600s
+      573s)
     object FilesTab: TTabItem
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 44.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
       Text = 'Files'
+      ExplicitSize.cx = 44.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
       object ListBox1: TListBox
         Align = Client
-        Size.Width = 493.000000000000000000
-        Size.Height = 498.000000000000000000
+        Size.Width = 600.000000000000000000
+        Size.Height = 573.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
         DisableFocusEffect = True
@@ -125,8 +127,8 @@ object Form1: TForm1
         DefaultItemStyles.GroupHeaderStyle = ''
         DefaultItemStyles.GroupFooterStyle = ''
         OnItemClick = ListBox1ItemClick
-        Viewport.Width = 489.000000000000000000
-        Viewport.Height = 494.000000000000000000
+        Viewport.Width = 596.000000000000000000
+        Viewport.Height = 569.000000000000000000
       end
     end
     object ImageTab: TTabItem
@@ -140,14 +142,50 @@ object Form1: TForm1
       StyleLookup = ''
       TabOrder = 0
       Text = 'Image'
+      ExplicitSize.cx = 53.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
       object Image: TImage
         MultiResBitmap = <
           item
           end>
         Align = Client
-        Size.Width = 493.000000000000000000
-        Size.Height = 498.000000000000000000
+        Size.Width = 600.000000000000000000
+        Size.Height = 573.000000000000000000
         Size.PlatformDefault = False
+      end
+    end
+    object PhotosTab: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 57.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Photos'
+      ExplicitSize.cx = 57.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object PhotosVertScrollBox: TVertScrollBox
+        Align = Client
+        Size.Width = 600.000000000000000000
+        Size.Height = 573.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Viewport.Width = 600.000000000000000000
+        Viewport.Height = 573.000000000000000000
+        object PhotosFlowLayout: TFlowLayout
+          Align = Top
+          Size.Width = 600.000000000000000000
+          Size.Height = 209.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Justify = Left
+          JustifyLastLine = Left
+          FlowDirection = LeftToRight
+          OnResized = PhotosFlowLayoutResized
+        end
       end
     end
   end

@@ -6,7 +6,7 @@ unit DW.IOUtils.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -26,6 +26,10 @@ type
     ///   Combines all paths in the array into a single path
     /// </summary>
     class function CombineAll(const APaths: array of string): string; static;
+    /// <summary>
+    ///   Returns a path for ATargetPath that is absolute
+    /// </summary>
+    class function GetAbsolutePath(const ABasePath, ARelativePath: string): string; static;
     /// <summary>
     ///   Returns the specified filename in the documents folder, or appends the app folder if not on mobile
     /// </summary>
@@ -58,6 +62,10 @@ type
     /// </remarks>
     class function GetAppSupportPath(const AFolder: string = ''): string; static;
     class function GetDirectoryName(const AFileName: string): string; static;
+    /// <summary>
+    ///   Returns a path for ATargetPath that is relative to ABasePath
+    /// </summary>
+    class function GetRelativePath(const ABasePath, ATargetPath: string): string; static;
     /// <summary>
     ///   Returns the path to a file in deployed resources (e.g. on macOS, to Contents\Resources), and appends the folder if present
     /// </summary>
@@ -92,6 +100,10 @@ type
     ///   Appends the source file to the end of the dest file
     /// </summary>
     class procedure Concat(const ASourceName, ADestName: string); static;
+    /// <summary>
+    ///   Copies the source file to dest file if it is newer
+    /// </summary>
+    class function CopyIfNewer(const ASourceName, ADestName: string; const AOverwrite: Boolean): Boolean; static;
     class function GetBackupFileName(const AFileName: string; const AExt: string = 'bak'): string; static;
     /// <summary>
     ///   Checks if the file is in use
@@ -159,7 +171,7 @@ implementation
 
 uses
   // RTL
-  System.SysUtils, System.Classes,
+  System.SysUtils, System.Classes, System.Math,
   // DW
   {$IF Defined(MSWINDOWS)}
   DW.IOUtils.Helpers.Win,
@@ -250,6 +262,87 @@ begin
   Result := TPath.Combine(GetAppDocumentsPath(AAppFolder), AFileName);
 end;
 
+function GetDriveLetter(const APath: string): string;
+begin
+  Result := '';
+  if not APath.IsEmpty and (Length(APath) > 1) and (APath.Chars[1] = ':') then
+    Result := APath.Chars[0];
+end;
+
+class function TPathHelper.GetAbsolutePath(const ABasePath, ARelativePath: string): string;
+var
+  LRelDriveLetter: string;
+  LBaseParts, LRelativeParts: TArray<string>;
+begin
+  Result := ABasePath;
+  if not ARelativePath.IsEmpty then
+  begin
+    LRelDriveLetter := GetDriveLetter(ARelativePath);
+    if LRelDriveLetter.IsEmpty or LRelDriveLetter.Equals(GetDriveLetter(ABasePath)) then
+    begin
+      LRelativeParts := ARelativePath.Split([PathDelim]);
+      if Length(LRelativeParts) > 0 then
+      begin
+        if LRelativeParts[0].Equals('.') then
+          Result := ExcludeTrailingPathDelimiter(ABasePath) + ARelativePath.Substring(1)
+        else
+        begin
+          LBaseParts := ExcludeTrailingPathDelimiter(ABasePath).Split([PathDelim]);
+          // Not supporting weirdos who might do crap like this: ..\.\..\..\.\MyDir
+          while (Length(LBaseParts) > 0) and (Length(LRelativeParts) > 0) and LRelativeParts[0].Equals('..') do
+          begin
+            Delete(LRelativeParts, 0, 1);
+            Delete(LBaseParts, Length(LBaseParts) - 1, 1);
+          end;
+          Result := string.Join(PathDelim, LBaseParts) + PathDelim + string.Join(PathDelim, LRelativeParts);
+        end;
+      end;
+    end
+    else
+      Result := ARelativePath;
+  end;
+end;
+
+class function TPathHelper.GetRelativePath(const ABasePath, ATargetPath: string): string;
+var
+  LBaseDriveLetter: string;
+  LBaseParts, LTargetParts: TArray<string>;
+  I, LIndex, LLevels: Integer;
+begin
+  Result := ATargetPath;
+  LBaseDriveLetter := GetDriveLetter(ABasePath);
+  if not LBaseDriveLetter.IsEmpty and LBaseDriveLetter.Equals(GetDriveLetter(ATargetPath)) then
+  begin
+    LBaseParts := ExcludeTrailingPathDelimiter(ABasePath).Split([PathDelim]);
+    LTargetParts := ExcludeTrailingPathDelimiter(ATargetPath).Split([PathDelim]);
+    LIndex := -1;
+    for I := 0 to Max(High(LBaseParts), High(LTargetParts)) do
+    begin
+      if (I > High(LBaseParts)) or not SameText(LBaseParts[I], LTargetParts[I]) then
+      begin
+        LIndex := I;
+        Break;
+      end;
+    end;
+    if LIndex > 0 then
+    begin
+      Result := '';
+      LLevels := Length(LBaseParts) - LIndex;
+      Delete(LTargetParts, 0, LIndex);
+      if LLevels > 0 then
+      begin
+        Result := '..';
+        for I := 0 to LLevels - 2 do
+          Result := Result + PathDelim + '..';
+      end
+      else
+        Result := '.';
+      for I := 0 to High(LTargetParts) do
+        Result := Result + PathDelim + LTargetParts[I];
+    end;
+  end;
+end;
+
 class function TPathHelper.GetResourcesFile(const AFileName, AFolder: string): string;
 begin
   Result := TPath.Combine(GetResourcesPath(AFolder), AFileName);
@@ -325,6 +418,24 @@ begin
       end;
     finally
       LDestStream.Free;
+    end;
+  end;
+end;
+
+class function TFileHelper.CopyIfNewer(const ASourceName, ADestName: string; const AOverwrite: Boolean): Boolean;
+var
+  LDestDateTime: TDateTime;
+begin
+  Result := False;
+  if TFile.Exists(ASourceName) then
+  begin
+    LDestDateTime := 0;
+    if TFile.Exists(ADestName) then
+      LDestDateTime := TFile.GetLastWriteTime(ADestName);
+    if TFile.GetLastWriteTime(ASourceName) > LDestDateTime then
+    begin
+      TFile.Copy(ASourceName, ADestName, AOverwrite);
+      Result := True;
     end;
   end;
 end;

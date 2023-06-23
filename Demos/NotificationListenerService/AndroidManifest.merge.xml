@@ -1,0 +1,18 @@
+<manifest xmlns:merge="http://www.delphiworlds.com/xmlns/merge" xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <service android:name="com.delphiworlds.kastri.DWNotificationListenerService" android:exported="true"
+      android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+      <intent-filter>
+        <action android:name="android.service.notification.NotificationListenerService" />
+      </intent-filter>
+      <meta-data
+        android:name="android.service.notification.default_filter_types"
+        android:value="conversations|alerting">
+      </meta-data>
+      <meta-data
+        android:name="android.service.notification.disabled_filter_types"
+        android:value="ongoing|silent">
+      </meta-data>
+    </service>
+  </application>
+</manifest>

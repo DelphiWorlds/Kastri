@@ -6,7 +6,7 @@ unit DW.iOSapi.FirebaseCore;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -112,7 +112,12 @@ uses
 const
   libSystemConfiguration = '/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration';
 
-procedure CLangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+procedure CLangRTLoader; cdecl;
+  {$IF not Defined(IOSSIMULATOR)}
+  external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+  {$ELSE}
+  external '/usr/lib/clang/lib/darwin/libclang_rt.iossim.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+  {$ENDIF}
 procedure FirebaseAnalyticsLoader; cdecl; external framework 'FirebaseAnalytics';
 procedure FirebaseCoreLoader; cdecl; external framework 'FirebaseCore';
 procedure FirebaseCoreDiagnosticsLoader; cdecl; external framework 'FirebaseCoreDiagnostics';

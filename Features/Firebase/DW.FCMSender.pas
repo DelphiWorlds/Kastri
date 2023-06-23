@@ -6,7 +6,7 @@ unit DW.FCMSender;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -420,8 +420,10 @@ end;
 //   See Table 1
 function TFCMMessage.GetAPNSJSONValue: TJSONValue;
 var
-  LAPNS, LPayload, LAPS, LAlert: TJSONObject;
+  LAPNS, LPayload, LAPS, LAlert, LDataValue: TJSONObject;
   LHasAPS: Boolean;
+  I: Integer;
+  LPair: TJSONPair;
 begin
   Result := nil;
   LHasAPS := False;
@@ -444,6 +446,21 @@ begin
       LAlert.AddPair('title', TJSONString.Create(FTitle));
       LAlert.AddPair('body', TJSONString.Create(FBody));
       LAPS.AddPair('alert', LAlert);
+    end;
+    // Add any data JSON values to the APS member
+    if not FData.IsEmpty then
+    begin
+      LDataValue := TJSONObject(TJSONObject.ParseJSONValue(FData));
+      if LDataValue <> nil then
+      try
+        for I := 0 to LDataValue.Count - 1 do
+        begin
+          LPair := LDataValue.Pairs[I];
+          LPayload.AddPair(LPair.JsonString.Value, TJSONValue(LPair.JsonValue.Clone));
+        end;
+      finally
+        LDataValue.Free;
+      end;
     end;
     // Add this LAST
     if LAPS.Count > 0 then

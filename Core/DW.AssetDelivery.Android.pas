@@ -6,7 +6,7 @@ unit DW.AssetDelivery.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -20,7 +20,7 @@ interface
 
 uses
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.Jni.GraphicsContentViewText,
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.Jni.GraphicsContentViewText, Androidapi.JNI,
   // DW
   DW.Androidapi.JNI.PlayCore;
 

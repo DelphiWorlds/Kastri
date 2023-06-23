@@ -6,7 +6,7 @@ package com.delphiworlds.kastri;
  *                                                     *
  *        Delphi Worlds Cross-Platform Library         *
  *                                                     *
- * Copyright 2020-2021 Dave Nottage under MIT license  *
+ * Copyright 2020-2023 Dave Nottage under MIT license  *
  * which is located in the root folder of this library *
  *                                                     *
  *******************************************************/
@@ -61,6 +61,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 
 // Delphi 10.4.2 and earlier
 // import android.support.v4.app.JobIntentService;
@@ -76,7 +78,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Calendar;
+import java.util.Locale;
+
+import javax.naming.NameNotFoundException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 
@@ -84,6 +97,7 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 
   private static final String KEY_RESTART_AFTER_REPLACE = "DWMultiBroadcastReceiver.KEY_RESTART_AFTER_REPLACE"; // true or false
   private static final String KEY_START_ON_BOOT = "DWMultiBroadcastReceiver.KEY_START_ON_BOOT"; // true or false
+  private static final String KEY_START_ON_BOOT_CHANNEL_ID = "DWMultiBroadcastReceiver.KEY_START_ON_BOOT_CHANNEL_ID";
   private static final String KEY_START_SERVICE_ON_BOOT = "DWMultiBroadcastReceiver.KEY_START_SERVICE_ON_BOOT"; // string = service name
   private static final String WAKE_LOCK_ID = "DWMultiBroadcastReceiver.WAKE_LOCK";
   private static final String WAKE_ON_NOTIFICATION = "DWMultiBroadcastReceiver.WAKE_ON_NOTIFICATION";
@@ -130,14 +144,83 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
     return true;
   }
 
-  private boolean sendStartupNotification(Context context) {
+  private static String rawResourceToString(Context context, String resourceName) {
+    int resourceId = context.getResources().getIdentifier(resourceName, "raw", context.getPackageName());
+    if (resourceId == 0) {
+      Log.d(TAG, "resourceName: " + resourceName + " not present");
+      return null;
+    }
+    InputStream input = context.getResources().openRawResource(resourceId);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+    String line;
+    StringBuilder sb = new StringBuilder();
+    try {
+      while ((line = reader.readLine()) != null) {
+        sb.append(line);
+        sb.append('\n');
+      }
+    } catch (IOException e) {
+      return null;
+    }
+    return sb.toString();
+  }
+
+  private static String getCurrentLocaleIdentifier(Context context) {
+    Configuration configuration = context.getResources().getConfiguration();
+    Locale locale;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+      locale = configuration.getLocales().get(0);
+    else
+      locale = configuration.locale;
+    return locale.toString();
+  }
+
+  private static int getDefaultAppIconId(Context context) {
+    try {
+      return context.getPackageManager().getApplicationInfo(context.getPackageName(), 0).icon;
+    } catch (PackageManager.NameNotFoundException e) {
+        e.printStackTrace();
+    }
+    return 0;
+  }
+
+  private boolean sendStartupNotification(Context context, String channelId) {
     Log.d(TAG, "Sending startup notification");
+    String defaultTitle = "Start At Boot";
+    String defaultBody = "Please tap this notification for the application to start";
+    String title = null;
+    String body = null;
+    String json = rawResourceToString(context, "startupnotification");
+    if (json != null) {
+      String currentLocale = getCurrentLocaleIdentifier(context);
+      try {
+        JSONArray jsonArray = new JSONArray(json);
+        for (int i = 0; i < jsonArray.length(); i++) {
+          JSONObject jsonObject = jsonArray.getJSONObject(i);
+          // First values are the default
+          if (i == 0) {
+            JSONObject localeObject = jsonObject.getJSONObject("default");
+            if (localeObject != null) {
+              defaultTitle = localeObject.getString("title");
+              defaultBody = localeObject.getString("body");
+            }
+          } else if (jsonObject.has(currentLocale)) {
+            JSONObject localeObject = jsonObject.getJSONObject(currentLocale);
+            title = localeObject.getString("title");
+            body = localeObject.getString("body");
+            break;
+          }
+        }
+      } catch (JSONException e) {
+          Log.e(TAG, "Error reading startupnotification json", e);
+      }
+    }
     Intent intent = new Intent();
-    intent.putExtra("title", "Start At Boot");
-    intent.putExtra("body", "Please tap this notification for the application to start");
+    intent.putExtra("title", (title != null) ? title : defaultTitle);
+    intent.putExtra("body", (body != null) ? body : defaultBody);
     intent.putExtra("priority", Integer.toString(NotificationCompat.PRIORITY_HIGH));
-    intent.putExtra("fullscreen", "1");
-    DWNotificationPublisher.sendNotification(context, intent, true);
+    intent.putExtra("isFullScreen", "1");
+    DWNotificationPresenter.presentNotification(context, intent, channelId, getDefaultAppIconId(context));
     return true;
   }
 
@@ -187,8 +270,10 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
         if (metaData.getBoolean(KEY_START_ON_BOOT)) {
           if (Build.VERSION.SDK_INT < 29)
             return startApp(context);
-          else
-            return sendStartupNotification(context);
+          else {
+            String channelId = metaData.containsKey(KEY_START_ON_BOOT_CHANNEL_ID) ? metaData.getString(KEY_START_ON_BOOT_CHANNEL_ID) : null;
+            return sendStartupNotification(context, channelId);
+          }
         }
       }
       if ((metaData != null) && metaData.containsKey(KEY_START_SERVICE_ON_BOOT)) {

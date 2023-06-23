@@ -6,7 +6,7 @@ unit DW.iOSapi.UIKit;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -766,6 +766,15 @@ const
   UIPointerEffectTintModeNone = 0;
   UIPointerEffectTintModeOverlay = 1;
   UIPointerEffectTintModeUnderlay = 2;
+  UITextSearchFoundTextStyleNormal = 0;
+  UITextSearchFoundTextStyleFound = 1;
+  UITextSearchFoundTextStyleHighlighted = 2;
+  UIFindSessionSearchResultDisplayStyleCurrentAndTotal = 0;
+  UIFindSessionSearchResultDisplayStyleTotal = 1;
+  UIFindSessionSearchResultDisplayStyleNone = 2;
+  UITextSearchMatchMethodContains = 0;
+  UITextSearchMatchMethodStartsWith = 1;
+  UITextSearchMatchMethodFullWord = 2;
 
 type
   UIAlertAction = interface;
@@ -1046,6 +1055,12 @@ type
   UIWindowScene = interface;
   UIWindowSceneDelegate = interface;
   UIWindowSceneDestructionRequestOptions = interface;
+  UITextSearching = interface;
+  UITextSearchOptions = interface;
+  UIFindSession = interface;
+  UITextSearchingFindSession = interface;
+  UIFindInteractionDelegate = interface;
+  UIFindInteraction = interface;
 
   {$IF CompilerVersion < 34}
   UIAlertActionStyle = NSInteger;
@@ -1220,6 +1235,10 @@ type
   UISceneCollectionJoinBehavior = NSInteger;
   UIWindowSceneDismissalAnimation = NSInteger;
   UIPointerEffectTintMode = NSInteger;
+  UITextSearchDocumentIdentifier = Pointer;
+  UITextSearchFoundTextStyle = NSInteger;
+  UIFindSessionSearchResultDisplayStyle = NSInteger;
+  UITextSearchMatchMethod = NSInteger;
 
   NSDirectionalEdgeInsets = record
     top: CGFloat;
@@ -1348,6 +1367,8 @@ type
   TUIViewPropertyAnimatorBlockMethod1 = procedure of object;
   TUIViewPropertyAnimatorBlockMethod2 = procedure(finalPosition: UIViewAnimatingPosition) of object;
   TUIWindowSceneDelegateBlockMethod1 = procedure(succeeded: Boolean) of object;
+  TUIFindInteractionBlockMethod1 = function(param1: NSArray): UIMenu of object;
+  TUIFindInteractionBlockMethod2 = procedure of object;
 
   // Exists in iOSapi.UIKit in Delphi 10.4.x and Delphi 11, however UIAlertAction is missing the setStyle method
   UIAlertActionClass = interface(NSObjectClass)
@@ -4895,6 +4916,111 @@ type
   end;
   TUITextInteraction = class(TOCGenericImport<UITextInteractionClass, UITextInteraction>) end;
 
+  UITextSearchAggregator = interface(IObjectiveC)
+    ['{923DC324-B408-4C4F-A766-874A9119DD6E}']
+    function allFoundRanges: NSOrderedSet; cdecl;
+    procedure finishedSearching; cdecl;
+    procedure foundRange(range: UITextRange; forSearchString: NSString; inDocument: UITextSearchDocumentIdentifier); cdecl;
+    procedure invalidate; cdecl;
+    procedure invalidateFoundRange(range: UITextRange; inDocument: UITextSearchDocumentIdentifier); cdecl;
+  end;
+
+  UITextSearching = interface(IObjectiveC)
+    ['{95FF0BFA-0BAF-4976-9619-C36BCF7F0C64}']
+    procedure clearAllDecoratedFoundText; cdecl;
+    function compareFoundRange(foundRange: UITextRange; toRange: UITextRange; inDocument: UITextSearchDocumentIdentifier): NSComparisonResult; cdecl;
+    function compareOrderFromDocument(fromDocument: UITextSearchDocumentIdentifier; toDocument: UITextSearchDocumentIdentifier): NSComparisonResult; cdecl;
+    procedure decorateFoundTextRange(range: UITextRange; inDocument: UITextSearchDocumentIdentifier; usingStyle: UITextSearchFoundTextStyle); cdecl;
+    procedure performTextSearchWithQueryString(&string: NSString; usingOptions: UITextSearchOptions; resultAggregator: Pointer); cdecl;
+    procedure replaceAllOccurrencesOfQueryString(queryString: NSString; usingOptions: UITextSearchOptions; withText: NSString); cdecl;
+    procedure replaceFoundTextInRange(range: UITextRange; inDocument: UITextSearchDocumentIdentifier; withText: NSString); cdecl;
+    procedure scrollRangeToVisible(range: UITextRange; inDocument: UITextSearchDocumentIdentifier); cdecl;
+    function selectedTextRange: UITextRange; cdecl;
+    function selectedTextSearchDocument: UITextSearchDocumentIdentifier; cdecl;
+    function shouldReplaceFoundTextInRange(range: UITextRange; inDocument: UITextSearchDocumentIdentifier; withText: NSString): Boolean; cdecl;
+    function supportsTextReplacement: Boolean; cdecl;
+    procedure willHighlightFoundTextRange(range: UITextRange; inDocument: UITextSearchDocumentIdentifier); cdecl;
+  end;
+
+  UITextSearchOptionsClass = interface(NSObjectClass)
+    ['{3980328A-863B-46E4-87DE-EF837FA9EDCC}']
+  end;
+
+  UITextSearchOptions = interface(NSObject)
+    ['{2589D24E-4245-4C37-8F37-CA72F49AE56C}']
+    function stringCompareOptions: NSStringCompareOptions; cdecl;
+    function wordMatchMethod: UITextSearchMatchMethod; cdecl;
+  end;
+  TUITextSearchOptions = class(TOCGenericImport<UITextSearchOptionsClass, UITextSearchOptions>) end;
+
+  UIFindSessionClass = interface(NSObjectClass)
+    ['{1B2C571D-1C65-4EE7-A663-951C0DF81532}']
+  end;
+
+  UIFindSession = interface(NSObject)
+    ['{BC09F04E-A06C-4477-A44B-3E1F307F8D4F}']
+    function allowsReplacement: Boolean; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("supportsReplacement", ios(16.0, 16.0))
+    function allowsReplacementForCurrentlyHighlightedResult: Boolean; cdecl;
+    function highlightedResultIndex: NSInteger; cdecl;
+    procedure highlightNextResultInDirection(direction: UITextStorageDirection); cdecl;
+    procedure invalidateFoundResults; cdecl;
+    procedure performSearchWithQuery(query: NSString; options: UITextSearchOptions); cdecl;
+    procedure performSingleReplacementWithSearchQuery(searchQuery: NSString; replacementString: NSString; options: UITextSearchOptions); cdecl;
+    procedure replaceAllInstancesOfSearchQuery(searchQuery: NSString; withReplacementString: NSString; options: UITextSearchOptions); cdecl;
+    function resultCount: NSInteger; cdecl;
+    function searchResultDisplayStyle: UIFindSessionSearchResultDisplayStyle; cdecl;
+    procedure setSearchResultDisplayStyle(searchResultDisplayStyle: UIFindSessionSearchResultDisplayStyle); cdecl;
+    function supportsReplacement: Boolean; cdecl;
+  end;
+  TUIFindSession = class(TOCGenericImport<UIFindSessionClass, UIFindSession>) end;
+
+  UITextSearchingFindSessionClass = interface(UIFindSessionClass)
+    ['{35A20E28-DBFA-4A00-86B3-1F3BB4D220FC}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  UITextSearchingFindSession = interface(UIFindSession)
+    ['{E396CC67-05BA-45D0-816A-E632717175C3}']
+    function initWithSearchableObject(searchableObject: Pointer): Pointer; cdecl;
+    function searchableObject: Pointer; cdecl;
+  end;
+  TUITextSearchingFindSession = class(TOCGenericImport<UITextSearchingFindSessionClass, UITextSearchingFindSession>) end;
+
+  UIFindInteractionDelegate = interface(IObjectiveC)
+    ['{6C40CC53-0CB9-4DE7-8311-F96148B490ED}']
+    [MethodName('findInteraction:didBeginFindSession:')]
+    procedure findInteractionDidBeginFindSession(interaction: UIFindInteraction; didBeginFindSession: UIFindSession); cdecl;
+    [MethodName('findInteraction:didEndFindSession:')]
+    procedure findInteractionDidEndFindSession(interaction: UIFindInteraction; didEndFindSession: UIFindSession); cdecl;
+    [MethodName('findInteraction:sessionForView:')]
+    function findInteractionSessionForView(interaction: UIFindInteraction; sessionForView: UIView): UIFindSession; cdecl;
+  end;
+
+  UIFindInteractionClass = interface(NSObjectClass)
+    ['{F6FE4941-BFE1-4E46-80CD-3E4948D96E31}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  UIFindInteraction = interface(NSObject)
+    ['{0D6EE4A3-07C4-48C4-82FA-591A71BA8D86}']
+    function activeFindSession: UIFindSession; cdecl;
+    function delegate: Pointer; cdecl;
+    procedure dismissFindNavigator; cdecl;
+    procedure findNext; cdecl;
+    procedure findPrevious; cdecl;
+    function initWithSessionDelegate(sessionDelegate: Pointer): Pointer; cdecl;
+    function isFindNavigatorVisible: Boolean; cdecl;
+    function optionsMenuProvider: TUIFindInteractionBlockMethod1; cdecl;
+    procedure presentFindNavigatorShowingReplace(showingReplace: Boolean); cdecl;
+    function replacementText: NSString; cdecl;
+    function searchText: NSString; cdecl;
+    procedure setOptionsMenuProvider(optionsMenuProvider: TUIFindInteractionBlockMethod2); cdecl;
+    procedure setReplacementText(replacementText: NSString); cdecl;
+    procedure setSearchText(searchText: NSString); cdecl;
+    procedure updateResultCount; cdecl;
+  end;
+  TUIFindInteraction = class(TOCGenericImport<UIFindInteractionClass, UIFindInteraction>) end;
+
   UIPencilInteractionClass = interface(NSObjectClass)
     ['{DFAB593E-72AD-4DE3-84A9-78D4CA3995BB}']
     {class} function preferredTapAction: UIPencilPreferredAction; cdecl;
@@ -5303,6 +5429,60 @@ type
     ['{DD808724-D9A2-4C1F-8973-2F9E6E0E9241}']
     procedure addAnimations(animations: TUIPointerInteractionAnimatingBlockMethod1); cdecl;
     procedure addCompletion(completion: TUIPointerInteractionAnimatingBlockMethod2); cdecl;
+  end;
+
+  UIImagePickerControllerClass = interface(UINavigationControllerClass)
+    ['{8244B4A8-641B-4DF7-9491-89E960713DA8}']
+    {class} function availableCaptureModesForCameraDevice(cameraDevice: UIImagePickerControllerCameraDevice): NSArray; cdecl;
+    {class} function availableMediaTypesForSourceType(sourceType: UIImagePickerControllerSourceType): NSArray; cdecl;
+    {class} function isCameraDeviceAvailable(cameraDevice: UIImagePickerControllerCameraDevice): Boolean; cdecl;
+    {class} function isFlashAvailableForCameraDevice(cameraDevice: UIImagePickerControllerCameraDevice): Boolean; cdecl;
+    {class} function isSourceTypeAvailable(sourceType: UIImagePickerControllerSourceType): Boolean; cdecl;
+  end;
+
+  UIImagePickerController = interface(UINavigationController)
+    ['{5670AA42-303E-4D63-B872-E00AD1879F5F}']
+    function allowsEditing: Boolean; cdecl;
+    function allowsImageEditing: Boolean; cdecl; // API_DEPRECATED("", ios(2.0, 3.1))
+    function cameraCaptureMode: UIImagePickerControllerCameraCaptureMode; cdecl;
+    function cameraDevice: UIImagePickerControllerCameraDevice; cdecl;
+    function cameraFlashMode: UIImagePickerControllerCameraFlashMode; cdecl;
+    function cameraOverlayView: UIView; cdecl;
+    function cameraViewTransform: CGAffineTransform; cdecl;
+    function delegate: Pointer; cdecl;
+    function imageExportPreset: UIImagePickerControllerImageURLExportPreset; cdecl; // API_DEPRECATED("Will be removed in a future release, use PHPicker.", ios(11.0, API_TO_BE_DEPRECATED))
+    function mediaTypes: NSArray; cdecl;
+    procedure setAllowsEditing(allowsEditing: Boolean); cdecl;
+    procedure setAllowsImageEditing(allowsImageEditing: Boolean); cdecl; // API_DEPRECATED("", ios(2.0, 3.1))
+    procedure setCameraCaptureMode(cameraCaptureMode: UIImagePickerControllerCameraCaptureMode); cdecl;
+    procedure setCameraDevice(cameraDevice: UIImagePickerControllerCameraDevice); cdecl;
+    procedure setCameraFlashMode(cameraFlashMode: UIImagePickerControllerCameraFlashMode); cdecl;
+    procedure setCameraOverlayView(cameraOverlayView: UIView); cdecl;
+    procedure setCameraViewTransform(cameraViewTransform: CGAffineTransform); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setImageExportPreset(imageExportPreset: UIImagePickerControllerImageURLExportPreset); cdecl; // API_DEPRECATED("Will be removed in a future release, use PHPicker.", ios(11.0, API_TO_BE_DEPRECATED))
+    procedure setMediaTypes(mediaTypes: NSArray); cdecl;
+    procedure setShowsCameraControls(showsCameraControls: Boolean); cdecl;
+    procedure setSourceType(sourceType: UIImagePickerControllerSourceType); cdecl;
+    procedure setVideoExportPreset(videoExportPreset: NSString); cdecl; // API_DEPRECATED("Will be removed in a future release, use PHPicker.", ios(11.0, API_TO_BE_DEPRECATED))
+    procedure setVideoMaximumDuration(videoMaximumDuration: NSTimeInterval); cdecl;
+    procedure setVideoQuality(videoQuality: UIImagePickerControllerQualityType); cdecl;
+    function showsCameraControls: Boolean; cdecl;
+    function sourceType: UIImagePickerControllerSourceType; cdecl;
+    function startVideoCapture: Boolean; cdecl;
+    procedure stopVideoCapture; cdecl;
+    procedure takePicture; cdecl;
+    function videoExportPreset: NSString; cdecl; // API_DEPRECATED("Will be removed in a future release, use PHPicker.", ios(11.0, API_TO_BE_DEPRECATED))
+    function videoMaximumDuration: NSTimeInterval; cdecl;
+    function videoQuality: UIImagePickerControllerQualityType; cdecl;
+  end;
+  TUIImagePickerController = class(TOCGenericImport<UIImagePickerControllerClass, UIImagePickerController>) end;
+
+  UIImagePickerControllerDelegate = interface(IObjectiveC)
+    ['{677A1228-4FEC-440F-B16D-F3EC58154E51}']
+    procedure imagePickerController(picker: UIImagePickerController; didFinishPickingMediaWithInfo: NSDictionary); overload; cdecl;
+    procedure imagePickerController(picker: UIImagePickerController; didFinishPickingImage: UIImage; editingInfo: NSDictionary); overload; cdecl; // API_DEPRECATED("", ios(2.0, 3.0))
+    procedure imagePickerControllerDidCancel(picker: UIImagePickerController); cdecl;
   end;
 
 function UIApplicationOpenSettingsURLString: NSString;

@@ -6,7 +6,7 @@ unit DW.AuthenticationServices.Types;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -30,6 +30,8 @@ type
     Email: string;
     Password: string;
     User: string;
+    GivenName: string;
+    FamilyName: string;
   end;
 
   TAppleIDAuthorizationResponse = record

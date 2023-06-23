@@ -6,7 +6,7 @@ unit DW.OrientationMonitor;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -24,9 +24,7 @@ type
 
   TOrientationMonitor = class(TObject)
   private
-    FHasOrientationChanged: Boolean;
     FOrientation: TScreenOrientation;
-    FRotation: Integer;
     FTimer: TTimer;
     FOnOrientationChanged: TOrientationChangedEvent;
     procedure DoOrientationChange;

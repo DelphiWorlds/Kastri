@@ -42,7 +42,7 @@ begin
   LTransition := TPlatformGeofenceManager.GetTransition(AnIntent.getIntExtra(TJGeofenceIntentReceiver.JavaClass.EXTRA_TRANSITION_TYPE, 1));
   LCoords.Latitude := AnIntent.getDoubleExtra(TJGeofenceIntentReceiver.JavaClass.EXTRA_TRANSITION_LATITUDE, 91);
   LCoords.Longitude := AnIntent.getDoubleExtra(TJGeofenceIntentReceiver.JavaClass.EXTRA_TRANSITION_LONGITUDE, 181);
-  TOSLog.d('AGDemoSrvice - %s: %s @ %.6f, %.6f', [cGeofenceTransitionCaptions[LTransition], LRegionIds, LCoords.Latitude, LCoords.Longitude]);
+  TOSLog.d('AGDemoService - %s: %s @ %.6f, %.6f', [cGeofenceTransitionCaptions[LTransition], LRegionIds, LCoords.Latitude, LCoords.Longitude]);
   // Here you can handle the transition information in Delphi code, even if the app is not running
 end;
 

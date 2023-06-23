@@ -6,7 +6,7 @@ unit DW.UIHelper.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -28,6 +28,8 @@ type
   ///   Helper functions specific to UI
   /// </summary>
   TPlatformUIHelper = record
+  private
+    class function GetScale: Single; static;
   public
     class function GetBrightness: Single; static;
     /// <summary>
@@ -48,9 +50,9 @@ uses
   // RTL
   System.SysUtils,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App, Androidapi.JNI.Provider,
+  Androidapi.Helpers, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App, Androidapi.JNI.Provider, Androidapi.JNI.JavaTypes,
   // FMX
-  FMX.Platform.UI.Android, FMX.Platform.Android,
+  FMX.Platform, FMX.Platform.UI.Android, FMX.Platform.Android,
   // DW
   DW.Androidapi.JNI.DWUtility;
 
@@ -74,6 +76,15 @@ begin
   Result := TRectF.Empty;
 end;
 
+class function TPlatformUIHelper.GetScale: Single;
+var
+  LService: IFMXScreenService;
+begin
+  Result := 1;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LService) then
+    Result := LService.GetScreenScale;
+end;
+
 class function TPlatformUIHelper.GetScreenOrientation: TScreenOrientation;
 var
   LRotation: Integer;
@@ -90,14 +101,28 @@ begin
 end;
 
 class function TPlatformUIHelper.GetStatusBarOffset: Single;
+var
+  LID: Integer;
+  LResources: JResources;
 begin
   Result := 0;
+  LResources := TAndroidHelper.Context.getResources;
+  LID := LResources.getIdentifier(StringToJString('status_bar_height'), StringToJString('dimen'), StringToJString('android'));
+  if LID > 0 then
+    Result := LResources.getDimensionPixelSize(LID) / GetScale;
 end;
 
 class function TPlatformUIHelper.GetUserInterfaceStyle: TUserInterfaceStyle;
+var
+  LConfiguration: JConfiguration;
+  LNightMode: Integer;
 begin
-  // Yet to be implemented. Work is in progress
-  Result := TUserInterfaceStyle.Light;
+  LConfiguration := TAndroidHelper.Context.getResources.getConfiguration;
+  LNightMode := LConfiguration.uiMode and TJConfiguration.JavaClass.UI_MODE_NIGHT_MASK;
+  if LNightMode = TJConfiguration.JavaClass.UI_MODE_NIGHT_YES then
+    Result := TUserInterfaceStyle.Dark
+  else
+    Result := TUserInterfaceStyle.Light;
 end;
 
 class procedure TPlatformUIHelper.Render(const AForm: TForm);

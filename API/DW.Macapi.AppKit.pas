@@ -6,7 +6,7 @@ unit DW.Macapi.AppKit;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -17,11 +17,20 @@ interface
 
 uses
   // macOS
-  Macapi.Foundation, Macapi.CocoaTypes, Macapi.ObjectiveC, Macapi.AppKit;
+  Macapi.Foundation, Macapi.CocoaTypes, Macapi.ObjectiveC, Macapi.AppKit,
+  // DW
+  DW.Macapi.CloudKit;
 
 type
+  NSCloudSharingServiceDelegate = interface;
   NSOpenPanel = interface;
   NSSavePanel = interface;
+  NSSharingService = interface;
+  NSSharingServiceDelegate = interface;
+  NSSharingServicePicker = interface;
+  NSSharingServicePickerDelegate = interface;
+  NSSharingServicePickerTouchBarItem = interface;
+  NSSharingServicePickerTouchBarItemDelegate = interface;
   NSStoryboard = interface;
   NSViewController = interface;
 
@@ -31,11 +40,21 @@ type
   NSViewControllerTransitionOptions = NSInteger;
   NSStoryboardName = NSString;
   NSStoryboardSceneIdentifier = NSString;
+  NSSharingServiceName = NSString;
+  NSSharingContentScope = NSInteger;
+  NSCloudKitSharingServiceOptions = NSInteger;
+  NSTouchBarItemIdentifier = NSString;
+  NSTouchBarItemPriority = Single;
+  NSTouchBarCustomizationIdentifier = NSString;
+
+  PNSRectEdge = ^NSRectEdge;
+  PNSSharingContentScope = ^NSSharingContentScope;
 
   NSStoryboardControllerCreator = function(coder: NSCoder): Pointer of object;
 
   TNSSavePanelBlockMethod1 = procedure(result: NSModalResponse) of object;
   TNSViewControllerBlockMethod1 = procedure of object;
+  TNSSharingServiceBlockMethod1 = procedure of object;
 
   NSSavePanelClass = interface(NSPanelClass)
     ['{E810D910-C0A9-4EFE-AFAE-FD417F913EEB}']
@@ -226,6 +245,172 @@ type
     procedure viewWillTransitionToSize(newSize: NSSize); cdecl;
   end;
   TNSViewController = class(TOCGenericImport<NSViewControllerClass, NSViewController>) end;
+
+  NSTouchBarItemClass = interface(NSObjectClass)
+    ['{041F7F3D-F751-4BFF-B2E6-0260E04074DC}']
+  end;
+
+  NSTouchBarItem = interface(NSObject)
+    ['{83084682-A41E-47AA-B926-80D000342690}']
+    function customizationLabel: NSString; cdecl;
+    function identifier: NSTouchBarItemIdentifier; cdecl;
+    function initWithCoder(coder: NSCoder): Pointer; cdecl;
+    function initWithIdentifier(identifier: NSTouchBarItemIdentifier): Pointer; cdecl;
+    function isVisible: Boolean; cdecl;
+    procedure setVisibilityPriority(visibilityPriority: NSTouchBarItemPriority); cdecl;
+    function view: NSView; cdecl;
+    function viewController: NSViewController; cdecl;
+    function visibilityPriority: NSTouchBarItemPriority; cdecl;
+  end;
+  TNSTouchBarItem = class(TOCGenericImport<NSTouchBarItemClass, NSTouchBarItem>) end;
+
+  NSTouchBarClass = interface(NSObjectClass)
+    ['{64066B30-F06B-4D47-A1B2-DFB06D7F8530}']
+    {class} function isAutomaticCustomizeTouchBarMenuItemEnabled: Boolean; cdecl;
+    {class} procedure setAutomaticCustomizeTouchBarMenuItemEnabled(automaticCustomizeTouchBarMenuItemEnabled: Boolean); cdecl;
+  end;
+
+  NSTouchBar = interface(NSObject)
+    ['{ADD03BB5-E627-4434-A1E3-5F9AC778B451}']
+    function customizationAllowedItemIdentifiers: NSArray; cdecl;
+    function customizationIdentifier: NSTouchBarCustomizationIdentifier; cdecl;
+    function customizationRequiredItemIdentifiers: NSArray; cdecl;
+    function defaultItemIdentifiers: NSArray; cdecl;
+    function delegate: Pointer; cdecl;
+    function escapeKeyReplacementItemIdentifier: NSTouchBarItemIdentifier; cdecl;
+    function initWithCoder(coder: NSCoder): Pointer; cdecl;
+    function isVisible: Boolean; cdecl;
+    function itemForIdentifier(identifier: NSTouchBarItemIdentifier): NSTouchBarItem; cdecl;
+    function itemIdentifiers: NSArray; cdecl;
+    function principalItemIdentifier: NSTouchBarItemIdentifier; cdecl;
+    procedure setCustomizationAllowedItemIdentifiers(customizationAllowedItemIdentifiers: NSArray); cdecl;
+    procedure setCustomizationIdentifier(customizationIdentifier: NSTouchBarCustomizationIdentifier); cdecl;
+    procedure setCustomizationRequiredItemIdentifiers(customizationRequiredItemIdentifiers: NSArray); cdecl;
+    procedure setDefaultItemIdentifiers(defaultItemIdentifiers: NSArray); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setEscapeKeyReplacementItemIdentifier(escapeKeyReplacementItemIdentifier: NSTouchBarItemIdentifier); cdecl;
+    procedure setPrincipalItemIdentifier(principalItemIdentifier: NSTouchBarItemIdentifier); cdecl;
+    procedure setTemplateItems(templateItems: NSSet); cdecl;
+    function templateItems: NSSet; cdecl;
+  end;
+  TNSTouchBar = class(TOCGenericImport<NSTouchBarClass, NSTouchBar>) end;
+
+  NSTouchBarDelegate = interface(IObjectiveC)
+    ['{CFA01AE9-49A8-443A-9CC7-54D9EEB696CA}']
+    function touchBar(touchBar: NSTouchBar; makeItemForIdentifier: NSTouchBarItemIdentifier): NSTouchBarItem; cdecl;
+  end;
+
+  NSTouchBarProvider = interface(IObjectiveC)
+    ['{B9A09F5A-1CF3-4D6E-9E3A-5D52A257B524}']
+    function touchBar: NSTouchBar; cdecl;
+  end;
+
+  NSSharingServiceClass = interface(NSObjectClass)
+    ['{9B90CABC-293D-464A-9F95-59CD848E0398}']
+    {class} function sharingServiceNamed(serviceName: NSSharingServiceName): NSSharingService; cdecl;
+    {class} function sharingServicesForItems(items: NSArray): NSArray; cdecl;
+  end;
+
+  NSSharingService = interface(NSObject)
+    ['{7F54B0F8-D909-424C-A3CD-FF8B2877E66B}']
+    function accountName: NSString; cdecl;
+    function alternateImage: NSImage; cdecl;
+    function attachmentFileURLs: NSArray; cdecl;
+    function canPerformWithItems(items: NSArray): Boolean; cdecl;
+    function delegate: Pointer; cdecl;
+    function image: NSImage; cdecl;
+    function initWithTitle(title: NSString; image: NSImage; alternateImage: NSImage; handler: TNSSharingServiceBlockMethod1): Pointer; cdecl;
+    function menuItemTitle: NSString; cdecl;
+    function messageBody: NSString; cdecl;
+    procedure performWithItems(items: NSArray); cdecl;
+    function permanentLink: NSURL; cdecl;
+    function recipients: NSArray; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setMenuItemTitle(menuItemTitle: NSString); cdecl;
+    procedure setRecipients(recipients: NSArray); cdecl;
+    procedure setSubject(subject: NSString); cdecl;
+    function subject: NSString; cdecl;
+    function title: NSString; cdecl;
+  end;
+  TNSSharingService = class(TOCGenericImport<NSSharingServiceClass, NSSharingService>) end;
+
+  NSSharingServiceDelegate = interface(IObjectiveC)
+    ['{1D3510B3-93CE-4EFD-B2BD-04824B265300}']
+    function anchoringViewForSharingService(sharingService: NSSharingService; showRelativeToRect: PNSRect; preferredEdge: PNSRectEdge): NSView; cdecl;
+    [MethodName('sharingService:didFailToShareItems:error:')]
+    procedure sharingServiceDidFailToShareItems(sharingService: NSSharingService; didFailToShareItems: NSArray; error: NSError); cdecl;
+    [MethodName('sharingService:didShareItems:')]
+    procedure sharingServiceDidShareItems(sharingService: NSSharingService; didShareItems: NSArray); cdecl;
+    [MethodName('sharingService:sourceFrameOnScreenForShareItem:')]
+    function sharingServiceSourceFrameOnScreenForShareItem(sharingService: NSSharingService; sourceFrameOnScreenForShareItem: Pointer): NSRect; cdecl;
+    [MethodName('sharingService:sourceWindowForShareItems:sharingContentScope:')]
+    function sharingServiceSourceWindowForShareItems(sharingService: NSSharingService; sourceWindowForShareItems: NSArray;
+      sharingContentScope: PNSSharingContentScope): NSWindow; cdecl;
+    [MethodName('sharingService:transitionImageForShareItem:contentRect:')]
+    function sharingServiceTransitionImageForShareItem(sharingService: NSSharingService; transitionImageForShareItem: Pointer;
+      contentRect: PNSRect): NSImage; cdecl;
+    [MethodName('sharingService:willShareItems:')]
+    procedure sharingServiceWillShareItems(sharingService: NSSharingService; willShareItems: NSArray); cdecl;
+  end;
+
+  NSCloudSharingServiceDelegate = interface(IObjectiveC)
+    ['{D68CD534-AF5D-44C1-B48A-F7A16015A377}']
+    function optionsForSharingService(cloudKitSharingService: NSSharingService; shareProvider: NSItemProvider): NSCloudKitSharingServiceOptions; cdecl;
+    [MethodName('sharingService:didCompleteForItems:error:')]
+    procedure sharingServiceDidCompleteForItems(sharingService: NSSharingService; didCompleteForItems: NSArray; error: NSError); cdecl;
+    [MethodName('sharingService:didSaveShare:')]
+    procedure sharingServiceDidSaveShare(sharingService: NSSharingService; didSaveShare: CKShare); cdecl;
+    [MethodName('sharingService:didStopSharing:')]
+    procedure sharingServiceDidStopSharing(sharingService: NSSharingService; didStopSharing: CKShare); cdecl;
+  end;
+
+  NSSharingServicePickerClass = interface(NSObjectClass)
+    ['{B663F2C7-8A68-4752-A142-64B4BE96FD20}']
+  end;
+
+  NSSharingServicePicker = interface(NSObject)
+    ['{87DAABDD-2E57-48C0-97C4-A3335FA91D3F}']
+    function delegate: Pointer; cdecl;
+    function initWithItems(items: NSArray): Pointer; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure showRelativeToRect(rect: NSRect; ofView: NSView; preferredEdge: NSRectEdge); cdecl;
+  end;
+  TNSSharingServicePicker = class(TOCGenericImport<NSSharingServicePickerClass, NSSharingServicePicker>) end;
+
+  NSSharingServicePickerDelegate = interface(IObjectiveC)
+    ['{35E5A733-DF7C-40AA-8A1B-6B7DB4E293D3}']
+    [MethodName('sharingServicePicker:delegateForSharingService:')]
+    function sharingServicePickerDelegateForSharingService(sharingServicePicker: NSSharingServicePicker;
+      delegateForSharingService: NSSharingService): Pointer; cdecl;
+    [MethodName('sharingServicePicker:didChooseSharingService:')]
+    procedure sharingServicePickerDidChooseSharingService(sharingServicePicker: NSSharingServicePicker;
+      didChooseSharingService: NSSharingService); cdecl;
+    [MethodName('sharingServicePicker:sharingServicesForItems:proposedSharingServices:')]
+    function sharingServicePickerSharingServicesForItems(sharingServicePicker: NSSharingServicePicker; sharingServicesForItems: NSArray;
+      proposedSharingServices: NSArray): NSArray; cdecl;
+  end;
+
+  NSSharingServicePickerTouchBarItemClass = interface(NSTouchBarItemClass)
+    ['{9DADD75B-7C53-4C2C-A50C-584ECC9A8F69}']
+  end;
+
+  NSSharingServicePickerTouchBarItem = interface(NSTouchBarItem)
+    ['{02ED0F42-6E92-4712-A936-B2A27D516F7B}']
+    function buttonImage: NSImage; cdecl;
+    function buttonTitle: NSString; cdecl;
+    function delegate: Pointer; cdecl;
+    function isEnabled: Boolean; cdecl;
+    procedure setButtonImage(buttonImage: NSImage); cdecl;
+    procedure setButtonTitle(buttonTitle: NSString); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+  end;
+  TNSSharingServicePickerTouchBarItem = class(TOCGenericImport<NSSharingServicePickerTouchBarItemClass, NSSharingServicePickerTouchBarItem>) end;
+
+  NSSharingServicePickerTouchBarItemDelegate = interface(IObjectiveC)
+    ['{DD2F8398-5CB1-4D68-A483-ACAE4EB47223}']
+    function itemsForSharingServicePickerTouchBarItem(pickerTouchBarItem: NSSharingServicePickerTouchBarItem): NSArray; cdecl;
+  end;
 
 implementation
 

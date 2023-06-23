@@ -6,7 +6,7 @@ unit DW.Firebase.Messaging;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -41,6 +41,7 @@ type
     procedure DoApplicationEnteredBackground; virtual;
     procedure DoAuthorizationResult(const AGranted: Boolean);
     procedure DoException(const AException: Exception);
+    procedure DoFailedToRegister(const AErrorMessage: string);
     procedure DoMessageReceived(const APayload: TStrings);
     procedure DoTokenReceived(const AToken: string);
     function GetDeviceToken: string; virtual;
@@ -154,6 +155,12 @@ end;
 procedure TCustomPlatformFirebaseMessaging.DoException(const AException: Exception);
 begin
   TOSLog.d('Exception - %s: %s', [AException.ClassName, AException.Message]);
+end;
+
+procedure TCustomPlatformFirebaseMessaging.DoFailedToRegister(const AErrorMessage: string);
+begin
+  TOSLog.d('Failed to register: %s', [AErrorMessage]);
+  FFirebaseMessaging.DoFailedToRegister(AErrorMessage);
 end;
 
 procedure TCustomPlatformFirebaseMessaging.ApplicationBecameActive;

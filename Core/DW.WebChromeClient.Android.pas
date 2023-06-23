@@ -6,7 +6,7 @@ unit DW.WebChromeClient.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -19,11 +19,11 @@ uses
   // RTL
   System.Classes, System.Messaging,
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.WebKit, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes,
+  Androidapi.JNIBridge, Androidapi.JNI.WebKit, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.JNI.Net,
   // FMX
   FMX.WebBrowser,
   // DW
-  DW.Androidapi.JNI.DWWebChromeClient, DW.WebChromeClient;
+  DW.Androidapi.JNI.DWWebChromeClient, DW.Androidapi.JNI.Os, DW.WebChromeClient;
 
 type
   TWebChromeClientManager = class;
@@ -41,8 +41,10 @@ type
 
   TWebChromeClientManager = class(TCustomPlatformWebChromeClientManager)
   private
-    FWebChromeClient: JDWWebChromeClient;
     FDelegate: JDWWebChromeClientDelegate;
+    FImageUri: Jnet_Uri;
+    FWebChromeClient: JDWWebChromeClient;
+    function GetPhotosPath: JFile;
     procedure MessageResultNotificationHandler(const Sender: TObject; const M: TMessage);
   protected
     procedure FlushCookies; override;
@@ -59,12 +61,15 @@ implementation
 
 uses
   // RTL
-  System.SysUtils,
+  System.SysUtils, System.Permissions,
   // Android
-  Androidapi.Helpers, Androidapi.JNI.App;
+  Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.Provider, Androidapi.JNI.Os, Androidapi.JNI.Support,
+  // DW
+  DW.Android.Helpers, DW.Consts.Android, DW.Permissions.Helpers;
 
 const
-  cFileChooserRequestCode = 9999;
+  cFileChooserRequestCodeDefault = 9000;
+  cFileChooserRequestCodeCamera = 9001;
 
 { TWebChromeClientDelegate }
 
@@ -106,21 +111,98 @@ begin
   inherited;
 end;
 
-function TWebChromeClientManager.HandleFileChooserIntent(const AIntent: JIntent): Boolean;
+function TWebChromeClientManager.GetPhotosPath: JFile;
+var
+  LDCIMPath, LStoragePath: JFile;
 begin
-  TAndroidHelper.Activity.startActivityForResult(AIntent, cFileChooserRequestCode);
+	Result := nil;
+  if FileCachePath.IsEmpty then
+  begin
+    if TJEnvironment.JavaClass.getExternalStorageState.equals(TJEnvironment.JavaClass.MEDIA_MOUNTED) then
+    begin
+      LDCIMPath := TJEnvironment.JavaClass.getExternalStoragePublicDirectory(TJEnvironment.JavaClass.DIRECTORY_DCIM);
+      LStoragePath := TJFile.JavaClass.init(LDCIMPath, StringToJString('Camera'));
+      if (LStoragePath <> nil) and not LStoragePath.mkdirs and not LStoragePath.exists then
+        Result := nil
+      else
+        Result := LStoragePath;
+    end;
+  end
+  else
+  begin
+    ForceDirectories(FileCachePath);
+    Result := TJFile.JavaClass.init(StringToJString(FileCachePath));
+  end;
+end;
+
+function TWebChromeClientManager.HandleFileChooserIntent(const AIntent: JIntent): Boolean;
+const
+  cImageFileNameTemplate = 'IMG_%s.jpg';
+var
+  LType, LFileName: string;
+  LMimeTypes: TArray<string>;
+  LFileChooser: TFileChooserKind;
+  LIntent: JIntent;
+  LPhotosPath: JFile;
+begin
+  LType := '';
+  if AIntent.getType <> nil then
+    LType := JStringToString(AIntent.getType);
+  LMimeTypes := LType.Split([' ']);
+  LFileChooser := TFileChooserKind.Default;
+  DoFileChooser(LMimeTypes, LFileChooser);
+  case LFileChooser of
+    TFileChooserKind.Default:
+      TAndroidHelper.Activity.startActivityForResult(AIntent, cFileChooserRequestCodeDefault);
+    TFileChooserKind.VisualMedia:
+    begin
+      LIntent := TJIntent.JavaClass.init(TJIntent.JavaClass.ACTION_PICK);
+      LIntent.setData(TJImages_Media.JavaClass.EXTERNAL_CONTENT_URI);
+      TAndroidHelper.Activity.startActivityForResult(LIntent, cFileChooserRequestCodeDefault);
+    end;
+    TFileChooserKind.Camera:
+    begin
+      PermissionsService.RequestPermissions([cPermissionCamera],
+        procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
+        begin
+          if AGrantResults.AreAllGranted then
+          begin
+            LPhotosPath := GetPhotosPath;
+            if LPhotosPath <> nil then
+            begin
+              LFileName := Format(cImageFileNameTemplate, [FormatDateTime('yyyymmdd_hhnnss', Now)]);
+              FImageUri := TAndroidHelper.JFileToJURI(TJFile.JavaClass.init(LPhotosPath, StringToJString(LFileName)));
+              // TOSLog.d('FImageUri: %s', [JStringToString(FImageUri.toString)]);
+              LIntent := TJIntent.JavaClass.init(TJMediaStore.JavaClass.ACTION_IMAGE_CAPTURE);
+              LIntent.putExtra(TJMediaStore.JavaClass.EXTRA_OUTPUT, TJParcelable.Wrap(FImageUri));
+              LIntent.setFlags(TJIntent.JavaClass.FLAG_GRANT_WRITE_URI_PERMISSION);
+              TAndroidHelper.Activity.startActivityForResult(LIntent, cFileChooserRequestCodeCamera);
+            end;
+          end;
+        end
+      );
+    end;
+  end;
   Result := True;
 end;
 
 procedure TWebChromeClientManager.MessageResultNotificationHandler(const Sender: TObject; const M: TMessage);
 var
   LResult: TMessageResultNotification;
+  LIntent: JIntent;
 begin
-  if M is TMessageResultNotification then
+  LResult := TMessageResultNotification(M);
+  if (LResult.RequestCode = cFileChooserRequestCodeDefault) or (LResult.RequestCode = cFileChooserRequestCodeCamera) then
   begin
-    LResult := TMessageResultNotification(M);
-    if LResult.RequestCode = cFileChooserRequestCode then
-      FWebChromeClient.handleFileChooserResult(LResult.Value, LResult.ResultCode);
+    LIntent := LResult.Value;
+    if LIntent = nil then
+      LIntent := TJIntent.JavaClass.init;
+    if LResult.RequestCode = cFileChooserRequestCodeCamera then
+    begin
+      LIntent.setData(FImageUri);
+      LIntent.setFlags(TJIntent.JavaClass.FLAG_GRANT_READ_URI_PERMISSION);
+    end;
+    FWebChromeClient.handleFileChooserResult(LIntent, LResult.ResultCode);
   end;
 end;
 

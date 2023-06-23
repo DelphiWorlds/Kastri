@@ -6,7 +6,7 @@ unit DW.SymbolScanner.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -281,7 +281,6 @@ procedure TPlatformSymbolScanner.ScannerData(scanDataCollection: JScanDataCollec
 var
   LScanDataList: JArrayList;
   LScanData: JScanDataCollection_ScanData;
-  LResults: JScannerResults;
   LData, LLabel: string;
   I: Integer;
 begin

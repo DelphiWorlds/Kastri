@@ -6,7 +6,7 @@ unit DW.UniversalLinks.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -21,7 +21,7 @@ uses
   // RTL
   System.SysUtils, System.Messaging,
   // Android
-  Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.Helpers,
+  Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.Helpers, Androidapi.JNI.App,
   // FMX
   FMX.Platform, FMX.Platform.Android,
   // DW
@@ -37,7 +37,7 @@ type
     FIntent: JIntent;
     FIsLaunching: Boolean;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
-    function HasAppLinkCategories(const AIntent: JIntent): Boolean;
+    // function HasAppLinkCategories(const AIntent: JIntent): Boolean;
     function IsViewAction(const AAction: JString): Boolean;
     procedure MessageReceivedNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
   public
@@ -86,10 +86,12 @@ begin
   FIntent := TMessageReceivedNotification(AMsg).Value;
 end;
 
+(*
 function TPlatformUniversalLinks.HasAppLinkCategories(const AIntent: JIntent): Boolean;
 begin
   Result := AIntent.hasCategory(TJIntent.JavaClass.CATEGORY_DEFAULT) and AIntent.hasCategory(TJIntent.JavaClass.CATEGORY_BROWSABLE);
 end;
+*)
 
 procedure TPlatformUniversalLinks.ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
 var

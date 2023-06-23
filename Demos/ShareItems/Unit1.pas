@@ -4,8 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Controls.Presentation, FMX.StdCtrls,
-  DW.ShareItems, FMX.Objects;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Controls.Presentation, FMX.StdCtrls, FMX.Objects,
+  DW.ShareItems;
 
 type
   TForm1 = class(TForm)
@@ -74,11 +74,13 @@ procedure TForm1.Share;
 var
   LSharedFileName: string;
 begin
+  FShareItems.Clear;
   LSharedFileName := TPath.Combine('Files', 'Lorem.txt');
   // FShareItems.AddText('Share Test');
   // Uncomment the following line and comment out the next one, to test sharing of a file
   // FShareItems.AddFile(TPath.Combine(TPath.GetDocumentsPath, LSharedFileName));
   FShareItems.AddImage(Image1.Bitmap); // On Android, don't attempt to share an image as well as text
+  // FShareItems.AddImage(Image1.Bitmap); // On Android, don't attempt to share an image as well as text
   FShareItems.Share(Button1, FExcluded);
 end;
 

@@ -6,7 +6,7 @@ unit DW.Android.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -17,12 +17,12 @@ interface
 
 uses
   // RTL
-  System.Classes, System.SysUtils,
+  System.Classes, System.SysUtils, System.TypInfo,
   // Android
   Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App, Androidapi.JNI.Media,
   Androidapi.JNIBridge,
   // DW
-  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes, DW.Androidapi.JNI.DWUtility;
+  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes, DW.Androidapi.JNI.DWUtility, DW.Androidapi.JNI.PlayCore;
 
 type
   TUncaughtExceptionHandler = class(TJavaLocal, JThread_UncaughtExceptionHandler)
@@ -70,6 +70,10 @@ type
     /// </summary>
     class function CheckBuildAndTarget(const AValue: Integer): Boolean; static;
     /// <summary>
+    ///   Creates a view from an Android resource
+    /// </summary>
+    class function CreateViewFromResource(const AName: string): JView; static;
+    /// <summary>
     ///   Enables/disables the Wake Lock. Needs Wake Lock checked in the Permissions section of the Project Options
     /// </summary>
     class procedure EnableWakeLock(const AEnable: Boolean); static;
@@ -105,6 +109,22 @@ type
     ///   Returns information about a running service, if the service is running
     /// </summary>
     class function GetRunningServiceInfo(const AServiceName: string): JActivityManager_RunningServiceInfo; static;
+    /// <summary>
+    ///   Determines whether or not a class is present. Note: If the class does not exist, a Java exception will show in the logs
+    /// </summary>
+    /// <remarks>
+    ///   This method should be used only to warn app developers when they may have missed including a required library
+    /// </remarks>
+    class function HasClass(const AClassName: string; const ALibraryName: string = ''): Boolean; overload; static;
+    class function HasClass(const ATypeInfo: PTypeInfo; const ALibraryName: string = ''): Boolean; overload; static;
+    /// <summary>
+    ///   Returns whether the application has the specified permission declared in the manifest
+    /// </summary>
+    class function HasManifestPermission(const APermission: string): Boolean; static;
+    /// <summary>
+    ///   Returns whether the application has permissions for a secure setting
+    /// </summary>
+    class function HasSecurePermissions(const ASetting: string): Boolean; static;
     /// <summary>
     ///   Sets an exception handler for any uncaught exceptions that occur in Java code
     /// </summary>
@@ -284,6 +304,18 @@ type
     constructor Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
   end;
 
+  TPlayCoreOnCompleteMethod = procedure(const ATask: JTask) of object;
+
+  TPlayCoreOnCompleteListener = class(TJavaLocal, JOnCompleteListener)
+  private
+    FOnCompleteHandler: TPlayCoreOnCompleteMethod;
+  public
+    { JOnCompleteListener }
+    procedure onComplete(task: JTask); cdecl;
+  public
+    constructor Create(const AOnCompleteHandler: TPlayCoreOnCompleteMethod);
+  end;
+
   TAndroidFileStream = class(TBytesStream)
   public
     constructor Create(const AFile: JFile); overload;
@@ -313,12 +345,12 @@ implementation
 
 uses
   // RTL
-  System.DateUtils, System.IOUtils,
+  System.DateUtils, System.IOUtils, System.Rtti,
   // Android
   Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI, Androidapi.JNI.Support,
   // DW
   {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.AndroidX.FileProvider, {$ENDIF}
-  DW.Consts.Android, DW.Androidapi.JNI.Util;
+  DW.Consts.Android, DW.Androidapi.JNI.Util, DW.Toast.Android;
 
 { TUncaughtExceptionHandler }
 
@@ -361,6 +393,16 @@ begin
   Result := (GetBuildSdkVersion >= AValue) and (GetTargetSdkVersion >= AValue);
 end;
 
+class function TAndroidHelperEx.CreateViewFromResource(const AName: string): JView;
+var
+  LResources: JResources;
+  LID: Integer;
+begin
+  LResources := TAndroidHelper.Context.getResources;
+  LID := LResources.getIdentifier(StringToJString('id/' + AName), nil, TAndroidHelper.Context.getPackageName);
+  Result := TAndroidHelper.Activity.getLayoutInflater.inflate(LID, nil);
+end;
+
 class procedure TAndroidHelperEx.EnableWakeLock(const AEnable: Boolean);
 var
   LTag: string;
@@ -393,6 +435,72 @@ begin
   Result := TJSystem.JavaClass.currentTimeMillis + (ASecondsFromNow * 1000);
 end;
 
+class function TAndroidHelperEx.HasClass(const AClassName: string; const ALibraryName: string = ''): Boolean;
+var
+  LShortClassName: string;
+begin
+  try
+    TJlang_Class.JavaClass.forName(StringToJString(AClassName));
+    Result := True;
+  except
+    // Eat the exception
+    Result := False;
+  end;
+  if not Result and not ALibraryName.IsEmpty then
+  begin
+    LShortClassName := AClassName.Substring(AClassName.LastIndexOf('.') + 1);
+    TToast.MakeEx(Format('J%s not found. Please add %s to the project', [LShortClassName, ALibraryName]), False);
+  end;
+end;
+
+class function TAndroidHelperEx.HasClass(const ATypeInfo: PTypeInfo; const ALibraryName: string = ''): Boolean;
+var
+  LContext: TRttiContext;
+  LType: TRttiType;
+  LAttribute: JavaSignatureAttribute;
+  LClassName: string;
+begin
+  Result := False;
+  LClassName := '';
+  LContext := TRttiContext.Create;
+  try
+    LType := LContext.GetType(ATypeInfo);
+    if (Length(LType.GetAttributes) > 0) and (LType.GetAttributes[0] is JavaSignatureAttribute) then
+      LClassName := JavaSignatureAttribute(LType.GetAttributes[0]).Signature.Replace('/', '.');
+  finally
+    LContext.Free;
+  end;
+  if not LClassName.IsEmpty then
+    Result := HasClass(LClassName, ALibraryName);
+end;
+
+class function TAndroidHelperEx.HasManifestPermission(const APermission: string): Boolean;
+var
+  LPackageInfo: JPackageInfo;
+  LPackageName, LPermission: JString;
+  LPermissions: TJavaObjectArray<JString>;
+  I: Integer;
+begin
+  Result := False;
+  LPackageName := TAndroidHelper.Context.getPackageName;
+  LPackageInfo := TAndroidHelper.Context.getPackageManager.getPackageInfo(LPackageName, TJPackageManager.JavaClass.GET_PERMISSIONS);
+  LPermissions := LPackageInfo.requestedPermissions;
+  if LPermissions <> nil then
+  try
+    LPermission := StringToJString(APermission);
+    for I := 0 to LPermissions.Length - 1 do
+    begin
+      if LPermissions[I].equals(LPermission) then
+      begin
+        Result := True;
+        Break;
+      end;
+    end;
+  finally
+    LPermissions.Free;
+  end;
+end;
+
 class procedure TAndroidHelperEx.ShowHome;
 var
   LIntent: JIntent;
@@ -414,7 +522,7 @@ end;
 
 class function TAndroidHelperEx.GetClass(const APackageClassName: string): Jlang_Class;
 begin
-  Result := TJLang_Class.JavaClass.forName(StringToJString(APackageClassName), True, TAndroidHelper.Context.getClassLoader);
+  Result := TJLang_Class.JavaClass.forName(StringToJString(APackageClassName));
 end;
 
 class function TAndroidHelperEx.GetCrashTrace: string;
@@ -563,6 +671,34 @@ end;
 class function TAndroidHelperEx.IsServiceRunning(const AServiceName: string): Boolean;
 begin
   Result := GetRunningServiceInfo(AServiceName) <> nil;
+end;
+
+class function TAndroidHelperEx.HasSecurePermissions(const ASetting: string): Boolean;
+var
+  LPackageNames: JString;
+  LPackages: TJavaObjectArray<JString>;
+  LComponentName: JComponentName;
+  I: Integer;
+begin
+  Result := False;
+  LPackageNames := TJSettings_Secure.JavaClass.getString(TAndroidHelper.ContentResolver, StringToJString(ASetting));
+  if LPackageNames <> nil then
+  begin
+    LPackages := LPackageNames.split(StringToJString(':'));
+    try
+      for I := 0 to LPackages.Length - 1 do
+      begin
+        LComponentName := TJComponentName.JavaClass.unflattenFromString(LPackages.Items[I]);
+        if (LComponentName <> nil) and TAndroidHelper.Context.getPackageName.equals(LComponentName.getPackageName) then
+        begin
+          Result := True;
+          Break;
+        end;
+      end;
+    finally
+      LPackages.Free;
+    end;
+  end;
 end;
 
 class function TAndroidHelperEx.KeyguardManager: JKeyguardManager;
@@ -879,6 +1015,19 @@ begin
     TThread.ForceQueue(nil, FRunHandler)
   else
     FRunHandler;
+end;
+
+{ TPlayCoreOnCompleteListener }
+
+constructor TPlayCoreOnCompleteListener.Create(const AOnCompleteHandler: TPlayCoreOnCompleteMethod);
+begin
+  FOnCompleteHandler := AOnCompleteHandler;
+end;
+
+procedure TPlayCoreOnCompleteListener.onComplete(task: JTask);
+begin
+  if Assigned(FOnCompleteHandler) then
+    FOnCompleteHandler(task);
 end;
 
 { TAndroidFileStream }

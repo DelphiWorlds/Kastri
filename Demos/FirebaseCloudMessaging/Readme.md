@@ -1,5 +1,7 @@
 # Firebase Cloud Messaging (FCM) Demo
 
+A new, simplified FCM implementation is being worked on, which you can find [here](https://github.com/DelphiWorlds/Playground/tree/main/Demos/FCMRebooted). The new implementation is targeted at Delphi 11.x, however it might be possible to make it work on earlier versions.
+
 ## IMPORTANT change for iOS users
 
 **FCM support in Kastri has been updated to be compatible with Firebase iOS SDK v8.7.0**

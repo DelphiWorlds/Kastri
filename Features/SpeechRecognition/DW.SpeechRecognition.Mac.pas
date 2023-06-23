@@ -6,7 +6,7 @@ unit DW.SpeechRecognition.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -150,7 +150,7 @@ begin
   FRequest := TSFSpeechAudioBufferRecognitionRequest.Create;
   FInputNode := FAudioEngine.inputNode;
   // Check LRequest and LInputNode for nil?
-  FRequest.setShouldReportPartialResults(True);
+  FRequest.setShouldReportPartialResults(Speech.WantPartialResults);
   FTask := FRecognizer.recognitionTaskWithRequest(FRequest, RecognitionRequestSpeechResultHandler);
   FInputNode.installTapOnBus(0, 4096, FInputNode.outputFormatForBus(0), InputNodeInstallTapOnBusHandler);
   FAudioEngine.prepare;

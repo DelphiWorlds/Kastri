@@ -2,16 +2,33 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 480
-  ClientWidth = 640
+  ClientHeight = 759
+  ClientWidth = 571
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
   object WebBrowser: TWebBrowser
     Align = Client
-    Size.Width = 640.000000000000000000
-    Size.Height = 480.000000000000000000
+    Size.Width = 571.000000000000000000
+    Size.Height = 724.000000000000000000
     Size.PlatformDefault = False
+    WindowsEngine = IEOnly
+  end
+  object UseCameraCheckBox: TCheckBox
+    Align = Top
+    StyledSettings = [Family, Style, FontColor]
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Size.Width = 555.000000000000000000
+    Size.Height = 19.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Use camera for image types'
+    TextSettings.Font.Size = 16.000000000000000000
   end
 end
