@@ -17,7 +17,7 @@ interface
 
 uses
   // DW
-  {$IF RTLVersion = 35.00}
+  {$IF RTLVersion >= 35.00}
   DW.Androidapi.JNI.PlayServices,
   {$ENDIF}
   // Android
