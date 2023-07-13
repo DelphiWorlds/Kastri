@@ -14,8 +14,7 @@ unit DW.iOSapi.DeviceCheck;
 {$I DW.GlobalDefines.inc}
 
 // **** NOTE: At present, this unit is UNTESTED **** Please use with care
-// As at Delphi 10.2.3, you cannot use this unit with the iOS simulator, as iOS 11.x simulators are *not supported* (this may change in Delphi 10.3)
-// You will need to add the DeviceCheck framework to the iOS 11.x SDK(s) using the SDK Manager in the IDE
+// You will need to add the DeviceCheck framework to the iOS SDK(s) using the SDK Manager in the IDE
 
 interface
 
@@ -28,53 +27,70 @@ uses
 const
   DCErrorUnknownSystemFailure = 0;
   DCErrorFeatureUnsupported = 1;
+  DCErrorInvalidInput = 2;
+  DCErrorInvalidKey = 3;
+  DCErrorServerUnavailable = 4;
 
 type
   DCDevice = interface;
-  NSErrorDomain = NSString;
-  DCError = NSInteger;
+  DCAppAttestService = interface;
 
-  TDeviceCheckCompletion = procedure(token: NSData; error: NSError) of object;
+  DCError = NSInteger;
+  NSErrorDomain = NSString;
+
+  TDCDeviceBlockMethod1 = procedure(token: NSData; error: NSError) of object;
+  TDCAppAttestServiceBlockMethod1 = procedure(keyId: NSString; error: NSError) of object;
+  TDCAppAttestServiceBlockMethod2 = procedure(attestationObject: NSData; error: NSError) of object;
+  TDCAppAttestServiceBlockMethod3 = procedure(assertionObject: NSData; error: NSError) of object;
 
   DCDeviceClass = interface(NSObjectClass)
     ['{EDA6CAA0-0DCE-4AD4-9C80-12FFFD77D661}']
+    {class} function currentDevice: DCDevice; cdecl;
   end;
 
   DCDevice = interface(NSObject)
     ['{1E9B372E-704C-4422-9A3B-D0160549FA98}']
-    function currentDevice: DCDevice; cdecl;
+    procedure generateTokenWithCompletionHandler(completion: TDCDeviceBlockMethod1); cdecl;
     function isSupported: Boolean; cdecl;
-    procedure generateTokenWithCompletionHandler(completion: TDeviceCheckCompletion); cdecl;
   end;
-  TDCDevice = class(TOCGenericImport<DCDeviceClass, DCDevice>)
+  TDCDevice = class(TOCGenericImport<DCDeviceClass, DCDevice>) end;
+
+  DCAppAttestServiceClass = interface(NSObjectClass)
+    ['{415136B6-0089-42DF-B16F-6CFC138F8611}']
+    {class} function sharedService: DCAppAttestService; cdecl;
   end;
 
-function DCErrorDomain: Pointer;
+  DCAppAttestService = interface(NSObject)
+    ['{86688179-0226-4A4E-B4FE-0BEDAAFA795B}']
+    procedure attestKey(keyId: NSString; clientDataHash: NSData; completionHandler: TDCAppAttestServiceBlockMethod2); cdecl;
+    procedure generateAssertion(keyId: NSString; clientDataHash: NSData; completionHandler: TDCAppAttestServiceBlockMethod3); cdecl;
+    procedure generateKeyWithCompletionHandler(completionHandler: TDCAppAttestServiceBlockMethod1); cdecl;
+    function isSupported: Boolean; cdecl;
+  end;
+  TDCAppAttestService = class(TOCGenericImport<DCAppAttestServiceClass, DCAppAttestService>) end;
+
+function DCErrorDomain: NSErrorDomain;
 
 const
   libDeviceCheck = '/System/Library/Frameworks/DeviceCheck.framework/DeviceCheck';
 
 implementation
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 uses
   Posix.Dlfcn;
 
 var
   DeviceCheckModule: THandle;
-{$ENDIF}
 
-function DCErrorDomain: Pointer;
+function DCErrorDomain: NSErrorDomain;
 begin
-  Result := CocoaPointerConst(libDeviceCheck, 'DCErrorDomain');
+  Result := CocoaNSStringConst(libDeviceCheck, 'DCErrorDomain');
 end;
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 initialization
   DeviceCheckModule := dlopen(MarshaledAString(libDeviceCheck), RTLD_LAZY);
 
 finalization
   dlclose(DeviceCheckModule);
-{$ENDIF}
 
 end.
