@@ -27,6 +27,7 @@ type
   JDebug = interface;
   JEnvironment = interface;
   JHandlerThread = interface;
+  JProcess = interface;
   JStatFs = interface;
   JSystem = interface;
 
@@ -478,6 +479,74 @@ type
     ['{6F88CF0F-2D6B-43D4-A23D-A04C1C56D88E}']
   end;
   TJSystemClock = class(TJavaGenericImport<JSystemClockClass, JSystemClock>) end;
+
+  JProcessClass = interface(JObjectClass)
+    ['{777EE25A-1E3F-4020-A358-ECDEB8E75497}']
+    {class} function _GetFIRST_APPLICATION_UID: Integer; cdecl;
+    {class} function _GetLAST_APPLICATION_UID: Integer; cdecl;
+    {class} function _GetPHONE_UID: Integer; cdecl;
+    {class} function _GetSIGNAL_KILL: Integer; cdecl;
+    {class} function _GetSIGNAL_QUIT: Integer; cdecl;
+    {class} function _GetSIGNAL_USR1: Integer; cdecl;
+    {class} function _GetSYSTEM_UID: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_AUDIO: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_BACKGROUND: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_DEFAULT: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_DISPLAY: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_FOREGROUND: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_LESS_FAVORABLE: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_LOWEST: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_MORE_FAVORABLE: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_URGENT_AUDIO: Integer; cdecl;
+    {class} function _GetTHREAD_PRIORITY_URGENT_DISPLAY: Integer; cdecl;
+    {class} function init: JProcess; cdecl;
+    {class} function getElapsedCpuTime: Int64; cdecl;
+    {class} function getExclusiveCores: TJavaArray<Integer>; cdecl;
+    {class} function getGidForName(name: JString): Integer; cdecl;
+    {class} function getStartElapsedRealtime: Int64; cdecl;
+    {class} function getStartRequestedElapsedRealtime: Int64; cdecl;
+    {class} function getStartRequestedUptimeMillis: Int64; cdecl;
+    {class} function getStartUptimeMillis: Int64; cdecl;
+    {class} function getThreadPriority(tid: Integer): Integer; cdecl;
+    {class} function getUidForName(name: JString): Integer; cdecl;
+    {class} function is64Bit: Boolean; cdecl;
+    {class} function isApplicationUid(uid: Integer): Boolean; cdecl;
+    {class} function isIsolated: Boolean; cdecl;
+    {class} function isSdkSandbox: Boolean; cdecl;
+    {class} procedure killProcess(pid: Integer); cdecl;
+    {class} function myPid: Integer; cdecl;
+    {class} function myProcessName: JString; cdecl;
+    {class} function myTid: Integer; cdecl;
+    {class} function myUid: Integer; cdecl;
+    {class} function myUserHandle: JUserHandle; cdecl;
+    {class} procedure sendSignal(pid: Integer; signal: Integer); cdecl;
+    {class} procedure setThreadPriority(tid: Integer; priority: Integer); cdecl; overload;
+    {class} procedure setThreadPriority(priority: Integer); cdecl; overload;
+    {class} function supportsProcesses: Boolean; cdecl;
+    {class} property FIRST_APPLICATION_UID: Integer read _GetFIRST_APPLICATION_UID;
+    {class} property LAST_APPLICATION_UID: Integer read _GetLAST_APPLICATION_UID;
+    {class} property PHONE_UID: Integer read _GetPHONE_UID;
+    {class} property SIGNAL_KILL: Integer read _GetSIGNAL_KILL;
+    {class} property SIGNAL_QUIT: Integer read _GetSIGNAL_QUIT;
+    {class} property SIGNAL_USR1: Integer read _GetSIGNAL_USR1;
+    {class} property SYSTEM_UID: Integer read _GetSYSTEM_UID;
+    {class} property THREAD_PRIORITY_AUDIO: Integer read _GetTHREAD_PRIORITY_AUDIO;
+    {class} property THREAD_PRIORITY_BACKGROUND: Integer read _GetTHREAD_PRIORITY_BACKGROUND;
+    {class} property THREAD_PRIORITY_DEFAULT: Integer read _GetTHREAD_PRIORITY_DEFAULT;
+    {class} property THREAD_PRIORITY_DISPLAY: Integer read _GetTHREAD_PRIORITY_DISPLAY;
+    {class} property THREAD_PRIORITY_FOREGROUND: Integer read _GetTHREAD_PRIORITY_FOREGROUND;
+    {class} property THREAD_PRIORITY_LESS_FAVORABLE: Integer read _GetTHREAD_PRIORITY_LESS_FAVORABLE;
+    {class} property THREAD_PRIORITY_LOWEST: Integer read _GetTHREAD_PRIORITY_LOWEST;
+    {class} property THREAD_PRIORITY_MORE_FAVORABLE: Integer read _GetTHREAD_PRIORITY_MORE_FAVORABLE;
+    {class} property THREAD_PRIORITY_URGENT_AUDIO: Integer read _GetTHREAD_PRIORITY_URGENT_AUDIO;
+    {class} property THREAD_PRIORITY_URGENT_DISPLAY: Integer read _GetTHREAD_PRIORITY_URGENT_DISPLAY;
+  end;
+
+  [JavaSignature('android/os/Process')]
+  JProcess = interface(JObject)
+    ['{059FFAB5-0122-4794-8EC1-4AD499A58619}']
+  end;
+  TJProcess = class(TJavaGenericImport<JProcessClass, JProcess>) end;
 
 implementation
 
