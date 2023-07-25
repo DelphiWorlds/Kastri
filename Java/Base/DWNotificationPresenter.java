@@ -38,7 +38,7 @@ public class DWNotificationPresenter
     try {
       bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
     } catch (IOException iOException) {
-      Log.w("DWNotificationPresenter", "Could not retrieve image from " + url);
+      Log.w(TAG, "Could not retrieve image from " + url);
     } 
     if (bitmap != null) {
       int i;
@@ -52,7 +52,7 @@ public class DWNotificationPresenter
         bitmap.recycle(); 
       return compareBitmap;
     }  
-    Log.d("DWNotificationPresenter", "Failed to retrieve or decode image");
+    Log.d(TAG, "Failed to retrieve or decode image");
     return null;
   }
 
@@ -111,6 +111,9 @@ public class DWNotificationPresenter
   }
   
   public static void presentNotification(Context context, Intent intent, String channelId, int iconId) {
+    // presentNotification can be called from more than one origin, so if it is silent, stop it here..
+    if (intent.hasExtra("isSilent") && intent.getStringExtra("isSilent").equals("1"))
+      return;
     mUniqueId++;
     intent.setClassName(context, "com.embarcadero.firemonkey.FMXNativeActivity");
     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
