@@ -135,7 +135,7 @@ begin
   finally
     LMIMETypes.Free;
   end;
-  if (LURIs.size + LTexts.size) > 1 then
+  if (LURIs.size > 1) or (LTexts.size > 1) then
   begin
     LIntent.setAction(TJIntent.JavaClass.ACTION_SEND_MULTIPLE);
     LIntent.putParcelableArrayListExtra(TJIntent.JavaClass.EXTRA_TEXT, LTexts);
