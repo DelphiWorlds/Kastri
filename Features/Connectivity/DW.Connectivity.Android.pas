@@ -123,7 +123,8 @@ end;
 
 procedure TNetworkCallbackDelegate.CheckConnectivityChange;
 begin
-  Sleep(250);
+  // TOSLog.d('TDWNetworkCallbackDelegate.CheckConnectivityChange');
+  Sleep(500);
   if FIsPendingAvailable then
     TThread.Synchronize(nil, ConnectivityChange);
 end;
