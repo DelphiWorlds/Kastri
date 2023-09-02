@@ -1,0 +1,29 @@
+{
+  "includedJars":[
+    "$(BDS)\\lib\\android\\debug\\annotation-jvm-1.6.0.jar",
+    "$(BDS)\\lib\\android\\debug\\core-1.10.1.jar",
+    "$(BDS)\\lib\\android\\debug\\drawerlayout-1.0.0.jar",
+    "$(BDS)\\lib\\android\\debug\\fragment-1.2.5.jar",
+    "$(BDS)\\lib\\android\\debug\\lifecycle-common-2.6.1.jar",
+    "$(BDS)\\lib\\android\\debug\\lifecycle-viewmodel-2.6.1.jar",
+    "$(BDS)\\lib\\android\\debug\\localbroadcastmanager-1.0.0.jar"
+  ],
+  "javaFiles":[
+    ".\\Base\\DWMediaDataSource.java",
+    ".\\Base\\DWMultiBroadcastReceiver.java",
+    ".\\Base\\DWMultiBroadcastReceiverDelegate.java",
+    ".\\Base\\DWNotificationListenerService.java",
+    ".\\Base\\DWNotificationPublisher.java",
+    ".\\Base\\DWNotificationPresenter.java",
+    ".\\Base\\DWSeekBar.java",
+    ".\\Base\\DWUtility.java",
+    ".\\Base\\DWWakeUp.java",
+    ".\\Base\\Connectivity\\DWNetworkCallback.java",
+    ".\\Base\\Connectivity\\DWNetworkCallbackDelegate.java",
+    ".\\Base\\TimerTask\\DWTimerTask.java",
+    ".\\Base\\TimerTask\\DWTimerTaskDelegate.java"
+  ],
+  "outputFile":"..\\Lib\\dw-kastri-base-3.0.0.jar",
+  "sourceVersion":"1.8",
+  "targetVersion":"1.8"
+}
