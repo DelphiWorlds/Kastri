@@ -1,0 +1,15 @@
+{
+  "includedJars":[
+    "$(BDS)\\lib\\android\\debug\\core-1.10.1.jar",
+    "$(BDS)\\lib\\android\\debug\\firebase-messaging-23.1.2.jar",
+    "$(BDS)\\lib\\android\\debug\\play-services-basement-18.1.0.jar",
+    "..\\Lib\\dw-kastri-base-3.0.0.jar"
+  ],
+  "javaFiles":[
+    ".\\FCM\\DWFirebaseMessagingService.java",
+    ".\\FCM\\DWFirebaseMessagingServiceCallback.java"
+  ],
+  "outputFile":"..\\Lib\\dw-fcm-3.0.0.jar",
+  "sourceVersion":"1.7",
+  "targetVersion":"1.7"
+}
