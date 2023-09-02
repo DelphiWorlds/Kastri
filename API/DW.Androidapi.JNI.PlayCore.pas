@@ -900,7 +900,7 @@ type
     function addOnCompleteListener(listener: JOnCompleteListener): JTask; cdecl; overload;
     function addOnCompleteListener(executor: JExecutor; listener: JOnCompleteListener): JTask; cdecl; overload;
     function addOnFailureListener(listener: JOnFailureListener): JTask; cdecl; overload;
-    function addOnFailureListener(executor: JExecutor; lonFailureListener: JOnFailureListener): JTask; cdecl; overload;
+    function addOnFailureListener(executor: JExecutor; listener: JOnFailureListener): JTask; cdecl; overload;
     function addOnSuccessListener(listener: JOnSuccessListener): JTask; cdecl; overload;
     function addOnSuccessListener(executor: JExecutor; listener: JOnSuccessListener): JTask; cdecl; overload;
     function getException: JException; cdecl;
