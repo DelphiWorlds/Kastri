@@ -95,7 +95,7 @@ var
   LItem: TSharingItem;
   LMIMETypes: TStrings;
   LURIs, LTexts: JArrayList;
-  LFileName, LType: string;
+  LFileName, LType, LText: string;
   LKind: TMimeTypes.TKind;
   LClipData: JClipData;
   I: Integer;
@@ -110,8 +110,12 @@ begin
     begin
       if LItem is TSharingItemText then
       begin
-        LTexts.add(StringToJString(TSharingItemFile(LItem).Text));
-        LMIMETypes.Add('text/plain');
+        LText := TSharingItemFile(LItem).Text;
+        LTexts.add(StringToJString(LText));
+        if LText.StartsWith('http://', True) or LText.StartsWith('https://', True) then
+          LMIMETypes.Add('text/url')
+        else
+          LMIMETypes.Add('text/plain');
       end
       else if LItem is TSharingItemFile then
       begin
