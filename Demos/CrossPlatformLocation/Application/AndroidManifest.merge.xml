@@ -4,6 +4,10 @@
     <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_SERVICE_ON_BOOT" android:value="CrossPlatformLocationService" />
     <!-- ***** Google Play services version is required for Fused Location API ***** -->
     <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+    <service merge:replace="android:name=&quot;com.embarcadero.services.CrossPlatformLocationService&quot;" 
+      android:name="com.embarcadero.services.CrossPlatformLocationService"
+      android:foregroundServiceType="location" 
+      android:exported="false" />
     <receiver
       android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver"
       android:exported="True">
