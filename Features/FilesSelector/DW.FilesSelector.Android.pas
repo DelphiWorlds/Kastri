@@ -56,7 +56,9 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNIBridge, Androidapi.JNI.Provider,
   // FMX
-  FMX.Platform.Android;
+  FMX.Platform.Android,
+  // DW
+  DW.Androidapi.JNI.Content;
 
 { TPlatformFilesSelector }
 
@@ -231,9 +233,16 @@ var
   LApplicationInfo: JApplicationInfo;
   I: Integer;
   LActivityClassName: string;
+  LFlags: JPackageManager_ResolveInfoFlags;
 begin
   Activities.Clear;
-  LList := TAndroidHelper.Context.getPackageManager.queryIntentActivities(FIntent, 0);
+  if TOSVersion.Check(13) then
+  begin
+    LFlags := TJPackageManager_ResolveInfoFlags.JavaClass.&of(0);
+    LList := TJPackageManagerEx.Wrap(TAndroidHelper.Context.getPackageManager).queryIntentActivities(FIntent, LFlags)
+  end
+  else
+    LList := TAndroidHelper.Context.getPackageManager.queryIntentActivities(FIntent, 0);
   for I := 0 to LList.size - 1 do
   begin
     LResolveInfo := TJResolveInfo.Wrap(LList.get(i));
