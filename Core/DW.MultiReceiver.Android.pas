@@ -39,28 +39,36 @@ type
   end;
   TJDWMultiBroadcastReceiver = class(TJavaGenericImport<JDWMultiBroadcastReceiverClass, JDWMultiBroadcastReceiver>) end;
 
-  TMultiReceiver = class;
+  TCustomMultiReceiver = class;
 
   TMultiBroadcastReceiverDelegate = class(TJavaLocal, JDWMultiBroadcastReceiverDelegate)
   private
-    FMultiReceiver: TMultiReceiver;
+    FMultiReceiver: TCustomMultiReceiver;
   public
     { JDWMultiBroadcastReceiverDelegate }
     procedure onReceive(context: JContext; intent: JIntent); cdecl;
   public
-    constructor Create(const AMultiReceiver: TMultiReceiver);
+    constructor Create(const AMultiReceiver: TCustomMultiReceiver);
   end;
 
-  TMultiReceiver = class(TObject)
+  TCustomMultiReceiver = class(TObject)
   private
-    FIntentFilter: JIntentFilter;
-    FLocal: Boolean;
     FReceiver: JBroadcastReceiver;
     FReceiverDelegate: JDWMultiBroadcastReceiverDelegate;
   protected
+    procedure Receive(context: JContext; intent: JIntent); virtual; abstract;
+  public
+    constructor Create;
+    property Receiver: JBroadcastReceiver read FReceiver;
+  end;
+
+  TMultiReceiver = class(TCustomMultiReceiver)
+  private
+    FIntentFilter: JIntentFilter;
+    FLocal: Boolean;
+  protected
     procedure ConfigureActions; virtual; abstract;
     function GetResultCode: Integer;
-    procedure Receive(context: JContext; intent: JIntent); virtual; abstract;
     property IntentFilter: JIntentFilter read FIntentFilter;
   public
     constructor Create(const ALocal: Boolean = False);
@@ -77,7 +85,7 @@ uses
 
 { TMultiBroadcastReceiverDelegate }
 
-constructor TMultiBroadcastReceiverDelegate.Create(const AMultiReceiver: TMultiReceiver);
+constructor TMultiBroadcastReceiverDelegate.Create(const AMultiReceiver: TCustomMultiReceiver);
 begin
   inherited Create;
   FMultiReceiver := AMultiReceiver;
@@ -88,14 +96,21 @@ begin
   FMultiReceiver.Receive(context, intent);
 end;
 
+{ TCustomMultiReceiver }
+
+constructor TCustomMultiReceiver.Create;
+begin
+  inherited;
+  FReceiverDelegate := TMultiBroadcastReceiverDelegate.Create(Self);
+  FReceiver := TJDWMultiBroadcastReceiver.JavaClass.init(FReceiverDelegate);
+end;
+
 { TMultiReceiver }
 
 constructor TMultiReceiver.Create(const ALocal: Boolean = False);
 begin
   inherited Create;
   FLocal := ALocal;
-  FReceiverDelegate := TMultiBroadcastReceiverDelegate.Create(Self);
-  FReceiver := TJDWMultiBroadcastReceiver.JavaClass.init(FReceiverDelegate);
   FIntentFilter := TJIntentFilter.JavaClass.init;
   ConfigureActions;
   if not FLocal then
