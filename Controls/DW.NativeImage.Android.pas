@@ -27,7 +27,7 @@ uses
   FMX.Presentation.Messages, FMX.Presentation.Android, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model,
   FMX.Graphics, FMX.Types,
   // DW
-  DW.NativeImage;
+  DW.NativeImage, DW.UIHelper.Android;
 
 type
   TAndroidNativeImage = class(TAndroidNativeView)
@@ -56,47 +56,6 @@ type
     property View: JViewGroup read FView;
   end;
 
-// Move these out to a common unit
-function VertTextAlignToGravity(const AAlign: TTextAlign): Integer;
-begin
-  case AAlign of
-    TTextAlign.Center:
-      Result := TJGravity.JavaClass.CENTER_VERTICAL;
-    TTextAlign.Leading:
-      Result := TJGravity.JavaClass.TOP;
-    TTextAlign.Trailing:
-      Result := TJGravity.JavaClass.BOTTOM;
-  else
-    Result := TJGravity.JavaClass.CENTER_VERTICAL;
-  end;
-end;
-
-function HorzTextAlignToGravity(const AAlign: TTextAlign): Integer;
-begin
-  case AAlign of
-    TTextAlign.Center:
-      Result := TJGravity.JavaClass.CENTER;
-    TTextAlign.Leading:
-      Result := TJGravity.JavaClass.LEFT;
-    TTextAlign.Trailing:
-      Result := TJGravity.JavaClass.RIGHT;
-  else
-    Result := TJGravity.JavaClass.CENTER;
-  end;
-end;
-
-function TFontStylesToStyle(const AStyle: TFontStyles): Integer;
-begin
-  if (TFontStyle.fsBold in AStyle) and (TFontStyle.fsItalic in AStyle) then
-    Result := TJTypeface.JavaClass.BOLD_ITALIC
-  else if TFontStyle.fsBold in AStyle then
-    Result := TJTypeface.JavaClass.BOLD
-  else if TFontStyle.fsItalic in AStyle then
-    Result := TJTypeface.JavaClass.ITALIC
-  else
-    Result := TJTypeface.JavaClass.NORMAL;
-end;
-
 { TAndroidNativeImage }
 
 constructor TAndroidNativeImage.Create;
@@ -119,7 +78,7 @@ begin
     TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT);
   FView := TJRelativeLayout.JavaClass.init(TAndroidHelper.Context);
   FImageView := TJImageView.JavaClass.init(TAndroidHelper.Context);
-  FImageView.setScaleType(TJImageView_ScaleType.JavaClass.CENTER_CROP);
+  FImageView.setScaleType(TJImageView_ScaleType.JavaClass.FIT_CENTER);
   FView.addView(FImageView, LLayoutParams);
   FTextView := TJTextView.JavaClass.init(TAndroidHelper.Context);
   // Make the image show through
@@ -198,9 +157,10 @@ begin
   LTextSettings := Model.TextSettingsInfo.TextSettings;
   FTextView.setTextColor(TAndroidHelper.AlphaColorToJColor(LTextSettings.FontColor));
   FTextView.setTextSize(TJTypedValue.JavaClass.COMPLEX_UNIT_DIP, LTextSettings.Font.Size);
-  FTextView.setGravity(VertTextAlignToGravity(LTextSettings.VertAlign) or HorzTextAlignToGravity(LTextSettings.HorzAlign));
+  FTextView.setGravity(TPlatformUIHelper.VertTextAlignToGravity(LTextSettings.VertAlign) or
+    TPlatformUIHelper.HorzTextAlignToGravity(LTextSettings.HorzAlign));
   FTextView.setTypeface(TJTypeface.JavaClass.create(StringToJString(LTextSettings.Font.Family),
-    TFontStylesToStyle(LTextSettings.Font.Style)));
+    TPlatformUIHelper.TFontStylesToStyle(LTextSettings.Font.Style)));
 end;
 
 initialization
