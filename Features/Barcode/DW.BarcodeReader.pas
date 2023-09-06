@@ -53,8 +53,8 @@ type
   private
     FPlatformReader: TCustomPlatformBarcodeReader;
     FOnBarcode: TBarcodeEvent;
-    procedure SetFormats(const Value: TBarcodeFormats);
     function GetFormats: TBarcodeFormats;
+    procedure SetFormats(const Value: TBarcodeFormats);
   protected
     procedure DoBarcodes(const ABarcodes: TBarcodes; const AError: string);
   public
