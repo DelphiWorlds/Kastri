@@ -17,24 +17,31 @@ interface
 
 uses
   // RTL
-  System.Json;
+  System.JSON;
 
 type
-  TJsonHelper = record
-    class function IsJson(const AJson: string): Boolean; static;
-    class function JsonEncode(const AJsonValue: TJSONValue): string; overload; static;
-    class function JsonEncode(const AJsonString: string): string; overload; static;
-    class function Tidy(const AJsonValue: TJsonValue; const AIndentSize: Integer = 2): string; overload; static;
-    class function Tidy(const AJson: string; const AIndentSize: Integer = 2): string; overload; static;
+  TJSONHelper = record
+    class function IsJSON(const AJSON: string): Boolean; static;
+    class function JSONEncode(const AValue: TJSONValue): string; overload; static;
+    class function JSONEncode(const AValue: string): string; overload; static;
+    class function Tidy(const AValue: TJsonValue; const AIndentSize: Integer = 2): string; overload; static;
+    class function Tidy(const AValue: string; const AIndentSize: Integer = 2): string; overload; static;
+    class function ToJSON(const AValue: string; const AKey: string = ''): string; overload; static;
+    class function ToJSON(const AValues: TArray<string>): string; overload; static;
+    class function ToStringArray(const AValues: TJSONArray): TArray<string>; static;
+  end;
+
+  TJSONValueHelper = class helper for TJSONValue
+    function TryGetISO8601Date(const APath: string; out ADate: TDateTime; const AReturnUTC: Boolean = True): Boolean;
   end;
 
 implementation
 
 uses
   // RTL
-  System.Character, System.SysUtils;
+  System.Character, System.SysUtils, System.DateUtils;
 
-class function TJsonHelper.IsJson(const AJson: string): Boolean;
+class function TJSONHelper.IsJson(const AJson: string): Boolean;
 var
   LJsonValue: TJSONValue;
 begin
@@ -48,33 +55,33 @@ begin
   end;
 end;
 
-class function TJsonHelper.JsonEncode(const AJsonValue: TJSONValue): string;
+class function TJSONHelper.JSONEncode(const AValue: TJSONValue): string;
 begin
-  Result := AJsonValue.ToJSON;
+  Result := AValue.ToJSON;
 end;
 
-class function TJsonHelper.JsonEncode(const AJsonString: string): string;
+class function TJSONHelper.JSONEncode(const AValue: string): string;
 var
-  LJsonValue: TJSONValue;
+  LValue: TJSONValue;
   LStr: string;
 begin
-  LStr := AnsiQuotedStr(AJsonString, '\');
+  LStr := AnsiQuotedStr(AValue, '\');
   LStr := Copy(LStr, 2, Length(LStr) - 2);
-  LJsonValue := TJSONObject.ParseJSONValue(LStr, False, True);
+  LValue := TJSONObject.ParseJSONValue(LStr, False, True);
   try
-    Result := JsonEncode(LJsonValue);
+    Result := JSONEncode(LValue);
   finally
-    LJsonValue.Free;
+    LValue.Free;
   end;
 end;
 
-class function TJsonHelper.Tidy(const AJsonValue: TJsonValue; const AIndentSize: Integer = 2): string;
+class function TJSONHelper.Tidy(const AValue: TJsonValue; const AIndentSize: Integer = 2): string;
 begin
-  Result := Tidy(AJsonValue.ToString, AIndentSize);
+  Result := Tidy(AValue.ToString, AIndentSize);
 end;
 
 // Now based on: https://pastebin.com/Juks92Y2 (if the link still exists), by Lars Fosdal
-class function TJsonHelper.Tidy(const AJson: string; const AIndentSize: Integer = 2): string;
+class function TJSONHelper.Tidy(const AValue: string; const AIndentSize: Integer = 2): string;
 const
   cEOL = #13#10;
 var
@@ -88,7 +95,7 @@ begin
   LIndent := 0;
   LIsInString := False;
   LIsEscape := False;
-  for LChar in AJson do
+  for LChar in AValue do
   begin
     if not LIsInString then
     begin
@@ -119,6 +126,58 @@ begin
       LIsInString := not LIsInString;
     LIsEscape := (LChar = '\') and not LIsEscape;
   end;
+end;
+
+class function TJSONHelper.ToJSON(const AValues: TArray<string>): string;
+var
+  LValues: TJSONArray;
+  LValue: string;
+begin
+  LValues := TJSONArray.Create;
+  try
+    for LValue in AValues do
+      LValues.AddElement(TJSONString.Create(LValue));
+    Result := LValues.ToJSON;
+  finally
+    LValues.Free;
+  end;
+end;
+
+class function TJSONHelper.ToJSON(const AValue: string; const AKey: string = ''): string;
+var
+  LValue: TJSONObject;
+begin
+  LValue := TJSONObject.Create;
+  try
+    if AKey.IsEmpty then
+      LValue.AddPair('value', TJSONString.Create(AValue))
+    else
+      LValue.AddPair(AKey, TJSONString.Create(AValue));
+    Result := LValue.ToJSON;
+  finally
+    LValue.Free;
+  end;
+end;
+
+class function TJSONHelper.ToStringArray(const AValues: TJSONArray): TArray<string>;
+var
+  LValue: TJSONValue;
+begin
+  for LValue in AValues do
+    Result := Result + [LValue.Value];
+end;
+
+{ TJSONValueHelper }
+
+function TJSONValueHelper.TryGetISO8601Date(const APath: string; out ADate: TDateTime; const AReturnUTC: Boolean = True): Boolean;
+var
+  LValue: string;
+begin
+  Result := TryGetValue(APath, LValue);
+  if Result then
+    ADate := ISO8601ToDate(LValue, AReturnUTC)
+  else
+    ADate := 0;
 end;
 
 end.
