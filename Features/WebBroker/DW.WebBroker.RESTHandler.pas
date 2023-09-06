@@ -1,12 +1,14 @@
 unit DW.WebBroker.RESTHandler;
 
+// **NOTE**: The WebBroker feature in Kastri is being deprecated - no further changes will be made.
+
 {*******************************************************}
 {                                                       }
 {                      Kastri                           }
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2022 Dave Nottage under MIT license   }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
