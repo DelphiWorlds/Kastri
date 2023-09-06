@@ -1,0 +1,11 @@
+{
+  "includedJars":[
+    "$(BDS)\\lib\\android\\debug\\localbroadcastmanager-1.0.0.jar"
+  ],
+  "javaFiles":[
+    ".\\Base\\DWNotificationListenerService.java"
+  ],
+  "outputFile":"..\\Research\\Demos\\NotificationListenerService\\Lib\\dw-notificationlistenerservice.jar",
+  "sourceVersion":"1.7",
+  "targetVersion":"1.7"
+}
