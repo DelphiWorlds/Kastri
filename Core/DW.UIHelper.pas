@@ -33,11 +33,13 @@ type
   public
     class procedure CopyImageToClipboard(const AImage: TStream); static;
     class function GetBrightness: Single; static;
+    class function GetNavigationBarOffset: Single; static;
     /// <summary>
     ///   Special function for handling of "notch" based devices
     /// </summary>
     class function GetOffsetRect: TRectF; overload; static;
     class function GetOffsetRect(const AHandle: TWindowHandle): TRectF; overload; static;
+    class function GetScale: Single; static;
     class function GetScreenOrientation: TScreenOrientation; static;
     class function GetStatusBarOffset: Single; static;
     /// <summary>
@@ -45,6 +47,8 @@ type
     /// </summary>
     class function GetTextColor(const ABackgroundColor: TAlphaColor; const AFactor: Single = 1): TAlphaColor; static;
     class function GetUserInterfaceStyle: TUserInterfaceStyle; static;
+    class function IsFullScreen: Boolean; static;
+    class procedure NeedsFullScreen; static;
     /// <summary>
     ///   Force a repaint of the form
     /// </summary>
@@ -54,11 +58,11 @@ type
 
 implementation
 
-{$IF Defined(ANDROID)}
 uses
+  FMX.Platform,
+{$IF Defined(ANDROID)}
   DW.UIHelper.Android;
 {$ELSEIF Defined(IOS)}
-uses
   DW.UIHelper.iOS;
 {$ENDIF}
 
@@ -82,12 +86,30 @@ begin
   {$ENDIF}
 end;
 
+class function TUIHelper.GetScale: Single;
+var
+  LService: IFMXScreenService;
+begin
+  Result := 1;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LService) then
+    Result := LService.GetScreenScale;
+end;
+
 class function TUIHelper.GetBrightness: Single;
 begin
   {$IF Defined(IOS) or Defined(Android)}
   Result := TPlatformUIHelper.GetBrightness;
   {$ELSE}
   Result := 1;
+  {$ENDIF}
+end;
+
+class function TUIHelper.GetNavigationBarOffset: Single;
+begin
+  {$IF Defined(Android)}
+  Result := TPlatformUIHelper.GetNavigationBarOffset;
+  {$ELSE}
+  Result := 0;
   {$ENDIF}
 end;
 
@@ -132,6 +154,22 @@ begin
   Result := TPlatformUIHelper.GetUserInterfaceStyle;
   {$ELSE}
   Result := TUserInterfaceStyle.Light;
+  {$ENDIF}
+end;
+
+class function TUIHelper.IsFullScreen: Boolean;
+begin
+  {$IF Defined(Android)}
+  Result := TPlatformUIHelper.IsFullScreen;
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+class procedure TUIHelper.NeedsFullScreen;
+begin
+  {$IF Defined(Android)}
+  TPlatformUIHelper.NeedsFullScreen;
   {$ENDIF}
 end;
 
