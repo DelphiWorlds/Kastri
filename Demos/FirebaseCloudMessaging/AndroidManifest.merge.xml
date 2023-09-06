@@ -1,4 +1,5 @@
 <manifest xmlns:merge="http://www.delphiworlds.com/xmlns/merge" xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application>
         <service merge:replace="android:name=&quot;com.embarcadero.firebase.messaging.ProxyFirebaseMessagingService&quot;" android:exported="false" android:name="com.delphiworlds.kastri.DWFirebaseMessagingService">
             <intent-filter>
