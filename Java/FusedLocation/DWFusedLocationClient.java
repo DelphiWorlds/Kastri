@@ -233,7 +233,7 @@ public class DWFusedLocationClient {
               // mRequestingLocationUpdates = false;
               break;
             }
-            mDelegate.onLocationSettingsChange(false);
+            mDelegate.onLocationUpdatesChange(false);
           }
         });
   }
