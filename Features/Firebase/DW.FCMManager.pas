@@ -95,7 +95,7 @@ uses
   {$IF Defined(IOS)}
   // macOS
   Macapi.Helpers,
-  // iOS 
+  // iOS
   iOSapi.FirebaseMessaging, iOSapi.UserNotifications,
   // FMX
   FMX.PushNotification.FCM.iOS,
@@ -178,8 +178,8 @@ type
     procedure DoStart;
     {$IF Defined(ANDROID)}
     function IsAndroidPushEnabled: Boolean;
-    {$ENDIF}
     procedure MessageReceivedNotificationHandler(const Sender: TObject; const AMsg: TMessage);
+    {$ENDIF}
     procedure PushDeviceTokenMessageHandler(const Sender: TObject; const AMsg: TMessage);
     procedure ReceiveNotificationHandler(Sender: TObject; const AServiceNotification: TPushServiceNotification);
     procedure ServiceConnectionChangeHandler(Sender: TObject; APushChanges: TPushService.TChanges);
@@ -249,8 +249,8 @@ begin
   FShowBannerIfForeground := True;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TPushDeviceTokenMessage, PushDeviceTokenMessageHandler);
-  TMessageManager.DefaultManager.SubscribeToMessage(TMessageReceivedNotification, MessageReceivedNotificationHandler);
   {$IF Defined(ANDROID)}
+  TMessageManager.DefaultManager.SubscribeToMessage(TMessageReceivedNotification, MessageReceivedNotificationHandler);
   FFirebaseMessagingServiceCallback := TDWFirebaseMessagingServiceCallback.Create(Self);
   TJDWFirebaseMessagingService.JavaClass.setCallback(FFirebaseMessagingServiceCallback);
   {$ENDIF}
@@ -260,7 +260,9 @@ destructor TFCMManager.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
   TMessageManager.DefaultManager.Unsubscribe(TPushDeviceTokenMessage, PushDeviceTokenMessageHandler);
+  {$IF Defined(ANDROID)}
   TMessageManager.DefaultManager.Unsubscribe(TMessageReceivedNotification, MessageReceivedNotificationHandler);
+  {$ENDIF}
   FServiceConnection.Free;
   inherited;
 end;
@@ -280,7 +282,7 @@ var
   LPushService: TPushService;
 begin
   LPushService := TPushServiceManager.Instance.GetServiceByName(TPushService.TServiceNames.FCM);
-  if LPushService <> nil  then
+  if LPushService <> nil then
   begin
     FServiceConnection := TPushServiceConnection.Create(LPushService);
     FServiceConnection.OnChange := ServiceConnectionChangeHandler;
@@ -430,8 +432,8 @@ begin
   Result := FDeviceToken;
 end;
 
-procedure TFCMManager.MessageReceivedNotificationHandler(const Sender: TObject; const AMsg: TMessage);
 {$IF Defined(ANDROID)}
+procedure TFCMManager.MessageReceivedNotificationHandler(const Sender: TObject; const AMsg: TMessage);
 var
   LIcon: string;
   LIntent: JIntent;
@@ -442,10 +444,6 @@ begin
     TOSMetadata.GetValue(cMetadataFCMDefaultNotificationIcon, LIcon);
     TJDWNotificationPresenter.JavaClass.presentNotification(TAndroidHelper.Context, LIntent, StringToJString(FChannelId), StrToIntDef(LIcon, 0));
   end;
-end;
-{$ELSE}
-begin
-  // Not applicable to other platforms
 end;
 {$ENDIF}
 
@@ -480,7 +478,10 @@ end;
 procedure TFCMManager.ServiceConnectionChangeHandler(Sender: TObject; APushChanges: TPushService.TChanges);
 begin
   if TPushService.TChange.DeviceToken in APushChanges then
+  begin
     FDeviceToken := FServiceConnection.Service.DeviceTokenValue[TPushService.TDeviceTokenNames.DeviceToken];
+    TOSLog.d('Device Token: %s', [FDeviceToken]);
+  end;
   if TPushService.TChange.Status in APushChanges then
   begin
     if FServiceConnection.Service.Status = TPushService.TStatus.StartupError then
@@ -506,7 +507,9 @@ begin
       procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
       begin
         if AGrantResults.AreAllGranted then
-          DoStart;
+          DoStart
+        else
+          TOSLog.d('> Permissions denied');
       end
     );
   end
