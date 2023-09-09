@@ -10,7 +10,7 @@
       android:exported="false" />
     <receiver
       android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver"
-      android:exported="True">
+      android:exported="true">
         <intent-filter>
             <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_ALARM_TIMER" />
             <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_SERVICE_ALARM" />
