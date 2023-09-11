@@ -78,10 +78,12 @@ type
     function GetLocationData(const ALocation: JLocation): TLocationData;
     // function GetLocationMode: Integer;
     function GetPriority: Integer;
+    function GetSmallestDisplacement: Single;
     function HasPermissions: Boolean;
     procedure SetFastestInterval(const Value: Int64);
     procedure SetInterval(const Value: Int64);
     procedure SetPriority(const Value: Integer);
+    procedure SetSmallestDisplacement(const Value: Single);
   protected
     procedure LocationChange(const ALocation: JLocation);
     procedure NmeaMessage(const AMsg: JString; const ATimestamp: Int64);
@@ -121,6 +123,7 @@ type
     /// </summary>
     property NeedsBackgroundAccess: Boolean read FNeedsBackgroundAccess write FNeedsBackgroundAccess;
     property Priority: Integer read GetPriority write SetPriority;
+    property SmallestDisplacement: Single read GetSmallestDisplacement write SetSmallestDisplacement;
     property OnLocationChange: TLocationChangeEvent read FOnLocationChange write FOnLocationChange;
     property OnNmeaMessage: TNmeaMessageEvent read FOnNmeaMessage write FOnNmeaMessage;
     /// <summary>
@@ -267,6 +270,11 @@ begin
   Result := FClient.getPriority;
 end;
 
+function TLocation.GetSmallestDisplacement: Single;
+begin
+  Result := FClient.getSmallestDisplacement;
+end;
+
 procedure TLocation.SetFastestInterval(const Value: Int64);
 begin
   if Value <> FastestInterval then
@@ -283,6 +291,11 @@ procedure TLocation.SetPriority(const Value: Integer);
 begin
   if Value <> Priority then
     FClient.setPriority(Value);
+end;
+
+procedure TLocation.SetSmallestDisplacement(const Value: Single);
+begin
+  FClient.setSmallestDisplacement(Value);
 end;
 
 procedure TLocation.SetIsPaused(const AValue: Boolean);
