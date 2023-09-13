@@ -23,6 +23,7 @@ uses
 
 type
   NSCloudSharingServiceDelegate = interface;
+  NSEvent = interface;
   NSOpenPanel = interface;
   NSSavePanel = interface;
   NSSharingService = interface;
@@ -34,9 +35,17 @@ type
   NSStoryboard = interface;
   NSViewController = interface;
 
+  NSEventButtonMask = NSInteger;
+  NSEventMask = NSInteger;
+  NSEventModifierFlags = NSInteger;
+  NSEventPhase = NSInteger;
+  NSEventSubtype = NSInteger;
+  NSEventSwipeTrackingOptions = NSInteger;
+  NSEventType = NSInteger;
   NSModalResponse = NSInteger;
   NSNibName = NSString;
   NSPopoverBehavior = NSInteger;
+  NSPressureBehavior = NSInteger;
   NSViewControllerTransitionOptions = NSInteger;
   NSStoryboardName = NSString;
   NSStoryboardSceneIdentifier = NSString;
@@ -52,6 +61,8 @@ type
 
   NSStoryboardControllerCreator = function(coder: NSCoder): Pointer of object;
 
+  TNSEventBlockMethod1 = procedure(gestureAmount: CGFloat; phase: NSEventPhase; isComplete: Boolean; stop: PBoolean) of object;
+  TNSEventBlockMethod2 = procedure(event: NSEvent) of object;
   TNSSavePanelBlockMethod1 = procedure(result: NSModalResponse) of object;
   TNSViewControllerBlockMethod1 = procedure of object;
   TNSSharingServiceBlockMethod1 = procedure of object;
@@ -411,6 +422,103 @@ type
     ['{DD2F8398-5CB1-4D68-A483-ACAE4EB47223}']
     function itemsForSharingServicePickerTouchBarItem(pickerTouchBarItem: NSSharingServicePickerTouchBarItem): NSArray; cdecl;
   end;
+
+  NSEventClass = interface(NSObjectClass)
+    ['{2C522522-2141-40BA-A61D-16C0362EFB95}']
+    {class} function addGlobalMonitorForEventsMatchingMask(mask: NSEventMask; handler: TNSEventBlockMethod2): Pointer; cdecl;
+    {class} function addLocalMonitorForEventsMatchingMask(mask: NSEventMask; handler: TNSEventBlockMethod2): Pointer; cdecl;
+    {class} function doubleClickInterval: NSTimeInterval; cdecl;
+    {class} function enterExitEventWithType(&type: NSEventType; location: NSPoint; modifierFlags: NSEventModifierFlags; timestamp: NSTimeInterval;
+      windowNumber: NSInteger; context: NSGraphicsContext; eventNumber: NSInteger; trackingNumber: NSInteger; userData: Pointer): NSEvent; cdecl;
+    {class} function eventWithCGEvent(cgEvent: CGEventRef): NSEvent; cdecl;
+    {class} function eventWithEventRef(eventRef: Pointer): NSEvent; cdecl;
+    {class} function isMouseCoalescingEnabled: Boolean; cdecl;
+    {class} function isSwipeTrackingFromScrollEventsEnabled: Boolean; cdecl;
+    {class} function keyEventWithType(&type: NSEventType; location: NSPoint; modifierFlags: NSEventModifierFlags; timestamp: NSTimeInterval;
+      windowNumber: NSInteger; context: NSGraphicsContext; characters: NSString; charactersIgnoringModifiers: NSString; isARepeat: Boolean;
+      keyCode: Word): NSEvent; cdecl;
+    {class} function keyRepeatDelay: NSTimeInterval; cdecl;
+    {class} function keyRepeatInterval: NSTimeInterval; cdecl;
+    {class} function modifierFlags: NSEventModifierFlags; cdecl;
+    {class} function mouseEventWithType(&type: NSEventType; location: NSPoint; modifierFlags: NSEventModifierFlags; timestamp: NSTimeInterval;
+      windowNumber: NSInteger; context: NSGraphicsContext; eventNumber: NSInteger; clickCount: NSInteger; pressure: Single): NSEvent; cdecl;
+    {class} function mouseLocation: NSPoint; cdecl;
+    {class} function otherEventWithType(&type: NSEventType; location: NSPoint; modifierFlags: NSEventModifierFlags; timestamp: NSTimeInterval;
+      windowNumber: NSInteger; context: NSGraphicsContext; subtype: Smallint; data1: NSInteger; data2: NSInteger): NSEvent; cdecl;
+    {class} function pressedMouseButtons: NSUInteger; cdecl;
+    {class} procedure removeMonitor(eventMonitor: Pointer); cdecl;
+    {class} procedure setMouseCoalescingEnabled(mouseCoalescingEnabled: Boolean); cdecl;
+    {class} procedure startPeriodicEventsAfterDelay(delay: NSTimeInterval; withPeriod: NSTimeInterval); cdecl;
+    {class} procedure stopPeriodicEvents; cdecl;
+  end;
+
+  NSEvent = interface(NSObject)
+    ['{66D96C14-65F4-4A71-AC65-246823864F5D}']
+    function absoluteX: NSInteger; cdecl;
+    function absoluteY: NSInteger; cdecl;
+    function absoluteZ: NSInteger; cdecl;
+    function allTouches: NSSet; cdecl;
+    function associatedEventsMask: NSEventMask; cdecl;
+    function buttonMask: NSEventButtonMask; cdecl;
+    function buttonNumber: NSInteger; cdecl;
+    function capabilityMask: NSUInteger; cdecl;
+    function CGEvent: CGEventRef; cdecl;
+    function characters: NSString; cdecl;
+    function charactersByApplyingModifiers(modifiers: NSEventModifierFlags): NSString; cdecl;
+    function charactersIgnoringModifiers: NSString; cdecl;
+    function clickCount: NSInteger; cdecl;
+    function coalescedTouchesForTouch(touch: NSTouch): NSArray; cdecl;
+    function context: NSGraphicsContext; cdecl;
+    function data1: NSInteger; cdecl;
+    function data2: NSInteger; cdecl;
+    function deltaX: CGFloat; cdecl;
+    function deltaY: CGFloat; cdecl;
+    function deltaZ: CGFloat; cdecl;
+    function deviceID: NSUInteger; cdecl;
+    function eventNumber: NSInteger; cdecl;
+    function eventRef: Pointer; cdecl;
+    function hasPreciseScrollingDeltas: Boolean; cdecl;
+    function isARepeat: Boolean; cdecl;
+    function isDirectionInvertedFromDevice: Boolean; cdecl;
+    function isEnteringProximity: Boolean; cdecl;
+    function keyCode: Word; cdecl;
+    function locationInWindow: NSPoint; cdecl;
+    function magnification: CGFloat; cdecl;
+    function modifierFlags: NSEventModifierFlags; cdecl;
+    function momentumPhase: NSEventPhase; cdecl;
+    function phase: NSEventPhase; cdecl;
+    function pointingDeviceID: NSUInteger; cdecl;
+    function pointingDeviceSerialNumber: NSUInteger; cdecl;
+    function pointingDeviceType: NSPointingDeviceType; cdecl;
+    function pressure: Single; cdecl;
+    function pressureBehavior: NSPressureBehavior; cdecl;
+    function rotation: Single; cdecl;
+    function scrollingDeltaX: CGFloat; cdecl;
+    function scrollingDeltaY: CGFloat; cdecl;
+    function stage: NSInteger; cdecl;
+    function stageTransition: CGFloat; cdecl;
+    function subtype: NSEventSubtype; cdecl;
+    function systemTabletID: NSUInteger; cdecl;
+    function tabletID: NSUInteger; cdecl;
+    function tangentialPressure: Single; cdecl;
+    function tilt: NSPoint; cdecl;
+    function timestamp: NSTimeInterval; cdecl;
+    function touchesForView(view: NSView): NSSet; cdecl;
+    function touchesMatchingPhase(phase: NSTouchPhase; inView: NSView): NSSet; cdecl;
+    function trackingArea: NSTrackingArea; cdecl;
+    function trackingNumber: NSInteger; cdecl;
+    procedure trackSwipeEventWithOptions(options: NSEventSwipeTrackingOptions; dampenAmountThresholdMin: CGFloat; max: CGFloat;
+      usingHandler: TNSEventBlockMethod1); cdecl;
+    function &type: NSEventType; cdecl;
+    function uniqueID: UInt64; cdecl;
+    function userData: Pointer; cdecl;
+    function vendorDefined: Pointer; cdecl;
+    function vendorID: NSUInteger; cdecl;
+    function vendorPointingDeviceType: NSUInteger; cdecl;
+    function window: NSWindow; cdecl;
+    function windowNumber: NSInteger; cdecl;
+  end;
+  TNSEvent = class(TOCGenericImport<NSEventClass, NSEvent>) end;
 
 implementation
 
