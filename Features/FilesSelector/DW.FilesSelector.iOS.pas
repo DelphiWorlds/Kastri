@@ -37,7 +37,6 @@ type
   private
     FController: PHPickerViewController;
     FItemProviderHandlers: TItemProviderHandlers;
-    FSelectedCount: Integer;
     FSelector: TPlatformFilesSelector;
     procedure DestroyController;
     procedure RemoveItemProviderHandler(const AHandler: IItemProviderHandler);
@@ -306,6 +305,7 @@ begin
     LObject := didFinishPickingMediaWithInfo.objectForKey(NSObjectToID(UIImagePickerControllerOriginalImage));
   if LObject <> nil then
   begin
+    Inc(FSelectedCount);
     LImage := TUIImage.Wrap(LObject);
     FSelector.HandleUIImage(LFileName, LImage);
   end;
@@ -324,6 +324,7 @@ begin
   if LObject <> nil then
     LFileName := NSStrToStr(TNSURL.Wrap(LObject).lastPathComponent);
   FSelector.HandleUIImage(LFileName, didFinishPickingImage);
+  Inc(FSelectedCount);
   if FSelector.IsSelectionLimit(FSelectedCount) then
     picker.dismissModalViewControllerAnimated(True);
 end;
