@@ -32,7 +32,8 @@ type
     FLocation: TLocation;
   public
     constructor Create(const ALocation: TLocation);
-    procedure onLocationChanged(location: JLocation); cdecl;
+    procedure onLocationChanged(location: JLocation); overload; cdecl;
+    procedure onLocationChanged(locations: JList); overload; cdecl;
     procedure onProviderDisabled(provider: JString); cdecl;
     procedure onProviderEnabled(provider: JString); cdecl;
     procedure onStatusChanged(provider: JString; status: Integer; extras: JBundle); cdecl;
@@ -112,6 +113,14 @@ end;
 procedure TLocationListener.onLocationChanged(location: JLocation);
 begin
   FLocation.LocationChange(location, TLocationSource.Listeners);
+end;
+
+procedure TLocationListener.onLocationChanged(locations: JList);
+var
+  I: Integer;
+begin
+  for I := 0 to locations.size - 1 do
+    onLocationChanged(TJLocation.Wrap(locations.get(I)));
 end;
 
 procedure TLocationListener.onProviderDisabled(provider: JString);
