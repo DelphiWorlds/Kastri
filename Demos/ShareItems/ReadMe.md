@@ -6,9 +6,11 @@ ShareItems support is intended as an alternative for ShareSheet actions in Delph
 
 It allows you to share text, images, and files, and the number being shared is restricted only by the OS.
 
+The implementation for the supported platforms is located in the [Features\ShareItems](https://github.com/DelphiWorlds/Kastri/tree/master/Features/ShareItems) folder of Kastri.
+
 ## Adding items
 
-Create an instance of TShareItems and call one of AddFile, AddImage or AddText for each item to be shared. Note that on Android, attempting to share text with an image does not appear to work.
+Create an instance of TShareItems and call one of AddFile, AddImage or AddText for each item to be shared.
 
 ## Executing sharing of items
 
