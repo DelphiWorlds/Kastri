@@ -31,6 +31,7 @@ type
     function SelectItem(const AItem: string): Integer;
     function SelectLastItem: Boolean;
     procedure ToggleChecked(const AIndex: Integer = -1);
+    procedure UncheckAll;
   end;
 
 implementation
@@ -125,6 +126,17 @@ begin
     end
     else if (AIndex > -1) and (AIndex < Items.Count) then
       TCheckListBox(Self).Checked[AIndex] := not TCheckListBox(Self).Checked[AIndex];
+  end;
+end;
+
+procedure TListBoxHelper.UncheckAll;
+var
+  I: Integer;
+begin
+  if Self is TCheckListBox then
+  begin
+    for I := 0 to Count - 1 do
+      TCheckListBox(Self).Checked[I] := False;
   end;
 end;
 
