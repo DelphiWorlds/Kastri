@@ -40,12 +40,15 @@ function TPermissionStatusArrayHelper.AreAllGranted: Boolean;
 var
   LStatus: TPermissionStatus;
 begin
+  Result := True;
   for LStatus in Self do
   begin
     if LStatus <> TPermissionStatus.Granted then
-      Exit(False); // <======
+    begin
+      Result := False;
+      Break;
+    end;
   end;
-  Result := True;
 end;
 
 end.
