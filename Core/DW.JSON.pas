@@ -28,6 +28,7 @@ type
     class function Tidy(const AValue: string; const AIndentSize: Integer = 2): string; overload; static;
     class function ToJSON(const AValue: string; const AKey: string = ''): string; overload; static;
     class function ToJSON(const AValues: TArray<string>): string; overload; static;
+    class function ToJSONValue(const AValues: TArray<string>): TJSONValue; static;
     class function ToStringArray(const AValues: TJSONArray): TArray<string>; static;
   end;
 
@@ -130,17 +131,25 @@ end;
 
 class function TJSONHelper.ToJSON(const AValues: TArray<string>): string;
 var
+  LJSON: TJSONValue;
+begin
+  LJSON := ToJSONValue(AValues);
+  try
+    Result := LJSON.ToJSON;
+  finally
+    LJSON.Free;
+  end;
+end;
+
+class function TJSONHelper.ToJSONValue(const AValues: TArray<string>): TJSONValue;
+var
   LValues: TJSONArray;
   LValue: string;
 begin
   LValues := TJSONArray.Create;
-  try
-    for LValue in AValues do
-      LValues.AddElement(TJSONString.Create(LValue));
-    Result := LValues.ToJSON;
-  finally
-    LValues.Free;
-  end;
+  for LValue in AValues do
+    LValues.AddElement(TJSONString.Create(LValue));
+  Result := LValues;
 end;
 
 class function TJSONHelper.ToJSON(const AValue: string; const AKey: string = ''): string;
