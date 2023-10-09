@@ -13,6 +13,9 @@ unit DW.iOSapi.SwiftCompat;
 
 {$I DW.GlobalDefines.inc}
 
+// NOTE: This file depends on importing Swift Support files as per the instructions at this link:
+//   https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport
+
 interface
 
 implementation
