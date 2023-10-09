@@ -1630,6 +1630,11 @@ function kGADAdSizeLeaderboard: GADAdSize;
 
 implementation
 
+{$IF not Defined(FIREBASE_PRE_V10)}
+uses
+  DW.iOSapi.SwiftCompat;
+{$ENDIF}
+
 function kGADAdSizeBanner: GADAdSize;
 begin
   Result.size.width := 320;
@@ -1661,12 +1666,17 @@ begin
 end;
 
 procedure CLangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
+{$IF not Defined(FIREBASE_PRE_V10)}
+procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
+{$ENDIF}
 procedure GoogleAppMeasurementLoader; cdecl; external framework 'GoogleAppMeasurement' dependency 'sqlite3';
 procedure GoogleAppMeasurementIdentitySupportLoader; cdecl; external framework 'GoogleAppMeasurementIdentitySupport';
 procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
 procedure JavaScriptCoreLoader; cdecl; external framework 'JavaScriptCore';
 procedure nanoPBLoader; cdecl; external framework 'nanoPB';
+{$IF Defined(FIREBASE_PRE_V10)}
 procedure PromisesObjCLoader; cdecl; external framework 'PromisesObjC';
+{$ENDIF}
 procedure UserMessagingPlatformLoader; cdecl; external framework 'UserMessagingPlatform';
 
 end.
