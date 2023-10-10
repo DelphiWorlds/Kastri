@@ -2,11 +2,15 @@
 
 ## Description
 
-This demonstrates the use of the [Google MLVision API to scan barcodes](https://developers.google.com/ml-kit/vision/barcode-scanning/android). It has been tested using Delphi 10.4.2, however it may work on earlier versions.
+This demonstrates the use of the [Google MLVision API to scan barcodes](https://developers.google.com/ml-kit/vision/barcode-scanning/android). 
 
 ~~The demo uses a TakePhotoFromCameraAction to capture the image - the code the processes the image to detect barcodes could possibly use images captured "on-the-fly" through video capture.~~
 
 **UPDATE: Due to improvements in TCameraComponent for Android, the demo now uses that for "on-the-fly" detection**
+
+## Supported Delphi versions
+
+Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
 
 ## Android 
 
@@ -18,6 +22,10 @@ The following jar files are used by the project:
 Both are located in the [`ThirdParty\Android`](https://github.com/DelphiWorlds/Kastri/tree/master/ThirdParty/Android) folder
 
 If you are creating a new project (i.e. other than the demo) you will need to add these jars to the `Libraries` node under the Android platform in Project Manager
+
+**Note**:
+
+Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
 
 ## iOS
 
