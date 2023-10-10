@@ -1,5 +1,15 @@
 # EMBTFCM Demo
 
+## **NOTE**
+
+**This implementation is now considered legacy, and should be used only in Delphi 10.4.x or earlier.**
+
+You can find the newer implementation [here](https://github.com/DelphiWorlds/Playground/tree/main/Demos/FCMRebooted).
+
+_No further changes will be made to this demo_
+
+## Description
+
 This demo makes use of Embarcadero's FCM implementations for Android and iOS and packages them into something more convenient
 
 For iOS, Embarcadero has implemented FCM in Delphi 10.4.2 or later. For 10.4.1 or earlier, **this demo** uses the implementation from Kastri.
