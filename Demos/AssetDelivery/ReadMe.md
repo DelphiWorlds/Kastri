@@ -4,9 +4,9 @@
 
 Demonstrates the use of the [Play Asset Delivery](https://developer.android.com/guide/playcore/asset-delivery) feature in Kastri
 
-## Supported versions of Delphi
+## Supported Delphi versions
 
-The demo was built with Delphi 11, however in theory it should also work with Delphi 10.4.2
+Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
 
 ## Asset Packs
 
@@ -67,6 +67,10 @@ You may note that a library has been added to the `Libraries` node of the `Andro
 ```
 
 This provides Play Asset Delivery support to the application, and is used by the Kastri code to manage the asset packs
+
+**Note**:
+
+Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` files to Android 64-bit does _not_ work)
 
 ## Manifest Changes
 
