@@ -4,6 +4,10 @@
 
 Demonstrates the use of the `DW.StartupHook.Android` unit in the `Core` folder
 
+## Supported Delphi versions
+
+Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
+
 ### Technical details
 
 Application events can be handled by using `TMessageManager` to `Subscribe` to events by using `TApplicationEventMessage`, however there are at least two events that are missing. 
