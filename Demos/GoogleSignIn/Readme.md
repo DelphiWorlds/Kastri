@@ -4,7 +4,11 @@
 
 A demo of the _very_ basic (so far) support in Kastri for Google SignIn on Android and iOS
 
-## Configuration
+## Supported Delphi versions
+
+Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
+
+## Project Configuration
 
 In order to use this demo, you will need to follow the steps at the ["Getting Started with the Google SignIn SDK"](https://github.com/grijjy/DelphiGoogleSignIn#getting-started-with-the-google-signin-sdk) section of Grijjy's readme. Note that at the time of writing, the Grijjy implementation is based on Delphi 10.2, and is a few years out of date, so please just focus on that section.
 
@@ -40,7 +44,9 @@ where `com.yourdomain.projectname` is the identifier you used for the project in
 * In the Project Options, ensure that the search path for **all** platforms includes folders from the Kastri repo _as per the demo_
 * In the Project Options, ensure that the `Framework search path` for iOS Device 64-bit includes the Firebase SDK paths _as per the demo_
 
+**Note**:
 
+Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
 
 
 
