@@ -55,13 +55,14 @@ type
 
   TPlatformKeyPressOSEvents = class(TPlatformOSEvents)
   private
-    FPressedKeys: TKeyCodes;
+    FDownKeys: TKeyCodes;
   protected
     function EventTapHandler(const proxy: CGEventTapProxy; const &type: CGEventType; const event: CGEventRef): CGEventRef; override;
   public
     constructor Create;
-    function HasMultipleDown: Boolean;
-    function DownCount: Integer;
+    function HasMultipleKeysDown: Boolean;
+    function DownKeysCount: Integer;
+    property DownKeys: TKeyCodes read FDownKeys;
   end;
 
 implementation
@@ -243,23 +244,23 @@ begin
   begin
     LKeyCode := CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
     if &type = kCGEventKeyDown then
-      FPressedKeys.Add(LKeyCode)
+      FDownKeys.Add(LKeyCode)
     else if &type = kCGEventKeyUp then
-      FPressedKeys.Remove(LKeyCode);
+      FDownKeys.Remove(LKeyCode);
     LHandled := HandleEventTap;
   end;
   if LHandled then
     Result := nil;
 end;
 
-function TPlatformKeyPressOSEvents.HasMultipleDown: Boolean;
+function TPlatformKeyPressOSEvents.HasMultipleKeysDown: Boolean;
 begin
-  Result := DownCount > 1;
+  Result := DownKeysCount > 1;
 end;
 
-function TPlatformKeyPressOSEvents.DownCount: Integer;
+function TPlatformKeyPressOSEvents.DownKeysCount: Integer;
 begin
-  Result := FPressedKeys.Count;
+  Result := FDownKeys.Count;
 end;
 
 end.
