@@ -16,6 +16,8 @@ unit DW.OSEvents.Mac;
 interface
 
 uses
+  // RTL
+  System.Classes,
   // macOS
   Macapi.CocoaTypes, Macapi.CoreFoundation;
 
@@ -53,26 +55,36 @@ type
 
   TKeyCodes = TArray<Word>;
 
+  TOSKeyEvent = procedure(Sender: TObject; const Key: Word; const KeyChar: Char; const Shift: TShiftState) of object;
+
   TPlatformKeyPressOSEvents = class(TPlatformOSEvents)
   private
     FDownKeys: TKeyCodes;
+    FOnKeyDown: TOSKeyEvent;
+    FOnKeyUp: TOSKeyEvent;
   protected
     function EventTapHandler(const proxy: CGEventTapProxy; const &type: CGEventType; const event: CGEventRef): CGEventRef; override;
+    procedure KeyDown(const AKey: Word; const AKeyChar: Char; const AShift: TShiftState); virtual;
+    procedure KeyUp(const AKey: Word; const AKeyChar: Char; const AShift: TShiftState); virtual;
   public
     constructor Create;
     function HasMultipleKeysDown: Boolean;
     function DownKeysCount: Integer;
+    procedure ClearDownKeys;
     property DownKeys: TKeyCodes read FDownKeys;
+    property OnKeyDown: TOSKeyEvent read FOnKeyDown write FOnKeyDown;
+    property OnKeyUp: TOSKeyEvent read FOnKeyUp write FOnKeyUp;
   end;
 
 implementation
 
 uses
-  DW.OSLog,
   // RTL
-  System.Classes,
+  System.SysUtils,
   // macOS
-  Macapi.ObjectiveC, Macapi.CoreGraphics, Macapi.Foundation, Macapi.Helpers;
+  Macapi.ObjectiveC, Macapi.CoreGraphics, Macapi.Foundation, Macapi.Helpers, Macapi.CoreServices,
+  // FMX
+  FMX.Platform, FMX.KeyMapping, FMX.Types;
 
 const
   libApplicationServices = '/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices';
@@ -80,9 +92,10 @@ const
 type
   TKeyCodesHelper = record helper for TKeyCodes
     procedure Add(const ACode: Word);
+    procedure Clear;
     function Count: Integer;
     function IndexOf(const ACode: Word): Integer;
-    procedure Remove(const ACode: Word);
+    function Remove(const ACode: Word): Boolean;
   end;
 
   // Declaring this type and function here as CGEventTapCallBack is declared incorrectly in Macapi.CocoaTypes
@@ -95,14 +108,24 @@ function CGEventTapCreate(tap: CGEventTapLocation; place: CGEventTapPlacement; o
 function AXIsProcessTrustedWithOptions(options: CFDictionaryRef): Boolean; cdecl;
   external libApplicationServices name _PU + 'AXIsProcessTrustedWithOptions';
 
+function kAXTrustedCheckOptionPrompt: NSString;
+begin
+  Result := CocoaNSStringConst(libApplicationServices, 'kAXTrustedCheckOptionPrompt');
+end;
+
 function CGEventMaskBit(const eventType: CGEventType): CGEventMask;
 begin
   Result := 1 shl eventType;
 end;
 
-function kAXTrustedCheckOptionPrompt: NSString;
+function KeyCodeToChar(const AKeyCode: CGKeyCode): Char;
+var
+  LKeyMappingService: IFMXKeyMappingService;
+  LKind: TKeyKind;
 begin
-  Result := CocoaNSStringConst(libApplicationServices, 'kAXTrustedCheckOptionPrompt');
+  Result := #0;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXKeyMappingService, LKeyMappingService) then
+    Result := Char(LKeyMappingService.PlatformKeyToVirtualKey(AKeyCode, LKind));
 end;
 
 { TKeyCodesHelper }
@@ -111,6 +134,11 @@ procedure TKeyCodesHelper.Add(const ACode: Word);
 begin
   if IndexOf(ACode) = -1 then
     Self := Self + [ACode];
+end;
+
+procedure TKeyCodesHelper.Clear;
+begin
+  Self := [];
 end;
 
 function TKeyCodesHelper.Count: Integer;
@@ -133,13 +161,17 @@ begin
   end;
 end;
 
-procedure TKeyCodesHelper.Remove(const ACode: Word);
+function TKeyCodesHelper.Remove(const ACode: Word): Boolean;
 var
   LIndex: Integer;
 begin
+  Result := False;
   LIndex := IndexOf(ACode);
   if LIndex > -1 then
+  begin
     Delete(Self, LIndex, 1);
+    Result := True;
+  end;
 end;
 
 { TPlatformEvents }
@@ -192,7 +224,6 @@ end;
 
 function TPlatformOSEvents.Start: Boolean;
 begin
-  Result := False;
   FEventTap := CGEventTapCreate(kCGSessionEventTap, kCGHeadInsertEventTap, 0, GetEventKindsMask(FEventKinds), EventTapCallback, Self);
   Result := FEventTap <> nil;
   if Result then
@@ -233,21 +264,45 @@ begin
   inherited Create([TOSEventKind.KeyDown, TOSEventKind.KeyUp]);
 end;
 
+procedure TPlatformKeyPressOSEvents.ClearDownKeys;
+begin
+  FDownKeys.Clear;
+end;
+
 function TPlatformKeyPressOSEvents.EventTapHandler(const proxy: CGEventTapProxy; const &type: CGEventType; const event: CGEventRef): CGEventRef;
 var
   LKeyCode: CGKeyCode;
   LHandled: Boolean;
+  LFlags: CGEventFlags;
+  LShift: TShiftState;
+  LKeyChar: Char;
 begin
   Result := event;
   LHandled := False;
+  LFlags := CGEventGetFlags(event);
+  if (LFlags and kCGEventFlagMaskShift) <> 0 then
+    Include(LShift, ssShift);
+  if (LFlags and kCGEventFlagMaskControl) <> 0 then
+    Include(LShift, ssCtrl);
+  if (LFlags and kCGEventFlagMaskCommand) <> 0 then
+    Include(LShift, ssCommand);
+  if (LFlags and kCGEventFlagMaskAlternate) <> 0 then
+    Include(LShift, ssAlt);
   if (&type = kCGEventKeyDown) or (&type = kCGEventKeyUp) then
   begin
     LKeyCode := CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
+    LKeyChar := KeyCodeToChar(LKeyCode);
     if &type = kCGEventKeyDown then
-      FDownKeys.Add(LKeyCode)
+    begin
+      FDownKeys.Add(LKeyCode);
+      KeyDown(LKeyCode, LKeyChar, LShift);
+    end
     else if &type = kCGEventKeyUp then
-      FDownKeys.Remove(LKeyCode);
-    LHandled := HandleEventTap;
+    begin
+      LHandled := not FDownKeys.Remove(LKeyCode);
+      KeyUp(LKeyCode, LKeyChar, LShift);
+    end;
+    LHandled := LHandled or HandleEventTap;
   end;
   if LHandled then
     Result := nil;
@@ -256,6 +311,18 @@ end;
 function TPlatformKeyPressOSEvents.HasMultipleKeysDown: Boolean;
 begin
   Result := DownKeysCount > 1;
+end;
+
+procedure TPlatformKeyPressOSEvents.KeyDown(const AKey: Word; const AKeyChar: Char; const AShift: TShiftState);
+begin
+  if Assigned(FOnKeyDown) then
+    FOnKeyDown(Self, AKey, AKeyChar, AShift);
+end;
+
+procedure TPlatformKeyPressOSEvents.KeyUp(const AKey: Word; const AKeyChar: Char; const AShift: TShiftState);
+begin
+  if Assigned(FOnKeyUp) then
+    FOnKeyUp(Self, AKey, AKeyChar, AShift);
 end;
 
 function TPlatformKeyPressOSEvents.DownKeysCount: Integer;
