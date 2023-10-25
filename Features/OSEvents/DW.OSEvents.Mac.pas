@@ -60,8 +60,10 @@ type
   TPlatformKeyPressOSEvents = class(TPlatformOSEvents)
   private
     FDownKeys: TKeyCodes;
+    FIgnoreKeyEvents: Boolean;
     FOnKeyDown: TOSKeyEvent;
     FOnKeyUp: TOSKeyEvent;
+    procedure SendKey(const AValue: Char; const AKeyDown: Boolean);
   protected
     function EventTapHandler(const proxy: CGEventTapProxy; const &type: CGEventType; const event: CGEventRef): CGEventRef; override;
     procedure KeyDown(const AKey: Word; const AKeyChar: Char; const AShift: TShiftState); virtual;
@@ -71,6 +73,7 @@ type
     function HasMultipleKeysDown: Boolean;
     function DownKeysCount: Integer;
     procedure ClearDownKeys;
+    procedure SendKeys(const AValue: string);
     property DownKeys: TKeyCodes read FDownKeys;
     property OnKeyDown: TOSKeyEvent read FOnKeyDown write FOnKeyDown;
     property OnKeyUp: TOSKeyEvent read FOnKeyUp write FOnKeyUp;
@@ -278,34 +281,37 @@ var
   LKeyChar: Char;
 begin
   Result := event;
-  LHandled := False;
-  LFlags := CGEventGetFlags(event);
-  if (LFlags and kCGEventFlagMaskShift) <> 0 then
-    Include(LShift, ssShift);
-  if (LFlags and kCGEventFlagMaskControl) <> 0 then
-    Include(LShift, ssCtrl);
-  if (LFlags and kCGEventFlagMaskCommand) <> 0 then
-    Include(LShift, ssCommand);
-  if (LFlags and kCGEventFlagMaskAlternate) <> 0 then
-    Include(LShift, ssAlt);
-  if (&type = kCGEventKeyDown) or (&type = kCGEventKeyUp) then
+  if not FIgnoreKeyEvents then
   begin
-    LKeyCode := CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
-    LKeyChar := KeyCodeToChar(LKeyCode);
-    if &type = kCGEventKeyDown then
+    LHandled := False;
+    LFlags := CGEventGetFlags(event);
+    if (LFlags and kCGEventFlagMaskShift) <> 0 then
+      Include(LShift, ssShift);
+    if (LFlags and kCGEventFlagMaskControl) <> 0 then
+      Include(LShift, ssCtrl);
+    if (LFlags and kCGEventFlagMaskCommand) <> 0 then
+      Include(LShift, ssCommand);
+    if (LFlags and kCGEventFlagMaskAlternate) <> 0 then
+      Include(LShift, ssAlt);
+    if (&type = kCGEventKeyDown) or (&type = kCGEventKeyUp) then
     begin
-      FDownKeys.Add(LKeyCode);
-      KeyDown(LKeyCode, LKeyChar, LShift);
-    end
-    else if &type = kCGEventKeyUp then
-    begin
-      LHandled := not FDownKeys.Remove(LKeyCode);
-      KeyUp(LKeyCode, LKeyChar, LShift);
+      LKeyCode := CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
+      LKeyChar := KeyCodeToChar(LKeyCode);
+      if &type = kCGEventKeyDown then
+      begin
+        FDownKeys.Add(LKeyCode);
+        KeyDown(LKeyCode, LKeyChar, LShift);
+      end
+      else if &type = kCGEventKeyUp then
+      begin
+        LHandled := not FDownKeys.Remove(LKeyCode);
+        KeyUp(LKeyCode, LKeyChar, LShift);
+      end;
+      LHandled := LHandled or HandleEventTap;
     end;
-    LHandled := LHandled or HandleEventTap;
+    if LHandled then
+      Result := nil;
   end;
-  if LHandled then
-    Result := nil;
 end;
 
 function TPlatformKeyPressOSEvents.HasMultipleKeysDown: Boolean;
@@ -323,6 +329,36 @@ procedure TPlatformKeyPressOSEvents.KeyUp(const AKey: Word; const AKeyChar: Char
 begin
   if Assigned(FOnKeyUp) then
     FOnKeyUp(Self, AKey, AKeyChar, AShift);
+end;
+
+procedure TPlatformKeyPressOSEvents.SendKey(const AValue: Char; const AKeyDown: Boolean);
+var
+  LEvent: CGEventRef;
+begin
+  LEvent := CGEventCreateKeyboardEvent(nil, 0, AKeyDown);
+  if LEvent <> nil then
+  try
+    CGEventKeyboardSetUnicodeString(LEvent, 1, PChar(AValue));
+    CGEventPost(kCGHIDEventTap, LEvent);
+  finally
+    CFRelease(LEvent);
+  end;
+end;
+
+procedure TPlatformKeyPressOSEvents.SendKeys(const AValue: string);
+var
+  LChar: Char;
+begin
+  FIgnoreKeyEvents := True;
+  try
+    for LChar in AValue do
+    begin
+      SendKey(LChar, True);
+      SendKey(LChar, False);
+    end;
+  finally
+    FIgnoreKeyEvents := False;
+  end;
 end;
 
 function TPlatformKeyPressOSEvents.DownKeysCount: Integer;
