@@ -66,12 +66,16 @@ If, for whatever reason, you need to drop back to Firebase v8.15 SDK, in the Pro
    $(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\PromisesObjC.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64_armv7
    ```
 
-
 ### Project Options
 
-Ensure you have a value of: `-ObjC` for the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit:
+1. If using the _currently supported_ version of Firebase SDK, set the Framework Search Path value for iOS Device 64 target to:
+   ```
+   $(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64_armv7
+   ```
 
-<img src="./Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
+2. Ensure you have a value of: `-ObjC -rpath /usr/lib/swift` for the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit:
+
+   <img src="./Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
 
 ### Android Entitlements
 
