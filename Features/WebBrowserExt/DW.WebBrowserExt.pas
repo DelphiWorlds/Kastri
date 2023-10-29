@@ -23,7 +23,9 @@ uses
 
 const
   cJavaScriptGetInputValueByName = '(function() { return document.getElementsByName("%s")[0].value; })()';
+  cJavaScriptGetPageContents = '(function() { return document.getElementsByTagName("html")[0].innerHTML; })()';
   cJavaScriptNullResult = 'null';
+  cJavaScriptSetInputValueByName = '(function() { document.getElementById("%s").value = "%s"; })()';
 
 const
   cJSEventScheme = 'about'; // This is being used so as to support Android (EMBT's code otherwise interferes)
