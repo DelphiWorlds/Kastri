@@ -96,9 +96,7 @@ begin
   dispatch_sync_f(queue, LCallback, DispatchCallback);
 end;
 
-
 { TGrandCentral }
-
 
 class procedure TGrandCentral.DispatchAsync(const AProc: dispatch_work_t; const AQueue: dispatch_queue_t = 0);
 
