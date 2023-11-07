@@ -41,7 +41,8 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  // RTL
+  System.SysUtils, System.Generics.Collections;
 
 { TStringArrayItem }
 
