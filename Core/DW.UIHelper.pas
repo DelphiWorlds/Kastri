@@ -64,6 +64,8 @@ uses
   DW.UIHelper.Android;
 {$ELSEIF Defined(IOS)}
   DW.UIHelper.iOS;
+{$ELSEIF Defined(MACOS)}
+  DW.UIHelper.Mac;
 {$ENDIF}
 
 { TUIHelper }
@@ -73,7 +75,7 @@ begin
   {$IF Defined(IOS) or Defined(Android)}
   Result := TPlatformUIHelper.GetOffsetRect;
   {$ELSE}
-  Result := RectF(0, 0, 0, 0);
+  Result := TRectF.Empty;
   {$ENDIF}
 end;
 
