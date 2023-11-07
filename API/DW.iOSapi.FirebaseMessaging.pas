@@ -19,65 +19,40 @@ uses
   // macOS
   Macapi.ObjectiveC,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation;
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UserNotifications;
 
 const
-  // Unknown error.
-  FIRInstanceIDErrorUnknown = 0;
-  // Auth Error -- GCM couldn't validate request from this client.
-  FIRInstanceIDErrorAuthentication = 1;
-  // NoAccess -- InstanceID service cannot be accessed.
-  FIRInstanceIDErrorNoAccess = 2;
-  // Timeout -- Request to InstanceID backend timed out.
-  FIRInstanceIDErrorTimeout = 3;
-  // Network -- No network available to reach the servers.
-  FIRInstanceIDErrorNetwork = 4;
-  // OperationInProgress -- Another similar operation in progress, bailing this one.
-  FIRInstanceIDErrorOperationInProgress = 5;
-  // InvalidRequest -- Some parameters of the request were invalid.
-  FIRInstanceIDErrorInvalidRequest = 7;
-  // Unknown token type.
-  FIRInstanceIDAPNSTokenTypeUnknown = 0;
-  // Sandbox token type.
-  FIRInstanceIDAPNSTokenTypeSandbox = 1;
-  // Production token type.
-  FIRInstanceIDAPNSTokenTypeProd = 2;
-
-  // Unknown error.
   FIRMessagingErrorUnknown = 0;
-  // FIRMessaging couldn't validate request from this client.
   FIRMessagingErrorAuthentication = 1;
-  // InstanceID service cannot be accessed.
   FIRMessagingErrorNoAccess = 2;
-  // Request to InstanceID backend timed out.
   FIRMessagingErrorTimeout = 3;
-  // No network available to reach the servers.
   FIRMessagingErrorNetwork = 4;
-  // Another similar operation in progress, bailing this one.
   FIRMessagingErrorOperationInProgress = 5;
-  // Some parameters of the request were invalid.
   FIRMessagingErrorInvalidRequest = 7;
-
-  // Unknown status.
+  FIRMessagingErrorInvalidTopicName = 8;
   FIRMessagingMessageStatusUnknown = 0;
-  // New downstream message received by the app.
   FIRMessagingMessageStatusNew = 1;
-  // Unknown token type.
-  FIRMessasingAPNSTokenTypeUnknown = 0;
-
-  // Sandbox token type.
-  FIRMessasingAPNSTokenTypeSandbox = 1;
-  // Production token type.
-  FIRMessasingAPNSTokenTypeProd = 2;
+  FIRMessagingAPNSTokenTypeUnknown = 0;
+  FIRMessagingAPNSTokenTypeSandbox = 1;
+  FIRMessagingAPNSTokenTypeProd = 2;
 
 type
-  FIRInstanceIDAPNSTokenType = NSInteger;
-  FIRMessagingAPNSTokenType = NSInteger;
-  FIRInstanceIDError = NSUInteger;
-  FIRMessagingError = NSUInteger;
-  FIRMessagingMessageStatus = NSInteger;
+  FIRMessagingMessageInfo = interface;
+  FIRMessagingDelegate = interface;
+  FIRMessaging = interface;
+  FIRMessagingExtensionHelper = interface;
 
-  TFIRMessagingConnectCompletion = procedure(error: NSError) of object;
+  FIRMessagingFCMTokenFetchCompletion = procedure(FCMToken: NSString; error: NSError) of object;
+  FIRMessagingDeleteFCMTokenCompletion = procedure(error: NSError) of object;
+
+  FIRMessagingTopicOperationCompletion = procedure(error: NSError) of object;
+  FIRMessagingError = NSInteger;
+  FIRMessagingMessageStatus = NSInteger;
+  FIRMessagingAPNSTokenType = NSInteger;
+  TFIRMessagingBlockMethod1 = procedure(token: NSString; error: NSError) of object;
+  TFIRMessagingBlockMethod2 = procedure(error: NSError) of object;
+  TFIRMessagingBlockMethod3 = procedure(FCMToken: NSString; error: NSError) of object;
+  TFIRMessagingExtensionHelperBlockMethod1 = procedure(param1: UNNotificationContent) of object;
 
   FIRMessagingMessageInfoClass = interface(NSObjectClass)
     ['{FDAC534F-3D79-4FF6-824E-50DC7423662A}']
@@ -89,6 +64,7 @@ type
   end;
   TFIRMessagingMessageInfo = class(TOCGenericImport<FIRMessagingMessageInfoClass, FIRMessagingMessageInfo>) end;
 
+  {$IF Defined(FIREBASE_PRE_V10)}
   FIRMessagingRemoteMessageClass = interface(NSObjectClass)
     ['{EF45D074-C7A5-4DB2-BCD1-53B8650419F4}']
   end;
@@ -98,8 +74,6 @@ type
     function appData: NSDictionary; cdecl;
   end;
   TFIRMessagingRemoteMessage = class(TOCGenericImport<FIRMessagingRemoteMessageClass, FIRMessagingRemoteMessage>) end;
-
-  FIRMessaging = interface;
 
   FIRMessagingDelegate = interface(IObjectiveC)
     ['{264C1F0E-3EA9-42AC-9802-EF1BC9A7E321}']
@@ -111,6 +85,13 @@ type
     [MethodName('messaging:didReceiveRegistrationToken:')]
     procedure didReceiveRegistrationToken(messaging: FIRMessaging; fcmToken: NSString); cdecl;
   end;
+  {$ELSE}
+
+  FIRMessagingDelegate = interface(IObjectiveC)
+    ['{D2E4D0A8-B2CD-4C69-B6C8-01619DC5E09B}']
+    procedure messaging(messaging: FIRMessaging; didReceiveRegistrationToken: NSString); cdecl;
+  end;
+  {$ENDIF}
 
   FIRMessagingClass = interface(NSObjectClass)
     ['{62AF9A4C-681E-4BCD-9063-6209CAE08296}']
@@ -120,20 +101,38 @@ type
   FIRMessaging = interface(NSObject)
     ['{A721C3D4-82EB-4A7B-A5E5-42EF9E8F618E}']
     function APNSToken: NSData; cdecl;
-    procedure connectWithCompletion(handler: TFIRMessagingConnectCompletion); cdecl;
+    function appDidReceiveMessage(message: NSDictionary): FIRMessagingMessageInfo; cdecl;
     function delegate: Pointer; cdecl;
-    procedure disconnect; cdecl;
-    procedure sendMessage(msg: NSDictionary; receiver: NSString; messageID: NSString; ttl: Int64); cdecl;
-    procedure setAPNSToken(apnsToken: NSData; tokenType: FIRMessagingAPNSTokenType); cdecl;
+    procedure deleteDataWithCompletion(completion: TFIRMessagingBlockMethod2); cdecl;
+    procedure deleteFCMTokenForSenderID(senderID: NSString; completion: TFIRMessagingBlockMethod2); cdecl;
+    procedure deleteTokenWithCompletion(completion: TFIRMessagingBlockMethod2); cdecl;
+    function FCMToken: NSString; cdecl;
+    function isAutoInitEnabled: Boolean; cdecl;
+    procedure retrieveFCMTokenForSenderID(senderID: NSString; completion: TFIRMessagingBlockMethod3); cdecl;
+    procedure setAPNSToken(APNSToken: NSData); overload; cdecl;
+    procedure setAPNSToken(apnsToken: NSData; &type: FIRMessagingAPNSTokenType); overload; cdecl;
+    procedure setAutoInitEnabled(autoInitEnabled: Boolean); cdecl;
     procedure setDelegate(delegate: Pointer); cdecl;
-    function shouldEstablishDirectChannel: Boolean; cdecl;
-    procedure setShouldEstablishDirectChannel(value: Boolean); cdecl;
-    procedure subscribeToTopic(topic: NSString); cdecl;
-    procedure unsubscribeFromTopic(topic: NSString); cdecl;
+    procedure subscribeToTopic(topic: NSString; completion: TFIRMessagingBlockMethod2); overload; cdecl;
+    procedure subscribeToTopic(topic: NSString); overload; cdecl;
+    procedure tokenWithCompletion(completion: TFIRMessagingBlockMethod1); cdecl;
+    procedure unsubscribeFromTopic(topic: NSString; completion: TFIRMessagingBlockMethod2); overload; cdecl;
+    procedure unsubscribeFromTopic(topic: NSString); overload; cdecl;
   end;
   TFIRMessaging = class(TOCGenericImport<FIRMessagingClass, FIRMessaging>) end;
 
-  function kFIRInstanceIDTokenRefreshNotification: NSString; cdecl;
+  FIRMessagingExtensionHelperClass = interface(NSObjectClass)
+    ['{285EE430-1E8E-4BCE-B678-70BA356C973A}']
+  end;
+
+  FIRMessagingExtensionHelper = interface(NSObject)
+    ['{0127DE9D-DC22-408E-895D-B4CD1D8089EB}']
+    procedure exportDeliveryMetricsToBigQueryWithMessageInfo(info: NSDictionary); cdecl;
+    procedure populateNotificationContent(content: UNMutableNotificationContent; withContentHandler: TFIRMessagingExtensionHelperBlockMethod1); cdecl;
+  end;
+  TFIRMessagingExtensionHelper = class(TOCGenericImport<FIRMessagingExtensionHelperClass, FIRMessagingExtensionHelper>) end;
+
+function kFIRInstanceIDTokenRefreshNotification: NSString; cdecl;
 
 implementation
 
@@ -150,5 +149,6 @@ begin
 end;
 
 procedure FirebaseMessagingLoader; cdecl; external framework 'FirebaseMessaging';
+procedure GoogleDataTransportLoader; cdecl; external framework 'GoogleDataTransport';
 
 end.

@@ -1630,10 +1630,8 @@ function kGADAdSizeLeaderboard: GADAdSize;
 
 implementation
 
-{$IF not Defined(FIREBASE_PRE_V10)}
 uses
   DW.iOSapi.SwiftCompat;
-{$ENDIF}
 
 function kGADAdSizeBanner: GADAdSize;
 begin
@@ -1665,18 +1663,18 @@ begin
   Result.size.height := 90;
 end;
 
-procedure CLangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
-{$IF not Defined(FIREBASE_PRE_V10)}
+procedure CLangRTLoader; cdecl;
+  {$IF not Defined(IOSSIMULATOR)}
+  external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+  {$ELSE}
+  external '/usr/lib/clang/lib/darwin/libclang_rt.iossim.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+  {$ENDIF}
 procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
-{$ENDIF}
 procedure GoogleAppMeasurementLoader; cdecl; external framework 'GoogleAppMeasurement' dependency 'sqlite3';
 procedure GoogleAppMeasurementIdentitySupportLoader; cdecl; external framework 'GoogleAppMeasurementIdentitySupport';
 procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
 procedure JavaScriptCoreLoader; cdecl; external framework 'JavaScriptCore';
 procedure nanoPBLoader; cdecl; external framework 'nanoPB';
-{$IF Defined(FIREBASE_PRE_V10)}
-procedure PromisesObjCLoader; cdecl; external framework 'PromisesObjC';
-{$ENDIF}
 procedure UserMessagingPlatformLoader; cdecl; external framework 'UserMessagingPlatform';
 
 end.
