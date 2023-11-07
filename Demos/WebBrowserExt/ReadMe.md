@@ -19,7 +19,9 @@ Demonstrates some of the usage of `TWebBrowserExt`, found in the `Features\WebBr
 
 ## Known Issues
 
-There is an outstanding [issue for `TWebBrowser` that affects the Windows platform](https://quality.embarcadero.com/browse/RSP-38165). For TWebBrowserExt to work on Windows, please follow these steps:
+**NOTE: The issue below has been fixed in Delphi 12**
+
+There is an outstanding [issue in Delphi 11.x for `TWebBrowser` that affects the Windows platform](https://quality.embarcadero.com/browse/RSP-38165). For TWebBrowserExt to work on Windows, please follow these steps:
 
 1. Make a copy of `FMX.WebBrowser.Win.pas` from the `fmx` folder in the Delphi source and put it somewhere in the project's search path
 2. Modify the `TWinNativeWebBrowser.QueryInterface` method to look like this:
@@ -37,4 +39,3 @@ There is an outstanding [issue for `TWebBrowser` that affects the Windows platfo
     ```
 
 As per my comment dated 19th April 2023, the other parts of the issue have been fixed.
-
