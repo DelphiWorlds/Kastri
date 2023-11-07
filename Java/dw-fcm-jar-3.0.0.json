@@ -10,6 +10,6 @@
     ".\\FCM\\DWFirebaseMessagingServiceCallback.java"
   ],
   "outputFile":"..\\Lib\\dw-fcm-3.0.0.jar",
-  "sourceVersion":"1.7",
-  "targetVersion":"1.7"
+  "sourceVersion":"1.10",
+  "targetVersion":"1.10"
 }

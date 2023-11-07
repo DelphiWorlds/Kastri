@@ -24,6 +24,6 @@
     ".\\Base\\TimerTask\\DWTimerTaskDelegate.java"
   ],
   "outputFile":"..\\Lib\\dw-kastri-base-3.0.0.jar",
-  "sourceVersion":"1.8",
-  "targetVersion":"1.8"
+  "sourceVersion":"1.10",
+  "targetVersion":"1.10"
 }

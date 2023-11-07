@@ -57,7 +57,7 @@ const
   );
   cKnownVersionNames: array[0..8] of string = (
     'Delphi XE7', 'Delphi XE8', 'Delphi 10 Seattle', 'Delphi 10.1 Berlin', 'Delphi 10.2 Tokyo', 'Delphi 10.3 Rio',
-    'Delphi 10.4 Sydney', 'Delphi 11 Alexandria', 'Delphi 12 XXXXX'
+    'Delphi 10.4 Sydney', 'Delphi 11 Alexandria', 'Delphi 12 Athens'
   );
 
 { TBDSEnvironment }

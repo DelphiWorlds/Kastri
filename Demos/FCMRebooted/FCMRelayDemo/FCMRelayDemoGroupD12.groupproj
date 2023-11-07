@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{A9FBAF1B-E841-4721-9C40-B739152FF460}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="FCMRelayDemo12.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Service\FCMRelayService.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="FCMRelayDemo12">
+        <MSBuild Projects="FCMRelayDemo12.dproj"/>
+    </Target>
+    <Target Name="FCMRelayDemo12:Clean">
+        <MSBuild Projects="FCMRelayDemo12.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FCMRelayDemo12:Make">
+        <MSBuild Projects="FCMRelayDemo12.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FCMRelayService">
+        <MSBuild Projects="Service\FCMRelayService.dproj"/>
+    </Target>
+    <Target Name="FCMRelayService:Clean">
+        <MSBuild Projects="Service\FCMRelayService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FCMRelayService:Make">
+        <MSBuild Projects="Service\FCMRelayService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="FCMRelayDemo12;FCMRelayService"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="FCMRelayDemo12:Clean;FCMRelayService:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="FCMRelayDemo12:Make;FCMRelayService:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -10,7 +10,7 @@ Note that at present, most of the controls will function only on Android and iOS
 
 ## Installation
 
-Simply open the `KastriFMX.dproj` project in the folder under the `Packages` folder that corresponds to the major version number of Delphi that you have (e.g. `Packages\D104` for Delphi 10.4.x) and Compile and Install. The components will appear in the Kastri FMX section on the Component Pallette
+Simply open the `KastriFMX.dproj` project in the folder under the `Packages` folder and Compile and Install. The components will appear in the Kastri FMX section on the Component Pallette
 
 <br>
 
