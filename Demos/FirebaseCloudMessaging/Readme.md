@@ -6,7 +6,7 @@
 
 You can find the newer implementation [here](https://github.com/DelphiWorlds/Playground/tree/main/Demos/FCMRebooted).
 
-_No further changes will be made to this demo_
+_No further changes will be made to this demo, or the code that it uses_
 
 ## IMPORTANT change for iOS users
 

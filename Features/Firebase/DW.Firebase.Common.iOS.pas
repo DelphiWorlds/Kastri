@@ -1,27 +1,27 @@
 unit DW.Firebase.Common.iOS;
 
-interface
+{*******************************************************}
+{                                                       }
+{                      Kastri                           }
+{                                                       }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  which is located in the root folder of this library  }
+{                                                       }
+{*******************************************************}
 
-type
-  TFirebaseCommon = record
-  private
-    class var FInitialized: Boolean;
-  public
-    class procedure Initialize; static;
-  end;
+{$I DW.GlobalDefines.inc}
+
+interface
 
 implementation
 
 uses
+  // DW
   DW.iOSapi.FirebaseCore;
 
-{ TFirebaseCommon }
-
-class procedure TFirebaseCommon.Initialize;
-begin
-  if not FInitialized then
-    TFIRApp.OCClass.configure;
-  FInitialized := True;
-end;
+initialization
+  TFIRApp.OCClass.configure;
 
 end.
