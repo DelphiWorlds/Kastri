@@ -6,7 +6,7 @@ From [Delphi Worlds](http://www.delphiworlds.com)
 
 [![Twitter](https://img.shields.io/badge/-Twitter-1DA1F2?style=plastic&logo=Twitter)](https://twitter.com/DelphiWorlds)  [![Facebook](https://img.shields.io/badge/-Facebook-green?style=plastic&logo=Facebook)](https://www.facebook.com/DelphiWorlds)  [![Instagram](https://img.shields.io/badge/-Instagram-833AB4?style=plastic&logo=Instagram)](https://www.instagram.com/delphiworlds)
 
-Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two point releases of major releases** (e.g. at present that includes Delphi 10.4.2 and Delphi 11) are "officially" supported. 
+Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two point releases of major releases** (e.g. at present that includes Delphi 12 and Delphi 11.3) are "officially" supported. 
 
 Development of Kastri can be helped along with [Github Sponsorship](https://github.com/sponsors/DelphiWorlds), so please consider sponsoring today!
 
@@ -31,11 +31,11 @@ If you're looking to [learn Delphi, please visit this link](https://learndelphi.
 
 [Playground](https://github.com/DelphiWorlds/Playground) is a separate repository that serves as a testing ground for features that may or may not be included in Kastri. Please visit the Playground for features/demos that are on the bleeding edge!
 
-## Delphi 11 changes
+## Delphi 11/12 changes
 
-With the introduction of Delphi 11, there have been some changes related to Android. You may notice new jar files in the `Lib` folder where the name is the same as an existing jar, with a suffix of `2.0.0` (or greater) e.g. `dw-kastri-base-2.0.0.jar`. Jars with a `2.0.0` suffix will work **only with Delphi 11** (and possibly later). If a jar does not have a corresponding jar with a `2.0.0` (or greater) suffix, it should also work with Delphi 11. Please also see the Demos section below.
+With the introduction of Delphi 11 and Delphi 12, there have been some changes related to Android. You may notice new jar files in the `Lib` folder where the name is the same as an existing jar, with a suffix of `2.0.0` or `3.0.0` e.g. `dw-kastri-base-3.0.0.jar`. Jars with a `2.0.0` suffix will work **only with Delphi 11**, and those with a suffix of `3.0.0` will work **only with Delphi 12**. If a jar does not have a corresponding jar with a `2.0.0` or `3.0.0` suffix, it should also work with Delphi 11 or Delphi 12. Please also see the Demos section below.
 
-**Due to the above changes to Delphi 11, the existing demos that were created with Delphi 10.4 or earlier may require the [Android Libraries fix](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AndroidLibraries)** 
+**Due to the above changes to Delphi 11 and Delphi 12, the existing demos that were created with Delphi 10.4 or Delphi 11 when using them with a later version of Delphi may require the [Android Libraries fix](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AndroidLibraries)** 
 
 ## Intro video
 
