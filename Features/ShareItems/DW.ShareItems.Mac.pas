@@ -129,7 +129,6 @@ var
   ColorSpace: CGColorSpaceRef;
   BitmapData: TBitmapData;
   BitmapInfo: CGBitmapInfo;
-  LSize: NSSize;
 begin
   if Bitmap.IsEmpty then
     Result := TNSImage.Create
