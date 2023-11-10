@@ -224,7 +224,7 @@ uses
 {$ENDIF}
 
 {$IF Defined(MSWINDOWS)}
-  // DW.ADB,           <---- JCL/JVCL
+  DW.ADB,
   DW.Connectivity.Win,
   DW.ExternalDevice.Win,
   DW.FileVersionInfo.Win,
@@ -235,7 +235,7 @@ uses
   DW.OSMetadata.Win,
   DW.OSPower.Win,
   DW.OSTimer.Win,
-  // DW.RunProcess.Win,  <---- JCL/JVCL
+  DW.RunProcess.Win,
   DW.Swizzler.Win,
   DW.Vcl.DialogService,
   DW.Vcl.FormStates,
@@ -282,7 +282,7 @@ uses
   DW.Permissions.Helpers,
   DW.PushUDP,
   DW.REST.Json.Helpers,
-  // DW.RunProcess,  // JCL/JVCL
+  DW.RunProcess,
   DW.Sensors,
   DW.Services,
   DW.ShareItems,
