@@ -33,6 +33,9 @@ type
     { JRecognitionListener }
     procedure onBeginningOfSpeech; cdecl;
     procedure onBufferReceived(buffer: TJavaArray<Byte>); cdecl;
+    {$IF CompilerVersion > 35}
+    procedure onEndOfSegmentedSession; cdecl;
+    {$ENDIF}
     procedure onEndOfSpeech; cdecl;
     procedure onError(error: Integer); cdecl;
     procedure onEvent(eventType: Integer; params: JBundle); cdecl;
@@ -40,6 +43,9 @@ type
     procedure onReadyForSpeech(params: JBundle); cdecl;
     procedure onResults(results: JBundle); cdecl;
     procedure onRmsChanged(rmsdB: Single); cdecl;
+    {$IF CompilerVersion > 35}
+    procedure onSegmentResults(segmentResults: JBundle); cdecl;
+    {$ENDIF}
   public
     constructor Create(const APlatformSpeech: TPlatformSpeechRecognition);
   end;
@@ -58,6 +64,7 @@ type
     procedure BeginningOfSpeech;
     procedure BufferReceived(buffer: TJavaArray<Byte>);
     procedure EndOfSpeech;
+    procedure EndOfSegmentedSession;
     procedure Error(error: Integer);
     procedure Event(eventType: Integer; params: JBundle);
     function IsRecording: Boolean; override;
@@ -66,6 +73,7 @@ type
     procedure RequestPermission; override;
     procedure Results(results: JBundle);
     procedure RmsChanged(rmsdB: Single);
+    procedure SegmentResults(segmentResults: JBundle);
     procedure StartRecording; override;
     procedure StopRecording; override;
   public
@@ -103,6 +111,11 @@ begin
   FPlatformSpeech.BufferReceived(buffer);
 end;
 
+procedure TSpeechRecognitionListener.onEndOfSegmentedSession;
+begin
+  FPlatformSpeech.EndOfSegmentedSession;
+end;
+
 procedure TSpeechRecognitionListener.onEndOfSpeech;
 begin
   FPlatformSpeech.EndOfSpeech;
@@ -138,6 +151,11 @@ begin
   FPlatformSpeech.RmsChanged(rmsDB);
 end;
 
+procedure TSpeechRecognitionListener.onSegmentResults(segmentResults: JBundle);
+begin
+  FPlatformSpeech.SegmentResults(segmentResults);
+end;
+
 { TPlatformSpeechRecognition }
 
 constructor TPlatformSpeechRecognition.Create(const ASpeech: TSpeechRecognition);
@@ -168,8 +186,10 @@ begin
         end;
         TPermissionStatus.Denied:
           DoAuthorizationStatus(TAuthorizationStatus.Denied);
+        {$IF CompilerVersion < 36}
         TPermissionStatus.PermanentlyDenied:
           DoAuthorizationStatus(TAuthorizationStatus.Restricted);
+        {$ENDIF}
       end;
       FIsRecordingPending := False;
     end
@@ -195,6 +215,11 @@ begin
     LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_LANGUAGE, StringToJString(Speech.Language));
   LIntent.putExtra(TJRecognizerIntent.JavaClass.EXTRA_PROMPT, StringToJString(Speech.Prompt));
   FSpeechRecognizer.startListening(LIntent);
+end;
+
+procedure TPlatformSpeechRecognition.SegmentResults(segmentResults: JBundle);
+begin
+  // Yet to be implemented
 end;
 
 procedure TPlatformSpeechRecognition.StartRecording;
@@ -223,6 +248,11 @@ end;
 procedure TPlatformSpeechRecognition.BufferReceived(buffer: TJavaArray<Byte>);
 begin
   // Partial results?
+end;
+
+procedure TPlatformSpeechRecognition.EndOfSegmentedSession;
+begin
+  // Yet to be implemented
 end;
 
 procedure TPlatformSpeechRecognition.EndOfSpeech;
