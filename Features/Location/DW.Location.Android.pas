@@ -32,6 +32,9 @@ type
     FLocation: TLocation;
   public
     constructor Create(const ALocation: TLocation);
+    {$IF CompilerVersion > 35}
+    procedure onFlushComplete(requestCode: Integer); cdecl;
+    {$ENDIF}
     procedure onLocationChanged(location: JLocation); overload; cdecl;
     procedure onLocationChanged(locations: JList); overload; cdecl;
     procedure onProviderDisabled(provider: JString); cdecl;
@@ -113,6 +116,11 @@ end;
 procedure TLocationListener.onLocationChanged(location: JLocation);
 begin
   FLocation.LocationChange(location, TLocationSource.Listeners);
+end;
+
+procedure TLocationListener.onFlushComplete(requestCode: Integer);
+begin
+  //
 end;
 
 procedure TLocationListener.onLocationChanged(locations: JList);
