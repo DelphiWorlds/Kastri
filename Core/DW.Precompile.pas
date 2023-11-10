@@ -111,7 +111,7 @@ uses
 {$ENDIF}
 
 {$IF Defined(MACOS)}
-  DW.Connectivity.Mac,
+  // DW.Connectivity.Mac,                 // <---- Requires SystemConfiguration framework to be added to the SDK
   DW.Graphics.Helpers.Mac,
   DW.IOUtils.Helpers.Mac,
   DW.OSLog.Mac,
@@ -126,26 +126,26 @@ uses
 {$IF Defined(OSX)}
   DW.Macapi.AppKit,
   DW.Macapi.AVFoundation,
-  DW.Macapi.AVKit,
+  // DW.Macapi.AVKit,                     // <---- Requires AVKit framework to be added to the SDK
   DW.Macapi.Foundation,
   DW.Macapi.FSEvents,
   DW.Macapi.IOKit,
   DW.Macapi.Simd,
-  DW.Macapi.SystemConfiguration,
+  // DW.Macapi.SystemConfiguration,       // <---- Requires SystemConfiguration framework to be added to the SDK
   DW.OSPower.Mac,
   // DW.RunProcess.Mac,
   DW.StatusBarMenu.Mac,
 {$ENDIF}
 
 {$IF Defined(IOS)}
-  DW.AuthenticationServices.iOS,
+  // DW.AuthenticationServices.iOS,       // <---- Requires AuthenticationServices framework to be added to the SDK
   // DW.BarcodeReader,
   // DW.BarcodeReader.iOS,
   DW.Biometric.iOS,
-  DW.Camera,
-  DW.CameraPreview,
-  DW.Camera.iOS,
-  DW.CameraPreview.iOS,
+  // DW.Camera,
+  // DW.CameraPreview,
+  // DW.Camera.iOS,                       // <---- Requires Vision framework to be added to the SDK
+  // DW.CameraPreview.iOS,                // <---- Requires Vision framework to be added to the SDK
   DW.Connectivity.iOS,
   DW.EXIF,
   DW.EXIF.iOS,
@@ -153,16 +153,16 @@ uses
   // DW.Firebase.Messaging.iOS,
   // DW.GoogleSignIn,
   // DW.GoogleSignIn.iOS,
-  DW.iOSapi.AppTrackingTransparency,
-  DW.iOSapi.ARKit,
-  DW.iOSapi.AuthenticationServices,
+  // DW.iOSapi.AppTrackingTransparency,   // <---- Requires AppTrackingTransparency framework to be added to the SDK
+  // DW.iOSapi.ARKit,                     // <---- Requires ARKit framework to be added to the SDK
+  // DW.iOSapi.AuthenticationServices,    // <---- Requires AuthenticationServices framework to be added to the SDK
   DW.iOSapi.AVFoundation,
-  DW.iOSapi.CallKit,
-  DW.iOSapi.CarPlay,
+  // DW.iOSapi.CallKit,                   // <---- Requires CallKit framework to be added to the SDK
+  // DW.iOSapi.CarPlay,                   // <---- Requires CarPlay framework to be added to the SDK
   DW.iOSapi.Contacts,
   DW.iOSapi.CoreImage,
   DW.iOSapi.CoreML,
-  DW.iOSapi.CoreNFC,
+  // DW.iOSapi.CoreNFC,                   // <---- Requires CoreNFC framework to be added to the SDK
   DW.iOSapi.CoreVideo,
   DW.iOSapi.DeviceCheck,
   DW.iOSapi.EventKit,
@@ -186,23 +186,23 @@ uses
   // DW.iOSapi.MLKitBarcodeScanning,
   // DW.iOSapi.MLKitCommon,
   // DW.iOSapi.MLKitVision,
-  DW.iOSapi.Network,
-  DW.iOSapi.NetworkExtension,
+  // DW.iOSapi.Network,                  // <---- Requires Network framework to be added to the SDK
+  // DW.iOSapi.NetworkExtension,         // <---- Requires Network framework to be added to the SDK
   DW.iOSapi.PassKit,
   DW.iOSapi.PDFKit,
   DW.iOSapi.Photos,
   DW.iOSapi.PhotosUI,
   DW.iOSapi.PushKit,
   DW.iOSapi.QuickLook,
-  DW.iOSapi.SceneKit,
+  // DW.iOSapi.SceneKit,                  // <---- Requires SceneKit framework to be added to the SDK
   DW.iOSapi.Speech,
-  DW.iOSapi.SpriteKit,
-  DW.iOSapi.SpriteKitExtra,
+  // DW.iOSapi.SpriteKit,                 // <---- Requires SpriteKit framework to be added to the SDK
+  // DW.iOSapi.SpriteKitExtra,            // <---- Requires SpriteKit framework to be added to the SDK
   DW.iOSapi.SystemConfiguration,
   DW.iOSapi.UIKit,
   DW.iOSapi.UserNotifications,
-  DW.iOSapi.Vision,
-  DW.iOSapi.VisionKit,
+  // DW.iOSapi.Vision,                    // <---- Requires Vision framework to be added to the SDK
+  // DW.iOSapi.VisionKit,                 // <---- Requires VisionKit framework to be added to the SDK
   DW.Location.iOS,
   DW.MuteCheck,
   DW.MuteCheck.iOS,
@@ -246,12 +246,13 @@ uses
 {$ENDIF}
 
   // Platform agnostic
-  DW.AppleIDButton,
   DW.AuthenticationServices.Types,
   DW.Base64.Helpers,
   DW.Biometric,
   DW.Classes.Helpers,
+  {$IF not Defined(OSX)}
   DW.Connectivity,
+  {$ENDIF}
   DW.Consts.Android, // Special case
   DW.Consts,
   DW.Controls.Helpers,
@@ -259,7 +260,9 @@ uses
   DW.DialogService,
   DW.ElasticLayout,
   DW.FileWriter,
-  // DW.Firebase.Messaging, // iOS needs Firebase
+  {$IF not Defined(IOS)}
+  DW.Firebase.Messaging,
+  {$ENDIF}
   DW.Geodetic,
   DW.Geofence,
   DW.Graphics.Helpers,
@@ -272,8 +275,10 @@ uses
   DW.NativeImage,
   DW.NativeShape,
   DW.NativeSlider,
+  {$IF not Defined(IOS)}
   DW.NFC,
-  // DW.Notifications, // iOS needs Firebase
+  DW.Notifications,
+  {$ENDIF}
   DW.OSDevice,
   DW.OSLog,
   DW.OSMetadata,
