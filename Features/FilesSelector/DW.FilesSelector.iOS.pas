@@ -58,7 +58,7 @@ type
     FSelectedCount: Integer;
     FSelector: TPlatformFilesSelector;
     procedure DestroyController;
-    function GetImageRotation(const AImage: UIImage): Single;
+    // function GetImageRotation(const AImage: UIImage): Single;
   public
     { UIImagePickerControllerDelegate }
     procedure imagePickerController(picker: UIImagePickerController; didFinishPickingMediaWithInfo: NSDictionary); overload; cdecl;
@@ -270,6 +270,7 @@ begin
   FController := nil;
 end;
 
+{
 function TUIImagePickerControllerDelegate.GetImageRotation(const AImage: UIImage): Single;
 begin
   case AImage.imageOrientation of
@@ -289,6 +290,7 @@ begin
     Result := 0;
   end;
 end;
+}
 
 procedure TUIImagePickerControllerDelegate.imagePickerController(picker: UIImagePickerController; didFinishPickingMediaWithInfo: NSDictionary);
 var
