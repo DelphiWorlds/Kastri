@@ -168,7 +168,7 @@ var
 begin
   LTimer := GetTimer(ATimer.TimerID);
   LTimer.RemoveTimer;
-  LTimer.DisposeOf;
+  LTimer.Free;
 end;
 
 class function TCustomPlatformOSTimer.GetTimer(const ATimerID: Cardinal): TCustomPlatformOSTimer;

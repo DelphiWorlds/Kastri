@@ -481,7 +481,6 @@ class function TAndroidHelperEx.HasClass(const ATypeInfo: PTypeInfo; const ALibr
 var
   LContext: TRttiContext;
   LType: TRttiType;
-  LAttribute: JavaSignatureAttribute;
   LClassName: string;
 begin
   Result := False;
