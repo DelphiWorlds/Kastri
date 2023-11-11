@@ -57,9 +57,15 @@ type
     FIsRecording: Boolean;
     FIsRecordingPending: Boolean;
     FListener: JRecognitionListener;
+    FResultsText: string;
     FSpeechRecognizer: JSpeechRecognizer;
+    FText: string;
+    function CanRestart: Boolean;
+    function IsTextTerminated: Boolean;
+    procedure DoRestartRecording;
     procedure DoStartRecording;
     procedure RequestAuthorization;
+    function TerminateText: Boolean;
   protected
     procedure BeginningOfSpeech;
     procedure BufferReceived(buffer: TJavaArray<Byte>);
@@ -91,7 +97,7 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes,
   // DW
-  DW.Consts.Android, DW.Types, DW.Permissions.Helpers;
+  DW.OSLog, DW.Consts.Android, DW.Types, DW.Permissions.Helpers;
 
 { TSpeechRecognitionListener }
 
@@ -202,6 +208,14 @@ begin
   RequestAuthorization;
 end;
 
+procedure TPlatformSpeechRecognition.DoRestartRecording;
+begin
+  if TerminateText then
+    DoRecognition(FText, False);
+  // TOSLog.d('> Restarting with FText: %s', [FText]);
+  DoStartRecording;
+end;
+
 procedure TPlatformSpeechRecognition.DoStartRecording;
 var
   LIntent: JIntent;
@@ -224,6 +238,7 @@ end;
 
 procedure TPlatformSpeechRecognition.StartRecording;
 begin
+  FText := '';
   if not Speech.IsAuthorized then
   begin
     FIsRecordingPending := True;
@@ -257,13 +272,18 @@ end;
 
 procedure TPlatformSpeechRecognition.EndOfSpeech;
 begin
-  FIsRecording := False;
-  DoRecordingStatusChanged;
+  if Speech.StopInterval > 0 then
+  begin
+    FIsRecording := False;
+    DoRecordingStatusChanged;
+  end;
 end;
 
 procedure TPlatformSpeechRecognition.Error(error: Integer);
 begin
-  //
+  TOSLog.d('TPlatformSpeechRecognition.Error: %d', [error]);
+  if (error = TJSpeechRecognizer.JavaClass.ERROR_NO_MATCH) and CanRestart then
+    DoRestartRecording;
 end;
 
 procedure TPlatformSpeechRecognition.Event(eventType: Integer; params: JBundle);
@@ -288,9 +308,18 @@ begin
     LArrayList := results.getStringArrayList(TJSpeechRecognizer.JavaClass.RESULTS_RECOGNITION);
     for I := 0 to LArrayList.size - 1 do
       LResult := TJString.Wrap(TAndroidHelper.JObjectToID(LArrayList.get(I)));
-    FIsRecording := False;
-    DoRecordingStatusChanged;
+    if Speech.StopInterval > 0 then
+    begin
+      FIsRecording := False;
+      DoRecordingStatusChanged;
+    end;
     DoRecognition(JStringToString(LResult), True);
+  end
+  else if CanRestart then
+  begin
+    // https://github.com/DelphiWorlds/Kastri/issues/189
+    FText := FText + FResultsText;
+    DoStartRecording;
   end
   else
     Stopped;
@@ -311,15 +340,40 @@ begin
   Result := TJSpeechRecognizer.JavaClass.isRecognitionAvailable(TAndroidHelper.Context);
 end;
 
+function TPlatformSpeechRecognition.IsTextTerminated: Boolean;
+begin
+  Result := not FText.IsEmpty and (FText.LastIndexOf('.') = Length(FText) - 1);
+end;
+
+function TPlatformSpeechRecognition.CanRestart: Boolean;
+begin
+  Result := FIsRecording and (Speech.StopInterval = 0);
+end;
+
+function TPlatformSpeechRecognition.TerminateText: Boolean;
+begin
+  Result := False;
+  if not FText.IsEmpty and not IsTextTerminated then
+  begin
+    FText := FText + '.';
+    Result := True;
+  end;
+end;
+
 procedure TPlatformSpeechRecognition.PartialResults(partialResults: JBundle);
 var
   LList: JArrayList;
-  LText: string;
 begin
+  if FResultsText.IsEmpty then
+    TerminateText;
   LList := partialResults.getStringArrayList(TJSpeechRecognizer.JavaClass.RESULTS_RECOGNITION);
-  LText := JStringToString(TJString.Wrap(LList.get(0)));
-  if not LText.IsEmpty then
-    DoRecognition(LText, False);
+  FResultsText := JStringToString(TJString.Wrap(LList.get(0)));
+  if not FResultsText.IsEmpty then
+  begin
+    if FText.EndsWith('.') then
+      FText := FText + ' ';
+    DoRecognition(FText + FResultsText, False);
+  end;
 end;
 
 end.

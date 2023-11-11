@@ -207,9 +207,12 @@ end;
 
 procedure TSpeechRecognition.DoRecognition(const AText: string; const AStop: Boolean);
 begin
-  FText := AText;
-  if Assigned(FOnText) then
-    FOnText(Self, AText);
+  if not AText.IsEmpty then
+  begin
+    FText := AText;
+    if Assigned(FOnText) then
+      FOnText(Self, AText);
+  end;
   if AStop then
     Stopped;
 end;
