@@ -14,6 +14,8 @@ type
     Memo: TMemo;
     MessageLabel: TLabel;
     BottomLayout: TLayout;
+    BottomContentsLayout: TLayout;
+    ContinuousCheckBox: TCheckBox;
     procedure RecordButtonClick(Sender: TObject);
   private
     FSpeech: TSpeechRecognition;
@@ -41,7 +43,6 @@ constructor TfrmMain.Create(AOwner: TComponent);
 begin
   inherited;
   FSpeech := TSpeechRecognition.Create;
-  FSpeech.StopInterval := 1500;
   FSpeech.WantPartialResults := True;
   FSpeech.OnAuthorizationStatus := SpeechAuthorizationHandler;
   FSpeech.OnRecording := SpeechRecordingHandler;
@@ -84,6 +85,7 @@ const
   cRecordCaptions: array[Boolean] of string = ('Record', 'Stop');
 begin
   RecordButton.Text := cRecordCaptions[IsRecording];
+  ContinuousCheckBox.Enabled := not IsRecording;
   if IsRecording then
     MessageLabel.Text := 'Now say something!'
   else
@@ -113,6 +115,10 @@ begin
   else
   begin
     FText := '';
+    if ContinuousCheckBox.IsChecked then
+      FSpeech.StopInterval := 0
+    else
+      FSpeech.StopInterval := 1500;
     FSpeech.StartRecording;
   end;
 end;
