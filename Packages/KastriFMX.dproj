@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{B1ECF0B2-6A30-4B73-8011-A18C47864D22}</ProjectGuid>
         <MainSource>KastriFMX.dpk</MainSource>
-        <ProjectVersion>20.0</ProjectVersion>
+        <ProjectVersion>20.1</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
@@ -88,7 +88,7 @@
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <SanitizedProjectName>KastriFMX</SanitizedProjectName>
-        <DCC_UnitSearchPath>..\..\API;..\..\Controls;..\..\Core;..\..\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\API;..\Controls;..\Core;..\Include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>3081</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
@@ -186,50 +186,50 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="fmx.dcp"/>
-        <DCCReference Include="..\..\Controls\DW.NativeImage.pas"/>
-        <DCCReference Include="..\..\Controls\DW.NativeButton.pas"/>
-        <DCCReference Include="..\..\Controls\DW.NativeSlider.pas"/>
-        <DCCReference Include="..\..\Controls\DW.NativeShape.pas"/>
-        <DCCReference Include="..\..\Controls\DW.NativeControlModel.pas"/>
-        <RcItem Include="..\Resources\TNativeButton.bmp">
+        <DCCReference Include="Z:\Controls\DW.NativeImage.pas"/>
+        <DCCReference Include="Z:\Controls\DW.NativeButton.pas"/>
+        <DCCReference Include="Z:\Controls\DW.NativeSlider.pas"/>
+        <DCCReference Include="Z:\Controls\DW.NativeShape.pas"/>
+        <DCCReference Include="Z:\Controls\DW.NativeControlModel.pas"/>
+        <RcItem Include="Resources\TNativeButton.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeButton</ResourceId>
+            <ResourceId>Bitmap_1</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeButton32.bmp">
+        <RcItem Include="Resources\TNativeButton32.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeButton32</ResourceId>
+            <ResourceId>Bitmap_2</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeImage.bmp">
+        <RcItem Include="Resources\TNativeEllipse.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeImage</ResourceId>
+            <ResourceId>Bitmap_3</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeImage32.bmp">
+        <RcItem Include="Resources\TNativeEllipse32.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeImage32</ResourceId>
+            <ResourceId>Bitmap_4</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeSlider.bmp">
+        <RcItem Include="Resources\TNativeImage.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeSlider</ResourceId>
+            <ResourceId>Bitmap_5</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeSlider32.bmp">
+        <RcItem Include="Resources\TNativeImage32.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeSlider32</ResourceId>
+            <ResourceId>Bitmap_6</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeEllipse.bmp">
+        <RcItem Include="Resources\TNativeRectangle.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeEllipse</ResourceId>
+            <ResourceId>Bitmap_7</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeEllipse32.bmp">
+        <RcItem Include="Resources\TNativeRectangle32.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeEllipse32</ResourceId>
+            <ResourceId>Bitmap_8</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeRectangle.bmp">
+        <RcItem Include="Resources\TNativeSlider.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeRectangle</ResourceId>
+            <ResourceId>Bitmap_9</ResourceId>
         </RcItem>
-        <RcItem Include="..\Resources\TNativeRectangle32.bmp">
+        <RcItem Include="Resources\TNativeSlider32.bmp">
             <ResourceType>BITMAP</ResourceType>
-            <ResourceId>TNativeRectangle32</ResourceId>
+            <ResourceId>Bitmap_10</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -252,8 +252,6 @@
                     <Source Name="MainSource">KastriFMX.dpk</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclRESTBackendComponents290.bpl">Embarcadero REST-Backend Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclRESTComponents290.bpl">Embarcadero REST-Library Components (Designtime)</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclemsclient290.bpl">Embarcadero RAD Server Client Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclemsclientfiredac290.bpl">Embarcadero RAD Server Client FireDAC Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclemsedge290.bpl">Embarcadero RAD Server Edge Components</Excluded_Packages>
@@ -278,6 +276,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\KastriFMX270.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl\KastriFMX290.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>KastriFMX.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>
