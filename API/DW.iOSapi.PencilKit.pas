@@ -251,8 +251,9 @@ type
     function interpolatedLocationAt(parametricValue: CGFloat): CGPoint; cdecl;
     function interpolatedPointAt(parametricValue: CGFloat): PKStrokePoint; cdecl;
     function objectAtIndexedSubscript(i: NSUInteger): PKStrokePoint; cdecl;
-    function parametricValue(parametricValue: CGFloat; offsetByTime: NSTimeInterval): CGFloat; overload; cdecl;
-    function parametricValue(parametricValue: CGFloat; offsetByDistance: CGFloat): CGFloat; overload; cdecl;
+    function parametricValue(parametricValue: CGFloat; offsetByTime: NSTimeInterval): CGFloat; cdecl;
+    [MethodName('parametricValue:offsetByDistance:')]
+    function parametricValueOffsetByDistance(parametricValue: CGFloat; offsetByDistance: CGFloat): CGFloat; cdecl;
     function pointAtIndex(i: NSUInteger): PKStrokePoint; cdecl;
   end;
   TPKStrokePath = class(TOCGenericImport<PKStrokePathClass, PKStrokePath>) end;
