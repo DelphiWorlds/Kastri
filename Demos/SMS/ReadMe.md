@@ -6,7 +6,7 @@ Demonstrates the use of the SMS feature in Kastri
 
 ## Supported Delphi versions
 
-The demos should compile and work for at least versions 10.4.x and 11 - please note that you need to use SMSDemoD11 for Delphi 11 and above
+The demos should compile and work for at least versions 10.4.x, 11 and 12 - please note that you need to use SMSDemoD12 for Delphi 12, and SMSDemoD11 for Delphi 11.
 
 ## Supported platforms
 
