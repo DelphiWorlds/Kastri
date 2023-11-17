@@ -6,7 +6,7 @@ Demonstrates implementation of starting an app at boot time on Android.
 
 ## Supported Delphi versions
 
-Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
+Delphi 12, Delphi 11.x, Delphi 12. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
 
 ## Project Configuration
 
