@@ -33,6 +33,6 @@ requires
   fmx;
 
 contains
-  DW.AdMobBannerAd in 'Z:\Controls\DW.AdMobBannerAd.pas';
+  DW.AdMobBannerAd in '..\Controls\DW.AdMobBannerAd.pas';
 
 end.

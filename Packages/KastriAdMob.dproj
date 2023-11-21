@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{BB856DF5-862C-479E-9B83-4CE4843B2CA9}</ProjectGuid>
         <MainSource>KastriAdMob.dpk</MainSource>
-        <ProjectVersion>20.0</ProjectVersion>
+        <ProjectVersion>20.1</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
@@ -181,7 +181,7 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="fmx.dcp"/>
-        <DCCReference Include="Z:\Controls\DW.AdMobBannerAd.pas"/>
+        <DCCReference Include="..\Controls\DW.AdMobBannerAd.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -229,6 +229,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\KastriAdMob.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl\KastriAdMob290.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>KastriAdMob.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>
