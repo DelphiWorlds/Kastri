@@ -211,9 +211,6 @@ type
     function addCustomTargeting(key: JString; value: JString): JAdManagerAdRequest_Builder; cdecl; overload;
     function addCustomTargeting(key: JString; values: JList): JAdManagerAdRequest_Builder; cdecl; overload;
     function build: JAdManagerAdRequest; cdecl;
-    {$IF CompilerVersion >= 35}
-    function setAdInfo(adInfo: JAdInfo): JAdManagerAdRequest_Builder; cdecl; // Not documented at https://developers.google.com/android/reference/com/google/android/gms/ads/admanager/AdManagerAdRequest.Builder
-    {$ENDIF}
     function setPublisherProvidedId(publisherProvidedId: JString): JAdManagerAdRequest_Builder; cdecl;
   end;
   TJAdManagerAdRequest_Builder = class(TJavaGenericImport<JAdManagerAdRequest_BuilderClass, JAdManagerAdRequest_Builder>) end;
