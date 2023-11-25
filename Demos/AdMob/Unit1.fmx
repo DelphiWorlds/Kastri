@@ -44,6 +44,7 @@ object Form1: TForm1
       Size.PlatformDefault = False
       TabOrder = 2
       Text = 'Banner'
+      TextSettings.Trimming = None
       OnClick = ShowBannerClick
     end
     object ShowInterstitial: TButton
@@ -56,6 +57,7 @@ object Form1: TForm1
       Size.PlatformDefault = False
       TabOrder = 1
       Text = 'Interstitial'
+      TextSettings.Trimming = None
       OnClick = ShowInterstitialClick
     end
     object ShowReward: TButton
@@ -68,6 +70,7 @@ object Form1: TForm1
       Size.PlatformDefault = False
       TabOrder = 0
       Text = 'Reward'
+      TextSettings.Trimming = None
       OnClick = ShowRewardClick
     end
   end

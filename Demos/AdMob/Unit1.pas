@@ -33,6 +33,7 @@ type
     procedure AdFailedToLoadHandler(Sender: TObject; const AError: TAdError);
     procedure AdFailedToShowFullScreenContentHandler(Sender: TObject; const AError: TAdError);
     procedure AdLoadedHander(Sender: TObject);
+    procedure AdMobConsentErrorHandler(Sender: TObject; const AError: TConsentError);
     procedure AdWillPresentFullScreenContentHandler(Sender: TObject);
     function GetErrorMessage(const AEvent: string; const ASender: TObject; const AError: TAdError): string;
     procedure UserEarnedRewardHandler(Sender: TObject; const AReward: TAdReward);
@@ -52,6 +53,17 @@ implementation
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
+  // AdMob calls must be performed before the application becomes active
+  AdMob.OnConsentError := AdMobConsentErrorHandler;
+  // AdMob.SetIsUMPEnabled(False); // <---- Call this if you need to opt out of UMP
+  // AdMob.ResetConsent; // <---- Simulates users first install experience
+  AdMob.SetDebugGeography(TDebugGeography.EEA); // <---- Simulates geographical area
+  {$IF Defined(ANDROID)}
+  AdMob.SetTestDeviceHashedId('5E236AB5D9ACD3626D268508544B8259'); // <---- This value is shown in logcat messages on first run
+  {$ELSEIF Defined(IOS)}
+  AdMob.SetTestDeviceHashedId('2FC249F1-70AE-4E9A-896B-0754F17D31C3'); // <---- This value is shown in Console messages on first run
+  {$ENDIF}
+
   FIntAd := TInterstitialAd.Create;
   FIntAd.TestMode := True;
   FIntAd.OnAdDismissedFullScreenContent := AdDismissedFullScreenContentHandler;
@@ -155,6 +167,11 @@ end;
 procedure TForm1.AdMobBannerAd1AdOpened(Sender: TObject);
 begin
   Memo.Lines.Add('Ad Opened ' + Sender.ClassName);
+end;
+
+procedure TForm1.AdMobConsentErrorHandler(Sender: TObject; const AError: TConsentError);
+begin
+  Memo.Lines.Add(Format('Consent error from: %s - %d: %s', [AError.Origin, AError.ErrorCode, AError.Message]));
 end;
 
 end.

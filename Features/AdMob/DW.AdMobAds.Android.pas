@@ -168,7 +168,7 @@ type
     procedure DoAdDismissedFullScreenContent; override;
     procedure DoAdFailedToShowFullScreenContent(const AError: TAdError); override;
     procedure DoAdWillPresentFullScreenContent; override;
-    procedure Load; override;
+    procedure DoLoad; override;
   public
     constructor Create(const AInterstitialAd: TInterstitialAd); override;
     destructor Destroy; override;
@@ -216,7 +216,7 @@ type
     procedure DoAdFailedToShowFullScreenContent(const AError: TAdError); override;
     procedure DoAdWillPresentFullScreenContent; override;
     procedure DoUserEarnedReward(const AReward: TAdReward); override;
-    procedure Load; override;
+    procedure DoLoad; override;
   public
     constructor Create(const ARewardedAd: TRewardedAd); override;
     destructor Destroy; override;
@@ -253,7 +253,7 @@ type
     procedure DoAdFailedToShowFullScreenContent(const AError: TAdError); override;
     procedure DoAdWillPresentFullScreenContent; override;
     procedure DoUserEarnedReward(const AReward: TAdReward); override;
-    procedure Load; override;
+    procedure DoLoad; override;
   public
     constructor Create(const ARewardedInterstitialAd: TRewardedInterstitialAd); override;
     destructor Destroy; override;
@@ -382,7 +382,7 @@ begin
   inherited;
 end;
 
-procedure TPlatformInterstitialAd.Load;
+procedure TPlatformInterstitialAd.DoLoad;
 var
   LRequest: JAdRequest;
   LAdUnitId: JString;
@@ -489,7 +489,7 @@ begin
   inherited;
 end;
 
-procedure TPlatformRewardedAd.Load;
+procedure TPlatformRewardedAd.DoLoad;
 var
   LRequest: JAdRequest;
   LAdUnitId: JString;
@@ -583,9 +583,8 @@ begin
   inherited;
 end;
 
-procedure TPlatformRewardedInterstitialAd.Load;
+procedure TPlatformRewardedInterstitialAd.DoLoad;
 begin
-  // TPlatformMobileAds.Start(LoadAd);
   LoadAd;
 end;
 

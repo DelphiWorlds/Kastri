@@ -29,8 +29,10 @@ type
     class var FIsWarmStart: Boolean;
   private
     FBaseAd: TBaseAd;
+    FNeedsLoad: Boolean;
     FTestMode: Boolean;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
+    procedure AdsStartedMessageHandler(const Sender: TObject; const M: TMessage);
   protected
     FAdUnitId: string;
     procedure ApplicationBecameActive; virtual;
@@ -38,7 +40,8 @@ type
     procedure DoAdFailedToLoad(const AError: TAdError); virtual;
     procedure DoAdLoaded; virtual;
     function GetAdUnitId: string; virtual;
-    procedure Load; virtual;
+    procedure Load;
+    procedure DoLoad; virtual;
     function IsWarmStart: Boolean;
     property AdUnitId: string read GetAdUnitId write FAdUnitId;
     property TestMode: Boolean read FTestMode write FTestMode;
@@ -245,11 +248,13 @@ begin
   inherited Create;
   FBaseAd := ABaseAd;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAdsStartedMessage, AdsStartedMessageHandler);
 end;
 
 destructor TCustomPlatformBaseAd.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TAdsStartedMessage, AdsStartedMessageHandler);
   inherited;
 end;
 
@@ -273,6 +278,14 @@ begin
   Result := FIsWarmStart;
 end;
 
+procedure TCustomPlatformBaseAd.Load;
+begin
+  if AdMob.IsStarted then
+    DoLoad
+  else
+    FNeedsLoad := True;
+end;
+
 procedure TCustomPlatformBaseAd.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
 begin
   case TApplicationEventMessage(M).Value.Event of
@@ -286,6 +299,12 @@ begin
   end;
 end;
 
+procedure TCustomPlatformBaseAd.AdsStartedMessageHandler(const Sender: TObject; const M: TMessage);
+begin
+  if FNeedsLoad then
+    DoLoad;
+end;
+
 procedure TCustomPlatformBaseAd.ApplicationBecameActive;
 begin
   //
@@ -296,7 +315,7 @@ begin
   //
 end;
 
-procedure TCustomPlatformBaseAd.Load;
+procedure TCustomPlatformBaseAd.DoLoad;
 begin
   //
 end;
