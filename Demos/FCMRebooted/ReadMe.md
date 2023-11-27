@@ -14,8 +14,8 @@ The unit `DW.FCMManager` handles management of FCM, which is exposed as a refere
 
 There are 2 demos: 
 
-* A regular FCM demo, and
-* A demo of using a service to handle the message regardless of whether or not the app is running
+* A regular FCM demo (FCMBaseDemo), and
+* A demo of using a service to handle the message regardless of whether or not the app is running (FCMRelayDemo)
 
 **In order for messages to be received properly on Android, FCM message payloads will need to omit `notification` elements, and include `title`, `body` and `imageUrl` (if needed) properties in the `data` element.** Please refer to the [Sending test messages](#sending-test-messages) section.
 
@@ -105,6 +105,48 @@ For your own project, **or** the demo:
 
 In the `Services` section of the Project Options, import the google-services.json file that you download from your project configured in [Firebase Console](https://console.firebase.google.com/).
 
+The FCMRelayDemo was updated on Nov 28th, 2023 to illustrate how it could be used. In this case, if a push notification is sent to the device in a certain format, it will send an SMS to the specified destinations. This is an example message payload that could be sent in a push:
+
+```json
+{
+  "message":{
+    "topic":"FCMRebooted",
+    "data":{
+      "SMSText":"Test Message",
+      "SMSDest":"+610499999999",
+      "title":"Test SMS",
+      "body":"This is a test"
+    }
+  }
+}
+```
+
+Note that this is a **data-only** message (i.e. no `notification` member). See the [section below](#sending-test-messages) regarding sending push messages. The message arrives at the FCMRelayDemo app like this:
+
+```json
+{
+   "google.delivered_priority":"normal",
+   "google.sent_time":"1701112119113",
+   "google.ttl":"2419200",
+   "google.original_priority":"normal",
+   "SMSDest":"+610499999999",
+   "SMSText":"Test Message",
+   "body":"Test SMS",
+   "from":"\/topics\/FCMRebooted",
+   "title":"This is a test",
+   "google.message_id":"0:1701112119712079%e6375accf9fd7ecd",
+   "google.c.sender.id":"952580923416"
+}
+```
+
+The service checks if the `SMSText` and `SMSDest` members are present, and if so, uses the [SMS feature](https://github.com/DelphiWorlds/Kastri/tree/master/Demos/SMS) in Kastri to send an SMS. 
+
+**NOTE: Using the SMS API (as opposed to via intents) requires special permission from Google if you plan to deploy such an app to the Play Store.** Unfortunately, sending an SMS via intents requires user interaction, so doing so via a service is not feasible.
+
+The FCMRelayDemo app needs to be run **at least once**, so that the user can respond to the SMS permission request. After this, the app does not need to be running in order for the service to respond to the push notification and send the SMS.
+
+As stated above, sending an SMS is _just one example_ of how a "relay" service might be used.
+
 ## Sending test messages
 
 Test messages can be sent using the [PushIt](https://github.com/DelphiWorlds/PushIt) tool. Please take note of the section on how to obtain the service account file from the [Cloud Console](https://console.cloud.google.com/iam-admin/serviceaccounts).
@@ -113,7 +155,7 @@ Test messages can be sent using the [PushIt](https://github.com/DelphiWorlds/Pus
 
 This is due to a limitation in FCM where messages that contain a "notification" property (regardless of whether it contains a "data" property) do not cause the customized FCM service to be invoked when the app is not running or is in the background. 
 
-Added bonus: images can be included in the customised notification (they will appear on the left). Use the Image URL edit box to include a URL to an image, e.g: https://sd.keepcalms.com/i/keep-calm-and-love-delphi-26.png
+Added bonus: for Android, images can be included in the customised notification (they will appear on the left). Use the Image URL edit box to include a URL to an image, e.g: https://sd.keepcalms.com/i/keep-calm-and-love-delphi-26.png
 
 With PushIt, you can see what the resulting payload looks like by selecting the `JSON` tab, which can help guide you in constructing message payloads in your server.
 
