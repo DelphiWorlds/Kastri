@@ -6,7 +6,7 @@ Advertising implementation, specifically for AdMob (at present)
 
 **UPDATE** -
 
-Nov 25th, 2023: Support for User Messsaging Platform (UMP) has been added (Android support for **Delphi 12 only**), which is required by Google in some geographic locations. This is **enabled by default**, and will require configuration in your [AdMob settings](https://apps.admob.com).
+Nov 25th, 2023: Support for User Messsaging Platform (UMP) has been added (Android support for **Delphi 12 only**, iOS support for Delphi 11.x and Delphi 12), which is required by Google in some geographic locations. This is **enabled by default**, and will require configuration in your [AdMob settings](https://apps.admob.com).
 
 See [below](#user-messaging-platform-ump-support) for further information about the UMP support.
 
