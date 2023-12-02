@@ -14,6 +14,8 @@ Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earl
 
 ## Android 
 
+### Vision libraries
+
 The following jar files are used by the project:
 
 * play-services-vision-17.0.2.jar
@@ -26,6 +28,14 @@ If you are creating a new project (i.e. other than the demo) you will need to ad
 **Note**:
 
 Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+
+### Manifest
+
+You will also need to modify `AndroidManifest.template.xml` - under `<%application-meta-data%>`, add this line:
+
+```xml
+<meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+```
 
 ## iOS
 
