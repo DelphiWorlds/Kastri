@@ -218,7 +218,8 @@ begin
   LInfo := nil;
   LCapabilities := ConnectivityManager.getNetworkCapabilities(ANetwork);
   // Check if the network has internet capability
-  if (LCapabilities <> nil) and LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_INTERNET) then
+  if (LCapabilities <> nil) and LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_INTERNET) and
+    LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_NOT_VPN) then
   begin
     // ..and is Validated or SDK < 23
     if ASkipValidation or (TJBuild_VERSION.JavaClass.SDK_INT < 23) or LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_VALIDATED) then
