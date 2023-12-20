@@ -37,41 +37,57 @@ object Form1: TForm1
     TabOrder = 1
     object ShowBanner: TButton
       Align = Left
+      Enabled = False
       Position.X = 4.000000000000000000
       Position.Y = 4.000000000000000000
-      Size.Width = 101.000000000000000000
+      Size.Width = 80.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 2
+      TabOrder = 3
       Text = 'Banner'
       TextSettings.Trimming = None
       OnClick = ShowBannerClick
     end
     object ShowInterstitial: TButton
       Align = Left
+      Enabled = False
       Margins.Left = 8.000000000000000000
-      Position.X = 113.000000000000000000
+      Position.X = 92.000000000000000000
       Position.Y = 4.000000000000000000
-      Size.Width = 101.000000000000000000
+      Size.Width = 80.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 1
+      TabOrder = 2
       Text = 'Interstitial'
       TextSettings.Trimming = None
       OnClick = ShowInterstitialClick
     end
     object ShowReward: TButton
       Align = Left
+      Enabled = False
       Margins.Left = 8.000000000000000000
-      Position.X = 222.000000000000000000
+      Position.X = 180.000000000000000000
       Position.Y = 4.000000000000000000
-      Size.Width = 101.000000000000000000
+      Size.Width = 80.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 0
+      TabOrder = 1
       Text = 'Reward'
       TextSettings.Trimming = None
       OnClick = ShowRewardClick
+    end
+    object ConsentButton: TButton
+      Align = Right
+      Margins.Left = 8.000000000000000000
+      Position.X = 372.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Consent'
+      TextSettings.Trimming = None
+      OnClick = ConsentButtonClick
     end
   end
   object AdMobBannerAd1: TAdMobBannerAd

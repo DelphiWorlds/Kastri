@@ -16,6 +16,7 @@ type
     AdMobBannerAd1: TAdMobBannerAd;
     ShowInterstitial: TButton;
     ShowReward: TButton;
+    ConsentButton: TButton;
     procedure ShowBannerClick(Sender: TObject);
     procedure AdMobBannerAd1AdClicked(Sender: TObject);
     procedure AdMobBannerAd1AdClosed(Sender: TObject);
@@ -25,6 +26,7 @@ type
     procedure AdMobBannerAd1AdOpened(Sender: TObject);
     procedure ShowInterstitialClick(Sender: TObject);
     procedure ShowRewardClick(Sender: TObject);
+    procedure ConsentButtonClick(Sender: TObject);
   private
     FIntAd: TInterstitialAd;
     FRewAd: TRewardedAd;
@@ -34,6 +36,7 @@ type
     procedure AdFailedToShowFullScreenContentHandler(Sender: TObject; const AError: TAdError);
     procedure AdLoadedHander(Sender: TObject);
     procedure AdMobConsentErrorHandler(Sender: TObject; const AError: TConsentError);
+    procedure AdMobConsentCompleteHandler(Sender: TObject; const AStatus: TConsentStatus);
     procedure AdWillPresentFullScreenContentHandler(Sender: TObject);
     function GetErrorMessage(const AEvent: string; const ASender: TObject; const AError: TAdError): string;
     procedure UserEarnedRewardHandler(Sender: TObject; const AReward: TAdReward);
@@ -48,20 +51,22 @@ implementation
 
 {$R *.fmx}
 
+const
+  cConsentStatusValues: array[TConsentStatus] of string = ('Unknown', 'Required', 'Not Required', 'Obtained');
+
 { TForm1 }
 
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
-  // AdMob calls must be performed before the application becomes active
+  AdMob.OnConsentComplete := AdMobConsentCompleteHandler;
   AdMob.OnConsentError := AdMobConsentErrorHandler;
-  // AdMob.SetIsUMPEnabled(False); // <---- Call this if you need to opt out of UMP
   // AdMob.ResetConsent; // <---- Simulates users first install experience
   AdMob.SetDebugGeography(TDebugGeography.EEA); // <---- Simulates geographical area
   {$IF Defined(ANDROID)}
   AdMob.SetTestDeviceHashedId('5E236AB5D9ACD3626D268508544B8259'); // <---- This value is shown in logcat messages on first run
   {$ELSEIF Defined(IOS)}
-  AdMob.SetTestDeviceHashedId('2FC249F1-70AE-4E9A-896B-0754F17D31C3'); // <---- This value is shown in Console messages on first run
+  AdMob.SetTestDeviceHashedId('2E868554-4228-45B3-BE84-28AE14B4DA31'); // <---- This value is shown in Console messages on first run
   {$ENDIF}
 
   FIntAd := TInterstitialAd.Create;
@@ -86,6 +91,13 @@ begin
 //  FOpenAd.OnAdFailedToShowFullScreenContent := AdFailedToShowFullScreenContentHandler;
 //  FOpenAd.OnAdWillPresentFullScreenContent := AdWillPresentFullScreenContentHandler;
 //  FOpenAd.Load;
+end;
+
+procedure TForm1.ConsentButtonClick(Sender: TObject);
+begin
+  // Use RequestConsent(False) if you need to opt out of UMP
+  AdMob.RequestConsent;
+  // **** NOTE: Ads will not start until RequestConsent has been called ****
 end;
 
 function TForm1.GetErrorMessage(const AEvent: string; const ASender: TObject; const AError: TAdError): string;
@@ -167,6 +179,14 @@ end;
 procedure TForm1.AdMobBannerAd1AdOpened(Sender: TObject);
 begin
   Memo.Lines.Add('Ad Opened ' + Sender.ClassName);
+end;
+
+procedure TForm1.AdMobConsentCompleteHandler(Sender: TObject; const AStatus: TConsentStatus);
+begin
+  Memo.Lines.Add(Format('Consent complete - Status: %s, CanRequestAds: %s', [cConsentStatusValues[AStatus], BoolToStr(AdMob.CanRequestAds, True)]));
+  ShowBanner.Enabled := True;
+  ShowInterstitial.Enabled := True;
+  ShowReward.Enabled := True;
 end;
 
 procedure TForm1.AdMobConsentErrorHandler(Sender: TObject; const AError: TConsentError);

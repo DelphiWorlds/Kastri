@@ -75,8 +75,6 @@ type
     FConsentFormLoadSuccessListener: JUserMessagingPlatform_OnConsentFormLoadSuccessListener;
     FConsentInfoUpdateFailureListener: JConsentInformation_OnConsentInfoUpdateFailureListener;
     FConsentInfoUpdateSuccessListener: JConsentInformation_OnConsentInfoUpdateSuccessListener;
-    function CanRequestAds: Boolean;
-    procedure CheckConsent;
     function ConsentInformation: JConsentInformation;
     procedure CreateListeners;
     function GetDebugGeography: Integer;
@@ -87,8 +85,11 @@ type
     procedure ConsentFormDismissed(const AFormError: JFormError);
     procedure ConsentFormLoad(const AForm: JConsentForm; const AFormError: JFormError);
     procedure ConsentInfoUpdate(const AFormError: JFormError);
-    procedure RequestConsent; override;
-    procedure ResetConsent; override;
+    procedure DoRequestConsent; override;
+  public
+    function CanRequestAds: Boolean; override;
+    function ConsentStatus: TConsentStatus; override;
+    procedure DoResetConsent; override;
   end;
 
 { TAdMobListener }
@@ -145,6 +146,21 @@ begin
   FConsentInfoUpdateFailureListener := TConsentInfoUpdateFailureListener.Create(Self);
 end;
 
+function TPlatformAdMob.ConsentStatus: TConsentStatus;
+var
+  LStatus: Integer;
+begin
+  LStatus := ConsentInformation.getConsentStatus;
+  if LStatus = TJConsentInformation_ConsentStatus.JavaClass.OBTAINED then
+    Result := TConsentStatus.Obtained
+  else if LStatus = TJConsentInformation_ConsentStatus.JavaClass.NOT_REQUIRED then
+    Result := TConsentStatus.NotRequired
+  else if LStatus = TJConsentInformation_ConsentStatus.JavaClass.REQUIRED then
+    Result := TConsentStatus.Required
+  else
+    Result := TConsentStatus.Unknown;
+end;
+
 function TPlatformAdMob.GetDebugGeography: Integer;
 begin
   case DebugGeography of
@@ -167,7 +183,7 @@ begin
   Result := TJUserMessagingPlatform.JavaClass;
 end;
 
-procedure TPlatformAdMob.RequestConsent;
+procedure TPlatformAdMob.DoRequestConsent;
 var
   LParams: JConsentRequestParameters_Builder;
   LDebugSettings: JConsentDebugSettings;
@@ -188,10 +204,11 @@ begin
     LParams := LParams.setConsentDebugSettings(LDebugSettings);
   ConsentInformation.requestConsentInfoUpdate(TAndroidHelper.Activity, LParams.build, FConsentInfoUpdateSuccessListener,
     FConsentInfoUpdateFailureListener);
-  CheckConsent;
+  if CanRequestAds then
+    StartAds;
 end;
 
-procedure TPlatformAdMob.ResetConsent;
+procedure TPlatformAdMob.DoResetConsent;
 begin
   ConsentInformation.reset;
 end;
@@ -203,7 +220,11 @@ begin
     {$IF Defined(UMP_210)}
     UserMessagingPlatform.loadAndShowConsentFormIfRequired(TAndroidHelper.Activity, FConsentFormDismissedListener);
     {$ELSE}
-    UserMessagingPlatform.loadConsentForm(TAndroidHelper.Context, FConsentFormLoadSuccessListener, FConsentFormLoadFailureListener);
+    if (ConsentStatus = TConsentStatus.Required) and ConsentInformation.isConsentFormAvailable then
+      UserMessagingPlatform.loadConsentForm(TAndroidHelper.Context, FConsentFormLoadSuccessListener, FConsentFormLoadFailureListener)
+    else if CanRequestAds then
+      StartAds;
+    // else ????
     {$ENDIF}
   end
   else
@@ -215,23 +236,35 @@ begin
   {$IF Defined(UMP_210)}
   Result := ConsentInformation.canRequestAds;
   {$ELSE}
-  Result := (ConsentInformation.getConsentStatus = TJConsentInformation_ConsentStatus.JavaClass.OBTAINED) or
-    (ConsentInformation.getConsentStatus = TJConsentInformation_ConsentStatus.JavaClass.NOT_REQUIRED);
+  Result := ConsentStatus in [TConsentStatus.Obtained, TConsentStatus.NotRequired];
   {$ENDIF}
 end;
 
-procedure TPlatformAdMob.CheckConsent;
+function StringArrayToJList(const AValues: TArray<string>): JList;
+var
+  LValue: string;
+  LArrayList: JArrayList;
 begin
-  if CanRequestAds then
-    StartAds
-  else
-    TOSLog.d('CanRequestAds is FALSE');
+  LArrayList := TJArrayList.Create;
+  for LValue in AValues do
+    LArrayList.add(StringToJString(LValue));
+  Result := TJList.Wrap(LArrayList);
 end;
 
 procedure TPlatformAdMob.StartAds;
+var
+  LConfiguration: JRequestConfiguration;
 begin
-  TJMobileAds.JavaClass.initialize(TAndroidHelper.Context);
-  AdsStarted;
+  if not IsStarted then
+  begin
+    if not TestDeviceHashedId.IsEmpty then
+    begin
+      LConfiguration := TJRequestConfiguration_Builder.JavaClass.init.setTestDeviceIds(StringArrayToJList([TestDeviceHashedId])).build;
+      TJMobileAds.JavaClass.setRequestConfiguration(LConfiguration);
+    end;
+    TJMobileAds.JavaClass.initialize(TAndroidHelper.Context);
+    AdsStarted;
+  end;
 end;
 
 procedure TPlatformAdMob.HandleError(const AOrigin: string; const AFormError: JFormError);
@@ -242,7 +275,9 @@ end;
 procedure TPlatformAdMob.ConsentFormDismissed(const AFormError: JFormError);
 begin
   if AFormError = nil then
-    CheckConsent
+  begin
+    StartAds;
+  end
   else
     HandleError('ConsentFormDismissed', AFormError);
 end;

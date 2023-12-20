@@ -30,10 +30,10 @@ A package containing the component is available as [KastriAdMob.dproj](https://g
 
 As described in the update info, UMP support for Android is for **Delphi 12 only**. It should work on iOS for Delphi 12 and Delphi 11.x.
 
-As [required by Google](https://support.google.com/admob/answer/10114014), if using AdMob, your app must show a consent message before ads can be shown. Kastri supports this via the `DW.AdMob` unit. If for whatever reason, you need to disable UMP, use the following code in your startup code that is executed before the application becomes active (i.e. shown on screen):
+As [required by Google](https://support.google.com/admob/answer/10114014), if using AdMob, your app must show a consent message before ads can be shown. Kastri supports this via the `DW.AdMob` unit. Call RequestConsent when your app is ready to request constent.
 
 ```delphi
-  AdMob.SetIsUMPEnabled(False);
+  AdMob.RequestConsent; // Call RequestConsent(True) to bypass UMP
 ```
 
 While you are testing your app, you can use the following methods:
@@ -112,7 +112,11 @@ This adds a library with the same name as the project, with an extension of `.R.
 
 ### iOS
 
-**UPDATED Nov 8th, 2023**
+**UPDATE: Dec 21st, 2023**
+
+The UMP support has now been modified to include App Tracking Transparency (ATT), so you will need to [modify the iOS SDK to add the `AppTrackingTransparency` framework](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks).
+
+**UPDATE: Nov 8th, 2023**
 
 AdMob support in Kastri has now been aligned with the latest compatible version of the Firebase SDK for iOS, which is version 10.8.0. Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo.
 
