@@ -37,6 +37,7 @@ type
     class function GetUniqueDeviceID: string; static;
     class function IsLocationServiceEnabled: Boolean; static;
     class function IsScreenLocked: Boolean; static;
+    class function IsTablet: Boolean; static;
     class function IsTouchDevice: Boolean; static;
     class procedure OpenURL(const AURL: string); static;
     class procedure OpenAppSettings; static;
@@ -118,6 +119,11 @@ end;
 class function TPlatformOSDevice.IsScreenLocked: Boolean;
 begin
   Result := False; // To be implemented
+end;
+
+class function TPlatformOSDevice.IsTablet: Boolean;
+begin
+  Result := TiOSHelper.CurrentDevice.userInterfaceIdiom = UIUserInterfaceIdiomPad;
 end;
 
 class function TPlatformOSDevice.IsTouchDevice: Boolean;

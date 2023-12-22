@@ -39,6 +39,7 @@ type
     class function HasHardwareKeyboard: Boolean; static;
     class function IsLocationServiceEnabled: Boolean; static;
     class function IsScreenLocked: Boolean; static;
+    class function IsTablet: Boolean; static;
     class function IsTouchDevice: Boolean; static;
     class procedure OpenAppSettings; static;
     class procedure OpenURL(const AURL: string); static;
@@ -200,6 +201,12 @@ end;
 class function TPlatformOSDevice.IsScreenLocked: Boolean;
 begin
   Result := TAndroidHelperEx.KeyguardManager.inKeyguardRestrictedInputMode;
+end;
+
+class function TPlatformOSDevice.IsTablet: Boolean;
+begin
+  Result := (TAndroidHelper.Context.getResources.getConfiguration.screenLayout and TJConfiguration.JavaClass.SCREENLAYOUT_SIZE_MASK)
+    >= TJConfiguration.JavaClass.SCREENLAYOUT_SIZE_LARGE;
 end;
 
 // **** NOTE: Use this value with care, as devices that do not have touch support, but are connected to another screen, will report True

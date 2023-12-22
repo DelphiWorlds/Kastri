@@ -116,17 +116,21 @@ type
     /// </summary>
     class function IsMobile: Boolean; static;
     /// <summary>
+    ///   Returns whether the platform matches
+    /// </summary>
+    class function IsPlatform(const APlatform: TOSPlatform): Boolean; static;
+    /// <summary>
     ///   Returns whether the screen is locked
     /// </summary>
     class function IsScreenLocked: Boolean; static;
     /// <summary>
+    ///   Returns whether the device is a tablet (e.g. large Android device or iPad)
+    /// </summary>
+    class function IsTablet: Boolean; static;
+    /// <summary>
     ///   Returns whether the device has touch capability
     /// </summary>
     class function IsTouchDevice: Boolean; static;
-    /// <summary>
-    ///   Returns whether the platform matches
-    /// </summary>
-    class function IsPlatform(const APlatform: TOSPlatform): Boolean; static;
     /// <summary>
     ///   Opens the default browser with the URL
     /// </summary>
@@ -316,6 +320,16 @@ begin
   {$IF Defined(IOS) or Defined(ANDROID)}
   Result := TPlatformOSDevice.IsScreenLocked;
   {$ELSE}
+  Result := False;
+  {$ENDIF}
+end;
+
+class function TOSDevice.IsTablet: Boolean;
+begin
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  Result := TPlatformOSDevice.IsTablet;
+  {$ELSE}
+  // TODO: Windows Surface devices, for example
   Result := False;
   {$ENDIF}
 end;
