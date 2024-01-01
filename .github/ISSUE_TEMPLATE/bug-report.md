@@ -7,6 +7,10 @@ assignees: ''
 
 ---
 
+**NOTE If you just have a question about a programming problem, please ask in an online forum or chatroom**. There are some suggestions [here](https://github.com/DelphiWorlds/HowTo/blob/main/Readme.md).
+
+**This area is ONLY for reporting issues for Kastri**
+
 If your issue is for a particular feature (e.g. Camera, Connectivity, Biometric etc), please prefix the issue title with the feature in square brackets, e.g. "[Camera] Crash when image is captured"
 
 **Description**
