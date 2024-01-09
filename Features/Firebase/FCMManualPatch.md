@@ -2,7 +2,9 @@
 
 ## Copy the source file
 
-Copy `FMX.PushNotification.FCM.iOS.pas` from the the Delphi `source\fmx` folder to the `Features\Firebase` folder in your copy of Kastri (i.e. the same one as this readme file) 
+Copy `FMX.PushNotification.FCM.iOS.pas` from the the Delphi `source\fmx` folder to the `Features\Firebase` folder in your copy of Kastri (i.e. the same one as this readme file).
+
+**NOTE**: The patched file needs to be in in the *search path* (like the `Features\Firebase` folder in your copy of Kastri, as described above) **OR** the *project folder*. **Do not patch it "in place" in the Delphi source**, because those folders are not normally in the search path.
 
 ## Modify the copied source file
 
