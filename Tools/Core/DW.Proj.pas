@@ -28,8 +28,32 @@ type
     function GetIsEnabled: Boolean;
   end;
 
+  IProjDeployFilePlatform =  interface(IInterface)
+    ['{A0C25429-6526-4AE2-A899-6224E2CEFB1E}']
+    function GetName: string;
+    function GetOverwrite: Boolean;
+    function GetRemoteDir: string;
+    function GetRemoteName: string;
+  end;
+
+  IProjDeployFile =  interface(IInterface)
+    ['{D8433D68-974D-4FB8-BA75-10FCB555296D}']
+    function GetConfiguration: string;
+    function GetDeployClass: string;
+    function GetLocalName: string;
+    function GetPlatform(const AIndex: Integer): IProjDeployFilePlatform;
+    function GetPlatformCount: Integer;
+  end;
+
+  IProjDeployment =  interface(IInterface)
+    ['{11CAA93F-F95B-42E8-BA5C-B45B920EB7DE}']
+    function GetDeployFile(const AIndex: Integer): IProjDeployFile;
+    function GetDeployFileCount: Integer;
+  end;
+
   IProjBorlandProject = interface(IInterface)
     ['{6A337219-BC7A-4561-82C1-8F65F80066AA}']
+    function GetDeployment: IProjDeployment;
     function GetPlatform(const AIndex: Integer): IProjPlatform;
     function GetPlatformCount: Integer;
   end;
@@ -52,6 +76,7 @@ type
 
   IProj = interface(IInterface)
     ['{3FF84EDB-86BD-461F-9CA7-94C47997D067}']
+    function FindBasePropertyGroup(out AGroup: IProjPropertyGroup): Boolean;
     function FindPropertyGroup(const AConfigIdent, APlatform: string; out AGroup: IProjPropertyGroup): Boolean;
     function GetConfigs: TProjConfigs;
     function GetPlatforms(const AEnabledOnly: Boolean): TArray<string>;
@@ -72,6 +97,7 @@ type
     function InternalGetProjectPaths(const ACondition: string): TArray<string>;
   public
     { IProj }
+    function FindBasePropertyGroup(out AGroup: IProjPropertyGroup): Boolean;
     function FindPropertyGroup(const AConfigIdent, APlatform: string; out AGroup: IProjPropertyGroup): Boolean;
     function GetConfigs: TProjConfigs;
     function GetPlatforms(const AEnabledOnly: Boolean = False): TArray<string>;
@@ -134,6 +160,7 @@ type
   TProjBorlandProject = class(TCustomProjNode, IProjBorlandProject)
   public
     { IProjBorlandProject }
+    function GetDeployment: IProjDeployment;
     function GetPlatform(const AIndex: Integer): IProjPlatform;
     function GetPlatformCount: Integer;
   end;
@@ -145,12 +172,54 @@ type
     function GetIsEnabled: Boolean;
   end;
 
+  TProjDeployment = class(TCustomProjNode, IProjDeployment)
+  public
+    { IProjDeployment }
+    function GetDeployFile(const AIndex: Integer): IProjDeployFile;
+    function GetDeployFileCount: Integer;
+  end;
+
+  TProjDeployFile = class(TCustomProjNode, IProjDeployFile)
+  public
+    { IProjDeployFile }
+    function GetConfiguration: string;
+    function GetDeployClass: string;
+    function GetLocalName: string;
+    function GetPlatform(const AIndex: Integer): IProjDeployFilePlatform;
+    function GetPlatformCount: Integer;
+  end;
+
+  TProjDeployFilePlatform = class(TCustomProjNode, IProjDeployFilePlatform)
+  public
+    { IProjDeployFilePlatform }
+    function GetName: string;
+    function GetOverwrite: Boolean;
+    function GetRemoteDir: string;
+    function GetRemoteName: string;
+  end;
+
 { TProj }
 
 constructor TProj.Create(const AFileName: string);
 begin
   inherited Create;
   LoadFromFile(AFileName);
+end;
+
+procedure TProj.LoadFromFile(const AFileName: string);
+begin
+  FNode := nil;
+  FDocument := nil;
+  if TFile.Exists(AFileName) then
+  begin
+    FDocument := LoadXMLDocument(AFileName);
+    FNode := FDocument.DocumentElement;
+  end;
+end;
+
+function TProj.FindBasePropertyGroup(out AGroup: IProjPropertyGroup): Boolean;
+begin
+  Result := InternalFindPropertyGroup(cConditionBase, AGroup);
 end;
 
 function TProj.FindPropertyGroup(const AConfigIdent, APlatform: string; out AGroup: IProjPropertyGroup): Boolean;
@@ -286,12 +355,19 @@ end;
 function TProj.GetProjectExtensions: IProjProjectExtensions;
 var
   LNode: IXMLNode;
+  I: Integer;
 begin
   if FProjectExtensions = nil then
   begin
-    LNode := FNode.ChildNodes.FindNode('ProjectExtensions');
-    if LNode <> nil then
-      FProjectExtensions := TProjProjectExtensions.Create(LNode);
+    for I := 0 to FNode.ChildNodes.Count - 1 do
+    begin
+      LNode := FNode.ChildNodes[I];
+      if LNode.NodeName.Equals('ProjectExtensions') and (LNode.ChildNodes.Count > 0) then
+      begin
+        FProjectExtensions := TProjProjectExtensions.Create(LNode);
+        Break;
+      end;
+    end;
   end;
   Result := FProjectExtensions;
 end;
@@ -328,17 +404,6 @@ begin
   end;
 end;
 
-procedure TProj.LoadFromFile(const AFileName: string);
-begin
-  FNode := nil;
-  FDocument := nil;
-  if TFile.Exists(AFileName) then
-  begin
-    FDocument := LoadXMLDocument(AFileName);
-    FNode := FDocument.DocumentElement;
-  end;
-end;
-
 { TCustomProjNode }
 
 constructor TCustomProjNode.Create(const ANode: IXMLNode);
@@ -362,7 +427,46 @@ begin
   Result := FBorlandProject;
 end;
 
+{ TProjDeployment }
+
+function TProjDeployment.GetDeployFile(const AIndex: Integer): IProjDeployFile;
+var
+  I, LIndex: Integer;
+begin
+  Result := nil;
+  LIndex := -1;
+  for I := 0 to FNode.ChildNodes.Count - 1 do
+  begin
+    if FNode.ChildNodes[I].NodeName.Equals('DeployFile') then
+    begin
+      Inc(LIndex);
+      if AIndex = LIndex then
+      begin
+        Result := TProjDeployFile.Create(FNode.ChildNodes[I]);
+        Break;
+      end;
+    end;
+  end;
+end;
+
+function TProjDeployment.GetDeployFileCount: Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 0 to FNode.ChildNodes.Count - 1 do
+  begin
+    if FNode.ChildNodes[I].NodeName.Equals('DeployFile') then
+      Inc(Result);
+  end;
+end;
+
 { TProjBorlandProject }
+
+function TProjBorlandProject.GetDeployment: IProjDeployment;
+begin
+  Result := TProjDeployment.Create(FNode.ChildNodes.FindNode('Deployment'));
+end;
 
 function TProjBorlandProject.GetPlatform(const AIndex: Integer): IProjPlatform;
 var
@@ -434,6 +538,92 @@ end;
 function TProjPropertyGroup.GetCondition: string;
 begin
   Result := FCondition;
+end;
+
+{ TProjDeployFile }
+
+function TProjDeployFile.GetConfiguration: string;
+begin
+  Result := VarToStrDef(FNode.Attributes['Configuration'], '');
+end;
+
+function TProjDeployFile.GetDeployClass: string;
+begin
+  Result := VarToStrDef(FNode.Attributes['Class'], '');
+end;
+
+function TProjDeployFile.GetLocalName: string;
+begin
+  Result := VarToStrDef(FNode.Attributes['LocalName'], '');
+end;
+
+function TProjDeployFile.GetPlatform(const AIndex: Integer): IProjDeployFilePlatform;
+var
+  I, LIndex: Integer;
+begin
+  Result := nil;
+  LIndex := -1;
+  for I := 0 to FNode.ChildNodes.Count - 1 do
+  begin
+    if FNode.ChildNodes[I].NodeName.Equals('Platform') then
+    begin
+      Inc(LIndex);
+      if AIndex = LIndex then
+      begin
+        Result := TProjDeployFilePlatform.Create(FNode.ChildNodes[I]);
+        Break;
+      end;
+    end;
+  end;
+end;
+
+function TProjDeployFile.GetPlatformCount: Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 0 to FNode.ChildNodes.Count - 1 do
+  begin
+    if FNode.ChildNodes[I].NodeName.Equals('Platform') then
+      Inc(Result);
+  end;
+end;
+
+{ TProjDeployFilePlatform }
+
+function TProjDeployFilePlatform.GetName: string;
+begin
+  Result := VarToStrDef(FNode.Attributes['Name'], '');
+end;
+
+function TProjDeployFilePlatform.GetOverwrite: Boolean;
+var
+  LNode: IXMLNode;
+begin
+  Result := False;
+  LNode := FNode.ChildNodes.FindNode('Overwrite');
+  if LNode <> nil then
+    Result := SameText(LNode.Text, 'true');
+end;
+
+function TProjDeployFilePlatform.GetRemoteDir: string;
+var
+  LNode: IXMLNode;
+begin
+  Result := '.\';
+  LNode := FNode.ChildNodes.FindNode('RemoteDir');
+  if LNode <> nil then
+    Result := LNode.Text;
+end;
+
+function TProjDeployFilePlatform.GetRemoteName: string;
+var
+  LNode: IXMLNode;
+begin
+  Result := '';
+  LNode := FNode.ChildNodes.FindNode('RemoteName');
+  if LNode <> nil then
+    Result := LNode.Text;
 end;
 
 end.
