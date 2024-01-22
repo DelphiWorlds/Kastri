@@ -21,17 +21,16 @@ uses
 
 type
   JArrayDeque = interface;
-  JBase64 = interface;
+  JFormatter = interface;
+  JInflater = interface;
   JLinkedHashSet = interface;
   JMap_Entry = interface;
   JNavigableMap = interface;
   JNavigableSet = interface;
-  JRational = interface;
   JSortedSet = interface;
   JTimerTask = interface;
   JTimer = interface;
   JTreeMap = interface;
-  Jutil_Log = interface;
 
   JArrayDequeClass = interface(JAbstractCollectionClass)
     ['{53FE7FDB-6B49-4ABF-AC02-0871A9E52A05}']
@@ -227,71 +226,6 @@ type
   end;
   TJLinkedHashSet = class(TJavaGenericImport<JLinkedHashSetClass, JLinkedHashSet>) end;
 
-  JRationalClass = interface(JNumberClass)
-    ['{592776A4-0BC8-4829-88B1-714E90C34FE1}']
-    {class} function _GetNEGATIVE_INFINITY: JRational; cdecl;
-    {class} function _GetNaN: JRational; cdecl;
-    {class} function _GetPOSITIVE_INFINITY: JRational; cdecl;
-    {class} function _GetZERO: JRational; cdecl;
-    {class} function init(numerator: Integer; denominator: Integer): JRational; cdecl;
-    {class} function compareTo(another: JRational): Integer; cdecl;
-    {class} function doubleValue: Double; cdecl;
-    {class} function getNumerator: Integer; cdecl;
-    {class} function hashCode: Integer; cdecl;
-    {class} function intValue: Integer; cdecl;
-    {class} function isZero: Boolean; cdecl;
-    {class} function longValue: Int64; cdecl;
-    {class} function parseRational(&string: JString): JRational; cdecl;
-    {class} property NEGATIVE_INFINITY: JRational read _GetNEGATIVE_INFINITY;
-    {class} property NaN: JRational read _GetNaN;
-    {class} property POSITIVE_INFINITY: JRational read _GetPOSITIVE_INFINITY;
-    {class} property ZERO: JRational read _GetZERO;
-  end;
-
-  [JavaSignature('android/util/Rational')]
-  JRational = interface(JNumber)
-    ['{5DEFEB1B-2D1F-4ADF-B69B-54B0498F8544}']
-    function equals(obj: JObject): Boolean; cdecl;
-    function floatValue: Single; cdecl;
-    function getDenominator: Integer; cdecl;
-    function isFinite: Boolean; cdecl;
-    function isInfinite: Boolean; cdecl;
-    function isNaN: Boolean; cdecl;
-    function shortValue: SmallInt; cdecl;
-    function toString: JString; cdecl;
-  end;
-  TJRational = class(TJavaGenericImport<JRationalClass, JRational>) end;
-
-  JBase64Class = interface(JObjectClass)
-    ['{DA78E162-4CB0-455B-ACC0-BEDDE5484C85}']
-    function _GetCRLF: Integer; cdecl;
-    function _GetDEFAULT: Integer; cdecl;
-    function _GetNO_CLOSE: Integer; cdecl;
-    function _GetNO_PADDING: Integer; cdecl;
-    function _GetNO_WRAP: Integer; cdecl;
-    function _GetURL_SAFE: Integer; cdecl;
-    function decode(input: TJavaArray<Byte>; flags: Integer): TJavaArray<Byte>; cdecl; overload;
-    function decode(input: TJavaArray<Byte>; offset: Integer; len: Integer; flags: Integer): TJavaArray<Byte>; cdecl; overload;
-    function decode(str: JString; flags: Integer): TJavaArray<Byte>; cdecl; overload;
-    function encode(input: TJavaArray<Byte>; flags: Integer): TJavaArray<Byte>; cdecl; overload;
-    function encode(input: TJavaArray<Byte>; offset: Integer; len: Integer; flags: Integer): TJavaArray<Byte>; cdecl; overload;
-    function encodeToString(input: TJavaArray<Byte>; flags: Integer): JString; cdecl; overload;
-    function encodeToString(input: TJavaArray<Byte>; offset: Integer; len: Integer; flags: Integer): JString; cdecl; overload;
-    property &DEFAULT: Integer read _GetDEFAULT;
-    property CRLF: Integer read _GetCRLF;
-    property NO_CLOSE: Integer read _GetNO_CLOSE;
-    property NO_PADDING: Integer read _GetNO_PADDING;
-    property NO_WRAP: Integer read _GetNO_WRAP;
-    property URL_SAFE: Integer read _GetURL_SAFE;
-  end;
-
-  [JavaSignature('android/util/Base64')]
-  JBase64 = interface(JObject)
-    ['{AC976256-7237-4F07-87CD-B57F5F28BF6A}']
-  end;
-  TJBase64 = class(TJavaGenericImport<JBase64Class, JBase64>)
-  end;
-
   JTimerClass = interface(JObjectClass)
     ['{07C8270D-52FF-4B70-B364-A4E86A4F3411}']
     function init: JTimer; cdecl; overload;
@@ -329,45 +263,72 @@ type
   TJTimerTask = class(TJavaGenericImport<JTimerTaskClass, JTimerTask>)
   end;
 
-  Jutil_LogClass = interface(JObjectClass)
-    ['{62108FE8-1DBB-4C4F-A0C7-35D12BD116DC}']
-    {class} function _GetASSERT: Integer; cdecl;
-    {class} function _GetDEBUG: Integer; cdecl;
-    {class} function _GetERROR: Integer; cdecl;
-    {class} function _GetINFO: Integer; cdecl;
-    {class} function _GetVERBOSE: Integer; cdecl;
-    {class} function _GetWARN: Integer; cdecl;
-    {class} function d(tag: JString; msg: JString): Integer; cdecl; overload;
-    {class} function d(tag: JString; msg: JString; tr: JThrowable): Integer; cdecl; overload;
-    {class} function e(tag: JString; msg: JString): Integer; cdecl; overload;
-    {class} function e(tag: JString; msg: JString; tr: JThrowable): Integer; cdecl; overload;
-    {class} function getStackTraceString(tr: JThrowable): JString; cdecl;
-    {class} function i(tag: JString; msg: JString): Integer; cdecl; overload;
-    {class} function i(tag: JString; msg: JString; tr: JThrowable): Integer; cdecl; overload;
-    {class} function isLoggable(tag: JString; level: Integer): Boolean; cdecl;
-    {class} function println(priority: Integer; tag: JString; msg: JString): Integer; cdecl;
-    {class} function v(tag: JString; msg: JString): Integer; cdecl; overload;
-    {class} function v(tag: JString; msg: JString; tr: JThrowable): Integer; cdecl; overload;
-    {class} function w(tag: JString; msg: JString): Integer; cdecl; overload;
-    {class} function w(tag: JString; msg: JString; tr: JThrowable): Integer; cdecl; overload;
-    {class} function w(tag: JString; tr: JThrowable): Integer; cdecl; overload;
-    {class} function wtf(tag: JString; msg: JString): Integer; cdecl; overload;
-    {class} function wtf(tag: JString; tr: JThrowable): Integer; cdecl; overload;
-    {class} function wtf(tag: JString; msg: JString; tr: JThrowable): Integer; cdecl; overload;
-    {class} property ASSERT: Integer read _GetASSERT;
-    {class} property DEBUG: Integer read _GetDEBUG;
-    {class} property ERROR: Integer read _GetERROR;
-    {class} property INFO: Integer read _GetINFO;
-    {class} property VERBOSE: Integer read _GetVERBOSE;
-    {class} property WARN: Integer read _GetWARN;
+  JInflaterClass = interface(JObjectClass)
+    ['{50E9050B-5927-4EEA-816F-ADC57D3BA62E}']
+    {class} function init: JInflater; cdecl; overload;
+    {class} function init(boolean: Boolean): JInflater; cdecl; overload;
   end;
 
-  [JavaSignature('android/util/Log')]
-  Jutil_Log = interface(JObject)
-    ['{6A5EC34E-CB76-4AB0-A11D-7CCB3B40C571}']
+  [JavaSignature('java/util/zip/Inflater')]
+  JInflater = interface(JObject)
+    ['{FBE4754B-620C-4917-8421-0264BEA5EA09}']
+    procedure &end; cdecl;
+    function finished: Boolean; cdecl;
+    function getAdler: Integer; cdecl;
+    function getBytesRead: Int64; cdecl;
+    function getBytesWritten: Int64; cdecl;
+    function getRemaining: Integer; cdecl;
+    function getTotalIn: Integer; cdecl;
+    function getTotalOut: Integer; cdecl;
+    function inflate(bytes: TJavaArray<Byte>): Integer; cdecl; overload;
+    function inflate(bytes: TJavaArray<Byte>; int: Integer; int_1: Integer): Integer; cdecl; overload;
+    function inflate(bytebuffer: JByteBuffer): Integer; cdecl; overload;
+    function needsDictionary: Boolean; cdecl;
+    function needsInput: Boolean; cdecl;
+    procedure reset; cdecl;
+    procedure setDictionary(bytes: TJavaArray<Byte>; int: Integer; int_1: Integer); cdecl; overload;
+    procedure setDictionary(bytes: TJavaArray<Byte>); cdecl; overload;
+    procedure setDictionary(bytebuffer: JByteBuffer); cdecl; overload;
+    procedure setInput(bytes: TJavaArray<Byte>; int: Integer; int_1: Integer); cdecl; overload;
+    procedure setInput(bytes: TJavaArray<Byte>); cdecl; overload;
+    procedure setInput(bytebuffer: JByteBuffer); cdecl; overload;
   end;
-  TJutil_Log = class(TJavaGenericImport<Jutil_LogClass, Jutil_Log>) end;
+  TJInflater = class(TJavaGenericImport<JInflaterClass, JInflater>) end;
 
+  JFormatterClass = interface(JObjectClass)
+    ['{B3FC1195-51B4-4118-BDDD-7B478079C41D}']
+    {class} function init(outputstream: JOutputStream): JFormatter; cdecl; overload;
+    {class} function init(printstream: JPrintStream): JFormatter; cdecl; overload;
+    {class} function init(file_1: JFile; charset: JCharset; locale: JLocale): JFormatter; cdecl; overload;
+    {class} function init(outputstream: JOutputStream; charset: JCharset; locale: JLocale): JFormatter; cdecl; overload;
+    {class} function init(outputstream: JOutputStream; string_1: JString; locale: JLocale): JFormatter; cdecl; overload;
+    {class} function init(outputstream: JOutputStream; string_1: JString): JFormatter; cdecl; overload;
+    {class} function init: JFormatter; cdecl; overload;
+    {class} function init(string_1: JString): JFormatter; cdecl; overload;
+    {class} function init(appendable: JAppendable): JFormatter; cdecl; overload;
+    {class} function init(appendable: JAppendable; locale: JLocale): JFormatter; cdecl; overload;
+    {class} function init(locale: JLocale): JFormatter; cdecl; overload;
+    {class} function init(string_1: JString; string_2: JString): JFormatter; cdecl; overload;
+    {class} function init(file_1: JFile; string_1: JString; locale: JLocale): JFormatter; cdecl; overload;
+    {class} function init(file_1: JFile; string_1: JString): JFormatter; cdecl; overload;
+    {class} function init(file_1: JFile): JFormatter; cdecl; overload;
+    {class} function init(string_1: JString; string_2: JString; locale: JLocale): JFormatter; cdecl; overload;
+    {class} function init(string_1: JString; charset: JCharset; locale: JLocale): JFormatter; cdecl; overload;
+  end;
+
+  [JavaSignature('java/util/Formatter')]
+  JFormatter = interface(JObject)
+    ['{AF9F5943-D81D-4AD7-8CF6-21B1ADE3A84D}']
+    function &out: JAppendable; cdecl;
+    procedure close; cdecl;
+    procedure flush; cdecl;
+    function format(locale: JLocale; string_1: JString; object_1: JObject): JFormatter; cdecl; overload;
+    function format(string_1: JString; object_1: JObject): JFormatter; cdecl; overload;
+    function ioException: JIOException; cdecl;
+    function locale: JLocale; cdecl;
+    function toString: JString; cdecl;
+  end;
+  TJFormatter = class(TJavaGenericImport<JFormatterClass, JFormatter>) end;
 
 implementation
 
