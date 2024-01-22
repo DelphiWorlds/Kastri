@@ -42,7 +42,7 @@ uses
   // Android
   Androidapi.Helpers,
   // DW
-  DW.Androidapi.JNI.Util, DW.OSDevice.Android;
+  DW.Androidapi.JNI.Android.Util, DW.OSDevice.Android;
 
 { TPlatformOSLog }
 
@@ -55,17 +55,17 @@ begin
   LMsg := StringToJString(AMsg);
   case ALogType of
     TLogType.Debug:
-      TJutil_Log.JavaClass.d(FTag, LMsg);
+      TJLog.JavaClass.d(FTag, LMsg);
     TLogType.Warning:
-      TJutil_Log.JavaClass.w(FTag, LMsg);
+      TJLog.JavaClass.w(FTag, LMsg);
     TLogType.Error:
-      TJutil_Log.JavaClass.e(FTag, LMsg);
+      TJLog.JavaClass.e(FTag, LMsg);
   end;
 end;
 
 class function TPlatformOSLog.GetTrace: string;
 begin
-  Result := JStringToString(TJutil_Log.JavaClass.getStackTraceString(TJException.JavaClass.init));
+  Result := JStringToString(TJLog.JavaClass.getStackTraceString(TJException.JavaClass.init));
 end;
 
 class procedure TPlatformOSLog.Trace;
