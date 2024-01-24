@@ -20,7 +20,7 @@ uses
   Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes,Androidapi.JNI.Location,
   Androidapi.JNI.Media, Androidapi.JNI.Os, Androidapi.JNI.Util,
   // DW
-  DW.Androidapi.JNI.Util;
+  DW.Androidapi.JNI.Android.Util;
 
 type
   JCameraAccessException = interface;
