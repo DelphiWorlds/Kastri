@@ -66,6 +66,9 @@ type
     /// </summary>
     class function AlarmManager: JAlarmManager; static;
     /// <summary>
+    ///   Determines whether or not exact alarms can be scheduled. Applies to Android 14+
+    class function CanScheduleExactAlarms: Boolean; static;
+    /// <summary>
     ///   Checks if both build and target are greater or equal to the tested value
     /// </summary>
     class function CheckBuildAndTarget(const AValue: Integer): Boolean; static;
@@ -222,6 +225,10 @@ type
     /// </remarks>
     class function ShowAllFilesAccessPermissionSettings: Boolean; static;
     /// <summary>
+    ///   Shows the exact alarms permissions activity if they are yet to be enabled
+    /// </summary>
+    class function ShowExactAlarmPermissionSettings: Boolean; static;
+    /// <summary>
     ///   Sends the device to the home screen
     /// </summary>
     class procedure ShowHome; static;
@@ -374,7 +381,18 @@ uses
   Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI, Androidapi.JNI.Support,
   // DW
   {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.AndroidX.FileProvider, {$ENDIF}
-  DW.Consts.Android, DW.Androidapi.JNI.Util, DW.Toast.Android;
+  DW.Consts.Android, DW.Androidapi.JNI.Android.Util, DW.Toast.Android, DW.Permissions.Helpers;
+
+const
+  cActionRequestScheduledExactAlarm = 'android.settings.REQUEST_SCHEDULE_EXACT_ALARM';
+
+type
+  [JavaSignature('android/app/AlarmManager')]
+  JAlarmManagerEx = interface(JObject)
+    ['{A03543C2-BB1C-4857-9E68-8EA1328C23A4}']
+    function canScheduleExactAlarms: Boolean; cdecl;
+  end;
+  TJAlarmManagerEx = class(TJavaGenericImport<JAlarmManagerClass, JAlarmManagerEx>) end;
 
 { TUncaughtExceptionHandler }
 
@@ -410,6 +428,11 @@ begin
       FAlarmManager := TJAlarmManager.Wrap(LService);
   end;
   Result := FAlarmManager;
+end;
+
+class function TAndroidHelperEx.CanScheduleExactAlarms: Boolean;
+begin
+  Result := not TOSVersion.Check(14) or TJAlarmManagerEx.Wrap(AlarmManager).canScheduleExactAlarms;
 end;
 
 class function TAndroidHelperEx.CheckBuildAndTarget(const AValue: Integer): Boolean;
@@ -820,7 +843,12 @@ begin
   LStartAt := GetTimeFromNowInMillis(SecondsBetween(Now, AAlarm));
   // Allow for alarms while in "doze" mode
   if TOSVersion.Check(6) then
-    TAndroidHelper.AlarmManager.setExactAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result)
+  begin
+    if CanScheduleExactAlarms then
+      AlarmManager.setExactAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result)
+    else
+      AlarmManager.setAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result);
+  end
   else
     TAndroidHelper.AlarmManager.&set(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result);
 end;
@@ -859,6 +887,16 @@ begin
     LAction := StringToJString('android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION');
     LIntent := TJIntent.JavaClass.init(LAction, LUri);
     TAndroidHelper.Context.startActivity(LIntent);
+    Result := True;
+  end;
+end;
+
+class function TAndroidHelperEx.ShowExactAlarmPermissionSettings: Boolean;
+begin
+  Result := False;
+  if not CanScheduleExactAlarms then
+  begin
+    TAndroidHelper.Context.startActivity(TJIntent.JavaClass.init(StringToJString(cActionRequestScheduledExactAlarm)));
     Result := True;
   end;
 end;
