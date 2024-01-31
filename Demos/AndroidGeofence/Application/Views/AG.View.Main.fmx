@@ -40,6 +40,7 @@ object MainView: TMainView
       Size.PlatformDefault = False
       TabOrder = 4
       Text = 'To Json'
+      TextSettings.Trimming = None
       Visible = False
       OnClick = ToJsonButtonClick
     end
@@ -53,6 +54,7 @@ object MainView: TMainView
       Size.PlatformDefault = False
       TabOrder = 3
       Text = 'Start'
+      TextSettings.Trimming = None
       OnClick = StartButtonClick
     end
     object StopButton: TButton
@@ -65,6 +67,7 @@ object MainView: TMainView
       Size.PlatformDefault = False
       TabOrder = 2
       Text = 'Stop'
+      TextSettings.Trimming = None
       OnClick = StopButtonClick
     end
     object ClearButton: TButton
@@ -77,6 +80,7 @@ object MainView: TMainView
       Size.PlatformDefault = False
       TabOrder = 1
       Text = 'Clear'
+      TextSettings.Trimming = None
       OnClick = ClearButtonClick
     end
     object RemoveAppleButton: TButton
@@ -90,6 +94,7 @@ object MainView: TMainView
       Size.PlatformDefault = False
       TabOrder = 0
       Text = 'Remove Apple'
+      TextSettings.Trimming = None
       OnClick = RemoveAppleButtonClick
     end
   end

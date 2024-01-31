@@ -50,7 +50,7 @@ uses
   Androidapi.JNI.GraphicsContentViewText, Androidapi.Helpers, Androidapi.JNI.Net, Androidapi.JNI.Provider,
   FMX.Platform, FMX.DialogService.Async,
   DW.OSLog,
-  DW.Json, DW.Consts.Android, DW.Android.Helpers;
+  DW.Json, DW.Consts.Android, DW.Android.Helpers, DW.Permissions.Helpers;
 
 const
   cGeofenceRadius = 100; // metres
@@ -59,14 +59,14 @@ const
 type
   TPermissionsHelper = record
   public
-    class procedure LogPermissions(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>); static;
+    class procedure LogPermissions(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray); static;
   end;
 
 { TPermissionsHelper }
 
-class procedure TPermissionsHelper.LogPermissions(const APermissions: TArray<string>; const AGrantResults: TArray<TPermissionStatus>);
+class procedure TPermissionsHelper.LogPermissions(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray);
 const
-  cGrantedCaptions: array[TPermissionStatus] of string = ('Granted', 'Denied', 'Permanently Denied');
+  cGrantedCaptions: array[TPermissionStatus] of string = ('Granted', 'Denied');
 var
   I: Integer;
 begin
