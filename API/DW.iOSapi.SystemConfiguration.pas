@@ -169,303 +169,303 @@ type
   end;
   PSCNetworkConnectionContext = ^SCNetworkConnectionContext;
 
-function kCNNetworkInfoKeySSIDData: Pointer;
-function kCNNetworkInfoKeySSID: Pointer;
-function kCNNetworkInfoKeyBSSID: Pointer;
-function kSCDynamicStoreUseSessionKeys: Pointer;
-function kSCResvLink: Pointer;
-function kSCResvInactive: Pointer;
-function kSCPropInterfaceName: Pointer;
-function kSCPropMACAddress: Pointer;
-function kSCPropUserDefinedName: Pointer;
-function kSCPropVersion: Pointer;
-function kSCPrefCurrentSet: Pointer;
-function kSCPrefNetworkServices: Pointer;
-function kSCPrefSets: Pointer;
-function kSCPrefSystem: Pointer;
-function kSCCompNetwork: Pointer;
-function kSCCompService: Pointer;
-function kSCCompGlobal: Pointer;
-function kSCCompHostNames: Pointer;
-function kSCCompInterface: Pointer;
-function kSCCompSystem: Pointer;
-function kSCCompUsers: Pointer;
-function kSCCompAnyRegex: Pointer;
-function kSCEntNetAirPort: Pointer;
-function kSCEntNetDHCP: Pointer;
-function kSCEntNetDNS: Pointer;
-function kSCEntNetEthernet: Pointer;
-function kSCEntNetFireWire: Pointer;
-function kSCEntNetInterface: Pointer;
-function kSCEntNetIPSec: Pointer;
-function kSCEntNetIPv4: Pointer;
-function kSCEntNetIPv6: Pointer;
-function kSCEntNetL2TP: Pointer;
-function kSCEntNetLink: Pointer;
-function kSCEntNetModem: Pointer;
-function kSCEntNetPPP: Pointer;
-function kSCEntNetPPPoE: Pointer;
-function kSCEntNetPPPSerial: Pointer;
-function kSCEntNetPPTP: Pointer;
-function kSCEntNetProxies: Pointer;
-function kSCEntNetSMB: Pointer;
-function kSCEntNet6to4: Pointer;
-function kSCPropNetOverridePrimary: Pointer;
-function kSCPropNetServiceOrder: Pointer;
-function kSCPropNetPPPOverridePrimary: Pointer;
-function kSCPropNetInterfaces: Pointer;
-function kSCPropNetLocalHostName: Pointer;
-function kSCPropNetAirPortAllowNetCreation: Pointer;
-function kSCPropNetAirPortAuthPassword: Pointer;
-function kSCPropNetAirPortAuthPasswordEncryption: Pointer;
-function kSCPropNetAirPortJoinMode: Pointer;
-function kSCPropNetAirPortPowerEnabled: Pointer;
-function kSCPropNetAirPortPreferredNetwork: Pointer;
-function kSCPropNetAirPortSavePasswords: Pointer;
-function kSCValNetAirPortJoinModeAutomatic: Pointer;
-function kSCValNetAirPortJoinModePreferred: Pointer;
-function kSCValNetAirPortJoinModeRanked: Pointer;
-function kSCValNetAirPortJoinModeRecent: Pointer;
-function kSCValNetAirPortJoinModeStrongest: Pointer;
-function kSCValNetAirPortAuthPasswordEncryptionKeychain: Pointer;
-function kSCPropNetDNSDomainName: Pointer;
-function kSCPropNetDNSOptions: Pointer;
-function kSCPropNetDNSSearchDomains: Pointer;
-function kSCPropNetDNSSearchOrder: Pointer;
-function kSCPropNetDNSServerAddresses: Pointer;
-function kSCPropNetDNSServerPort: Pointer;
-function kSCPropNetDNSServerTimeout: Pointer;
-function kSCPropNetDNSSortList: Pointer;
-function kSCPropNetDNSSupplementalMatchDomains: Pointer;
-function kSCPropNetDNSSupplementalMatchOrders: Pointer;
-function kSCPropNetEthernetMediaSubType: Pointer;
-function kSCPropNetEthernetMediaOptions: Pointer;
-function kSCPropNetEthernetMTU: Pointer;
-function kSCPropNetInterfaceDeviceName: Pointer;
-function kSCPropNetInterfaceHardware: Pointer;
-function kSCPropNetInterfaceType: Pointer;
-function kSCPropNetInterfaceSubType: Pointer;
-function kSCPropNetInterfaceSupportsModemOnHold: Pointer;
-function kSCValNetInterfaceTypeEthernet: Pointer;
-function kSCValNetInterfaceTypeFireWire: Pointer;
-function kSCValNetInterfaceTypePPP: Pointer;
-function kSCValNetInterfaceType6to4: Pointer;
-function kSCValNetInterfaceTypeIPSec: Pointer;
-function kSCValNetInterfaceSubTypePPPoE: Pointer;
-function kSCValNetInterfaceSubTypePPPSerial: Pointer;
-function kSCValNetInterfaceSubTypePPTP: Pointer;
-function kSCValNetInterfaceSubTypeL2TP: Pointer;
-function kSCPropNetIPSecAuthenticationMethod: Pointer;
-function kSCPropNetIPSecLocalCertificate: Pointer;
-function kSCPropNetIPSecLocalIdentifier: Pointer;
-function kSCPropNetIPSecLocalIdentifierType: Pointer;
-function kSCPropNetIPSecSharedSecret: Pointer;
-function kSCPropNetIPSecSharedSecretEncryption: Pointer;
-function kSCPropNetIPSecConnectTime: Pointer;
-function kSCPropNetIPSecRemoteAddress: Pointer;
-function kSCPropNetIPSecStatus: Pointer;
-function kSCPropNetIPSecXAuthEnabled: Pointer;
-function kSCPropNetIPSecXAuthName: Pointer;
-function kSCPropNetIPSecXAuthPassword: Pointer;
-function kSCPropNetIPSecXAuthPasswordEncryption: Pointer;
-function kSCValNetIPSecAuthenticationMethodSharedSecret: Pointer;
-function kSCValNetIPSecAuthenticationMethodCertificate: Pointer;
-function kSCValNetIPSecAuthenticationMethodHybrid: Pointer;
-function kSCValNetIPSecLocalIdentifierTypeKeyID: Pointer;
-function kSCValNetIPSecSharedSecretEncryptionKeychain: Pointer;
-function kSCValNetIPSecXAuthPasswordEncryptionKeychain: Pointer;
-function kSCValNetIPSecXAuthPasswordEncryptionPrompt: Pointer;
-function kSCPropNetIPv4Addresses: Pointer;
-function kSCPropNetIPv4ConfigMethod: Pointer;
-function kSCPropNetIPv4DHCPClientID: Pointer;
-function kSCPropNetIPv4Router: Pointer;
-function kSCPropNetIPv4SubnetMasks: Pointer;
-function kSCPropNetIPv4DestAddresses: Pointer;
-function kSCPropNetIPv4BroadcastAddresses: Pointer;
-function kSCValNetIPv4ConfigMethodAutomatic: Pointer;
-function kSCValNetIPv4ConfigMethodBOOTP: Pointer;
-function kSCValNetIPv4ConfigMethodDHCP: Pointer;
-function kSCValNetIPv4ConfigMethodINFORM: Pointer;
-function kSCValNetIPv4ConfigMethodLinkLocal: Pointer;
-function kSCValNetIPv4ConfigMethodManual: Pointer;
-function kSCValNetIPv4ConfigMethodPPP: Pointer;
-function kSCPropNetIPv6Addresses: Pointer;
-function kSCPropNetIPv6ConfigMethod: Pointer;
-function kSCPropNetIPv6DestAddresses: Pointer;
-function kSCPropNetIPv6Flags: Pointer;
-function kSCPropNetIPv6PrefixLength: Pointer;
-function kSCPropNetIPv6Router: Pointer;
-function kSCValNetIPv6ConfigMethodAutomatic: Pointer;
-function kSCValNetIPv6ConfigMethodLinkLocal: Pointer;
-function kSCValNetIPv6ConfigMethodManual: Pointer;
-function kSCValNetIPv6ConfigMethodRouterAdvertisement: Pointer;
-function kSCValNetIPv6ConfigMethod6to4: Pointer;
-function kSCPropNet6to4Relay: Pointer;
-function kSCPropNetLinkActive: Pointer;
-function kSCPropNetLinkDetaching: Pointer;
-function kSCPropNetModemAccessPointName: Pointer;
-function kSCPropNetModemConnectionPersonality: Pointer;
-function kSCPropNetModemConnectionScript: Pointer;
-function kSCPropNetModemConnectSpeed: Pointer;
-function kSCPropNetModemDataCompression: Pointer;
-function kSCPropNetModemDeviceContextID: Pointer;
-function kSCPropNetModemDeviceModel: Pointer;
-function kSCPropNetModemDeviceVendor: Pointer;
-function kSCPropNetModemDialMode: Pointer;
-function kSCPropNetModemErrorCorrection: Pointer;
-function kSCPropNetModemHoldCallWaitingAudibleAlert: Pointer;
-function kSCPropNetModemHoldDisconnectOnAnswer: Pointer;
-function kSCPropNetModemHoldEnabled: Pointer;
-function kSCPropNetModemHoldReminder: Pointer;
-function kSCPropNetModemHoldReminderTime: Pointer;
-function kSCPropNetModemNote: Pointer;
-function kSCPropNetModemPulseDial: Pointer;
-function kSCPropNetModemSpeaker: Pointer;
-function kSCPropNetModemSpeed: Pointer;
-function kSCValNetModemDialModeIgnoreDialTone: Pointer;
-function kSCValNetModemDialModeManual: Pointer;
-function kSCValNetModemDialModeWaitForDialTone: Pointer;
-function kSCPropNetPPPACSPEnabled: Pointer;
-function kSCPropNetPPPConnectTime: Pointer;
-function kSCPropNetPPPDeviceLastCause: Pointer;
-function kSCPropNetPPPDialOnDemand: Pointer;
-function kSCPropNetPPPDisconnectOnFastUserSwitch: Pointer;
-function kSCPropNetPPPDisconnectOnIdle: Pointer;
-function kSCPropNetPPPDisconnectOnIdleTimer: Pointer;
-function kSCPropNetPPPDisconnectOnLogout: Pointer;
-function kSCPropNetPPPDisconnectOnSleep: Pointer;
-function kSCPropNetPPPDisconnectTime: Pointer;
-function kSCPropNetPPPIdleReminderTimer: Pointer;
-function kSCPropNetPPPIdleReminder: Pointer;
-function kSCPropNetPPPLastCause: Pointer;
-function kSCPropNetPPPLogfile: Pointer;
-function kSCPropNetPPPPlugins: Pointer;
-function kSCPropNetPPPRetryConnectTime: Pointer;
-function kSCPropNetPPPSessionTimer: Pointer;
-function kSCPropNetPPPStatus: Pointer;
-function kSCPropNetPPPUseSessionTimer: Pointer;
-function kSCPropNetPPPVerboseLogging: Pointer;
-function kSCPropNetPPPAuthEAPPlugins: Pointer;
-function kSCPropNetPPPAuthName: Pointer;
-function kSCPropNetPPPAuthPassword: Pointer;
-function kSCPropNetPPPAuthPasswordEncryption: Pointer;
-function kSCPropNetPPPAuthPrompt: Pointer;
-function kSCPropNetPPPAuthProtocol: Pointer;
-function kSCValNetPPPAuthPasswordEncryptionKeychain: Pointer;
-function kSCValNetPPPAuthPasswordEncryptionToken: Pointer;
-function kSCValNetPPPAuthPromptBefore: Pointer;
-function kSCValNetPPPAuthPromptAfter: Pointer;
-function kSCValNetPPPAuthProtocolCHAP: Pointer;
-function kSCValNetPPPAuthProtocolEAP: Pointer;
-function kSCValNetPPPAuthProtocolMSCHAP1: Pointer;
-function kSCValNetPPPAuthProtocolMSCHAP2: Pointer;
-function kSCValNetPPPAuthProtocolPAP: Pointer;
-function kSCPropNetPPPCommAlternateRemoteAddress: Pointer;
-function kSCPropNetPPPCommConnectDelay: Pointer;
-function kSCPropNetPPPCommDisplayTerminalWindow: Pointer;
-function kSCPropNetPPPCommRedialCount: Pointer;
-function kSCPropNetPPPCommRedialEnabled: Pointer;
-function kSCPropNetPPPCommRedialInterval: Pointer;
-function kSCPropNetPPPCommRemoteAddress: Pointer;
-function kSCPropNetPPPCommTerminalScript: Pointer;
-function kSCPropNetPPPCommUseTerminalScript: Pointer;
-function kSCPropNetPPPCCPEnabled: Pointer;
-function kSCPropNetPPPCCPMPPE40Enabled: Pointer;
-function kSCPropNetPPPCCPMPPE128Enabled: Pointer;
-function kSCPropNetPPPIPCPCompressionVJ: Pointer;
-function kSCPropNetPPPIPCPUsePeerDNS: Pointer;
-function kSCPropNetPPPLCPEchoEnabled: Pointer;
-function kSCPropNetPPPLCPEchoFailure: Pointer;
-function kSCPropNetPPPLCPEchoInterval: Pointer;
-function kSCPropNetPPPLCPCompressionACField: Pointer;
-function kSCPropNetPPPLCPCompressionPField: Pointer;
-function kSCPropNetPPPLCPMRU: Pointer;
-function kSCPropNetPPPLCPMTU: Pointer;
-function kSCPropNetPPPLCPReceiveACCM: Pointer;
-function kSCPropNetPPPLCPTransmitACCM: Pointer;
-function kSCPropNetL2TPIPSecSharedSecret: Pointer;
-function kSCPropNetL2TPIPSecSharedSecretEncryption: Pointer;
-function kSCPropNetL2TPTransport: Pointer;
-function kSCValNetL2TPIPSecSharedSecretEncryptionKeychain: Pointer;
-function kSCValNetL2TPTransportIP: Pointer;
-function kSCValNetL2TPTransportIPSec: Pointer;
-function kSCPropNetProxiesExceptionsList: Pointer;
-function kSCPropNetProxiesExcludeSimpleHostnames: Pointer;
-function kSCPropNetProxiesFTPEnable: Pointer;
-function kSCPropNetProxiesFTPPassive: Pointer;
-function kSCPropNetProxiesFTPPort: Pointer;
-function kSCPropNetProxiesFTPProxy: Pointer;
-function kSCPropNetProxiesGopherEnable: Pointer;
-function kSCPropNetProxiesGopherPort: Pointer;
-function kSCPropNetProxiesGopherProxy: Pointer;
-function kSCPropNetProxiesHTTPEnable: Pointer;
-function kSCPropNetProxiesHTTPPort: Pointer;
-function kSCPropNetProxiesHTTPProxy: Pointer;
-function kSCPropNetProxiesHTTPSEnable: Pointer;
-function kSCPropNetProxiesHTTPSPort: Pointer;
-function kSCPropNetProxiesHTTPSProxy: Pointer;
-function kSCPropNetProxiesRTSPEnable: Pointer;
-function kSCPropNetProxiesRTSPPort: Pointer;
-function kSCPropNetProxiesRTSPProxy: Pointer;
-function kSCPropNetProxiesSOCKSEnable: Pointer;
-function kSCPropNetProxiesSOCKSPort: Pointer;
-function kSCPropNetProxiesSOCKSProxy: Pointer;
-function kSCPropNetProxiesProxyAutoConfigEnable: Pointer;
-function kSCPropNetProxiesProxyAutoConfigJavaScript: Pointer;
-function kSCPropNetProxiesProxyAutoConfigURLString: Pointer;
-function kSCPropNetProxiesProxyAutoDiscoveryEnable: Pointer;
-function kSCPropNetSMBNetBIOSName: Pointer;
-function kSCPropNetSMBNetBIOSNodeType: Pointer;
-function kSCPropNetSMBNetBIOSScope: Pointer;
-function kSCPropNetSMBWINSAddresses: Pointer;
-function kSCPropNetSMBWorkgroup: Pointer;
-function kSCValNetSMBNetBIOSNodeTypeBroadcast: Pointer;
-function kSCValNetSMBNetBIOSNodeTypePeer: Pointer;
-function kSCValNetSMBNetBIOSNodeTypeMixed: Pointer;
-function kSCValNetSMBNetBIOSNodeTypeHybrid: Pointer;
-function kSCEntUsersConsoleUser: Pointer;
-function kSCPropSystemComputerName: Pointer;
-function kSCPropSystemComputerNameEncoding: Pointer;
-function kSCDynamicStoreDomainFile: Pointer;
-function kSCDynamicStoreDomainPlugin: Pointer;
-function kSCDynamicStoreDomainSetup: Pointer;
-function kSCDynamicStoreDomainState: Pointer;
-function kSCDynamicStoreDomainPrefs: Pointer;
-function kSCDynamicStorePropSetupCurrentSet: Pointer;
-function kSCDynamicStorePropSetupLastUpdated: Pointer;
-function kSCDynamicStorePropNetInterfaces: Pointer;
-function kSCDynamicStorePropNetPrimaryInterface: Pointer;
-function kSCDynamicStorePropNetPrimaryService: Pointer;
-function kSCDynamicStorePropNetServiceIDs: Pointer;
-function kSCPropUsersConsoleUserName: Pointer;
-function kSCPropUsersConsoleUserUID: Pointer;
-function kSCPropUsersConsoleUserGID: Pointer;
-function kCFErrorDomainSystemConfiguration: Pointer;
-function kSCNetworkInterfaceType6to4: Pointer;
-function kSCNetworkInterfaceTypeBluetooth: Pointer;
-function kSCNetworkInterfaceTypeBond: Pointer;
-function kSCNetworkInterfaceTypeEthernet: Pointer;
-function kSCNetworkInterfaceTypeFireWire: Pointer;
-function kSCNetworkInterfaceTypeIEEE80211: Pointer;
-function kSCNetworkInterfaceTypeIPSec: Pointer;
-function kSCNetworkInterfaceTypeIrDA: Pointer;
-function kSCNetworkInterfaceTypeL2TP: Pointer;
-function kSCNetworkInterfaceTypeModem: Pointer;
-function kSCNetworkInterfaceTypePPP: Pointer;
-function kSCNetworkInterfaceTypePPTP: Pointer;
-function kSCNetworkInterfaceTypeSerial: Pointer;
-function kSCNetworkInterfaceTypeVLAN: Pointer;
-function kSCNetworkInterfaceTypeWWAN: Pointer;
-function kSCNetworkInterfaceTypeIPv4: Pointer;
-function kSCNetworkInterfaceIPv4: Pointer;
-function kSCBondStatusDeviceAggregationStatus: Pointer;
-function kSCBondStatusDeviceCollecting: Pointer;
-function kSCBondStatusDeviceDistributing: Pointer;
-function kSCNetworkProtocolTypeDNS: Pointer;
-function kSCNetworkProtocolTypeIPv4: Pointer;
-function kSCNetworkProtocolTypeIPv6: Pointer;
-function kSCNetworkProtocolTypeProxies: Pointer;
-function kSCNetworkProtocolTypeSMB: Pointer;
+function kCNNetworkInfoKeySSIDData: NSString;
+function kCNNetworkInfoKeySSID: NSString;
+function kCNNetworkInfoKeyBSSID: NSString;
+function kSCDynamicStoreUseSessionKeys: NSString;
+function kSCResvLink: NSString;
+function kSCResvInactive: NSString;
+function kSCPropInterfaceName: NSString;
+function kSCPropMACAddress: NSString;
+function kSCPropUserDefinedName: NSString;
+function kSCPropVersion: NSString;
+function kSCPrefCurrentSet: NSString;
+function kSCPrefNetworkServices: NSString;
+function kSCPrefSets: NSString;
+function kSCPrefSystem: NSString;
+function kSCCompNetwork: NSString;
+function kSCCompService: NSString;
+function kSCCompGlobal: NSString;
+function kSCCompHostNames: NSString;
+function kSCCompInterface: NSString;
+function kSCCompSystem: NSString;
+function kSCCompUsers: NSString;
+function kSCCompAnyRegex: NSString;
+function kSCEntNetAirPort: NSString;
+function kSCEntNetDHCP: NSString;
+function kSCEntNetDNS: NSString;
+function kSCEntNetEthernet: NSString;
+function kSCEntNetFireWire: NSString;
+function kSCEntNetInterface: NSString;
+function kSCEntNetIPSec: NSString;
+function kSCEntNetIPv4: NSString;
+function kSCEntNetIPv6: NSString;
+function kSCEntNetL2TP: NSString;
+function kSCEntNetLink: NSString;
+function kSCEntNetModem: NSString;
+function kSCEntNetPPP: NSString;
+function kSCEntNetPPPoE: NSString;
+function kSCEntNetPPPSerial: NSString;
+function kSCEntNetPPTP: NSString;
+function kSCEntNetProxies: NSString;
+function kSCEntNetSMB: NSString;
+function kSCEntNet6to4: NSString;
+function kSCPropNetOverridePrimary: NSString;
+function kSCPropNetServiceOrder: NSString;
+function kSCPropNetPPPOverridePrimary: NSString;
+function kSCPropNetInterfaces: NSString;
+function kSCPropNetLocalHostName: NSString;
+function kSCPropNetAirPortAllowNetCreation: NSString;
+function kSCPropNetAirPortAuthPassword: NSString;
+function kSCPropNetAirPortAuthPasswordEncryption: NSString;
+function kSCPropNetAirPortJoinMode: NSString;
+function kSCPropNetAirPortPowerEnabled: NSString;
+function kSCPropNetAirPortPreferredNetwork: NSString;
+function kSCPropNetAirPortSavePasswords: NSString;
+function kSCValNetAirPortJoinModeAutomatic: NSString;
+function kSCValNetAirPortJoinModePreferred: NSString;
+function kSCValNetAirPortJoinModeRanked: NSString;
+function kSCValNetAirPortJoinModeRecent: NSString;
+function kSCValNetAirPortJoinModeStrongest: NSString;
+function kSCValNetAirPortAuthPasswordEncryptionKeychain: NSString;
+function kSCPropNetDNSDomainName: NSString;
+function kSCPropNetDNSOptions: NSString;
+function kSCPropNetDNSSearchDomains: NSString;
+function kSCPropNetDNSSearchOrder: NSString;
+function kSCPropNetDNSServerAddresses: NSString;
+function kSCPropNetDNSServerPort: NSString;
+function kSCPropNetDNSServerTimeout: NSString;
+function kSCPropNetDNSSortList: NSString;
+function kSCPropNetDNSSupplementalMatchDomains: NSString;
+function kSCPropNetDNSSupplementalMatchOrders: NSString;
+function kSCPropNetEthernetMediaSubType: NSString;
+function kSCPropNetEthernetMediaOptions: NSString;
+function kSCPropNetEthernetMTU: NSString;
+function kSCPropNetInterfaceDeviceName: NSString;
+function kSCPropNetInterfaceHardware: NSString;
+function kSCPropNetInterfaceType: NSString;
+function kSCPropNetInterfaceSubType: NSString;
+function kSCPropNetInterfaceSupportsModemOnHold: NSString;
+function kSCValNetInterfaceTypeEthernet: NSString;
+function kSCValNetInterfaceTypeFireWire: NSString;
+function kSCValNetInterfaceTypePPP: NSString;
+function kSCValNetInterfaceType6to4: NSString;
+function kSCValNetInterfaceTypeIPSec: NSString;
+function kSCValNetInterfaceSubTypePPPoE: NSString;
+function kSCValNetInterfaceSubTypePPPSerial: NSString;
+function kSCValNetInterfaceSubTypePPTP: NSString;
+function kSCValNetInterfaceSubTypeL2TP: NSString;
+function kSCPropNetIPSecAuthenticationMethod: NSString;
+function kSCPropNetIPSecLocalCertificate: NSString;
+function kSCPropNetIPSecLocalIdentifier: NSString;
+function kSCPropNetIPSecLocalIdentifierType: NSString;
+function kSCPropNetIPSecSharedSecret: NSString;
+function kSCPropNetIPSecSharedSecretEncryption: NSString;
+function kSCPropNetIPSecConnectTime: NSString;
+function kSCPropNetIPSecRemoteAddress: NSString;
+function kSCPropNetIPSecStatus: NSString;
+function kSCPropNetIPSecXAuthEnabled: NSString;
+function kSCPropNetIPSecXAuthName: NSString;
+function kSCPropNetIPSecXAuthPassword: NSString;
+function kSCPropNetIPSecXAuthPasswordEncryption: NSString;
+function kSCValNetIPSecAuthenticationMethodSharedSecret: NSString;
+function kSCValNetIPSecAuthenticationMethodCertificate: NSString;
+function kSCValNetIPSecAuthenticationMethodHybrid: NSString;
+function kSCValNetIPSecLocalIdentifierTypeKeyID: NSString;
+function kSCValNetIPSecSharedSecretEncryptionKeychain: NSString;
+function kSCValNetIPSecXAuthPasswordEncryptionKeychain: NSString;
+function kSCValNetIPSecXAuthPasswordEncryptionPrompt: NSString;
+function kSCPropNetIPv4Addresses: NSString;
+function kSCPropNetIPv4ConfigMethod: NSString;
+function kSCPropNetIPv4DHCPClientID: NSString;
+function kSCPropNetIPv4Router: NSString;
+function kSCPropNetIPv4SubnetMasks: NSString;
+function kSCPropNetIPv4DestAddresses: NSString;
+function kSCPropNetIPv4BroadcastAddresses: NSString;
+function kSCValNetIPv4ConfigMethodAutomatic: NSString;
+function kSCValNetIPv4ConfigMethodBOOTP: NSString;
+function kSCValNetIPv4ConfigMethodDHCP: NSString;
+function kSCValNetIPv4ConfigMethodINFORM: NSString;
+function kSCValNetIPv4ConfigMethodLinkLocal: NSString;
+function kSCValNetIPv4ConfigMethodManual: NSString;
+function kSCValNetIPv4ConfigMethodPPP: NSString;
+function kSCPropNetIPv6Addresses: NSString;
+function kSCPropNetIPv6ConfigMethod: NSString;
+function kSCPropNetIPv6DestAddresses: NSString;
+function kSCPropNetIPv6Flags: NSString;
+function kSCPropNetIPv6PrefixLength: NSString;
+function kSCPropNetIPv6Router: NSString;
+function kSCValNetIPv6ConfigMethodAutomatic: NSString;
+function kSCValNetIPv6ConfigMethodLinkLocal: NSString;
+function kSCValNetIPv6ConfigMethodManual: NSString;
+function kSCValNetIPv6ConfigMethodRouterAdvertisement: NSString;
+function kSCValNetIPv6ConfigMethod6to4: NSString;
+function kSCPropNet6to4Relay: NSString;
+function kSCPropNetLinkActive: NSString;
+function kSCPropNetLinkDetaching: NSString;
+function kSCPropNetModemAccessPointName: NSString;
+function kSCPropNetModemConnectionPersonality: NSString;
+function kSCPropNetModemConnectionScript: NSString;
+function kSCPropNetModemConnectSpeed: NSString;
+function kSCPropNetModemDataCompression: NSString;
+function kSCPropNetModemDeviceContextID: NSString;
+function kSCPropNetModemDeviceModel: NSString;
+function kSCPropNetModemDeviceVendor: NSString;
+function kSCPropNetModemDialMode: NSString;
+function kSCPropNetModemErrorCorrection: NSString;
+function kSCPropNetModemHoldCallWaitingAudibleAlert: NSString;
+function kSCPropNetModemHoldDisconnectOnAnswer: NSString;
+function kSCPropNetModemHoldEnabled: NSString;
+function kSCPropNetModemHoldReminder: NSString;
+function kSCPropNetModemHoldReminderTime: NSString;
+function kSCPropNetModemNote: NSString;
+function kSCPropNetModemPulseDial: NSString;
+function kSCPropNetModemSpeaker: NSString;
+function kSCPropNetModemSpeed: NSString;
+function kSCValNetModemDialModeIgnoreDialTone: NSString;
+function kSCValNetModemDialModeManual: NSString;
+function kSCValNetModemDialModeWaitForDialTone: NSString;
+function kSCPropNetPPPACSPEnabled: NSString;
+function kSCPropNetPPPConnectTime: NSString;
+function kSCPropNetPPPDeviceLastCause: NSString;
+function kSCPropNetPPPDialOnDemand: NSString;
+function kSCPropNetPPPDisconnectOnFastUserSwitch: NSString;
+function kSCPropNetPPPDisconnectOnIdle: NSString;
+function kSCPropNetPPPDisconnectOnIdleTimer: NSString;
+function kSCPropNetPPPDisconnectOnLogout: NSString;
+function kSCPropNetPPPDisconnectOnSleep: NSString;
+function kSCPropNetPPPDisconnectTime: NSString;
+function kSCPropNetPPPIdleReminderTimer: NSString;
+function kSCPropNetPPPIdleReminder: NSString;
+function kSCPropNetPPPLastCause: NSString;
+function kSCPropNetPPPLogfile: NSString;
+function kSCPropNetPPPPlugins: NSString;
+function kSCPropNetPPPRetryConnectTime: NSString;
+function kSCPropNetPPPSessionTimer: NSString;
+function kSCPropNetPPPStatus: NSString;
+function kSCPropNetPPPUseSessionTimer: NSString;
+function kSCPropNetPPPVerboseLogging: NSString;
+function kSCPropNetPPPAuthEAPPlugins: NSString;
+function kSCPropNetPPPAuthName: NSString;
+function kSCPropNetPPPAuthPassword: NSString;
+function kSCPropNetPPPAuthPasswordEncryption: NSString;
+function kSCPropNetPPPAuthPrompt: NSString;
+function kSCPropNetPPPAuthProtocol: NSString;
+function kSCValNetPPPAuthPasswordEncryptionKeychain: NSString;
+function kSCValNetPPPAuthPasswordEncryptionToken: NSString;
+function kSCValNetPPPAuthPromptBefore: NSString;
+function kSCValNetPPPAuthPromptAfter: NSString;
+function kSCValNetPPPAuthProtocolCHAP: NSString;
+function kSCValNetPPPAuthProtocolEAP: NSString;
+function kSCValNetPPPAuthProtocolMSCHAP1: NSString;
+function kSCValNetPPPAuthProtocolMSCHAP2: NSString;
+function kSCValNetPPPAuthProtocolPAP: NSString;
+function kSCPropNetPPPCommAlternateRemoteAddress: NSString;
+function kSCPropNetPPPCommConnectDelay: NSString;
+function kSCPropNetPPPCommDisplayTerminalWindow: NSString;
+function kSCPropNetPPPCommRedialCount: NSString;
+function kSCPropNetPPPCommRedialEnabled: NSString;
+function kSCPropNetPPPCommRedialInterval: NSString;
+function kSCPropNetPPPCommRemoteAddress: NSString;
+function kSCPropNetPPPCommTerminalScript: NSString;
+function kSCPropNetPPPCommUseTerminalScript: NSString;
+function kSCPropNetPPPCCPEnabled: NSString;
+function kSCPropNetPPPCCPMPPE40Enabled: NSString;
+function kSCPropNetPPPCCPMPPE128Enabled: NSString;
+function kSCPropNetPPPIPCPCompressionVJ: NSString;
+function kSCPropNetPPPIPCPUsePeerDNS: NSString;
+function kSCPropNetPPPLCPEchoEnabled: NSString;
+function kSCPropNetPPPLCPEchoFailure: NSString;
+function kSCPropNetPPPLCPEchoInterval: NSString;
+function kSCPropNetPPPLCPCompressionACField: NSString;
+function kSCPropNetPPPLCPCompressionPField: NSString;
+function kSCPropNetPPPLCPMRU: NSString;
+function kSCPropNetPPPLCPMTU: NSString;
+function kSCPropNetPPPLCPReceiveACCM: NSString;
+function kSCPropNetPPPLCPTransmitACCM: NSString;
+function kSCPropNetL2TPIPSecSharedSecret: NSString;
+function kSCPropNetL2TPIPSecSharedSecretEncryption: NSString;
+function kSCPropNetL2TPTransport: NSString;
+function kSCValNetL2TPIPSecSharedSecretEncryptionKeychain: NSString;
+function kSCValNetL2TPTransportIP: NSString;
+function kSCValNetL2TPTransportIPSec: NSString;
+function kSCPropNetProxiesExceptionsList: NSString;
+function kSCPropNetProxiesExcludeSimpleHostnames: NSString;
+function kSCPropNetProxiesFTPEnable: NSString;
+function kSCPropNetProxiesFTPPassive: NSString;
+function kSCPropNetProxiesFTPPort: NSString;
+function kSCPropNetProxiesFTPProxy: NSString;
+function kSCPropNetProxiesGopherEnable: NSString;
+function kSCPropNetProxiesGopherPort: NSString;
+function kSCPropNetProxiesGopherProxy: NSString;
+function kSCPropNetProxiesHTTPEnable: NSString;
+function kSCPropNetProxiesHTTPPort: NSString;
+function kSCPropNetProxiesHTTPProxy: NSString;
+function kSCPropNetProxiesHTTPSEnable: NSString;
+function kSCPropNetProxiesHTTPSPort: NSString;
+function kSCPropNetProxiesHTTPSProxy: NSString;
+function kSCPropNetProxiesRTSPEnable: NSString;
+function kSCPropNetProxiesRTSPPort: NSString;
+function kSCPropNetProxiesRTSPProxy: NSString;
+function kSCPropNetProxiesSOCKSEnable: NSString;
+function kSCPropNetProxiesSOCKSPort: NSString;
+function kSCPropNetProxiesSOCKSProxy: NSString;
+function kSCPropNetProxiesProxyAutoConfigEnable: NSString;
+function kSCPropNetProxiesProxyAutoConfigJavaScript: NSString;
+function kSCPropNetProxiesProxyAutoConfigURLString: NSString;
+function kSCPropNetProxiesProxyAutoDiscoveryEnable: NSString;
+function kSCPropNetSMBNetBIOSName: NSString;
+function kSCPropNetSMBNetBIOSNodeType: NSString;
+function kSCPropNetSMBNetBIOSScope: NSString;
+function kSCPropNetSMBWINSAddresses: NSString;
+function kSCPropNetSMBWorkgroup: NSString;
+function kSCValNetSMBNetBIOSNodeTypeBroadcast: NSString;
+function kSCValNetSMBNetBIOSNodeTypePeer: NSString;
+function kSCValNetSMBNetBIOSNodeTypeMixed: NSString;
+function kSCValNetSMBNetBIOSNodeTypeHybrid: NSString;
+function kSCEntUsersConsoleUser: NSString;
+function kSCPropSystemComputerName: NSString;
+function kSCPropSystemComputerNameEncoding: NSString;
+function kSCDynamicStoreDomainFile: NSString;
+function kSCDynamicStoreDomainPlugin: NSString;
+function kSCDynamicStoreDomainSetup: NSString;
+function kSCDynamicStoreDomainState: NSString;
+function kSCDynamicStoreDomainPrefs: NSString;
+function kSCDynamicStorePropSetupCurrentSet: NSString;
+function kSCDynamicStorePropSetupLastUpdated: NSString;
+function kSCDynamicStorePropNetInterfaces: NSString;
+function kSCDynamicStorePropNetPrimaryInterface: NSString;
+function kSCDynamicStorePropNetPrimaryService: NSString;
+function kSCDynamicStorePropNetServiceIDs: NSString;
+function kSCPropUsersConsoleUserName: NSString;
+function kSCPropUsersConsoleUserUID: NSString;
+function kSCPropUsersConsoleUserGID: NSString;
+function kCFErrorDomainSystemConfiguration: NSString;
+function kSCNetworkInterfaceType6to4: NSString;
+function kSCNetworkInterfaceTypeBluetooth: NSString;
+function kSCNetworkInterfaceTypeBond: NSString;
+function kSCNetworkInterfaceTypeEthernet: NSString;
+function kSCNetworkInterfaceTypeFireWire: NSString;
+function kSCNetworkInterfaceTypeIEEE80211: NSString;
+function kSCNetworkInterfaceTypeIPSec: NSString;
+function kSCNetworkInterfaceTypeIrDA: NSString;
+function kSCNetworkInterfaceTypeL2TP: NSString;
+function kSCNetworkInterfaceTypeModem: NSString;
+function kSCNetworkInterfaceTypePPP: NSString;
+function kSCNetworkInterfaceTypePPTP: NSString;
+function kSCNetworkInterfaceTypeSerial: NSString;
+function kSCNetworkInterfaceTypeVLAN: NSString;
+function kSCNetworkInterfaceTypeWWAN: NSString;
+function kSCNetworkInterfaceTypeIPv4: NSString;
+function kSCNetworkInterfaceIPv4: NSString;
+function kSCBondStatusDeviceAggregationStatus: NSString;
+function kSCBondStatusDeviceCollecting: NSString;
+function kSCBondStatusDeviceDistributing: NSString;
+function kSCNetworkProtocolTypeDNS: NSString;
+function kSCNetworkProtocolTypeIPv4: NSString;
+function kSCNetworkProtocolTypeIPv6: NSString;
+function kSCNetworkProtocolTypeProxies: NSString;
+function kSCNetworkProtocolTypeSMB: NSString;
 
 const
   libSystemConfiguration = '/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration';
@@ -847,1489 +847,1489 @@ var
   SystemConfigurationModule: THandle;
 {$ENDIF IOS}
 
-function kCNNetworkInfoKeySSIDData: Pointer;
+function kCNNetworkInfoKeySSIDData: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kCNNetworkInfoKeySSIDData');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kCNNetworkInfoKeySSIDData');
 end;
 
-function kCNNetworkInfoKeySSID: Pointer;
+function kCNNetworkInfoKeySSID: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kCNNetworkInfoKeySSID');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kCNNetworkInfoKeySSID');
 end;
 
-function kCNNetworkInfoKeyBSSID: Pointer;
+function kCNNetworkInfoKeyBSSID: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kCNNetworkInfoKeyBSSID');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kCNNetworkInfoKeyBSSID');
 end;
 
-function kSCDynamicStoreUseSessionKeys: Pointer;
+function kSCDynamicStoreUseSessionKeys: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStoreUseSessionKeys');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStoreUseSessionKeys');
 end;
 
-function kSCResvLink: Pointer;
+function kSCResvLink: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCResvLink');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCResvLink');
 end;
 
-function kSCResvInactive: Pointer;
+function kSCResvInactive: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCResvInactive');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCResvInactive');
 end;
 
-function kSCPropInterfaceName: Pointer;
+function kSCPropInterfaceName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropInterfaceName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropInterfaceName');
 end;
 
-function kSCPropMACAddress: Pointer;
+function kSCPropMACAddress: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropMACAddress');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropMACAddress');
 end;
 
-function kSCPropUserDefinedName: Pointer;
+function kSCPropUserDefinedName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropUserDefinedName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropUserDefinedName');
 end;
 
-function kSCPropVersion: Pointer;
+function kSCPropVersion: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropVersion');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropVersion');
 end;
 
-function kSCPrefCurrentSet: Pointer;
+function kSCPrefCurrentSet: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPrefCurrentSet');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPrefCurrentSet');
 end;
 
-function kSCPrefNetworkServices: Pointer;
+function kSCPrefNetworkServices: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPrefNetworkServices');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPrefNetworkServices');
 end;
 
-function kSCPrefSets: Pointer;
+function kSCPrefSets: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPrefSets');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPrefSets');
 end;
 
-function kSCPrefSystem: Pointer;
+function kSCPrefSystem: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPrefSystem');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPrefSystem');
 end;
 
-function kSCCompNetwork: Pointer;
+function kSCCompNetwork: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCCompNetwork');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCCompNetwork');
 end;
 
-function kSCCompService: Pointer;
+function kSCCompService: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCCompService');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCCompService');
 end;
 
-function kSCCompGlobal: Pointer;
+function kSCCompGlobal: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCCompGlobal');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCCompGlobal');
 end;
 
-function kSCCompHostNames: Pointer;
+function kSCCompHostNames: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCCompHostNames');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCCompHostNames');
 end;
 
-function kSCCompInterface: Pointer;
+function kSCCompInterface: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCCompInterface');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCCompInterface');
 end;
 
-function kSCCompSystem: Pointer;
+function kSCCompSystem: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCCompSystem');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCCompSystem');
 end;
 
-function kSCCompUsers: Pointer;
+function kSCCompUsers: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCCompUsers');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCCompUsers');
 end;
 
-function kSCCompAnyRegex: Pointer;
+function kSCCompAnyRegex: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCCompAnyRegex');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCCompAnyRegex');
 end;
 
-function kSCEntNetAirPort: Pointer;
+function kSCEntNetAirPort: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetAirPort');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetAirPort');
 end;
 
-function kSCEntNetDHCP: Pointer;
+function kSCEntNetDHCP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetDHCP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetDHCP');
 end;
 
-function kSCEntNetDNS: Pointer;
+function kSCEntNetDNS: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetDNS');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetDNS');
 end;
 
-function kSCEntNetEthernet: Pointer;
+function kSCEntNetEthernet: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetEthernet');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetEthernet');
 end;
 
-function kSCEntNetFireWire: Pointer;
+function kSCEntNetFireWire: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetFireWire');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetFireWire');
 end;
 
-function kSCEntNetInterface: Pointer;
+function kSCEntNetInterface: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetInterface');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetInterface');
 end;
 
-function kSCEntNetIPSec: Pointer;
+function kSCEntNetIPSec: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetIPSec');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetIPSec');
 end;
 
-function kSCEntNetIPv4: Pointer;
+function kSCEntNetIPv4: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetIPv4');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetIPv4');
 end;
 
-function kSCEntNetIPv6: Pointer;
+function kSCEntNetIPv6: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetIPv6');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetIPv6');
 end;
 
-function kSCEntNetL2TP: Pointer;
+function kSCEntNetL2TP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetL2TP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetL2TP');
 end;
 
-function kSCEntNetLink: Pointer;
+function kSCEntNetLink: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetLink');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetLink');
 end;
 
-function kSCEntNetModem: Pointer;
+function kSCEntNetModem: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetModem');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetModem');
 end;
 
-function kSCEntNetPPP: Pointer;
+function kSCEntNetPPP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetPPP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetPPP');
 end;
 
-function kSCEntNetPPPoE: Pointer;
+function kSCEntNetPPPoE: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetPPPoE');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetPPPoE');
 end;
 
-function kSCEntNetPPPSerial: Pointer;
+function kSCEntNetPPPSerial: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetPPPSerial');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetPPPSerial');
 end;
 
-function kSCEntNetPPTP: Pointer;
+function kSCEntNetPPTP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetPPTP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetPPTP');
 end;
 
-function kSCEntNetProxies: Pointer;
+function kSCEntNetProxies: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetProxies');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetProxies');
 end;
 
-function kSCEntNetSMB: Pointer;
+function kSCEntNetSMB: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNetSMB');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNetSMB');
 end;
 
-function kSCEntNet6to4: Pointer;
+function kSCEntNet6to4: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntNet6to4');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntNet6to4');
 end;
 
-function kSCPropNetOverridePrimary: Pointer;
+function kSCPropNetOverridePrimary: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetOverridePrimary');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetOverridePrimary');
 end;
 
-function kSCPropNetServiceOrder: Pointer;
+function kSCPropNetServiceOrder: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetServiceOrder');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetServiceOrder');
 end;
 
-function kSCPropNetPPPOverridePrimary: Pointer;
+function kSCPropNetPPPOverridePrimary: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPOverridePrimary');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPOverridePrimary');
 end;
 
-function kSCPropNetInterfaces: Pointer;
+function kSCPropNetInterfaces: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetInterfaces');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetInterfaces');
 end;
 
-function kSCPropNetLocalHostName: Pointer;
+function kSCPropNetLocalHostName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetLocalHostName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetLocalHostName');
 end;
 
-function kSCPropNetAirPortAllowNetCreation: Pointer;
+function kSCPropNetAirPortAllowNetCreation: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetAirPortAllowNetCreation');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetAirPortAllowNetCreation');
 end;
 
-function kSCPropNetAirPortAuthPassword: Pointer;
+function kSCPropNetAirPortAuthPassword: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetAirPortAuthPassword');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetAirPortAuthPassword');
 end;
 
-function kSCPropNetAirPortAuthPasswordEncryption: Pointer;
+function kSCPropNetAirPortAuthPasswordEncryption: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetAirPortAuthPasswordEncryption');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetAirPortAuthPasswordEncryption');
 end;
 
-function kSCPropNetAirPortJoinMode: Pointer;
+function kSCPropNetAirPortJoinMode: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetAirPortJoinMode');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetAirPortJoinMode');
 end;
 
-function kSCPropNetAirPortPowerEnabled: Pointer;
+function kSCPropNetAirPortPowerEnabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetAirPortPowerEnabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetAirPortPowerEnabled');
 end;
 
-function kSCPropNetAirPortPreferredNetwork: Pointer;
+function kSCPropNetAirPortPreferredNetwork: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetAirPortPreferredNetwork');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetAirPortPreferredNetwork');
 end;
 
-function kSCPropNetAirPortSavePasswords: Pointer;
+function kSCPropNetAirPortSavePasswords: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetAirPortSavePasswords');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetAirPortSavePasswords');
 end;
 
-function kSCValNetAirPortJoinModeAutomatic: Pointer;
+function kSCValNetAirPortJoinModeAutomatic: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetAirPortJoinModeAutomatic');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetAirPortJoinModeAutomatic');
 end;
 
-function kSCValNetAirPortJoinModePreferred: Pointer;
+function kSCValNetAirPortJoinModePreferred: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetAirPortJoinModePreferred');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetAirPortJoinModePreferred');
 end;
 
-function kSCValNetAirPortJoinModeRanked: Pointer;
+function kSCValNetAirPortJoinModeRanked: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetAirPortJoinModeRanked');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetAirPortJoinModeRanked');
 end;
 
-function kSCValNetAirPortJoinModeRecent: Pointer;
+function kSCValNetAirPortJoinModeRecent: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetAirPortJoinModeRecent');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetAirPortJoinModeRecent');
 end;
 
-function kSCValNetAirPortJoinModeStrongest: Pointer;
+function kSCValNetAirPortJoinModeStrongest: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetAirPortJoinModeStrongest');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetAirPortJoinModeStrongest');
 end;
 
-function kSCValNetAirPortAuthPasswordEncryptionKeychain: Pointer;
+function kSCValNetAirPortAuthPasswordEncryptionKeychain: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetAirPortAuthPasswordEncryptionKeychain');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetAirPortAuthPasswordEncryptionKeychain');
 end;
 
-function kSCPropNetDNSDomainName: Pointer;
+function kSCPropNetDNSDomainName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSDomainName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSDomainName');
 end;
 
-function kSCPropNetDNSOptions: Pointer;
+function kSCPropNetDNSOptions: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSOptions');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSOptions');
 end;
 
-function kSCPropNetDNSSearchDomains: Pointer;
+function kSCPropNetDNSSearchDomains: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSSearchDomains');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSSearchDomains');
 end;
 
-function kSCPropNetDNSSearchOrder: Pointer;
+function kSCPropNetDNSSearchOrder: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSSearchOrder');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSSearchOrder');
 end;
 
-function kSCPropNetDNSServerAddresses: Pointer;
+function kSCPropNetDNSServerAddresses: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSServerAddresses');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSServerAddresses');
 end;
 
-function kSCPropNetDNSServerPort: Pointer;
+function kSCPropNetDNSServerPort: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSServerPort');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSServerPort');
 end;
 
-function kSCPropNetDNSServerTimeout: Pointer;
+function kSCPropNetDNSServerTimeout: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSServerTimeout');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSServerTimeout');
 end;
 
-function kSCPropNetDNSSortList: Pointer;
+function kSCPropNetDNSSortList: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSSortList');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSSortList');
 end;
 
-function kSCPropNetDNSSupplementalMatchDomains: Pointer;
+function kSCPropNetDNSSupplementalMatchDomains: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSSupplementalMatchDomains');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSSupplementalMatchDomains');
 end;
 
-function kSCPropNetDNSSupplementalMatchOrders: Pointer;
+function kSCPropNetDNSSupplementalMatchOrders: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetDNSSupplementalMatchOrders');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetDNSSupplementalMatchOrders');
 end;
 
-function kSCPropNetEthernetMediaSubType: Pointer;
+function kSCPropNetEthernetMediaSubType: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetEthernetMediaSubType');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetEthernetMediaSubType');
 end;
 
-function kSCPropNetEthernetMediaOptions: Pointer;
+function kSCPropNetEthernetMediaOptions: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetEthernetMediaOptions');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetEthernetMediaOptions');
 end;
 
-function kSCPropNetEthernetMTU: Pointer;
+function kSCPropNetEthernetMTU: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetEthernetMTU');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetEthernetMTU');
 end;
 
-function kSCPropNetInterfaceDeviceName: Pointer;
+function kSCPropNetInterfaceDeviceName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetInterfaceDeviceName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetInterfaceDeviceName');
 end;
 
-function kSCPropNetInterfaceHardware: Pointer;
+function kSCPropNetInterfaceHardware: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetInterfaceHardware');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetInterfaceHardware');
 end;
 
-function kSCPropNetInterfaceType: Pointer;
+function kSCPropNetInterfaceType: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetInterfaceType');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetInterfaceType');
 end;
 
-function kSCPropNetInterfaceSubType: Pointer;
+function kSCPropNetInterfaceSubType: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetInterfaceSubType');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetInterfaceSubType');
 end;
 
-function kSCPropNetInterfaceSupportsModemOnHold: Pointer;
+function kSCPropNetInterfaceSupportsModemOnHold: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetInterfaceSupportsModemOnHold');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetInterfaceSupportsModemOnHold');
 end;
 
-function kSCValNetInterfaceTypeEthernet: Pointer;
+function kSCValNetInterfaceTypeEthernet: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceTypeEthernet');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceTypeEthernet');
 end;
 
-function kSCValNetInterfaceTypeFireWire: Pointer;
+function kSCValNetInterfaceTypeFireWire: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceTypeFireWire');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceTypeFireWire');
 end;
 
-function kSCValNetInterfaceTypePPP: Pointer;
+function kSCValNetInterfaceTypePPP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceTypePPP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceTypePPP');
 end;
 
-function kSCValNetInterfaceType6to4: Pointer;
+function kSCValNetInterfaceType6to4: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceType6to4');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceType6to4');
 end;
 
-function kSCValNetInterfaceTypeIPSec: Pointer;
+function kSCValNetInterfaceTypeIPSec: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceTypeIPSec');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceTypeIPSec');
 end;
 
-function kSCValNetInterfaceSubTypePPPoE: Pointer;
+function kSCValNetInterfaceSubTypePPPoE: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceSubTypePPPoE');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceSubTypePPPoE');
 end;
 
-function kSCValNetInterfaceSubTypePPPSerial: Pointer;
+function kSCValNetInterfaceSubTypePPPSerial: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceSubTypePPPSerial');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceSubTypePPPSerial');
 end;
 
-function kSCValNetInterfaceSubTypePPTP: Pointer;
+function kSCValNetInterfaceSubTypePPTP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceSubTypePPTP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceSubTypePPTP');
 end;
 
-function kSCValNetInterfaceSubTypeL2TP: Pointer;
+function kSCValNetInterfaceSubTypeL2TP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetInterfaceSubTypeL2TP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetInterfaceSubTypeL2TP');
 end;
 
-function kSCPropNetIPSecAuthenticationMethod: Pointer;
+function kSCPropNetIPSecAuthenticationMethod: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecAuthenticationMethod');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecAuthenticationMethod');
 end;
 
-function kSCPropNetIPSecLocalCertificate: Pointer;
+function kSCPropNetIPSecLocalCertificate: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecLocalCertificate');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecLocalCertificate');
 end;
 
-function kSCPropNetIPSecLocalIdentifier: Pointer;
+function kSCPropNetIPSecLocalIdentifier: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecLocalIdentifier');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecLocalIdentifier');
 end;
 
-function kSCPropNetIPSecLocalIdentifierType: Pointer;
+function kSCPropNetIPSecLocalIdentifierType: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecLocalIdentifierType');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecLocalIdentifierType');
 end;
 
-function kSCPropNetIPSecSharedSecret: Pointer;
+function kSCPropNetIPSecSharedSecret: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecSharedSecret');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecSharedSecret');
 end;
 
-function kSCPropNetIPSecSharedSecretEncryption: Pointer;
+function kSCPropNetIPSecSharedSecretEncryption: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecSharedSecretEncryption');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecSharedSecretEncryption');
 end;
 
-function kSCPropNetIPSecConnectTime: Pointer;
+function kSCPropNetIPSecConnectTime: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecConnectTime');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecConnectTime');
 end;
 
-function kSCPropNetIPSecRemoteAddress: Pointer;
+function kSCPropNetIPSecRemoteAddress: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecRemoteAddress');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecRemoteAddress');
 end;
 
-function kSCPropNetIPSecStatus: Pointer;
+function kSCPropNetIPSecStatus: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecStatus');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecStatus');
 end;
 
-function kSCPropNetIPSecXAuthEnabled: Pointer;
+function kSCPropNetIPSecXAuthEnabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecXAuthEnabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecXAuthEnabled');
 end;
 
-function kSCPropNetIPSecXAuthName: Pointer;
+function kSCPropNetIPSecXAuthName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecXAuthName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecXAuthName');
 end;
 
-function kSCPropNetIPSecXAuthPassword: Pointer;
+function kSCPropNetIPSecXAuthPassword: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecXAuthPassword');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecXAuthPassword');
 end;
 
-function kSCPropNetIPSecXAuthPasswordEncryption: Pointer;
+function kSCPropNetIPSecXAuthPasswordEncryption: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPSecXAuthPasswordEncryption');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPSecXAuthPasswordEncryption');
 end;
 
-function kSCValNetIPSecAuthenticationMethodSharedSecret: Pointer;
+function kSCValNetIPSecAuthenticationMethodSharedSecret: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPSecAuthenticationMethodSharedSecret');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPSecAuthenticationMethodSharedSecret');
 end;
 
-function kSCValNetIPSecAuthenticationMethodCertificate: Pointer;
+function kSCValNetIPSecAuthenticationMethodCertificate: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPSecAuthenticationMethodCertificate');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPSecAuthenticationMethodCertificate');
 end;
 
-function kSCValNetIPSecAuthenticationMethodHybrid: Pointer;
+function kSCValNetIPSecAuthenticationMethodHybrid: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPSecAuthenticationMethodHybrid');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPSecAuthenticationMethodHybrid');
 end;
 
-function kSCValNetIPSecLocalIdentifierTypeKeyID: Pointer;
+function kSCValNetIPSecLocalIdentifierTypeKeyID: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPSecLocalIdentifierTypeKeyID');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPSecLocalIdentifierTypeKeyID');
 end;
 
-function kSCValNetIPSecSharedSecretEncryptionKeychain: Pointer;
+function kSCValNetIPSecSharedSecretEncryptionKeychain: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPSecSharedSecretEncryptionKeychain');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPSecSharedSecretEncryptionKeychain');
 end;
 
-function kSCValNetIPSecXAuthPasswordEncryptionKeychain: Pointer;
+function kSCValNetIPSecXAuthPasswordEncryptionKeychain: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPSecXAuthPasswordEncryptionKeychain');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPSecXAuthPasswordEncryptionKeychain');
 end;
 
-function kSCValNetIPSecXAuthPasswordEncryptionPrompt: Pointer;
+function kSCValNetIPSecXAuthPasswordEncryptionPrompt: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPSecXAuthPasswordEncryptionPrompt');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPSecXAuthPasswordEncryptionPrompt');
 end;
 
-function kSCPropNetIPv4Addresses: Pointer;
+function kSCPropNetIPv4Addresses: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv4Addresses');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv4Addresses');
 end;
 
-function kSCPropNetIPv4ConfigMethod: Pointer;
+function kSCPropNetIPv4ConfigMethod: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv4ConfigMethod');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv4ConfigMethod');
 end;
 
-function kSCPropNetIPv4DHCPClientID: Pointer;
+function kSCPropNetIPv4DHCPClientID: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv4DHCPClientID');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv4DHCPClientID');
 end;
 
-function kSCPropNetIPv4Router: Pointer;
+function kSCPropNetIPv4Router: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv4Router');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv4Router');
 end;
 
-function kSCPropNetIPv4SubnetMasks: Pointer;
+function kSCPropNetIPv4SubnetMasks: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv4SubnetMasks');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv4SubnetMasks');
 end;
 
-function kSCPropNetIPv4DestAddresses: Pointer;
+function kSCPropNetIPv4DestAddresses: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv4DestAddresses');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv4DestAddresses');
 end;
 
-function kSCPropNetIPv4BroadcastAddresses: Pointer;
+function kSCPropNetIPv4BroadcastAddresses: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv4BroadcastAddresses');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv4BroadcastAddresses');
 end;
 
-function kSCValNetIPv4ConfigMethodAutomatic: Pointer;
+function kSCValNetIPv4ConfigMethodAutomatic: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodAutomatic');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodAutomatic');
 end;
 
-function kSCValNetIPv4ConfigMethodBOOTP: Pointer;
+function kSCValNetIPv4ConfigMethodBOOTP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodBOOTP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodBOOTP');
 end;
 
-function kSCValNetIPv4ConfigMethodDHCP: Pointer;
+function kSCValNetIPv4ConfigMethodDHCP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodDHCP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodDHCP');
 end;
 
-function kSCValNetIPv4ConfigMethodINFORM: Pointer;
+function kSCValNetIPv4ConfigMethodINFORM: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodINFORM');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodINFORM');
 end;
 
-function kSCValNetIPv4ConfigMethodLinkLocal: Pointer;
+function kSCValNetIPv4ConfigMethodLinkLocal: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodLinkLocal');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodLinkLocal');
 end;
 
-function kSCValNetIPv4ConfigMethodManual: Pointer;
+function kSCValNetIPv4ConfigMethodManual: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodManual');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodManual');
 end;
 
-function kSCValNetIPv4ConfigMethodPPP: Pointer;
+function kSCValNetIPv4ConfigMethodPPP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodPPP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv4ConfigMethodPPP');
 end;
 
-function kSCPropNetIPv6Addresses: Pointer;
+function kSCPropNetIPv6Addresses: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv6Addresses');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv6Addresses');
 end;
 
-function kSCPropNetIPv6ConfigMethod: Pointer;
+function kSCPropNetIPv6ConfigMethod: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv6ConfigMethod');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv6ConfigMethod');
 end;
 
-function kSCPropNetIPv6DestAddresses: Pointer;
+function kSCPropNetIPv6DestAddresses: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv6DestAddresses');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv6DestAddresses');
 end;
 
-function kSCPropNetIPv6Flags: Pointer;
+function kSCPropNetIPv6Flags: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv6Flags');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv6Flags');
 end;
 
-function kSCPropNetIPv6PrefixLength: Pointer;
+function kSCPropNetIPv6PrefixLength: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv6PrefixLength');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv6PrefixLength');
 end;
 
-function kSCPropNetIPv6Router: Pointer;
+function kSCPropNetIPv6Router: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetIPv6Router');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetIPv6Router');
 end;
 
-function kSCValNetIPv6ConfigMethodAutomatic: Pointer;
+function kSCValNetIPv6ConfigMethodAutomatic: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethodAutomatic');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethodAutomatic');
 end;
 
-function kSCValNetIPv6ConfigMethodLinkLocal: Pointer;
+function kSCValNetIPv6ConfigMethodLinkLocal: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethodLinkLocal');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethodLinkLocal');
 end;
 
-function kSCValNetIPv6ConfigMethodManual: Pointer;
+function kSCValNetIPv6ConfigMethodManual: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethodManual');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethodManual');
 end;
 
-function kSCValNetIPv6ConfigMethodRouterAdvertisement: Pointer;
+function kSCValNetIPv6ConfigMethodRouterAdvertisement: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethodRouterAdvertisement');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethodRouterAdvertisement');
 end;
 
-function kSCValNetIPv6ConfigMethod6to4: Pointer;
+function kSCValNetIPv6ConfigMethod6to4: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethod6to4');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetIPv6ConfigMethod6to4');
 end;
 
-function kSCPropNet6to4Relay: Pointer;
+function kSCPropNet6to4Relay: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNet6to4Relay');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNet6to4Relay');
 end;
 
-function kSCPropNetLinkActive: Pointer;
+function kSCPropNetLinkActive: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetLinkActive');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetLinkActive');
 end;
 
-function kSCPropNetLinkDetaching: Pointer;
+function kSCPropNetLinkDetaching: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetLinkDetaching');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetLinkDetaching');
 end;
 
-function kSCPropNetModemAccessPointName: Pointer;
+function kSCPropNetModemAccessPointName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemAccessPointName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemAccessPointName');
 end;
 
-function kSCPropNetModemConnectionPersonality: Pointer;
+function kSCPropNetModemConnectionPersonality: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemConnectionPersonality');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemConnectionPersonality');
 end;
 
-function kSCPropNetModemConnectionScript: Pointer;
+function kSCPropNetModemConnectionScript: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemConnectionScript');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemConnectionScript');
 end;
 
-function kSCPropNetModemConnectSpeed: Pointer;
+function kSCPropNetModemConnectSpeed: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemConnectSpeed');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemConnectSpeed');
 end;
 
-function kSCPropNetModemDataCompression: Pointer;
+function kSCPropNetModemDataCompression: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemDataCompression');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemDataCompression');
 end;
 
-function kSCPropNetModemDeviceContextID: Pointer;
+function kSCPropNetModemDeviceContextID: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemDeviceContextID');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemDeviceContextID');
 end;
 
-function kSCPropNetModemDeviceModel: Pointer;
+function kSCPropNetModemDeviceModel: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemDeviceModel');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemDeviceModel');
 end;
 
-function kSCPropNetModemDeviceVendor: Pointer;
+function kSCPropNetModemDeviceVendor: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemDeviceVendor');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemDeviceVendor');
 end;
 
-function kSCPropNetModemDialMode: Pointer;
+function kSCPropNetModemDialMode: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemDialMode');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemDialMode');
 end;
 
-function kSCPropNetModemErrorCorrection: Pointer;
+function kSCPropNetModemErrorCorrection: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemErrorCorrection');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemErrorCorrection');
 end;
 
-function kSCPropNetModemHoldCallWaitingAudibleAlert: Pointer;
+function kSCPropNetModemHoldCallWaitingAudibleAlert: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemHoldCallWaitingAudibleAlert');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemHoldCallWaitingAudibleAlert');
 end;
 
-function kSCPropNetModemHoldDisconnectOnAnswer: Pointer;
+function kSCPropNetModemHoldDisconnectOnAnswer: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemHoldDisconnectOnAnswer');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemHoldDisconnectOnAnswer');
 end;
 
-function kSCPropNetModemHoldEnabled: Pointer;
+function kSCPropNetModemHoldEnabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemHoldEnabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemHoldEnabled');
 end;
 
-function kSCPropNetModemHoldReminder: Pointer;
+function kSCPropNetModemHoldReminder: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemHoldReminder');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemHoldReminder');
 end;
 
-function kSCPropNetModemHoldReminderTime: Pointer;
+function kSCPropNetModemHoldReminderTime: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemHoldReminderTime');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemHoldReminderTime');
 end;
 
-function kSCPropNetModemNote: Pointer;
+function kSCPropNetModemNote: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemNote');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemNote');
 end;
 
-function kSCPropNetModemPulseDial: Pointer;
+function kSCPropNetModemPulseDial: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemPulseDial');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemPulseDial');
 end;
 
-function kSCPropNetModemSpeaker: Pointer;
+function kSCPropNetModemSpeaker: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemSpeaker');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemSpeaker');
 end;
 
-function kSCPropNetModemSpeed: Pointer;
+function kSCPropNetModemSpeed: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetModemSpeed');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetModemSpeed');
 end;
 
-function kSCValNetModemDialModeIgnoreDialTone: Pointer;
+function kSCValNetModemDialModeIgnoreDialTone: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetModemDialModeIgnoreDialTone');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetModemDialModeIgnoreDialTone');
 end;
 
-function kSCValNetModemDialModeManual: Pointer;
+function kSCValNetModemDialModeManual: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetModemDialModeManual');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetModemDialModeManual');
 end;
 
-function kSCValNetModemDialModeWaitForDialTone: Pointer;
+function kSCValNetModemDialModeWaitForDialTone: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetModemDialModeWaitForDialTone');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetModemDialModeWaitForDialTone');
 end;
 
-function kSCPropNetPPPACSPEnabled: Pointer;
+function kSCPropNetPPPACSPEnabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPACSPEnabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPACSPEnabled');
 end;
 
-function kSCPropNetPPPConnectTime: Pointer;
+function kSCPropNetPPPConnectTime: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPConnectTime');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPConnectTime');
 end;
 
-function kSCPropNetPPPDeviceLastCause: Pointer;
+function kSCPropNetPPPDeviceLastCause: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPDeviceLastCause');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPDeviceLastCause');
 end;
 
-function kSCPropNetPPPDialOnDemand: Pointer;
+function kSCPropNetPPPDialOnDemand: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPDialOnDemand');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPDialOnDemand');
 end;
 
-function kSCPropNetPPPDisconnectOnFastUserSwitch: Pointer;
+function kSCPropNetPPPDisconnectOnFastUserSwitch: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnFastUserSwitch');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnFastUserSwitch');
 end;
 
-function kSCPropNetPPPDisconnectOnIdle: Pointer;
+function kSCPropNetPPPDisconnectOnIdle: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnIdle');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnIdle');
 end;
 
-function kSCPropNetPPPDisconnectOnIdleTimer: Pointer;
+function kSCPropNetPPPDisconnectOnIdleTimer: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnIdleTimer');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnIdleTimer');
 end;
 
-function kSCPropNetPPPDisconnectOnLogout: Pointer;
+function kSCPropNetPPPDisconnectOnLogout: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnLogout');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnLogout');
 end;
 
-function kSCPropNetPPPDisconnectOnSleep: Pointer;
+function kSCPropNetPPPDisconnectOnSleep: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnSleep');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectOnSleep');
 end;
 
-function kSCPropNetPPPDisconnectTime: Pointer;
+function kSCPropNetPPPDisconnectTime: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectTime');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPDisconnectTime');
 end;
 
-function kSCPropNetPPPIdleReminderTimer: Pointer;
+function kSCPropNetPPPIdleReminderTimer: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPIdleReminderTimer');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPIdleReminderTimer');
 end;
 
-function kSCPropNetPPPIdleReminder: Pointer;
+function kSCPropNetPPPIdleReminder: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPIdleReminder');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPIdleReminder');
 end;
 
-function kSCPropNetPPPLastCause: Pointer;
+function kSCPropNetPPPLastCause: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLastCause');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLastCause');
 end;
 
-function kSCPropNetPPPLogfile: Pointer;
+function kSCPropNetPPPLogfile: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLogfile');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLogfile');
 end;
 
-function kSCPropNetPPPPlugins: Pointer;
+function kSCPropNetPPPPlugins: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPPlugins');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPPlugins');
 end;
 
-function kSCPropNetPPPRetryConnectTime: Pointer;
+function kSCPropNetPPPRetryConnectTime: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPRetryConnectTime');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPRetryConnectTime');
 end;
 
-function kSCPropNetPPPSessionTimer: Pointer;
+function kSCPropNetPPPSessionTimer: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPSessionTimer');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPSessionTimer');
 end;
 
-function kSCPropNetPPPStatus: Pointer;
+function kSCPropNetPPPStatus: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPStatus');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPStatus');
 end;
 
-function kSCPropNetPPPUseSessionTimer: Pointer;
+function kSCPropNetPPPUseSessionTimer: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPUseSessionTimer');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPUseSessionTimer');
 end;
 
-function kSCPropNetPPPVerboseLogging: Pointer;
+function kSCPropNetPPPVerboseLogging: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPVerboseLogging');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPVerboseLogging');
 end;
 
-function kSCPropNetPPPAuthEAPPlugins: Pointer;
+function kSCPropNetPPPAuthEAPPlugins: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPAuthEAPPlugins');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPAuthEAPPlugins');
 end;
 
-function kSCPropNetPPPAuthName: Pointer;
+function kSCPropNetPPPAuthName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPAuthName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPAuthName');
 end;
 
-function kSCPropNetPPPAuthPassword: Pointer;
+function kSCPropNetPPPAuthPassword: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPAuthPassword');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPAuthPassword');
 end;
 
-function kSCPropNetPPPAuthPasswordEncryption: Pointer;
+function kSCPropNetPPPAuthPasswordEncryption: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPAuthPasswordEncryption');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPAuthPasswordEncryption');
 end;
 
-function kSCPropNetPPPAuthPrompt: Pointer;
+function kSCPropNetPPPAuthPrompt: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPAuthPrompt');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPAuthPrompt');
 end;
 
-function kSCPropNetPPPAuthProtocol: Pointer;
+function kSCPropNetPPPAuthProtocol: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPAuthProtocol');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPAuthProtocol');
 end;
 
-function kSCValNetPPPAuthPasswordEncryptionKeychain: Pointer;
+function kSCValNetPPPAuthPasswordEncryptionKeychain: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthPasswordEncryptionKeychain');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthPasswordEncryptionKeychain');
 end;
 
-function kSCValNetPPPAuthPasswordEncryptionToken: Pointer;
+function kSCValNetPPPAuthPasswordEncryptionToken: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthPasswordEncryptionToken');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthPasswordEncryptionToken');
 end;
 
-function kSCValNetPPPAuthPromptBefore: Pointer;
+function kSCValNetPPPAuthPromptBefore: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthPromptBefore');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthPromptBefore');
 end;
 
-function kSCValNetPPPAuthPromptAfter: Pointer;
+function kSCValNetPPPAuthPromptAfter: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthPromptAfter');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthPromptAfter');
 end;
 
-function kSCValNetPPPAuthProtocolCHAP: Pointer;
+function kSCValNetPPPAuthProtocolCHAP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolCHAP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolCHAP');
 end;
 
-function kSCValNetPPPAuthProtocolEAP: Pointer;
+function kSCValNetPPPAuthProtocolEAP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolEAP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolEAP');
 end;
 
-function kSCValNetPPPAuthProtocolMSCHAP1: Pointer;
+function kSCValNetPPPAuthProtocolMSCHAP1: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolMSCHAP1');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolMSCHAP1');
 end;
 
-function kSCValNetPPPAuthProtocolMSCHAP2: Pointer;
+function kSCValNetPPPAuthProtocolMSCHAP2: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolMSCHAP2');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolMSCHAP2');
 end;
 
-function kSCValNetPPPAuthProtocolPAP: Pointer;
+function kSCValNetPPPAuthProtocolPAP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolPAP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetPPPAuthProtocolPAP');
 end;
 
-function kSCPropNetPPPCommAlternateRemoteAddress: Pointer;
+function kSCPropNetPPPCommAlternateRemoteAddress: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommAlternateRemoteAddress');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommAlternateRemoteAddress');
 end;
 
-function kSCPropNetPPPCommConnectDelay: Pointer;
+function kSCPropNetPPPCommConnectDelay: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommConnectDelay');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommConnectDelay');
 end;
 
-function kSCPropNetPPPCommDisplayTerminalWindow: Pointer;
+function kSCPropNetPPPCommDisplayTerminalWindow: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommDisplayTerminalWindow');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommDisplayTerminalWindow');
 end;
 
-function kSCPropNetPPPCommRedialCount: Pointer;
+function kSCPropNetPPPCommRedialCount: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommRedialCount');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommRedialCount');
 end;
 
-function kSCPropNetPPPCommRedialEnabled: Pointer;
+function kSCPropNetPPPCommRedialEnabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommRedialEnabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommRedialEnabled');
 end;
 
-function kSCPropNetPPPCommRedialInterval: Pointer;
+function kSCPropNetPPPCommRedialInterval: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommRedialInterval');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommRedialInterval');
 end;
 
-function kSCPropNetPPPCommRemoteAddress: Pointer;
+function kSCPropNetPPPCommRemoteAddress: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommRemoteAddress');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommRemoteAddress');
 end;
 
-function kSCPropNetPPPCommTerminalScript: Pointer;
+function kSCPropNetPPPCommTerminalScript: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommTerminalScript');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommTerminalScript');
 end;
 
-function kSCPropNetPPPCommUseTerminalScript: Pointer;
+function kSCPropNetPPPCommUseTerminalScript: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCommUseTerminalScript');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCommUseTerminalScript');
 end;
 
-function kSCPropNetPPPCCPEnabled: Pointer;
+function kSCPropNetPPPCCPEnabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCCPEnabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCCPEnabled');
 end;
 
-function kSCPropNetPPPCCPMPPE40Enabled: Pointer;
+function kSCPropNetPPPCCPMPPE40Enabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCCPMPPE40Enabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCCPMPPE40Enabled');
 end;
 
-function kSCPropNetPPPCCPMPPE128Enabled: Pointer;
+function kSCPropNetPPPCCPMPPE128Enabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPCCPMPPE128Enabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPCCPMPPE128Enabled');
 end;
 
-function kSCPropNetPPPIPCPCompressionVJ: Pointer;
+function kSCPropNetPPPIPCPCompressionVJ: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPIPCPCompressionVJ');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPIPCPCompressionVJ');
 end;
 
-function kSCPropNetPPPIPCPUsePeerDNS: Pointer;
+function kSCPropNetPPPIPCPUsePeerDNS: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPIPCPUsePeerDNS');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPIPCPUsePeerDNS');
 end;
 
-function kSCPropNetPPPLCPEchoEnabled: Pointer;
+function kSCPropNetPPPLCPEchoEnabled: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPEchoEnabled');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPEchoEnabled');
 end;
 
-function kSCPropNetPPPLCPEchoFailure: Pointer;
+function kSCPropNetPPPLCPEchoFailure: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPEchoFailure');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPEchoFailure');
 end;
 
-function kSCPropNetPPPLCPEchoInterval: Pointer;
+function kSCPropNetPPPLCPEchoInterval: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPEchoInterval');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPEchoInterval');
 end;
 
-function kSCPropNetPPPLCPCompressionACField: Pointer;
+function kSCPropNetPPPLCPCompressionACField: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPCompressionACField');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPCompressionACField');
 end;
 
-function kSCPropNetPPPLCPCompressionPField: Pointer;
+function kSCPropNetPPPLCPCompressionPField: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPCompressionPField');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPCompressionPField');
 end;
 
-function kSCPropNetPPPLCPMRU: Pointer;
+function kSCPropNetPPPLCPMRU: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPMRU');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPMRU');
 end;
 
-function kSCPropNetPPPLCPMTU: Pointer;
+function kSCPropNetPPPLCPMTU: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPMTU');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPMTU');
 end;
 
-function kSCPropNetPPPLCPReceiveACCM: Pointer;
+function kSCPropNetPPPLCPReceiveACCM: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPReceiveACCM');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPReceiveACCM');
 end;
 
-function kSCPropNetPPPLCPTransmitACCM: Pointer;
+function kSCPropNetPPPLCPTransmitACCM: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetPPPLCPTransmitACCM');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetPPPLCPTransmitACCM');
 end;
 
-function kSCPropNetL2TPIPSecSharedSecret: Pointer;
+function kSCPropNetL2TPIPSecSharedSecret: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetL2TPIPSecSharedSecret');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetL2TPIPSecSharedSecret');
 end;
 
-function kSCPropNetL2TPIPSecSharedSecretEncryption: Pointer;
+function kSCPropNetL2TPIPSecSharedSecretEncryption: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetL2TPIPSecSharedSecretEncryption');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetL2TPIPSecSharedSecretEncryption');
 end;
 
-function kSCPropNetL2TPTransport: Pointer;
+function kSCPropNetL2TPTransport: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetL2TPTransport');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetL2TPTransport');
 end;
 
-function kSCValNetL2TPIPSecSharedSecretEncryptionKeychain: Pointer;
+function kSCValNetL2TPIPSecSharedSecretEncryptionKeychain: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetL2TPIPSecSharedSecretEncryptionKeychain');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetL2TPIPSecSharedSecretEncryptionKeychain');
 end;
 
-function kSCValNetL2TPTransportIP: Pointer;
+function kSCValNetL2TPTransportIP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetL2TPTransportIP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetL2TPTransportIP');
 end;
 
-function kSCValNetL2TPTransportIPSec: Pointer;
+function kSCValNetL2TPTransportIPSec: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetL2TPTransportIPSec');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetL2TPTransportIPSec');
 end;
 
-function kSCPropNetProxiesExceptionsList: Pointer;
+function kSCPropNetProxiesExceptionsList: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesExceptionsList');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesExceptionsList');
 end;
 
-function kSCPropNetProxiesExcludeSimpleHostnames: Pointer;
+function kSCPropNetProxiesExcludeSimpleHostnames: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesExcludeSimpleHostnames');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesExcludeSimpleHostnames');
 end;
 
-function kSCPropNetProxiesFTPEnable: Pointer;
+function kSCPropNetProxiesFTPEnable: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesFTPEnable');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesFTPEnable');
 end;
 
-function kSCPropNetProxiesFTPPassive: Pointer;
+function kSCPropNetProxiesFTPPassive: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesFTPPassive');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesFTPPassive');
 end;
 
-function kSCPropNetProxiesFTPPort: Pointer;
+function kSCPropNetProxiesFTPPort: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesFTPPort');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesFTPPort');
 end;
 
-function kSCPropNetProxiesFTPProxy: Pointer;
+function kSCPropNetProxiesFTPProxy: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesFTPProxy');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesFTPProxy');
 end;
 
-function kSCPropNetProxiesGopherEnable: Pointer;
+function kSCPropNetProxiesGopherEnable: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesGopherEnable');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesGopherEnable');
 end;
 
-function kSCPropNetProxiesGopherPort: Pointer;
+function kSCPropNetProxiesGopherPort: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesGopherPort');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesGopherPort');
 end;
 
-function kSCPropNetProxiesGopherProxy: Pointer;
+function kSCPropNetProxiesGopherProxy: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesGopherProxy');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesGopherProxy');
 end;
 
-function kSCPropNetProxiesHTTPEnable: Pointer;
+function kSCPropNetProxiesHTTPEnable: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPEnable');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPEnable');
 end;
 
-function kSCPropNetProxiesHTTPPort: Pointer;
+function kSCPropNetProxiesHTTPPort: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPPort');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPPort');
 end;
 
-function kSCPropNetProxiesHTTPProxy: Pointer;
+function kSCPropNetProxiesHTTPProxy: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPProxy');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPProxy');
 end;
 
-function kSCPropNetProxiesHTTPSEnable: Pointer;
+function kSCPropNetProxiesHTTPSEnable: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPSEnable');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPSEnable');
 end;
 
-function kSCPropNetProxiesHTTPSPort: Pointer;
+function kSCPropNetProxiesHTTPSPort: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPSPort');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPSPort');
 end;
 
-function kSCPropNetProxiesHTTPSProxy: Pointer;
+function kSCPropNetProxiesHTTPSProxy: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPSProxy');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesHTTPSProxy');
 end;
 
-function kSCPropNetProxiesRTSPEnable: Pointer;
+function kSCPropNetProxiesRTSPEnable: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesRTSPEnable');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesRTSPEnable');
 end;
 
-function kSCPropNetProxiesRTSPPort: Pointer;
+function kSCPropNetProxiesRTSPPort: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesRTSPPort');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesRTSPPort');
 end;
 
-function kSCPropNetProxiesRTSPProxy: Pointer;
+function kSCPropNetProxiesRTSPProxy: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesRTSPProxy');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesRTSPProxy');
 end;
 
-function kSCPropNetProxiesSOCKSEnable: Pointer;
+function kSCPropNetProxiesSOCKSEnable: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesSOCKSEnable');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesSOCKSEnable');
 end;
 
-function kSCPropNetProxiesSOCKSPort: Pointer;
+function kSCPropNetProxiesSOCKSPort: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesSOCKSPort');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesSOCKSPort');
 end;
 
-function kSCPropNetProxiesSOCKSProxy: Pointer;
+function kSCPropNetProxiesSOCKSProxy: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesSOCKSProxy');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesSOCKSProxy');
 end;
 
-function kSCPropNetProxiesProxyAutoConfigEnable: Pointer;
+function kSCPropNetProxiesProxyAutoConfigEnable: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesProxyAutoConfigEnable');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesProxyAutoConfigEnable');
 end;
 
-function kSCPropNetProxiesProxyAutoConfigJavaScript: Pointer;
+function kSCPropNetProxiesProxyAutoConfigJavaScript: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesProxyAutoConfigJavaScript');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesProxyAutoConfigJavaScript');
 end;
 
-function kSCPropNetProxiesProxyAutoConfigURLString: Pointer;
+function kSCPropNetProxiesProxyAutoConfigURLString: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesProxyAutoConfigURLString');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesProxyAutoConfigURLString');
 end;
 
-function kSCPropNetProxiesProxyAutoDiscoveryEnable: Pointer;
+function kSCPropNetProxiesProxyAutoDiscoveryEnable: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetProxiesProxyAutoDiscoveryEnable');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetProxiesProxyAutoDiscoveryEnable');
 end;
 
-function kSCPropNetSMBNetBIOSName: Pointer;
+function kSCPropNetSMBNetBIOSName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetSMBNetBIOSName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetSMBNetBIOSName');
 end;
 
-function kSCPropNetSMBNetBIOSNodeType: Pointer;
+function kSCPropNetSMBNetBIOSNodeType: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetSMBNetBIOSNodeType');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetSMBNetBIOSNodeType');
 end;
 
-function kSCPropNetSMBNetBIOSScope: Pointer;
+function kSCPropNetSMBNetBIOSScope: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetSMBNetBIOSScope');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetSMBNetBIOSScope');
 end;
 
-function kSCPropNetSMBWINSAddresses: Pointer;
+function kSCPropNetSMBWINSAddresses: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetSMBWINSAddresses');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetSMBWINSAddresses');
 end;
 
-function kSCPropNetSMBWorkgroup: Pointer;
+function kSCPropNetSMBWorkgroup: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropNetSMBWorkgroup');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropNetSMBWorkgroup');
 end;
 
-function kSCValNetSMBNetBIOSNodeTypeBroadcast: Pointer;
+function kSCValNetSMBNetBIOSNodeTypeBroadcast: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetSMBNetBIOSNodeTypeBroadcast');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetSMBNetBIOSNodeTypeBroadcast');
 end;
 
-function kSCValNetSMBNetBIOSNodeTypePeer: Pointer;
+function kSCValNetSMBNetBIOSNodeTypePeer: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetSMBNetBIOSNodeTypePeer');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetSMBNetBIOSNodeTypePeer');
 end;
 
-function kSCValNetSMBNetBIOSNodeTypeMixed: Pointer;
+function kSCValNetSMBNetBIOSNodeTypeMixed: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetSMBNetBIOSNodeTypeMixed');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetSMBNetBIOSNodeTypeMixed');
 end;
 
-function kSCValNetSMBNetBIOSNodeTypeHybrid: Pointer;
+function kSCValNetSMBNetBIOSNodeTypeHybrid: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCValNetSMBNetBIOSNodeTypeHybrid');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCValNetSMBNetBIOSNodeTypeHybrid');
 end;
 
-function kSCEntUsersConsoleUser: Pointer;
+function kSCEntUsersConsoleUser: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCEntUsersConsoleUser');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCEntUsersConsoleUser');
 end;
 
-function kSCPropSystemComputerName: Pointer;
+function kSCPropSystemComputerName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropSystemComputerName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropSystemComputerName');
 end;
 
-function kSCPropSystemComputerNameEncoding: Pointer;
+function kSCPropSystemComputerNameEncoding: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropSystemComputerNameEncoding');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropSystemComputerNameEncoding');
 end;
 
-function kSCDynamicStoreDomainFile: Pointer;
+function kSCDynamicStoreDomainFile: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStoreDomainFile');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStoreDomainFile');
 end;
 
-function kSCDynamicStoreDomainPlugin: Pointer;
+function kSCDynamicStoreDomainPlugin: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStoreDomainPlugin');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStoreDomainPlugin');
 end;
 
-function kSCDynamicStoreDomainSetup: Pointer;
+function kSCDynamicStoreDomainSetup: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStoreDomainSetup');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStoreDomainSetup');
 end;
 
-function kSCDynamicStoreDomainState: Pointer;
+function kSCDynamicStoreDomainState: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStoreDomainState');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStoreDomainState');
 end;
 
-function kSCDynamicStoreDomainPrefs: Pointer;
+function kSCDynamicStoreDomainPrefs: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStoreDomainPrefs');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStoreDomainPrefs');
 end;
 
-function kSCDynamicStorePropSetupCurrentSet: Pointer;
+function kSCDynamicStorePropSetupCurrentSet: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStorePropSetupCurrentSet');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStorePropSetupCurrentSet');
 end;
 
-function kSCDynamicStorePropSetupLastUpdated: Pointer;
+function kSCDynamicStorePropSetupLastUpdated: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStorePropSetupLastUpdated');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStorePropSetupLastUpdated');
 end;
 
-function kSCDynamicStorePropNetInterfaces: Pointer;
+function kSCDynamicStorePropNetInterfaces: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStorePropNetInterfaces');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStorePropNetInterfaces');
 end;
 
-function kSCDynamicStorePropNetPrimaryInterface: Pointer;
+function kSCDynamicStorePropNetPrimaryInterface: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStorePropNetPrimaryInterface');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStorePropNetPrimaryInterface');
 end;
 
-function kSCDynamicStorePropNetPrimaryService: Pointer;
+function kSCDynamicStorePropNetPrimaryService: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStorePropNetPrimaryService');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStorePropNetPrimaryService');
 end;
 
-function kSCDynamicStorePropNetServiceIDs: Pointer;
+function kSCDynamicStorePropNetServiceIDs: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCDynamicStorePropNetServiceIDs');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCDynamicStorePropNetServiceIDs');
 end;
 
-function kSCPropUsersConsoleUserName: Pointer;
+function kSCPropUsersConsoleUserName: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropUsersConsoleUserName');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropUsersConsoleUserName');
 end;
 
-function kSCPropUsersConsoleUserUID: Pointer;
+function kSCPropUsersConsoleUserUID: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropUsersConsoleUserUID');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropUsersConsoleUserUID');
 end;
 
-function kSCPropUsersConsoleUserGID: Pointer;
+function kSCPropUsersConsoleUserGID: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCPropUsersConsoleUserGID');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCPropUsersConsoleUserGID');
 end;
 
-function kCFErrorDomainSystemConfiguration: Pointer;
+function kCFErrorDomainSystemConfiguration: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kCFErrorDomainSystemConfiguration');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kCFErrorDomainSystemConfiguration');
 end;
 
-function kSCNetworkInterfaceType6to4: Pointer;
+function kSCNetworkInterfaceType6to4: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceType6to4');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceType6to4');
 end;
 
-function kSCNetworkInterfaceTypeBluetooth: Pointer;
+function kSCNetworkInterfaceTypeBluetooth: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeBluetooth');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeBluetooth');
 end;
 
-function kSCNetworkInterfaceTypeBond: Pointer;
+function kSCNetworkInterfaceTypeBond: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeBond');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeBond');
 end;
 
-function kSCNetworkInterfaceTypeEthernet: Pointer;
+function kSCNetworkInterfaceTypeEthernet: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeEthernet');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeEthernet');
 end;
 
-function kSCNetworkInterfaceTypeFireWire: Pointer;
+function kSCNetworkInterfaceTypeFireWire: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeFireWire');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeFireWire');
 end;
 
-function kSCNetworkInterfaceTypeIEEE80211: Pointer;
+function kSCNetworkInterfaceTypeIEEE80211: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeIEEE80211');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeIEEE80211');
 end;
 
-function kSCNetworkInterfaceTypeIPSec: Pointer;
+function kSCNetworkInterfaceTypeIPSec: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeIPSec');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeIPSec');
 end;
 
-function kSCNetworkInterfaceTypeIrDA: Pointer;
+function kSCNetworkInterfaceTypeIrDA: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeIrDA');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeIrDA');
 end;
 
-function kSCNetworkInterfaceTypeL2TP: Pointer;
+function kSCNetworkInterfaceTypeL2TP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeL2TP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeL2TP');
 end;
 
-function kSCNetworkInterfaceTypeModem: Pointer;
+function kSCNetworkInterfaceTypeModem: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeModem');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeModem');
 end;
 
-function kSCNetworkInterfaceTypePPP: Pointer;
+function kSCNetworkInterfaceTypePPP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypePPP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypePPP');
 end;
 
-function kSCNetworkInterfaceTypePPTP: Pointer;
+function kSCNetworkInterfaceTypePPTP: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypePPTP');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypePPTP');
 end;
 
-function kSCNetworkInterfaceTypeSerial: Pointer;
+function kSCNetworkInterfaceTypeSerial: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeSerial');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeSerial');
 end;
 
-function kSCNetworkInterfaceTypeVLAN: Pointer;
+function kSCNetworkInterfaceTypeVLAN: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeVLAN');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeVLAN');
 end;
 
-function kSCNetworkInterfaceTypeWWAN: Pointer;
+function kSCNetworkInterfaceTypeWWAN: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeWWAN');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeWWAN');
 end;
 
-function kSCNetworkInterfaceTypeIPv4: Pointer;
+function kSCNetworkInterfaceTypeIPv4: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeIPv4');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceTypeIPv4');
 end;
 
-function kSCNetworkInterfaceIPv4: Pointer;
+function kSCNetworkInterfaceIPv4: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkInterfaceIPv4');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkInterfaceIPv4');
 end;
 
-function kSCBondStatusDeviceAggregationStatus: Pointer;
+function kSCBondStatusDeviceAggregationStatus: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCBondStatusDeviceAggregationStatus');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCBondStatusDeviceAggregationStatus');
 end;
 
-function kSCBondStatusDeviceCollecting: Pointer;
+function kSCBondStatusDeviceCollecting: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCBondStatusDeviceCollecting');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCBondStatusDeviceCollecting');
 end;
 
-function kSCBondStatusDeviceDistributing: Pointer;
+function kSCBondStatusDeviceDistributing: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCBondStatusDeviceDistributing');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCBondStatusDeviceDistributing');
 end;
 
-function kSCNetworkProtocolTypeDNS: Pointer;
+function kSCNetworkProtocolTypeDNS: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkProtocolTypeDNS');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkProtocolTypeDNS');
 end;
 
-function kSCNetworkProtocolTypeIPv4: Pointer;
+function kSCNetworkProtocolTypeIPv4: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkProtocolTypeIPv4');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkProtocolTypeIPv4');
 end;
 
-function kSCNetworkProtocolTypeIPv6: Pointer;
+function kSCNetworkProtocolTypeIPv6: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkProtocolTypeIPv6');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkProtocolTypeIPv6');
 end;
 
-function kSCNetworkProtocolTypeProxies: Pointer;
+function kSCNetworkProtocolTypeProxies: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkProtocolTypeProxies');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkProtocolTypeProxies');
 end;
 
-function kSCNetworkProtocolTypeSMB: Pointer;
+function kSCNetworkProtocolTypeSMB: NSString;
 begin
-  Result := CocoaPointerConst(libSystemConfiguration, 'kSCNetworkProtocolTypeSMB');
+  Result := CocoaNSStringConst(libSystemConfiguration, 'kSCNetworkProtocolTypeSMB');
 end;
 
 {$IF defined(IOS) and NOT defined(CPUARM)}
