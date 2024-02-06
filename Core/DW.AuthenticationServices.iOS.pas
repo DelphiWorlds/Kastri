@@ -120,7 +120,7 @@ var
   LPasswordCredential: ASPasswordCredential;
   LCredentials: TAppleIDCredentials;
   LResponse: TAppleIDAuthorizationResponse;
-  LToken: NSString;
+  LToken, LAuthCode: NSString;
   LTokenStr: string;
 begin
   LCredential := TNSObject.Wrap(authorization.credential);
@@ -148,7 +148,12 @@ begin
         end;
         if LAppleIDCredential.email <> nil then
           LCredentials.EMail := NSStrToStr(LAppleIDCredential.email);
-        LCredentials.AuthorizationCode := NSStrToStr(LAppleIDCredential.email);
+        if LAppleIDCredential.authorizationCode <> nil then
+        begin
+          LAuthCode := TNSString.Wrap(TNSString.Alloc.initWithData(LAppleIDCredential.authorizationCode, NSUTF8StringEncoding));
+          if LAuthCode <> nil then
+            LCredentials.AuthorizationCode := NSStrToStr(LAuthCode);
+        end;
         TOSLog.d('Saving token from response: ' + LTokenStr);
         FServices.Token := LTokenStr;
         LResponse.Credentials := LCredentials;
