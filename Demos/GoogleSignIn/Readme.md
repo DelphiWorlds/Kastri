@@ -26,10 +26,14 @@ where `com.yourdomain.projectname` is the identifier you used for the project in
 
 ### iOS
 
-* Go to [this link](https://github.com/firebase/firebase-ios-sdk/releases/tag/v8.15.0), download Firebase.zip, and extract it somewhere convenient
-* In the IDE Options > Environment Variables, create a user override called `Firebase` which points to the unzipped SDK, **or** modify `Framework search path` in the Project Options for iOS Device 64-bit to point to the unzipped SDK
-* In the Project Options for iOS Device 64-bit, modify the `CFBundleIndentifier` value in the Version Info section to use the identifier that corresponds to your App ID
-* Modify `info.plist.TemplateiOS.xml` to replace the string value inside the array for the `CFBundleURLSchemes` key with your iOS ClientID **however in REVERSE notation**. (See the example in the demo files)
+1. Go to [this link](https://github.com/firebase/firebase-ios-sdk/releases/tag/v8.15.0), download Firebase.zip, and extract it somewhere convenient
+2. In the IDE Options > Environment Variables, create a user override called `Firebase` which points to the unzipped SDK, **or** modify `Framework search path` in the Project Options for iOS Device 64-bit to point to the unzipped SDK
+3. In the Project Options for iOS Device 64-bit, modify the `CFBundleIndentifier` value in the Version Info section to use the identifier that corresponds to your App ID
+4. Modify `info.plist.TemplateiOS.xml` to replace the string value inside the array for the `CFBundleURLSchemes` key with your iOS ClientID **however in REVERSE notation**. (See the example in the demo files)
+5. Add the following iOS SDK frameworks as per [these instructions](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks#readme):
+   
+   AuthenticationServices
+
 
 ## Integration into your own project
 
