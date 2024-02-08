@@ -28,6 +28,7 @@ object Form1: TForm1
       Size.Width = 592.000000000000000000
       Size.Height = 21.000000000000000000
       Size.PlatformDefault = False
+      TextSettings.Trimming = None
       Text = 'Display Name:'
       TabOrder = 0
     end
@@ -39,6 +40,7 @@ object Form1: TForm1
       Size.Width = 592.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
+      TextSettings.Trimming = None
       TabOrder = 1
     end
     object ButtonsLayout: TLayout
@@ -63,6 +65,7 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 0
         Text = 'Select'
+        TextSettings.Trimming = None
         OnClick = SelectButtonClick
       end
       object SelectTypesLayout: TLayout
@@ -107,8 +110,9 @@ object Form1: TForm1
       CustomIcon = <
         item
         end>
+      TextSettings.Trimming = None
       IsSelected = False
-      Size.Width = 44.000000000000000000
+      Size.Width = 43.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
@@ -135,6 +139,7 @@ object Form1: TForm1
       CustomIcon = <
         item
         end>
+      TextSettings.Trimming = None
       IsSelected = False
       Size.Width = 53.000000000000000000
       Size.Height = 26.000000000000000000
@@ -158,6 +163,7 @@ object Form1: TForm1
       CustomIcon = <
         item
         end>
+      TextSettings.Trimming = None
       IsSelected = True
       Size.Width = 57.000000000000000000
       Size.Height = 26.000000000000000000
