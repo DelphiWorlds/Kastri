@@ -41,7 +41,7 @@ type
     procedure DestroyController;
     procedure RemoveItemProviderHandler(const AHandler: IItemProviderHandler);
   protected
-    procedure HandleAVAsset(const AHandler: IItemProviderHandler; const AFileName: string; const AAsset: AVAsset);
+    procedure HandleNSURL(const AHandler: IItemProviderHandler; const AFileName: string; const AURL: NSURL);
     procedure HandleUIImage(const AHandler: IItemProviderHandler; const AFileName: string; const AImage: UIImage);
   public
     { PHPickerViewControllerDelegate }
@@ -92,9 +92,9 @@ type
     FImagePicker: TUIImagePickerControllerDelegate;
     FPhotoPicker: TPHPickerViewControllerDelegate;
     FUTIs: TArray<string>;
-    function GetUTI(const AFileKind: TFileKind): string;
-    procedure HandleAVAsset(const AFileName: string; const AAsset: AVAsset);
-    procedure HandleUIImage(const AFileName: string; const AImage: UIImage);
+    function GeneratePreviewImage(const AURL: NSURL): UIImage;
+    procedure HandleNSURL(const AFileName: string; const AURL: NSURL);
+    procedure HandleUIImage(const AFileName: string; const AImage: UIImage; const AIsPreview: Boolean);
     procedure ShowDocumentPicker;
     procedure ShowImagePicker;
     procedure ShowPhotoPicker;
@@ -117,17 +117,17 @@ uses
   // macOS
   Macapi.Helpers,
   // iOS
-  iOSapi.Helpers, iOSapi.CoreGraphics,
+  iOSapi.Helpers, iOSapi.CoreGraphics, iOSapi.CoreMedia,
   // DW
-  DW.Macapi.Helpers;
+  DW.Macapi.Helpers, DW.iOSapi.AVFoundation;
 
 type
   TItemProviderHandler = class(TInterfacedObject, IItemProviderHandler)
   private
     FDelegate: TPHPickerViewControllerDelegate;
     FFileName: string;
+    procedure LoadObjectNSURLCompletionHandler(AURL: NSURL; AError: NSError);
     procedure LoadObjectUIImageCompletionHandler(AObject: Pointer; AError: NSError);
-    procedure LoadObjectAVAssetCompletionHandler(AObject: Pointer; AError: NSError);
   public
     constructor Create(const ADelegate: TPHPickerViewControllerDelegate; const AItemProvider: NSItemProvider);
   end;
@@ -137,9 +137,47 @@ type
     procedure LoadUIImageAsJPEG(const AImage: UIImage);
   end;
 
+function GetUTI(const AFileKind: TFileKind): string;
+begin
+  case AFileKind of
+    TFileKind.Image:
+      Result := 'public.image';
+    TFileKind.Audio:
+      Result := 'public.audio';
+    TFileKind.Movie:
+      Result := 'public.movie';
+    TFileKind.Text:
+      Result := 'public.text';
+    TFileKind.Item, TFileKind.Key: // Apparently .item will work for .key files?
+      Result := 'public.item';
+    TFileKind.Content:
+      Result := 'public.content';
+    TFileKind.X509Certificate:
+      Result := 'public.x509-certificate';
+    TFileKind.SourceCode:
+      Result := 'public.source-code';
+    TFileKind.PDF:
+      Result := 'com.adobe.pdf';
+    TFileKind.QuickTimeMovie:
+      Result := 'com.apple.quicktime-movie';
+  else
+    Result := 'public.item';
+  end;
+end;
+
 function UIImagePickerControllerImageURL: UIImagePickerControllerInfoKey;
 begin
   Result := CocoaNSStringConst(libUIKit, 'UIImagePickerControllerImageURL');
+end;
+
+function AVAssetExportPresetHighestQuality: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVAssetExportPresetHighestQuality');
+end;
+
+function AVFileTypeMPEG4: AVFileType;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVFileTypeMPEG4');
 end;
 
 { TMemoryStreamHelper }
@@ -156,20 +194,35 @@ end;
 { TItemProviderHandler }
 
 constructor TItemProviderHandler.Create(const ADelegate: TPHPickerViewControllerDelegate; const AItemProvider: NSItemProvider);
+var
+  LDebug: string;
+  LUTI: NSString;
+  LFileKind: TFileKind;
 begin
   inherited Create;
   FDelegate := ADelegate;
+  LDebug := NSStrToStr(AItemProvider.suggestedName);
   FFileName := NSStrToStr(AItemProvider.suggestedName);
   if AItemProvider.canLoadObjectOfClass(TUIImage.OCClass.&class) then
     AItemProvider.loadObjectOfClass(TUIImage.OCClass.&class, LoadObjectUIImageCompletionHandler)
-  else if AItemProvider.canLoadObjectOfClass(TAVAsset.OCClass.&class) then
-    AItemProvider.loadObjectOfClass(TAVAsset.OCClass.&class, LoadObjectAVAssetCompletionHandler);
+  else
+  begin
+    for LFileKind in [TFileKind.Movie, TFileKind.QuickTimeMovie] do
+    begin
+      LUTI := StrToNSStr(GetUTI(LFileKind));
+      if AItemProvider.hasItemConformingToTypeIdentifier(LUTI) then
+      begin
+        AItemProvider.loadFileRepresentationForTypeIdentifier(LUTI, LoadObjectNSURLCompletionHandler);
+        Break;
+      end;
+    end;
+  end;
 end;
 
-procedure TItemProviderHandler.LoadObjectAVAssetCompletionHandler(AObject: Pointer; AError: NSError);
+procedure TItemProviderHandler.LoadObjectNSURLCompletionHandler(AURL: NSURL; AError: NSError);
 begin
   if (AError = nil) or (AError.code = 0) then
-    FDelegate.HandleAVAsset(Self, FFileName, TAVAsset.Wrap(AObject));
+    FDelegate.HandleNSURL(Self, FFileName, AURL);
 end;
 
 procedure TItemProviderHandler.LoadObjectUIImageCompletionHandler(AObject: Pointer; AError: NSError);
@@ -197,15 +250,15 @@ begin
   FController := nil;
 end;
 
-procedure TPHPickerViewControllerDelegate.HandleAVAsset(const AHandler: IItemProviderHandler; const AFileName: string; const AAsset: AVAsset);
+procedure TPHPickerViewControllerDelegate.HandleNSURL(const AHandler: IItemProviderHandler; const AFileName: string; const AURL: NSURL);
 begin
-  FSelector.HandleAVAsset(AFileName, AAsset);
+  FSelector.HandleNSURL(AFileName, AURL);
   RemoveItemProviderHandler(AHandler);
 end;
 
 procedure TPHPickerViewControllerDelegate.HandleUIImage(const AHandler: IItemProviderHandler; const AFileName: string; const AImage: UIImage);
 begin
-  FSelector.HandleUIImage(AFileName, AImage);
+  FSelector.HandleUIImage(AFileName, AImage, False);
   RemoveItemProviderHandler(AHandler);
 end;
 
@@ -309,7 +362,7 @@ begin
   begin
     Inc(FSelectedCount);
     LImage := TUIImage.Wrap(LObject);
-    FSelector.HandleUIImage(LFileName, LImage);
+    FSelector.HandleUIImage(LFileName, LImage, False);
   end;
   if FSelector.IsSelectionLimit(FSelectedCount) then
     picker.dismissModalViewControllerAnimated(True);
@@ -325,7 +378,7 @@ begin
   LObject := editingInfo.objectForKey(NSObjectToID(UIImagePickerControllerImageURL));
   if LObject <> nil then
     LFileName := NSStrToStr(TNSURL.Wrap(LObject).lastPathComponent);
-  FSelector.HandleUIImage(LFileName, didFinishPickingImage);
+  FSelector.HandleUIImage(LFileName, didFinishPickingImage, False);
   Inc(FSelectedCount);
   if FSelector.IsSelectionLimit(FSelectedCount) then
     picker.dismissModalViewControllerAnimated(True);
@@ -345,9 +398,6 @@ begin
   FController.setTitle(StrToNSStr(FSelector.Title));
   TiOSHelper.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
 end;
-
-// https://escapetech.eu/manuals/qdrop/uti.html
-// "public.image", "public.audio", "public.movie", "public.text", "public.item", "public.content", "public.source-code"
 
 { TUIDocumentPickerDelegate }
 
@@ -451,39 +501,59 @@ begin
   FUTIs := FFileTypes.ToStringArray;
 end;
 
-function TPlatformFilesSelector.GetUTI(const AFileKind: TFileKind): string;
+function TPlatformFilesSelector.GeneratePreviewImage(const AURL: NSURL): UIImage;
+const
+  NSEC_PER_SEC = 1000000000;
+var
+  LGenerator: AVAssetImageGenerator;
+  LAsset: AVAsset;
+  LTime: CMTime;
+  LImageRef: CGImageRef;
+  LError: Pointer;
 begin
-  case AFileKind of
-    TFileKind.Image:
-      Result := 'public.image';
-    TFileKind.Audio:
-      Result := 'public.audio';
-    TFileKind.Movie:
-      Result := 'public.movie';
-    TFileKind.Text:
-      Result := 'public.text';
-    TFileKind.Item, TFileKind.Key: // Apparently .item will work for .key files?
-      Result := 'public.item';
-    TFileKind.Content:
-      Result := 'public.content';
-    TFileKind.X509Certificate:
-      Result := 'public.x509-certificate';
-    TFileKind.SourceCode:
-      Result := 'public.source-code';
-    TFileKind.PDF:
-      Result := 'com.adobe.pdf';
-  else
-    Result := 'public.item';
+  Result := nil;
+  LAsset := TAVURLAsset.Wrap(TAVURLAsset.OCClass.URLAssetWithURL(AURL, nil));
+  LGenerator := TAVAssetImageGenerator.Wrap(TAVAssetImageGenerator.Alloc.initWithAsset(LAsset));
+  LGenerator.setAppliesPreferredTrackTransform(True);
+  LTime := CMTimeMakeWithSeconds(1, NSEC_PER_SEC);
+  LError := nil;
+  LImageRef := LGenerator.copyCGImageAtTime(LTime, nil, LError);
+  if LError = nil then
+  try
+    Result := TUIImage.Wrap(TUIImage.Alloc.initWithCGImage(LImageRef));
+  finally
+    CGImageRelease(LImageRef);
   end;
 end;
 
-procedure TPlatformFilesSelector.HandleAVAsset(const AFileName: string; const AAsset: AVAsset);
+procedure TPlatformFilesSelector.HandleNSURL(const AFileName: string; const AURL: NSURL);
+var
+  LStream: TStream;
+  LData: NSData;
+  LImage: UIImage;
+  LFileName, LDocumentFileName: string;
 begin
-  // Ouch - here, the AVAsset needs to be exported using AVAssetExportSession
-  TOSLog.d('HandleAVAsset is yet to be implemented');
+  if not DocumentsFolder.IsEmpty and ForceDirectories(DocumentsFolder) then
+  begin
+    LFileName := NSStrToStr(AURL.path);
+    LDocumentFileName := TPath.Combine(DocumentsFolder, TPath.GetFileName(LFileName));
+    TFile.Copy(LFileName, LDocumentFileName);
+  end;
+  LImage := GeneratePreviewImage(AURL);
+  LStream := TMemoryStream.Create;
+  try
+    if LImage <> nil then
+    begin
+      LData := TNSData.Wrap(UIImageJPEGRepresentation(NSObjectToID(LImage), 1));
+      LStream.Write(LData.bytes^, LData.length);
+    end;
+    TThread.Synchronize(nil, procedure begin DoImageStream(LDocumentFileName, LStream); end);
+  finally
+    LStream.Free;
+  end;
 end;
 
-procedure TPlatformFilesSelector.HandleUIImage(const AFileName: string; const AImage: UIImage);
+procedure TPlatformFilesSelector.HandleUIImage(const AFileName: string; const AImage: UIImage; const AIsPreview: Boolean);
 var
   LStream: TStream;
   LData: NSData;
