@@ -76,6 +76,8 @@ const
   AVPlayerTimeControlStatusPlaying = 2;
 
 type
+  AVAssetExportSession = interface;
+  AVAssetImageGenerator = interface;
   AVAudioBuffer = interface;
   AVAudioChannelLayout = interface;
   AVAudioConnectionPoint = interface;
@@ -96,6 +98,7 @@ type
   AVAudioEnvironmentDistanceAttenuationParameters = interface;
   AVAudioUnitEQFilterParameters = interface;
   AVAudioEnvironmentReverbParameters = interface;
+  AVMetadataItemFilter = interface;
 
   PInt32 = ^Int32;
   AVAuthorizationStatus = NSInteger;
@@ -137,8 +140,16 @@ type
   AVAudioSessionLocation = NSString;
   AVAudioSessionOrientation = NSString;
   AVAudioSessionPolarPattern = NSString;
+  AVFileType = NSString;
+  AVAudioTimePitchAlgorithm = NSString;
+  AVAssetImageGeneratorApertureMode = NSString;
+  AVAssetImageGeneratorResult = NSInteger;
+  PCMTime = ^CMTime;
 
   CGImagePropertyOrientation = NSUInteger;
+
+  AVAssetImageGeneratorCompletionHandler = procedure(requestedTime: CMTime; image: CGImageRef; actualTime: CMTime;
+    result: AVAssetImageGeneratorResult; error: NSError) of object;
 
   AVAudio3DAngularOrientation = record
     yaw: Single;
@@ -167,6 +178,12 @@ type
   TAVPlayerBlockMethod3 = procedure of object;
   TAVAudioSessionBlockMethod1 = procedure(granted: Boolean) of object;
   TAVAudioSessionBlockMethod2 = procedure(activated: Boolean; error: NSError) of object;
+  TAVAssetExportSessionBlockMethod1 = procedure of object;
+  TAVAssetExportSessionBlockMethod2 = procedure(compatible: Boolean) of object;
+  TAVAssetExportSessionBlockMethod3 = procedure(compatibleFileTypes: NSArray) of object;
+  TAVAssetExportSessionBlockMethod4 = procedure(estimatedMaximumDuration: CMTime; error: NSError) of object;
+  TAVAssetExportSessionBlockMethod5 = procedure(estimatedOutputFileLength: Int64; error: NSError) of object;
+  TAVAssetImageGeneratorBlockMethod1 = procedure(image: CGImageRef; actualTime: CMTime; error: NSError) of object;
 
   AVAudioSessionRouteDescriptionClass = interface(NSObjectClass)
     ['{A7524349-5447-431C-A1A9-D09F2C1F6588}']
@@ -722,6 +739,100 @@ type
     function volume: Single; cdecl;
   end;
   TAVPlayer = class(TOCGenericImport<AVPlayerClass, AVPlayer>) end;
+
+  AVMetadataItemFilterClass = interface(NSObjectClass)
+    ['{D7EE4AFB-C4A9-4FE5-A971-EF13F9FBDEB0}']
+    {class} function metadataItemFilterForSharing: AVMetadataItemFilter; cdecl;
+  end;
+
+  AVMetadataItemFilter = interface(NSObject)
+    ['{E1EEE8A8-45FD-4E86-A6EE-4CE187816A4D}']
+  end;
+  TAVMetadataItemFilter = class(TOCGenericImport<AVMetadataItemFilterClass, AVMetadataItemFilter>) end;
+
+  AVAssetExportSessionClass = interface(NSObjectClass)
+    ['{294A3A42-753E-4F64-9A98-6FDB5C5B73D0}']
+    {class} function allExportPresets: NSArray; cdecl;
+    {class} procedure determineCompatibilityOfExportPreset(presetName: NSString; withAsset: AVAsset; outputFileType: AVFileType;
+      completionHandler: TAVAssetExportSessionBlockMethod2); cdecl;
+    {class} function exportPresetsCompatibleWithAsset(asset: AVAsset): NSArray; cdecl;
+    {class} function exportSessionWithAsset(asset: AVAsset; presetName: NSString): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
+  end;
+
+  AVAssetExportSession = interface(NSObject)
+    ['{3935D50F-9711-4907-8CBF-BF8C23537534}']
+    function asset: AVAsset; cdecl;
+    function audioMix: AVAudioMix; cdecl;
+    function audioTimePitchAlgorithm: AVAudioTimePitchAlgorithm; cdecl;
+    procedure cancelExport; cdecl;
+    function canPerformMultiplePassesOverSourceMediaData: Boolean; cdecl;
+    function customVideoCompositor: Pointer; cdecl;
+    procedure determineCompatibleFileTypesWithCompletionHandler(handler: TAVAssetExportSessionBlockMethod3); cdecl;
+    function directoryForTemporaryFiles: NSURL; cdecl;
+    function error: NSError; cdecl;
+    function estimatedOutputFileLength: Int64; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("estimateOutputFileLengthWithCompletionHandler", macos(10.9, API_TO_BE_DEPRECATED), ios(5.0, API_TO_BE_DEPRECATED), tvos(5.0, API_TO_BE_DEPRECATED))
+    procedure estimateMaximumDurationWithCompletionHandler(handler: TAVAssetExportSessionBlockMethod4); cdecl;
+    procedure estimateOutputFileLengthWithCompletionHandler(handler: TAVAssetExportSessionBlockMethod5); cdecl;
+    procedure exportAsynchronouslyWithCompletionHandler(handler: TAVAssetExportSessionBlockMethod1); cdecl;
+    function fileLengthLimit: Int64; cdecl;
+    function initWithAsset(asset: AVAsset; presetName: NSString): Pointer; cdecl;
+    function maxDuration: CMTime; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("estimateMaximumDurationWithCompletionHandler", macos(10.14, API_TO_BE_DEPRECATED), ios(4.0, API_TO_BE_DEPRECATED), tvos(9.0, API_TO_BE_DEPRECATED))
+    function metadata: NSArray; cdecl;
+    function metadataItemFilter: AVMetadataItemFilter; cdecl;
+    function outputFileType: AVFileType; cdecl;
+    function outputURL: NSURL; cdecl;
+    function presetName: NSString; cdecl;
+    function progress: Single; cdecl;
+    procedure setAudioMix(audioMix: AVAudioMix); cdecl;
+    procedure setAudioTimePitchAlgorithm(audioTimePitchAlgorithm: AVAudioTimePitchAlgorithm); cdecl;
+    procedure setCanPerformMultiplePassesOverSourceMediaData(canPerformMultiplePassesOverSourceMediaData: Boolean); cdecl;
+    procedure setDirectoryForTemporaryFiles(directoryForTemporaryFiles: NSURL); cdecl;
+    procedure setFileLengthLimit(fileLengthLimit: Int64); cdecl;
+    procedure setMetadata(metadata: NSArray); cdecl;
+    procedure setMetadataItemFilter(metadataItemFilter: AVMetadataItemFilter); cdecl;
+    procedure setOutputFileType(outputFileType: AVFileType); cdecl;
+    procedure setOutputURL(outputURL: NSURL); cdecl;
+    procedure setShouldOptimizeForNetworkUse(shouldOptimizeForNetworkUse: Boolean); cdecl;
+    procedure setTimeRange(timeRange: CMTimeRange); cdecl;
+    procedure setVideoComposition(videoComposition: AVVideoComposition); cdecl;
+    function shouldOptimizeForNetworkUse: Boolean; cdecl;
+    function status: AVAssetExportSessionStatus; cdecl;
+    function supportedFileTypes: NSArray; cdecl;
+    function timeRange: CMTimeRange; cdecl;
+    function videoComposition: AVVideoComposition; cdecl;
+  end;
+  TAVAssetExportSession = class(TOCGenericImport<AVAssetExportSessionClass, AVAssetExportSession>) end;
+
+  AVAssetImageGeneratorClass = interface(NSObjectClass)
+    ['{DA143AD2-E011-47E4-8E31-79CE70E3C608}']
+    {class} function assetImageGeneratorWithAsset(asset: AVAsset): Pointer; cdecl;
+    {class} function new: Pointer; cdecl;
+  end;
+
+  AVAssetImageGenerator = interface(NSObject)
+    ['{B8E9970D-04CF-432E-B9E5-F9BB0BFD3C9C}']
+    function apertureMode: AVAssetImageGeneratorApertureMode; cdecl;
+    function appliesPreferredTrackTransform: Boolean; cdecl;
+    function asset: AVAsset; cdecl;
+    procedure cancelAllCGImageGeneration; cdecl;
+    function copyCGImageAtTime(requestedTime: CMTime; actualTime: PCMTime; error: PPointer): CGImageRef; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("generateCGImageAsynchronouslyForTime:completionHandler:", macos(10.7, API_TO_BE_DEPRECATED), ios(4.0, API_TO_BE_DEPRECATED), tvos(9.0, API_TO_BE_DEPRECATED))
+    function customVideoCompositor: Pointer; cdecl;
+    procedure generateCGImageAsynchronouslyForTime(requestedTime: CMTime; completionHandler: TAVAssetImageGeneratorBlockMethod1); cdecl;
+    procedure generateCGImagesAsynchronouslyForTimes(requestedTimes: NSArray; completionHandler: AVAssetImageGeneratorCompletionHandler); cdecl;
+    function initWithAsset(asset: AVAsset): Pointer; cdecl;
+    function maximumSize: CGSize; cdecl;
+    function requestedTimeToleranceAfter: CMTime; cdecl;
+    function requestedTimeToleranceBefore: CMTime; cdecl;
+    procedure setApertureMode(apertureMode: AVAssetImageGeneratorApertureMode); cdecl;
+    procedure setAppliesPreferredTrackTransform(appliesPreferredTrackTransform: Boolean); cdecl;
+    procedure setMaximumSize(maximumSize: CGSize); cdecl;
+    procedure setRequestedTimeToleranceAfter(requestedTimeToleranceAfter: CMTime); cdecl;
+    procedure setRequestedTimeToleranceBefore(requestedTimeToleranceBefore: CMTime); cdecl;
+    procedure setVideoComposition(videoComposition: AVVideoComposition); cdecl;
+    function videoComposition: AVVideoComposition; cdecl;
+  end;
+  TAVAssetImageGenerator = class(TOCGenericImport<AVAssetImageGeneratorClass, AVAssetImageGenerator>) end;
 
 function AVAudioSessionCategoryRecord: NSString;
 function AVAudioSessionModeMeasurement: NSString;
