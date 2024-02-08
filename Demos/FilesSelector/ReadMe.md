@@ -33,7 +33,7 @@ On iOS, with the document picker it is not entirely obvious how to make multiple
 <img src="./Screenshots/PickeriOSSelectOpen.png" alt="Select Open" height="750">
 <br/>
 
-When using a value of `[TFileKind.Photo]` for `FileKinds` on iOS, the standard gallery picker will be shown, and images selected will be returned in the `OnImageStream` event, called once for each image. This way developers can choose what they want to do with the stream, e.g. it could be saved as a file, using code like this:
+When using a value of `[TFileKind.Photo]` for `FileKinds` on iOS, the standard gallery picker will be shown, and images selected will be returned in the `OnImageStream` event, called once for each image/video. This way developers can choose what they want to do with the stream, e.g. images could be saved as a file, using code like this:
 
 ```Pascal
 var
@@ -41,7 +41,7 @@ var
 begin
   LStream := TMemoryStream.Create;
   try
-    LStream.CopyFrom(AIMageStream);
+    LStream.CopyFrom(AImageStream);
     LStream.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, AFileName));
   finally
     LStream.Free;
@@ -50,3 +50,5 @@ end;
 ```
 
 ..or for example the stream could be Base64 encoded using methods from the [`DW.Base64.Helpers`](https://github.com/DelphiWorlds/Kastri/blob/master/Core/DW.Base64.Helpers.pas) unit, such as `TBase64Helper.Encode` or `TBase64Helper.CompressEncode`.
+
+**NOTE**: When the `OnImageStream` event is called for **videos**, the entire video is copied to the folder specified in the `DocumentsFolder` property of `TFilesSelector`, a preview image of the video is contained in the `ImageStream` parameter, and the `FileName` parameter contains the **full path** to the stored video. **The fact that the entire video is copied means that the response can be delayed, especially if multiple videos are selected**.
