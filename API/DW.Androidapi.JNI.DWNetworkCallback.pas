@@ -25,7 +25,7 @@ type
 
   JDWNetworkCallbackClass = interface(JConnectivityManager_NetworkCallbackClass)
     ['{D5B4C0CD-4476-4908-AF1D-5CB1676A778B}']
-    {class} function init(context: JContext; delegate: JDWNetworkCallbackDelegate): JDWNetworkCallback; cdecl;
+    {class} function init(context: JContext; delegate: JDWNetworkCallbackDelegate; manualRegister: Boolean): JDWNetworkCallback; cdecl;
   end;
 
   [JavaSignature('com/delphiworlds/kastri/DWNetworkCallback')]

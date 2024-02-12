@@ -21,25 +21,27 @@ public class DWNetworkCallback extends ConnectivityManager.NetworkCallback {
     private static final String TAG = "DWNetworkCallback";
     private DWNetworkCallbackDelegate mDelegate;
 
-    public DWNetworkCallback(Context context, DWNetworkCallbackDelegate delegate) {
-        mDelegate = delegate;
+    public DWNetworkCallback(Context context, DWNetworkCallbackDelegate delegate, boolean manualRegister) {
+      mDelegate = delegate;
+      if (!manualRegister) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkRequest.Builder builder = new NetworkRequest.Builder();
         connectivityManager.registerNetworkCallback(builder.build(), this);
+      }
     }
 
     @Override
     public void onAvailable(Network network) {
-        mDelegate.onAvailable(network);
+      mDelegate.onAvailable(network);
     }
 
     @Override
     public void onLost(Network network) {
-        mDelegate.onLost(network);
+      mDelegate.onLost(network);
     }
 
     @Override
     public void onUnavailable() {
-        mDelegate.onUnavailable();
+      mDelegate.onUnavailable();
     }
 }
