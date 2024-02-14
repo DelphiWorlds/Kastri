@@ -96,7 +96,7 @@ type
 constructor TNetworkCallbackDelegate.Create(const APlatformConnectivity: TPlatformConnectivity);
 begin
   inherited Create;
-  FCallback := TJDWNetworkCallback.JavaClass.init(TAndroidHelper.Context, Self);
+  FCallback := TJDWNetworkCallback.JavaClass.init(TAndroidHelper.Context, Self, False);
   FPlatformConnectivity := APlatformConnectivity;
 end;
 
