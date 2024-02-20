@@ -145,6 +145,7 @@ type
   [JavaSignature('com/delphiworlds/kastri/DWFirebaseMessagingServiceCallback')]
   JDWFirebaseMessagingServiceCallback = interface(IJavaInstance)
     ['{F2EA3740-307A-43E0-B85B-A9582E15D967}']
+    function getShowNotificationWhenForeground: Boolean; cdecl;
     procedure onNotificationReceived(intent: JIntent); cdecl;
   end;
 
@@ -166,6 +167,7 @@ type
     FFCMManager: TFCMManager;
   public
     { JDWFirebaseMessagingServiceCallback }
+    function getShowNotificationWhenForeground: Boolean; cdecl;
     procedure onNotificationReceived(intent: JIntent); cdecl;
   public
     constructor Create(const AFCMManager: TFCMManager);
@@ -219,6 +221,7 @@ type
     {$ENDIF}
   protected
     procedure HandleNotification(const AServiceNotification: TPushServiceNotification);
+    property ShowBannerIfForeground: Boolean read FShowBannerIfForeground;
   public
     { IFCMManager }
     procedure CheckPushEnabled(const AHandler: TCheckPushEnabledMethod);
@@ -281,6 +284,11 @@ begin
   FFCMManager := AFCMManager;
 end;
 
+function TDWFirebaseMessagingServiceCallback.getShowNotificationWhenForeground: Boolean;
+begin
+  Result := FFCMManager.ShowBannerIfForeground;
+end;
+
 procedure TDWFirebaseMessagingServiceCallback.onNotificationReceived(intent: JIntent);
 var
   LExtras: JBundle;
@@ -313,6 +321,10 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TMessageReceivedNotification, MessageReceivedNotificationHandler);
   FFirebaseMessagingServiceCallback := TDWFirebaseMessagingServiceCallback.Create(Self);
   TJDWFirebaseMessagingService.JavaClass.setCallback(FFirebaseMessagingServiceCallback);
+  {$ENDIF}
+  {$IF Defined(IOS)}
+  if not TUserDefaults.GetValue('APNS').IsEmpty then
+    TOSLog.d('APNS: %s', [TUserDefaults.GetValue('APNS')]);
   {$ENDIF}
 end;
 
