@@ -15,6 +15,7 @@ import android.content.Intent;
 
 public interface DWFirebaseMessagingServiceCallback {
 
+  boolean getShowNotificationWhenForeground();
   void onNotificationReceived(Intent intent);
 
 }

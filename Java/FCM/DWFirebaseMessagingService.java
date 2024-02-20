@@ -11,6 +11,8 @@ package com.delphiworlds.kastri;
  *                                                     *
  *******************************************************/
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -71,8 +73,13 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
         else
           Log.e(TAG, "No job id specified for " + relayService);
       }
-    } 
-    DWNotificationPresenter.presentNotification(this, intent, channelId, icon);
+    }
+    RunningAppProcessInfo info = new RunningAppProcessInfo();
+    ActivityManager.getMyMemoryState(info);
+    boolean isAppForeground = info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+    // If no callback, or app is foreground and needs the notification, present it
+    if ((mCallback == null) || (mCallback.getShowNotificationWhenForeground() && isAppForeground))
+      DWNotificationPresenter.presentNotification(this, intent, channelId, icon);
     if (mCallback != null) {
       Log.d(TAG, "> mCallback.onNotificationReceived");
       mCallback.onNotificationReceived(intent);
