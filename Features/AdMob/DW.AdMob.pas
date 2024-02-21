@@ -233,6 +233,7 @@ end;
 
 procedure TAdMob.ResetConsent;
 begin
+  FIsComplete := False;
   DoResetConsent;
   FIsStarted := False;
 end;
