@@ -59,9 +59,11 @@ where `<Kastri>` is the root of your copy of Kastri. This should work for Delphi
 
 If you need to patch `FMX.PushNotification.FCM.iOS` manually, please see [these instructions](../../Features/Firebase/FCMManualPatch.md).
 
+**NOTE**: The patched file needs to be in the *project folder*, **OR** in the *search path*. **Do not patch it "in place" in the Delphi source**, because those folders are not normally in the search path.
+
 #### Firebase SDK
 
-Firebase support in Kastri has now been aligned with Firebase SDK for iOS version 10.8.0. Firebase SDK versions 9.x and older have now been **deprecated*, and are not guaranteed to work, so support for them has been removed entirely.
+Firebase support in Kastri has now been aligned with Firebase SDK for iOS version 10.8.0. Firebase SDK versions 9.x and older have now been **deprecated**, and are not guaranteed to work, so support for them has been removed entirely from Kastri.
 
 Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
 
@@ -81,6 +83,8 @@ Ensure you have a value of: `-ObjC -rpath /usr/lib/swift` for the `Options passe
 
 If you are creating your own project:
 
+#### Kastri java libraries
+
 FCM Rebooted relies on:
 
 * Delphi 12: `dw-kastri-base-3.0.0.jar` and `dw-fcm-3.0.0.jar`
@@ -90,7 +94,18 @@ from the `Lib` folder, so add them to the `Libraries` node under the Android pla
 
 **Note**:
 
-Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will need to either apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+
+#### Build Event
+
+Configure Build Events in Project Options to add a Post-Build event with the command:  
+
+    ```
+    [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
+    ```  
+    Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
+
+`AndroidManifest.merge.xml` can be found in the root folder of the respective demo (i.e. FCMBaseDemo and FCMRelayDemo), and should be copied to the root folder of your project
 
 ### Relay Demo
 
