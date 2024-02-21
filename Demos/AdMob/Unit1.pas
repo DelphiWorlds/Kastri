@@ -95,8 +95,13 @@ end;
 
 procedure TForm1.ConsentButtonClick(Sender: TObject);
 begin
-  // Use RequestConsent(False) if you need to opt out of UMP
+  // Use RequestConsent(True) if you need to OPT OUT out of UMP
+  {$IF CompilerVersion > 35}
   AdMob.RequestConsent;
+  {$ELSE}
+  // UMP not supported on Delphi 11
+  AdMob.RequestConsent(True);
+  {$ENDIF}
   // **** NOTE: Ads will not start until RequestConsent has been called ****
 end;
 
