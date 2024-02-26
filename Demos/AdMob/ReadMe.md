@@ -126,6 +126,7 @@ In order to compile successfully for iOS, it's also necessary to:
 2. Add the following frameworks to the iOS SDK in Delphi's SDK Manager (if they are not already added):
 
 * Accessibility
+* AppTrackingTransparency
 * Combine
 * AdServices
 * CoreMotion
