@@ -75,9 +75,10 @@ Download the `GoogleServices-info.plist` file from your project configured in [F
 
 #### Linker Options
 
-Ensure you have a value of: `-ObjC -rpath /usr/lib/swift` for the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit:
-
-   <img src="../AdMob//Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
+For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit, ensure you have a value of: 
+```
+-ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib  -weak_library /usr/lib/swift/libswiftFileProvider.dylib
+``` 
 
 ### Android
 

@@ -139,20 +139,28 @@ In order to compile successfully for iOS, it's also necessary to:
 
 If creating your own project:
 
-1. Set the Framework Search Path value for iOS Device 64-bit target to:
-   ```
-   $(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64_armv7
-   ```
+#### Framework search path
 
-2. Ensure you have a value of: `-ObjC -rpath /usr/lib/swift` for the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit:
+In Project Options, set the Framework Search Path value for iOS Device 64-bit target to:
+```
+$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64_armv7
+```
 
-   <img src="./Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
+#### Linker Options
 
-### Android Entitlements
+For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit, ensure you have a value of: 
+```
+-ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib  -weak_library /usr/lib/swift/libswiftFileProvider.dylib
+``` 
+#### NSUserTrackingUsageDescription
+
+For iOS, when you specify in App Store Connect that your app collects data from users, you will need to add a `NSUserTrackingUsageDescription` key and value to the Version Info section of the project options
+
+#### Android Entitlements
 
 Ensure your project has the `AdMob Service` enabled. This adds Google Play services metadata and the Ads activity to the manifest.
 
-### Android Permission
+#### Android Permission
 
 Ensure your project has the `Access Network State` permission in Project Options
 
