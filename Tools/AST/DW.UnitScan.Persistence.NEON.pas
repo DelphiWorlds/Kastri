@@ -11,8 +11,6 @@ unit DW.UnitScan.Persistence.NEON;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

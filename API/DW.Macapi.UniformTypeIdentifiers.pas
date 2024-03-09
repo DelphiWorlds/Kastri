@@ -11,8 +11,6 @@ unit DW.Macapi.UniformTypeIdentifiers;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

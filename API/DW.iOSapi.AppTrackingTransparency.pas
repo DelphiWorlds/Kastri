@@ -6,12 +6,11 @@ unit DW.iOSapi.AppTrackingTransparency;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // NOTE: To use this unit, please ensure that you add the AppTrackingTransparency framework via the Delphi SDK Manager
 

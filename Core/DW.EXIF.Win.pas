@@ -6,12 +6,11 @@ unit DW.EXIF.Win;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // **** NOTE: This unit is work in progress. ****
 //  For example, retrieval of Alititude, Latitude and Longitude is incpmplete, and the values retrieved for Make and Model do not appear to be right

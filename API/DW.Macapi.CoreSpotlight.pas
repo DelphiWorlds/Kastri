@@ -11,8 +11,6 @@ unit DW.Macapi.CoreSpotlight;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

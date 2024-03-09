@@ -6,12 +6,11 @@ unit DW.NFC.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // ****** NOTE: This is a work in progress, so don't expect miracles :-) *****
 // Tag ID reading might be added for iOS later - adding this URL as a possible reference

@@ -11,8 +11,6 @@ unit DW.Plist;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

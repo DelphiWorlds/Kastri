@@ -11,8 +11,6 @@ unit DW.Macapi.CloudKit;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

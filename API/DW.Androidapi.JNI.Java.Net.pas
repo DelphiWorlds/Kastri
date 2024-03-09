@@ -11,8 +11,6 @@ unit DW.Androidapi.JNI.Java.Net;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

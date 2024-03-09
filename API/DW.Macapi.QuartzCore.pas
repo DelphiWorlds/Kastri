@@ -11,8 +11,6 @@ unit DW.Macapi.QuartzCore;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

@@ -6,12 +6,11 @@ unit DW.iOSapi.DeviceCheck;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // **** NOTE: At present, this unit is UNTESTED **** Please use with care
 // You will need to add the DeviceCheck framework to the iOS SDK(s) using the SDK Manager in the IDE

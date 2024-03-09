@@ -11,8 +11,6 @@ unit DW.Macapi.Symbols;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

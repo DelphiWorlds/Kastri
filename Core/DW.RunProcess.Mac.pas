@@ -6,12 +6,11 @@ unit DW.RunProcess.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // Portions of code by Sebastian Zierer:
 //   https://www.codenewsfast.com/cnf/article/1692649891/permalink.art-ng2027q23047

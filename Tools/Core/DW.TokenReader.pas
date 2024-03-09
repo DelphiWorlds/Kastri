@@ -11,8 +11,6 @@ unit DW.TokenReader;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

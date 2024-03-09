@@ -11,8 +11,6 @@ unit DW.UnitScan;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses

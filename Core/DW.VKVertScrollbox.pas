@@ -2,13 +2,14 @@ unit DW.VKVertScrollbox;
 
 {*******************************************************}
 {                                                       }
-{                    Kastri Free                        }
+{                      Kastri                           }
 {                                                       }
-{          DelphiWorlds Cross-Platform Library          }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
+{  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 // For an example of how to use this unit, please refer to the demo, here:
 //   https://github.com/DelphiWorlds/KastriFree/tree/master/Demos/VKVertScrollbox

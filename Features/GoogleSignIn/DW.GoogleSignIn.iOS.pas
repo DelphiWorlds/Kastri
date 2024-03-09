@@ -6,12 +6,14 @@ unit DW.GoogleSignIn.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
+
+// Docs for Google SignIn on iOS:
+//   https://firebase.google.com/docs/auth/ios/google-signin#objective-c_3
 
 interface
 

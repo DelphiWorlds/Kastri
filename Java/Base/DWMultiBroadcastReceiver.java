@@ -6,7 +6,7 @@ package com.delphiworlds.kastri;
  *                                                     *
  *        Delphi Worlds Cross-Platform Library         *
  *                                                     *
- * Copyright 2020-2023 Dave Nottage under MIT license  *
+ * Copyright 2020-2024 Dave Nottage under MIT license  *
  * which is located in the root folder of this library *
  *                                                     *
  *******************************************************/
@@ -63,25 +63,21 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-
-// Delphi 10.4.2 and earlier
-// import android.support.v4.app.JobIntentService;
-// import android.support.v4.app.NotificationCompat;
-// import android.support.v4.content.LocalBroadcastManager;
-
-// Delphi 11 and later
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.JobIntentService;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.JobIntentService;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -109,6 +105,7 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
   public static final String ACTION_NOTIFICATION = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_NOTIFICATION";
   public static final String EXTRA_NOTIFICATION = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION";
   public static final String EXTRA_NOTIFICATION_ID = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_ID";
+  public static final String EXTRA_NOTIFICATION_IMAGE = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_IMAGE";
   public static final String EXTRA_NOTIFICATION_NAME = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_NAME";
   public static final String EXTRA_NOTIFICATION_REPEATINTERVAL = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_REPEATINTERVAL";
   public static final String EXTRA_SERVICE_RESTART = "com.delphiworlds.kastri.DWMultiBroadcastReceiver.EXTRA_SERVICE_RESTART";
@@ -404,6 +401,15 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
 		  alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
   }
 
+  private static String getNotificationTitle(Notification notification) {
+    return notification.extras.getString(Notification.EXTRA_TITLE);
+  }
+
+  private static String getNotificationText(Notification notification) {
+    CharSequence text = notification.extras.getCharSequence(Notification.EXTRA_TEXT);
+    return text != null ? text.toString() : null;
+  }
+
   @Override
   public void onReceive(Context context, Intent intent) {
     if (mDelegate == null) {
@@ -411,13 +417,23 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
       if (ACTION_NOTIFICATION.equals(intent.getAction())) {
         // Broadcast to the app to handle the notification if the app is running
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-        Notification notification = intent.getParcelableExtra(EXTRA_NOTIFICATION);
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         DWWakeUp.checkWakeUp(context, WAKE_ON_NOTIFICATION, false);
-        // Dispatch the notification to the OS
-        int id = intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0);
-        Log.d(TAG, "Notifying with id: " + id);
-        manager.notify(id, notification);
+        Notification notification = intent.getParcelableExtra(EXTRA_NOTIFICATION);
+        Intent notificationIntent = new Intent();
+        notificationIntent.putExtra("title", getNotificationTitle(notification));
+        notificationIntent.putExtra("body", getNotificationText(notification));
+        notificationIntent.putExtra("notifyId", intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0));
+        if (intent.hasExtra(EXTRA_NOTIFICATION_IMAGE)) {
+          String imagePath = intent.getStringExtra(EXTRA_NOTIFICATION_IMAGE);
+          Log.d(TAG, "imagePath: " + imagePath);
+          File file = new File(imagePath);
+          try {
+            notificationIntent.putExtra("imageUrl", file.toURI().toURL().toString());
+          } catch (MalformedURLException e) {
+            Log.e(TAG, "Image path invalid: " + imagePath);
+          }
+        }
+        DWNotificationPresenter.presentNotification(context, notificationIntent, notification.getChannelId(), notification.getSmallIcon().getResId());
         // Set alarm if repeating
         long alarmTime = getAlarmTime(notification.extras.getInt(EXTRA_NOTIFICATION_REPEATINTERVAL, 0));
         if (alarmTime != 0)

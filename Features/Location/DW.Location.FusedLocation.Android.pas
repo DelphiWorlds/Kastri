@@ -6,12 +6,11 @@ unit DW.Location.FusedLocation.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // *** NOTE ***: Requires dw-fusedlocation.jar (in the Lib folder) to be added to the Libraries node under the Android platform in Project Manager
 

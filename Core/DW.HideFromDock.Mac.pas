@@ -6,12 +6,11 @@ unit DW.HideFromDock.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // Including this unit in your macOS application turns it into an "accessory", i.e. it will be hidden from the Dock, as per:
 //   https://stackoverflow.com/a/9220857/3164070
