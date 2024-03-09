@@ -129,7 +129,9 @@ type
     FIsRunning: Boolean;
     FOutput: string;
     FProcess: TWindowsProcess;
-    procedure ProcessMessage;
+    function ProcessMessage(var AMsg: TMsg): Boolean; overload;
+    procedure ProcessMessage; overload;
+    procedure ProcessMessages;
     procedure ProcessReadHandler(Sender: TObject; const S: string; const StartsOnNewLine: Boolean);
     procedure ProcessTerminateHandler(Sender: TObject; ExitCode: Cardinal);
   protected
@@ -1210,6 +1212,16 @@ begin
   inherited;
 end;
 
+procedure TCustomRunProcess.ProcessMessages;
+var
+  LMsg: TMsg;
+begin
+  if not IsConsole then
+    ProcessMessage
+  else
+    while ProcessMessage(LMsg) do {loop};
+end;
+
 procedure TCustomRunProcess.ProcessMessage;
 var
   LMsg: TMsg;
@@ -1219,6 +1231,36 @@ begin
     TranslateMessage(LMsg);
     DispatchMessage(LMsg);
   end;
+end;
+
+function TCustomRunProcess.ProcessMessage(var AMsg: TMsg): Boolean;
+var
+  LIsUnicode: Boolean;
+  LMsgExists: Boolean;
+begin
+  Result := False;
+  if PeekMessage(AMsg, 0, 0, 0, PM_NOREMOVE) then
+  begin
+    LIsUnicode := (AMsg.hwnd = 0) or IsWindowUnicode(AMsg.hwnd);
+    if LIsUnicode then
+      LMsgExists := PeekMessageW(AMsg, 0, 0, 0, PM_REMOVE)
+    else
+      LMsgExists := PeekMessageA(AMsg, 0, 0, 0, PM_REMOVE);
+    if LMsgExists then
+    begin
+      Result := True;
+      if AMsg.Message <> WM_QUIT then
+      begin
+        TranslateMessage(AMsg);
+        if LIsUnicode then
+          DispatchMessageW(AMsg)
+        else
+          DispatchMessageA(AMsg);
+      end;
+    end;
+  end
+  else if IsConsole then
+    CheckSynchronize;
 end;
 
 procedure TCustomRunProcess.ProcessReadHandler(Sender: TObject; const S: string; const StartsOnNewLine: Boolean);
@@ -1242,8 +1284,8 @@ begin
   if InternalRun then
   begin
     LStart := Now;
-    while IsRunning and (MilliSecondsBetween(Now, LStart) < ATimeout) do
-      ProcessMessage;
+    while IsRunning and ((ATimeout = 0) or (MilliSecondsBetween(Now, LStart) < ATimeout)) do
+      ProcessMessages;
     if IsRunning then
       Result := 1  // Still running - timed out
     else
