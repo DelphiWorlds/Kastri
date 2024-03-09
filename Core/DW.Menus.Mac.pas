@@ -15,7 +15,7 @@ interface
 
 uses
   // RTL
-  System.Classes, System.TypInfo,
+  System.Classes, System.TypInfo, System.Types,
   // macOS
   Macapi.ObjectiveC, Macapi.Foundation, Macapi.AppKit, Macapi.CocoaTypes,
   // FMX
@@ -315,7 +315,9 @@ type
   public
     constructor Create(const AMenu: NSMenu);
     destructor Destroy; override;
+    function GetRect: TRectF;
     procedure SetImage(const ABitmap: TBitmap);
+    procedure SetTitle(const AValue: string);
   end;
 
   TPlatformMenu = class;
@@ -351,6 +353,8 @@ type
     procedure CreateSeparator;
     function Count: Integer;
     property Menu: NSMenu read FMenu;
+    property OnMenuClose: TNotifyEvent read FOnMenuClose write FOnMenuClose;
+    property OnMenuOpen: TNotifyEvent read FOnMenuOpen write FOnMenuOpen;
   end;
 
 implementation
@@ -519,6 +523,11 @@ begin
   FStatusItem.setImage(BitmapToMenuBitmap(ABitmap));
 end;
 
+procedure TPlatformStatusItem.SetTitle(const AValue: string);
+begin
+  FStatusItem.setTitle(StrToNSStr(AValue));
+end;
+
 class function TPlatformStatusItem.StatusBar: NSStatusBar;
 begin
   Result := TNSStatusBar.Wrap(TNSStatusBar.OCClass.systemStatusBar);
@@ -533,6 +542,14 @@ end;
 function TPlatformStatusItem.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IMacOSStatusItem);
+end;
+
+function TPlatformStatusItem.GetRect: TRectF;
+begin
+  if FStatusItem.button <> nil then
+    Result := FStatusItem.button.window.convertRectToScreen(FStatusItem.button.frame).ToRectF
+  else
+    Result := TRectF.Empty;
 end;
 
 { TPlatformMenuDelegate }
