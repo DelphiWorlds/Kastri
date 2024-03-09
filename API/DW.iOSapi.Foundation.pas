@@ -250,11 +250,13 @@ type
     procedure setPersistentIdentifier(persistentIdentifier: NSUserActivityPersistentIdentifier); cdecl;
     procedure setReferrerURL(referrerURL: NSURL); cdecl;
     procedure setRequiredUserInfoKeys(requiredUserInfoKeys: NSSet); cdecl;
+    procedure setSuggestedInvocationPhrase(phrase: NSString); cdecl;
     procedure setSupportsContinuationStreams(supportsContinuationStreams: Boolean); cdecl;
     procedure setTargetContentIdentifier(targetContentIdentifier: NSString); cdecl;
     procedure setTitle(title: NSString); cdecl;
     procedure setUserInfo(userInfo: NSDictionary); cdecl;
     procedure setWebpageURL(webpageURL: NSURL); cdecl;
+    function suggestedInvocationPhrase: NSString; cdecl;
     function supportsContinuationStreams: Boolean; cdecl;
     function targetContentIdentifier: NSString; cdecl;
     function title: NSString; cdecl;
