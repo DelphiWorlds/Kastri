@@ -22,6 +22,10 @@ uses
 type
   NSCloudSharingServiceDelegate = interface;
   NSEvent = interface;
+  NSLayoutAnchor = interface;
+  NSLayoutConstraint = interface;
+  NSLayoutDimension = interface;
+  NSLayoutGuide = interface;
   NSOpenPanel = interface;
   NSSavePanel = interface;
   NSSharingService = interface;
@@ -39,7 +43,11 @@ type
   NSEventPhase = NSInteger;
   NSEventSubtype = NSInteger;
   NSEventSwipeTrackingOptions = NSInteger;
-  NSEventType = NSInteger;
+  NSLayoutConstraintOrientation = NSInteger;
+  NSLayoutPriority = Single;
+  NSLayoutRelation = NSInteger;
+  NSLayoutAttribute = NSInteger;
+  NSLayoutFormatOptions = NSInteger;
   NSModalResponse = NSInteger;
   NSNibName = NSString;
   NSPopoverBehavior = NSInteger;
@@ -53,6 +61,7 @@ type
   NSTouchBarItemIdentifier = NSString;
   NSTouchBarItemPriority = Single;
   NSTouchBarCustomizationIdentifier = NSString;
+  NSUserInterfaceItemIdentifier = NSString;
 
   PNSRectEdge = ^NSRectEdge;
   PNSSharingContentScope = ^NSSharingContentScope;
@@ -60,7 +69,7 @@ type
   NSStoryboardControllerCreator = function(coder: NSCoder): Pointer of object;
 
   TNSEventBlockMethod1 = procedure(gestureAmount: CGFloat; phase: NSEventPhase; isComplete: Boolean; stop: PBoolean) of object;
-  TNSEventBlockMethod2 = procedure(event: NSEvent) of object;
+  TNSEventBlockMethod2 = function(event: NSEvent): NSEvent of object;
   TNSSavePanelBlockMethod1 = procedure(result: NSModalResponse) of object;
   TNSViewControllerBlockMethod1 = procedure of object;
   TNSSharingServiceBlockMethod1 = procedure of object;
@@ -517,6 +526,130 @@ type
     function windowNumber: NSInteger; cdecl;
   end;
   TNSEvent = class(TOCGenericImport<NSEventClass, NSEvent>) end;
+
+  NSLayoutAnchorClass = interface(NSObjectClass)
+    ['{162111AA-D951-47B2-9BE2-9203E3F70BDF}']
+  end;
+
+  NSLayoutAnchor = interface(NSObject)
+    ['{7359665A-59DB-42D7-A6CE-E7A12F686196}']
+    function constraintEqualToAnchor(anchor: NSLayoutAnchor): NSLayoutConstraint; overload; cdecl;
+    function constraintEqualToAnchor(anchor: NSLayoutAnchor; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintGreaterThanOrEqualToAnchor(anchor: NSLayoutAnchor; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintGreaterThanOrEqualToAnchor(anchor: NSLayoutAnchor): NSLayoutConstraint; overload; cdecl;
+    function constraintLessThanOrEqualToAnchor(anchor: NSLayoutAnchor; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintLessThanOrEqualToAnchor(anchor: NSLayoutAnchor): NSLayoutConstraint; overload; cdecl;
+    function constraintsAffectingLayout: NSArray; cdecl;
+    function hasAmbiguousLayout: Boolean; cdecl;
+    function item: Pointer; cdecl;
+    function name: NSString; cdecl;
+  end;
+  TNSLayoutAnchor = class(TOCGenericImport<NSLayoutAnchorClass, NSLayoutAnchor>) end;
+
+  NSLayoutXAxisAnchorClass = interface(NSLayoutAnchorClass)
+    ['{819BCA30-428F-4EB0-8C8C-7438270B4343}']
+  end;
+
+  NSLayoutXAxisAnchor = interface(NSLayoutAnchor)
+    ['{BEA53529-A1B5-439C-BE52-C3239760DA1C}']
+    function anchorWithOffsetToAnchor(otherAnchor: NSLayoutXAxisAnchor): NSLayoutDimension; cdecl;
+    function constraintEqualToSystemSpacingAfterAnchor(anchor: NSLayoutXAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintGreaterThanOrEqualToSystemSpacingAfterAnchor(anchor: NSLayoutXAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintLessThanOrEqualToSystemSpacingAfterAnchor(anchor: NSLayoutXAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+  end;
+  TNSLayoutXAxisAnchor = class(TOCGenericImport<NSLayoutXAxisAnchorClass, NSLayoutXAxisAnchor>) end;
+
+  NSLayoutYAxisAnchorClass = interface(NSLayoutAnchorClass)
+    ['{97FCDCB7-7B0A-4242-A8D8-6C3F7DFD5CB3}']
+  end;
+
+  NSLayoutYAxisAnchor = interface(NSLayoutAnchor)
+    ['{29ADC51C-0583-4053-8F6B-FEEDD7F8CE62}']
+    function anchorWithOffsetToAnchor(otherAnchor: NSLayoutYAxisAnchor): NSLayoutDimension; cdecl;
+    function constraintEqualToSystemSpacingBelowAnchor(anchor: NSLayoutYAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintGreaterThanOrEqualToSystemSpacingBelowAnchor(anchor: NSLayoutYAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintLessThanOrEqualToSystemSpacingBelowAnchor(anchor: NSLayoutYAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+  end;
+  TNSLayoutYAxisAnchor = class(TOCGenericImport<NSLayoutYAxisAnchorClass, NSLayoutYAxisAnchor>) end;
+
+  NSLayoutDimensionClass = interface(NSLayoutAnchorClass)
+    ['{5E895587-E52D-4ADA-8511-9A37D806503B}']
+  end;
+
+  NSLayoutDimension = interface(NSLayoutAnchor)
+    ['{06161B24-C456-4837-9FCE-AD43D7C1364F}']
+    function constraintEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintEqualToConstant(c: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintGreaterThanOrEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat;
+      constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintGreaterThanOrEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintGreaterThanOrEqualToConstant(c: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintLessThanOrEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintLessThanOrEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintLessThanOrEqualToConstant(c: CGFloat): NSLayoutConstraint; cdecl;
+  end;
+  TNSLayoutDimension = class(TOCGenericImport<NSLayoutDimensionClass, NSLayoutDimension>) end;
+
+  NSLayoutConstraintClass = interface(NSObjectClass)
+    ['{CE3B22AA-E0C1-4AF8-9063-4AC887F80EC3}']
+    {class} procedure activateConstraints(constraints: NSArray); cdecl;
+    {class} function constraintsWithVisualFormat(format: NSString; options: NSLayoutFormatOptions; metrics: NSDictionary;
+      views: NSDictionary): NSArray; cdecl;
+    [MethodName('constraintWithItem:attribute:relatedBy:toItem:attribute:multiplier:constant:')]
+    {class} function constraintWithItem(view1: Pointer; attribute: NSLayoutAttribute; relatedBy: NSLayoutRelation; toItem: Pointer;
+      attr2: NSLayoutAttribute; multiplier: CGFloat; constant: CGFloat): Pointer; cdecl;
+    {class} procedure deactivateConstraints(constraints: NSArray); cdecl;
+  end;
+
+  NSLayoutConstraint = interface(NSObject)
+    ['{B5D1D7E7-23B6-4BF7-A7E8-26BFEF6351EA}']
+    function constant: CGFloat; cdecl;
+    function firstAnchor: NSLayoutAnchor; cdecl;
+    function firstAttribute: NSLayoutAttribute; cdecl;
+    function firstItem: Pointer; cdecl;
+    function identifier: NSString; cdecl;
+    function isActive: Boolean; cdecl;
+    function multiplier: CGFloat; cdecl;
+    function priority: NSLayoutPriority; cdecl;
+    function relation: NSLayoutRelation; cdecl;
+    function secondAnchor: NSLayoutAnchor; cdecl;
+    function secondAttribute: NSLayoutAttribute; cdecl;
+    function secondItem: Pointer; cdecl;
+    procedure setActive(active: Boolean); cdecl;
+    procedure setConstant(constant: CGFloat); cdecl;
+    procedure setIdentifier(identifier: NSString); cdecl;
+    procedure setPriority(priority: NSLayoutPriority); cdecl;
+    procedure setShouldBeArchived(shouldBeArchived: Boolean); cdecl;
+    function shouldBeArchived: Boolean; cdecl;
+  end;
+  TNSLayoutConstraint = class(TOCGenericImport<NSLayoutConstraintClass, NSLayoutConstraint>) end;
+
+  NSLayoutGuideClass = interface(NSObjectClass)
+    ['{E341546F-9110-4A60-9636-5E59EF9377B2}']
+  end;
+
+  NSLayoutGuide = interface(NSObject)
+    ['{2FF3DAD7-B6F8-4197-8DCD-0B23AC886B31}']
+    function bottomAnchor: NSLayoutYAxisAnchor; cdecl;
+    function centerXAnchor: NSLayoutXAxisAnchor; cdecl;
+    function centerYAnchor: NSLayoutYAxisAnchor; cdecl;
+    function constraintsAffectingLayoutForOrientation(orientation: NSLayoutConstraintOrientation): NSArray; cdecl;
+    function frame: NSRect; cdecl;
+    function hasAmbiguousLayout: Boolean; cdecl;
+    function heightAnchor: NSLayoutDimension; cdecl;
+    function identifier: NSUserInterfaceItemIdentifier; cdecl;
+    function leadingAnchor: NSLayoutXAxisAnchor; cdecl;
+    function leftAnchor: NSLayoutXAxisAnchor; cdecl;
+    function owningView: NSView; cdecl;
+    function rightAnchor: NSLayoutXAxisAnchor; cdecl;
+    procedure setIdentifier(identifier: NSUserInterfaceItemIdentifier); cdecl;
+    procedure setOwningView(owningView: NSView); cdecl;
+    function topAnchor: NSLayoutYAxisAnchor; cdecl;
+    function trailingAnchor: NSLayoutXAxisAnchor; cdecl;
+    function widthAnchor: NSLayoutDimension; cdecl;
+  end;
+  TNSLayoutGuide = class(TOCGenericImport<NSLayoutGuideClass, NSLayoutGuide>) end;
 
 implementation
 
