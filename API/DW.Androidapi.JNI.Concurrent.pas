@@ -21,7 +21,7 @@ type
   JAtomicBoolean = interface;
   JAtomicReference = interface;
   JExecutors = interface;
-  JListenableFuture = interface;
+  JFuture = interface;
   JScheduledExecutorService = interface;
 
   JAtomicBooleanClass = interface(JObjectClass)
@@ -107,16 +107,20 @@ type
   end;
   TJExecutors = class(TJavaGenericImport<JExecutorsClass, JExecutors>) end;
 
-  JListenableFutureClass = interface(JFutureClass)
-    ['{DF69540B-BF18-48D3-B5EC-474094810D24}']
+  JFutureClass = interface(IJavaClass)
+    ['{4C847C2C-023A-425B-8B2D-08BE9C291764}']
   end;
 
-  [JavaSignature('com/google/common/util/concurrent/ListenableFuture')]
-  JListenableFuture = interface(JFuture)
-    ['{BB39381A-AD2C-496F-BE55-BFA377BEBD88}']
-    procedure addListener(runnable: JRunnable; executor: JExecutor); cdecl;
+  [JavaSignature('java/util/concurrent/Future')]
+  JFuture = interface(IJavaInstance)
+    ['{5776F9A1-6B47-45F7-812E-12BAA0A067B8}']
+    function cancel(boolean: Boolean): Boolean; cdecl;
+    function get(long: Int64; timeunit: JTimeUnit): JObject; cdecl; overload;
+    function get: JObject; cdecl; overload;
+    function isCancelled: Boolean; cdecl;
+    function isDone: Boolean; cdecl;
   end;
-  TJListenableFuture = class(TJavaGenericImport<JListenableFutureClass, JListenableFuture>) end;
+  TJFuture = class(TJavaGenericImport<JFutureClass, JFuture>) end;
 
 implementation
 
