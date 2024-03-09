@@ -143,13 +143,17 @@ type
     /// <summary>
     ///   Deletes the directory if it exists. Won't fail if the value passed is blank
     /// </summary>
-    class function Delete(const ADirectory: string): Boolean; static;
+    class function Delete(const ADirectory: string; const ACanRecycle: Boolean = False): Boolean; static;
     /// <summary>
     ///   Checks if the directory exists. Won't fail if the value passed is blank
     /// </summary>
     class function Exists(const ADirectory: string): Boolean; static;
     class function GetDirectories(const APath: string; const APatterns: TArray<string>;
       const ASearchOption: TSearchOption = TSearchOption.soTopDirectoryOnly): TArray<string>; static;
+    /// <summary>
+    ///   Retrieves filenames only for the nominated directory
+    /// </summary>
+    class function GetFileNames(const APath: string; const APattern: string = '*.*'): TArray<string>; static;
     /// <summary>
     ///   Retrieves files based on multiple search patterns
     /// </summary>
@@ -526,15 +530,15 @@ begin
   end;
 end;
 
-class function TDirectoryHelper.Delete(const ADirectory: string): Boolean;
+class function TDirectoryHelper.Delete(const ADirectory: string; const ACanRecycle: Boolean = False): Boolean;
 begin
   Result := not Exists(ADirectory);
   if not Result then
   begin
     {$IF Defined(MSWINDOWS) or Defined(MACOS)}
-      Result := TPlatformDirectory.Delete(ADirectory);
+    Result := TPlatformDirectory.Delete(ADirectory, ACanRecycle);
     {$ELSE}
-      Result := False;
+    Result := False;
     {$ENDIF}
   end;
 end;
@@ -571,6 +575,15 @@ begin
     LResult := TDirectory.GetDirectories(APath, LPattern, ASearchOption);
     Result := Concat(Result, LResult);
   end;
+end;
+
+class function TDirectoryHelper.GetFileNames(const APath: string; const APattern: string = '*.*'): TArray<string>;
+var
+  I: Integer;
+begin
+  Result := TDirectory.GetFiles(APath, APattern, TSearchOption.soTopDirectoryOnly);
+  for I := 0 to Length(Result) - 1 do
+    Result[I] := TPath.GetFileName(Result[I]);
 end;
 
 class function TDirectoryHelper.GetFiles(const APath: string; const APatterns: TArray<string>;

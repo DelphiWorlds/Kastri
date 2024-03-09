@@ -22,7 +22,7 @@ type
   TPlatformDirectory = record
   public
     class function Copy(const ASrcDirectory, ADestDirectory: string): Boolean; static;
-    class function Delete(const ADirectory: string): Boolean; static;
+    class function Delete(const ADirectory: string; const ACanRecycle: Boolean): Boolean; static;
   end;
 
 implementation
@@ -101,13 +101,16 @@ begin
     LMessage := NSStrToStr(TNSError.Wrap(LError).localizedDescription);
 end;
 
-class function TPlatformDirectory.Delete(const ADirectory: string): Boolean;
+class function TPlatformDirectory.Delete(const ADirectory: string; const ACanRecycle: Boolean): Boolean;
 var
   LError: Pointer;
 begin
-  // LError needs to be initialized to nil, because if trashItemAtURL succeeds, it does not touch the reference
+  // LError needs to be initialized to nil, because if the call succeeds, it does not touch the reference
   LError := nil;
-  FileManager.trashItemAtURL(TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ADirectory), True)), nil, @LError);
+  if ACanRecycle then
+    FileManager.trashItemAtURL(TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ADirectory), True)), nil, @LError)
+  else
+    FileManager.removeItemAtURL(TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ADirectory), True)), @LError);
   Result := LError = nil;
 end;
 
