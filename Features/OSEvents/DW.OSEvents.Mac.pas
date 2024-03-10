@@ -13,6 +13,8 @@ unit DW.OSEvents.Mac;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Classes,

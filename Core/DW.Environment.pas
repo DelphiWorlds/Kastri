@@ -13,6 +13,8 @@ unit DW.Environment;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   System.Classes, System.Win.Registry;
 

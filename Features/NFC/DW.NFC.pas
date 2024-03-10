@@ -13,6 +13,8 @@ unit DW.NFC;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TNFCPayloadTypeNameFormat = (Empty, NFCWellKnown, Media, AbsoluteURI, NFCExternal, Unknown, Unchanged);
 

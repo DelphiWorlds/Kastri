@@ -13,6 +13,8 @@ unit DW.AuthenticationServices.Types;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Messaging;

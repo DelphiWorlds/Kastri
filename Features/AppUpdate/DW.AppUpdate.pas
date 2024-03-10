@@ -13,6 +13,8 @@ unit DW.AppUpdate;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TAppUpdateInfoError = (Success, JavaScript, VersionNotFound, ScriptNotFound);
 

@@ -13,6 +13,8 @@ unit DW.FileVersionInfo.Win;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.SysUtils,

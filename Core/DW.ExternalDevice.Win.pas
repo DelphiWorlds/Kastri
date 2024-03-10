@@ -13,6 +13,8 @@ unit DW.ExternalDevice.Win;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // Win
   Winapi.Windows, Winapi.Messages,

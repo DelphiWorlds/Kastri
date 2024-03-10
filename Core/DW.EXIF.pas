@@ -13,6 +13,8 @@ unit DW.EXIF;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TEXIFOrientation = (Unknown, Normal, FlipHorizontal, Rotate180, FlipVertical, Transpose, Rotate90, Transverse, Rotate270);
 

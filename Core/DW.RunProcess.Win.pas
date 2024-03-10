@@ -13,6 +13,8 @@ unit DW.RunProcess.Win;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Classes,

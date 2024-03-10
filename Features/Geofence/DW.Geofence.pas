@@ -13,6 +13,8 @@ unit DW.Geofence;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 // ************ DO NOT ADD ANY FMX UNITS (or any that depend on them) HERE ***********
 uses
   // RTL

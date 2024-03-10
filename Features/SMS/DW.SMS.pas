@@ -13,6 +13,8 @@ unit DW.SMS;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // DW
   DW.Types;

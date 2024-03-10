@@ -17,6 +17,8 @@ unit DW.AssetDelivery.Android;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.Jni.GraphicsContentViewText, Androidapi.JNI,

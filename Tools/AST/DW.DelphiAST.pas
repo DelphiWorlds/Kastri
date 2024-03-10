@@ -13,6 +13,8 @@ unit DW.DelphiAST;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Classes,

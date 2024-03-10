@@ -13,6 +13,8 @@ unit DW.NotificationListenerServiceReceiver.Android;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // Android
   Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNIBridge,

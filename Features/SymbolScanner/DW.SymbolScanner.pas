@@ -13,6 +13,8 @@ unit DW.SymbolScanner;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Messaging;

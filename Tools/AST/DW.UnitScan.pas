@@ -13,6 +13,8 @@ unit DW.UnitScan;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.IOUtils,

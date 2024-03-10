@@ -13,6 +13,8 @@ unit DW.ShareItems;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Generics.Collections,

@@ -13,6 +13,8 @@ unit DW.GoogleSignIn;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TGoogleSignIn = class;
 

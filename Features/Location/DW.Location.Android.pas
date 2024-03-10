@@ -13,6 +13,8 @@ unit DW.Location.Android;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Sensors,

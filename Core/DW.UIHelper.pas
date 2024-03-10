@@ -13,6 +13,8 @@ unit DW.UIHelper;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Types, System.UITypes, System.Messaging,

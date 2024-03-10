@@ -13,6 +13,8 @@ unit DW.SoundPlayer;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TSoundPlayer = class;
 

@@ -13,6 +13,8 @@ unit DW.OSLog;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TLogType = (Debug, Warning, Error);
 

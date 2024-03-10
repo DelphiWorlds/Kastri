@@ -13,6 +13,8 @@ unit DW.ElasticLayout;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Types,

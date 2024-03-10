@@ -13,6 +13,8 @@ unit DW.OSPower;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TDevicePowerStatus = (Unknown, DeviceCharging, DeviceNotCharging, DeviceOnACPower);
 

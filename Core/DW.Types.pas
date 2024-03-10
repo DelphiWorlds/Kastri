@@ -2,6 +2,8 @@ unit DW.Types;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 const
   CRLF = #13#10;
 

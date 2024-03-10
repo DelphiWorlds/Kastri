@@ -42,6 +42,8 @@ SOFTWARE.
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Classes;

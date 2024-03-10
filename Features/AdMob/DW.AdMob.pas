@@ -13,6 +13,8 @@ unit DW.AdMob;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Classes, System.Messaging;

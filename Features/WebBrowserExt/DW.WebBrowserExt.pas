@@ -13,6 +13,8 @@ unit DW.WebBrowserExt;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Classes,

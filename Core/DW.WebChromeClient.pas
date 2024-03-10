@@ -13,6 +13,8 @@ unit DW.WebChromeClient;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   System.Classes;
 

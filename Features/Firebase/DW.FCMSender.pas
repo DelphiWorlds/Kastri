@@ -22,6 +22,8 @@ unit DW.FCMSender;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.JSON, System.Classes;

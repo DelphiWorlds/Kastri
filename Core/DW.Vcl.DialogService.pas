@@ -13,6 +13,8 @@ unit DW.Vcl.DialogService;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.UITypes;

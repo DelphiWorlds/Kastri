@@ -13,6 +13,8 @@ unit DW.Firebase.Messaging;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Classes, System.Messaging, System.SysUtils;

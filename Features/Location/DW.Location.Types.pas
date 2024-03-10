@@ -13,6 +13,8 @@ unit DW.Location.Types;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Sensors, System.JSON;

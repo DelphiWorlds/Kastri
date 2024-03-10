@@ -13,6 +13,8 @@ unit DW.BarcodeReader;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // FMX
   FMX.Controls, FMX.Graphics;

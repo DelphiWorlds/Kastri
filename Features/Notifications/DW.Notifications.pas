@@ -13,6 +13,8 @@ unit DW.Notifications;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TRepeatInterval = (None, Second, Minute, Hour, Day, Week, Weekday, Month, Quarter, Year, Era);
 

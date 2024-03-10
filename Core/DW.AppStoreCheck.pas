@@ -13,6 +13,8 @@ unit DW.AppStoreCheck;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TAppStore = (iTunes);
 

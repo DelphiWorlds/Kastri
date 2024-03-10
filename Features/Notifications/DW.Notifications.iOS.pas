@@ -19,6 +19,8 @@ unit DW.Notifications.iOS;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   iOSapi.Foundation,
   Macapi.ObjectiveC,

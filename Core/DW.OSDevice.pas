@@ -13,6 +13,8 @@ unit DW.OSDevice;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.SysUtils, System.Types, System.Classes;

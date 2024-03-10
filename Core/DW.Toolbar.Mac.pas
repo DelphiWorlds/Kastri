@@ -13,6 +13,8 @@ unit DW.Toolbar.Mac;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.TypInfo, System.Classes, System.Generics.Collections, System.Types,

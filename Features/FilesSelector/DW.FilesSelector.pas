@@ -13,6 +13,8 @@ unit DW.FilesSelector;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.Classes;

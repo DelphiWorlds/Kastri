@@ -13,6 +13,8 @@ unit DW.Biometric;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   // RTL
   System.SysUtils;

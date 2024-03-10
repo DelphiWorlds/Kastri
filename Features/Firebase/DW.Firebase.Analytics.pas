@@ -13,6 +13,8 @@ unit DW.Firebase.Analytics;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
   TAnalyticsEvent = (AddPaymentInfo, AddShippingInfo, AddToCart, AddToWishList, AdImpression, AppOpen, BeginCheckout, CampaignDetails,
     CheckoutProgress, EarnVirtualCurrency, EcommercePurchase, GenerateLead, JoinGroup, LevelEnd, LevelStart, LevelUp, Login, PostScore, PresentOffer,
