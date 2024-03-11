@@ -19,7 +19,8 @@ uses
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes,
   // DW
-  DW.Androidapi.JNI.AndroidX.Camera, DW.Androidapi.JNI.Concurrent, DW.Androidapi.JNI.AndroidX.Lifecycle, DW.Androidapi.JNI.Util;
+  DW.Androidapi.JNI.AndroidX.Camera, DW.Androidapi.JNI.Concurrent, DW.Androidapi.JNI.AndroidX.Lifecycle, DW.Androidapi.JNI.Util,
+  DW.Androidapi.JNI.Guava;
 
 type
   JLifecycleCamera = interface;

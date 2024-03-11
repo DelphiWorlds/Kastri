@@ -22,7 +22,7 @@ uses
   Androidapi.JNI.Net, Androidapi.JNI.Os, Androidapi.JNI.Util, Androidapi.JNI.Widget,
   // DW
   DW.Androidapi.JNI.Util, DW.Androidapi.JNI.Hardware.Camera2, DW.Androidapi.JNI.View, DW.Androidapi.JNI.Concurrent,
-  DW.Androidapi.JNI.AndroidX.Lifecycle;
+  DW.Androidapi.JNI.AndroidX.Lifecycle, DW.Androidapi.JNI.Guava;
 
 type
   JImageAnalysis = interface;
