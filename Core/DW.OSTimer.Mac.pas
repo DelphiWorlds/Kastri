@@ -16,12 +16,11 @@ interface
 uses
   // macOS
   Macapi.ObjectiveC,
-  {$IF Defined(MACDEV)}
-  Macapi.Foundation,
-  {$ENDIF}
   // iOS
   {$IF Defined(IOS)}
   iOSapi.Foundation,
+  {$ELSEIF Defined(MACOS)}
+  Macapi.Foundation,
   {$ENDIF}
   // DW
   DW.OSTimer;

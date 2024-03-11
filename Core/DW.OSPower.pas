@@ -61,8 +61,7 @@ uses
   {$ENDIF}
   {$IF Defined(IOS)}
   DW.OSPower.iOS;
-  {$ENDIF}
-  {$IF Defined(MACDEV)}
+  {$ELSEIF Defined(MACOS)}
   DW.OSPower.Mac;
   {$ENDIF}
 

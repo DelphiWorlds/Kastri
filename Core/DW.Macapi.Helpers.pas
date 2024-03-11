@@ -20,12 +20,11 @@ uses
   {$IF Defined(MACOS)}
   Macapi.CoreFoundation,
   {$ENDIF}
-  {$IF Defined(MACDEV)}
-  Macapi.Foundation, Macapi.AppKit;
-  {$ENDIF}
   // iOS
   {$IF Defined(IOS)}
   iOSapi.Foundation;
+  {$ELSEIF Defined(MACOS)}
+  Macapi.Foundation, Macapi.AppKit;
   {$ENDIF}
 
 type
@@ -67,7 +66,7 @@ type
     class function GetBundleValue(const AKey: string): string; static;
     class function GetBundleValueNS(const AKey: string): NSString; static;
     class function MainBundle: NSBundle; static;
-    {$IF Defined(MACDEV)}
+    {$IF not Defined(IOS)}
     class function SharedApplication: NSApplication; static;
     {$ENDIF}
     class function StandardUserDefaults: NSUserDefaults; static;
@@ -317,7 +316,7 @@ begin
   Result := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
 end;
 
-{$IF Defined(MACDEV)}
+{$IF not Defined(IOS)}
 class function TMacHelperEx.SharedApplication: NSApplication;
 begin
   Result := TNSApplication.Wrap(TNSApplication.OCClass.sharedApplication);

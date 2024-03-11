@@ -14,13 +14,12 @@ unit DW.Graphics.Helpers.Mac;
 interface
 
 uses
-  // macOS
-  {$IF Defined(MACDEV)}
-  Macapi.CocoaTypes,
-  {$ENDIF}
-  // iOS
   {$IF Defined(IOS)}
+  // iOS
   iOSapi.CoreVideo, iOSapi.CoreGraphics,
+  {$ELSEIF Defined(MACOS)}
+  // macOS
+  Macapi.CocoaTypes,
   {$ENDIF}
   // FMX
   FMX.Graphics;
@@ -53,11 +52,10 @@ uses
   System.Types, System.UITypes,
   // macOS
   Macapi.Helpers, Macapi.CoreFoundation, Macapi.ObjectiveC,
-  {$IF Defined(MACDEV)}
-  Macapi.CoreGraphics, Macapi.CoreVideo, Macapi.Foundation,
-  {$ENDIF}
   {$IF Defined(IOS)}
   iOSapi.Foundation, DW.iOSapi.CoreVideo,
+  {$ELSEIF Defined(MACOS)}
+  Macapi.CoreGraphics, Macapi.CoreVideo, Macapi.Foundation,
   {$ENDIF}
   // FMX
   FMX.Surfaces, FMX.Types;

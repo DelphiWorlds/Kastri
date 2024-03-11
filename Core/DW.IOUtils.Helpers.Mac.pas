@@ -33,12 +33,11 @@ uses
   // DW
   DW.IOUtils.Helpers,
   // macOS
-  {$IF Defined(MACDEV)}
-  Macapi.Foundation,
-  {$ENDIF}
   {$IF Defined(IOS)}
   Macapi.ObjectiveC,
   iOSapi.Foundation,
+  {$ELSEIF Defined(MACOS)}
+  Macapi.Foundation,
   {$ENDIF}
   Macapi.Helpers;
 
