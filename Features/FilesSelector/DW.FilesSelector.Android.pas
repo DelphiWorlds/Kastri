@@ -80,6 +80,8 @@ begin
       Result := 'image/*';
     TFileKind.Audio:
       Result := 'audio/*';
+    TFileKind.Item:
+      Result := '*/*';
     TFileKind.Movie:
       Result := 'video/*';
     TFileKind.Text, TFileKind.Content, TFileKind.SourceCode:
