@@ -21,7 +21,7 @@ uses
   //
   FMX.WebBrowser.Delegate.iOS,
   // DW
-  DW.WebBrowserExt;
+  DW.WebBrowserExt, DW.JavaScript;
 
 type
   TPlatformWebBrowserExt = class;

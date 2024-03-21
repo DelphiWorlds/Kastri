@@ -22,7 +22,7 @@ uses
   // FMX
   FMX.Graphics,
   // DW
-  DW.WebBrowserExt;
+  DW.WebBrowserExt, DW.JavaScript;
 
 type
   TPlatformWebBrowserExt = class;

@@ -19,7 +19,7 @@ uses
   // macOS
   Macapi.WebKit, Macapi.Foundation, Macapi.ObjectiveC,
   // DW
-  DW.WebBrowserExt;
+  DW.WebBrowserExt, DW.JavaScript;
 
 type
   TPlatformWebBrowserExt = class(TCustomPlatformWebBrowserExt)
