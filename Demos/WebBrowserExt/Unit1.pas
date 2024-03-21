@@ -29,6 +29,7 @@ type
     procedure DownloadButtonClick(Sender: TObject);
   private
     FWebBrowserExt: TWebBrowserExt;
+    FIsLoggingIn: Boolean;
     FIsPageLoaded: Boolean;
     procedure WebBrowserExtElementClickHandler(Sender: TObject; const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean);
     procedure WebBrowserShouldStartLoadWithRequestHandler(Sender: TObject; const AURL: string);
@@ -49,7 +50,7 @@ uses
   System.IOUtils, System.Net.HttpClient, System.Net.URLClient,
   DW.OSLog,
   DW.Consts.Android, DW.Permissions.Helpers,
-  DW.IOUtils.Helpers;
+  DW.IOUtils.Helpers, DW.JavaScript;
 
 type
   TURIHelper = record helper for TURI
@@ -73,7 +74,6 @@ begin
     end;
   end;
 end;
-
 
 { TForm1 }
 
@@ -109,6 +109,11 @@ end;
 procedure TForm1.WebBrowserDidFinishLoad(ASender: TObject);
 begin
   FIsPageLoaded := True;
+  if FIsLoggingIn then
+  begin
+    FIsLoggingIn := False;
+    Memo.Lines.Add('Responded from login attempt');
+  end;
 end;
 
 procedure TForm1.WebBrowserExtElementClickHandler(Sender: TObject; const AHitTestKind: THitTestKind; const AExtra: string;
@@ -137,6 +142,28 @@ end;
 procedure TForm1.ExecJSButtonClick(Sender: TObject);
 begin
   // Placeholder for using the ExecuteJavaScript method of TWebBrowserExt
+  FWebBrowserExt.ExecuteJavaScript(Format(cJavaScriptSetInputValueById, ['login', 'test']),
+    procedure(const AJavaScriptResult: string; const AErrorCode: Integer)
+    begin
+      if AErrorCode = 0 then
+      begin
+        FWebBrowserExt.ExecuteJavaScript(Format(cJavaScriptSetInputValueById, ['senha', 'test']),
+          procedure(const AJavaScriptResult: string; const AErrorCode: Integer)
+          begin
+            FWebBrowserExt.ExecuteJavaScript(Format(cJavaScriptClickButtonWithText, ['Acessar']),
+              procedure(const AJavaScriptResult: string; const AErrorCode: Integer)
+              begin
+                if AErrorCode = 0 then
+                  FIsLoggingIn := True
+                else
+                  Memo.Lines.Add(Format('ErrorCode: %d, %s', [AErrorCode, AJavaScriptResult]));
+              end
+            );
+          end
+        );
+      end;
+    end
+  );
 end;
 
 procedure TForm1.GoButtonClick(Sender: TObject);
