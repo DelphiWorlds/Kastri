@@ -1,0 +1,115 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 800
+  ClientWidth = 534
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object ImmediateButton: TButton
+    Align = Top
+    Margins.Left = 6.000000000000000000
+    Margins.Top = 6.000000000000000000
+    Margins.Right = 6.000000000000000000
+    Position.X = 6.000000000000000000
+    Position.Y = 31.000000000000000000
+    Size.Width = 522.000000000000000000
+    Size.Height = 43.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    Text = 'Immediate'
+    TextSettings.Trimming = None
+    OnClick = ImmediateButtonClick
+  end
+  object ScheduleButton: TButton
+    Align = Top
+    Margins.Left = 6.000000000000000000
+    Margins.Top = 6.000000000000000000
+    Margins.Right = 6.000000000000000000
+    Position.X = 6.000000000000000000
+    Position.Y = 129.000000000000000000
+    Size.Width = 522.000000000000000000
+    Size.Height = 43.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    Text = 'Schedule 5 Seconds'
+    TextSettings.Trimming = None
+    OnClick = ScheduleButtonClick
+  end
+  object CancelScheduled: TButton
+    Align = Top
+    Margins.Left = 6.000000000000000000
+    Margins.Top = 6.000000000000000000
+    Margins.Right = 6.000000000000000000
+    Position.X = 6.000000000000000000
+    Position.Y = 227.000000000000000000
+    Size.Width = 522.000000000000000000
+    Size.Height = 43.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Cancel Scheduled'
+    TextSettings.Trimming = None
+    OnClick = CancelScheduledClick
+  end
+  object LogMemo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Client
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Size.Width = 526.000000000000000000
+    Size.Height = 522.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    Viewport.Width = 522.000000000000000000
+    Viewport.Height = 518.000000000000000000
+  end
+  object ScheduleRepeatingButton: TButton
+    Align = Top
+    Margins.Left = 6.000000000000000000
+    Margins.Top = 6.000000000000000000
+    Margins.Right = 6.000000000000000000
+    Position.X = 6.000000000000000000
+    Position.Y = 178.000000000000000000
+    Size.Width = 522.000000000000000000
+    Size.Height = 43.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Schedule Repeating Every Minute'
+    TextSettings.Trimming = None
+    OnClick = ScheduleRepeatingButtonClick
+  end
+  object CancelImmediateButton: TButton
+    Align = Top
+    Margins.Left = 6.000000000000000000
+    Margins.Top = 6.000000000000000000
+    Margins.Right = 6.000000000000000000
+    Position.X = 6.000000000000000000
+    Position.Y = 80.000000000000000000
+    Size.Width = 522.000000000000000000
+    Size.Height = 43.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Text = 'Cancel Immediate'
+    TextSettings.Trimming = None
+    OnClick = CancelImmediateButtonClick
+  end
+  object IncludeImageCheckBox: TCheckBox
+    Align = Top
+    IsChecked = True
+    Margins.Left = 6.000000000000000000
+    Margins.Top = 6.000000000000000000
+    Margins.Right = 6.000000000000000000
+    Position.X = 6.000000000000000000
+    Position.Y = 6.000000000000000000
+    Size.Width = 522.000000000000000000
+    Size.Height = 19.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 8
+    Text = 'Include image in notification'
+  end
+end
