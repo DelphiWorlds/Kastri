@@ -41,12 +41,11 @@ type
     property Notifications: TNotifications read FNotifications write FNotifications;
   public
     { UNUserNotificationCenterDelegate }
-    [MethodName('userNotificationCenter:openSettingsForNotification:')]
-    procedure userNotificationCenter(center: UNUserNotificationCenter; notification: UNNotification); overload; cdecl;
-    [MethodName('userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:')]
-    procedure userNotificationCenter(center: UNUserNotificationCenter; response: UNNotificationResponse; completionHandler: Pointer); overload; cdecl;
-    [MethodName('userNotificationCenter:willPresentNotification:withCompletionHandler:')]
-    procedure userNotificationCenter(center: UNUserNotificationCenter; notification: UNNotification; completionHandler: Pointer); overload; cdecl;
+    procedure userNotificationCenter(center: UNUserNotificationCenter; openSettingsForNotification: UNNotification); overload; cdecl;
+    procedure userNotificationCenter(center: UNUserNotificationCenter; didReceiveNotificationResponse: UNNotificationResponse;
+      withCompletionHandler: Pointer); overload; cdecl;
+    procedure userNotificationCenter(center: UNUserNotificationCenter; willPresentNotification: UNNotification;
+      withCompletionHandler: Pointer); overload; cdecl;
   end;
 
   TAuthorizationCallback = reference to procedure(const AGranted: Boolean);
@@ -77,7 +76,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.Messaging, System.DateUtils,
+  System.SysUtils, System.Messaging, System.DateUtils, System.IOUtils,
   Macapi.Helpers, Macapi.ObjCRuntime,
   iOSapi.CocoaTypes,
   FMX.Platform,
@@ -143,30 +142,30 @@ begin
 end;
 
 procedure TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter;
-  response: UNNotificationResponse; completionHandler: Pointer);
+  didReceiveNotificationResponse: UNNotificationResponse; withCompletionHandler: Pointer);
 var
   LBlockImp: procedure; cdecl;
 begin
-  ProcessNotificationRequest(response.notification.request, TNotificationMode.DidReceive);
-  @LBlockImp := imp_implementationWithBlock(completionHandler);
+  ProcessNotificationRequest(didReceiveNotificationResponse.notification.request, TNotificationMode.DidReceive);
+  @LBlockImp := imp_implementationWithBlock(withCompletionHandler);
   LBlockImp;
   imp_removeBlock(@LBlockImp);
 end;
 
-procedure TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter;
-  notification: UNNotification; completionHandler: Pointer);
+procedure TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter; willPresentNotification: UNNotification;
+  withCompletionHandler: Pointer);
 var
   LBlockImp: procedure(options: UNNotificationPresentationOptions); cdecl;
   LOptions: UNNotificationPresentationOptions;
 begin
-  ProcessNotificationRequest(notification.request, TNotificationMode.WillPresent);
-  @LBlockImp := imp_implementationWithBlock(completionHandler);
+  ProcessNotificationRequest(willPresentNotification.request, TNotificationMode.WillPresent);
+  @LBlockImp := imp_implementationWithBlock(withCompletionHandler);
   LOptions := UNNotificationPresentationOptionAlert;
   LBlockImp(LOptions);
   imp_removeBlock(@LBlockImp);
 end;
 
-procedure TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter; notification: UNNotification);
+procedure TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter; openSettingsForNotification: UNNotification);
 begin
   //
 end;
@@ -225,6 +224,8 @@ function TPlatformNotifications.GetNotificationContent(ANotification: TNotificat
 var
   LSound: Pointer;
   LUserInfo: TNSMutableDictionaryHelper;
+  LAttachment, LPointer: Pointer;
+  LImageURL: NSURL;
 begin
   Result := TUNMutableNotificationContent.Create;
   Result.setTitle(StrToNSStr(ANotification.Title));
@@ -241,6 +242,13 @@ begin
   end
   else
     Result.setSound(nil);
+  if not ANotification.Image.IsEmpty then
+  begin
+    LPointer := nil;
+    LImageURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ANotification.Image)));
+    LAttachment := TUNNotificationAttachment.OCClass.attachmentWithIdentifier(StrToNSStr(''), LImageURL, nil, @LPointer);
+    Result.setAttachments(TNSArray.Wrap(TNSArray.OCClass.arrayWithObject(LAttachment)));
+  end;
   LUserInfo := TNSMutableDictionaryHelper.Create(TNSMutableDictionary.Create);
   LUserInfo.SetValue(Ord(ANotification.RepeatInterval), 'RepeatInterval');
   Result.setUserInfo(LUserInfo.Dictionary);
@@ -294,11 +302,20 @@ var
   LPointer: Pointer;
   LRequest: UNNotificationRequest;
   LName: string;
+  LURL: NSURL;
+  LAttachment, LError: Pointer;
 begin
   LName := ANotification.Name;
   if LName.IsEmpty then
     LName := 'ImmediateNotification';
   LContent := GetNotificationContent(ANotification);
+  if not ANotification.Image.IsEmpty and TFile.Exists(ANotification.Image) then
+  begin
+    LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ANotification.Image)));
+    LError := nil;
+    LAttachment := TUNNotificationAttachment.OCClass.attachmentWithIdentifier(StrToNSStr('image'), LURL, nil, @LError);
+    LContent.setAttachments(TNSArray.Wrap(TNSArray.OCClass.arrayWithObject(LAttachment)));
+  end;
   LTrigger := GetNotificationTrigger(ANotification, AImmediate);
   LPointer := TUNNotificationRequest.OCClass.requestWithIdentifier(StrToNSStr(LName), LContent, LTrigger);
   LRequest := TUNNotificationRequest.Wrap(LPointer);
