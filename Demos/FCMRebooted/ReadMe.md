@@ -21,7 +21,7 @@ There are 2 demos:
 
 ## Supported Delphi versions
 
-Delphi 12, Delphi 11.x. _There is no support for 10.4.x or earlier_
+Delphi 12.x, Delphi 11.x. _There is no support for 10.4.x or earlier_
 
 ## Project Configuration
 
@@ -40,7 +40,6 @@ In order to use FCM in Delphi, you will need to:
 * Add iOS support to the project
 * Add the APNs key to the Cloud Messaging iOS support
 * Add Android support to the project
-
 
 ### iOS
 
@@ -82,13 +81,15 @@ For the `Options passed to the LD linker` option in the Project Options for iOS 
 
 ### Android
 
+See [Build Event](#build-eventandroid-manifest) section **even if you are using the demo with Delphi 12.1**
+
 If you are creating your own project:
 
 #### Kastri java libraries
 
 FCM Rebooted relies on:
 
-* Delphi 12: `dw-kastri-base-3.0.0.jar` and `dw-fcm-3.0.0.jar`
+* Delphi 12.x: `dw-kastri-base-3.0.0.jar` and `dw-fcm-3.0.0.jar`
 * Delphi 11.x: `dw-kastri-base-2.0.0.jar` and `dw-fcm-2.0.0.jar` 
  
 from the `Lib` folder, so add them to the `Libraries` node under the Android platform in Project Manager.
@@ -97,7 +98,25 @@ from the `Lib` folder, so add them to the `Libraries` node under the Android pla
 
 Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will need to either apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
 
-#### Build Event
+#### Build Event/Android Manifest
+
+**Delphi 12.1**
+
+Due to changes in the Android build process:
+
+* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
+* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+* Modify `AndroidManifest.template.xml` to add the following *just before* `<%services%>`
+
+  ```
+  <service android:name="com.delphiworlds.kastri.DWFirebaseMessagingService" android:exported="false">
+      <intent-filter>
+          <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+      </intent-filter>
+  </service>
+  ```
+
+**Delphi 12.0 or earlier:**
 
 Configure Build Events in Project Options to add a Post-Build event with the command:  
 

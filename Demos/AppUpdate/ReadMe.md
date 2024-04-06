@@ -25,7 +25,25 @@ This feature is dependent on the Play Core library, which does not ship with Del
 
 Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
 
-### Build Events
+### Build Event/Android Manifest
+
+**Delphi 12.1:**
+
+Due to changes in the Android build process:
+
+* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
+* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+* Modify `AndroidManifest.template.xml` to add *before* the terminating application tag, i.e. `</application>`
+
+  ```
+    <activity android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
+        android:enabled="false"
+        android:exported="true"
+        android:stateNotNeeded="true"
+        android:theme="@style/Theme.PlayCore.Transparent" />
+  ```
+
+**Delphi 12.0 or earlier:**
 
 Please refer to the Build Events section of the Project Options. There are two commands in a Post-Build event:
 

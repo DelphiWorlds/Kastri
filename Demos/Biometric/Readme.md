@@ -63,7 +63,24 @@ For Delphi 10.4.x, you will only need to add:
 
 * dw-biometric.jar
 
-### Build Events (Delphi 11.x and Android only, for both 32-bit and 64-bit)
+### Build Event/Android Manifest
+
+**Delphi 12.1:**
+
+Due to changes in the Android build process:
+
+* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
+* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+* Modify `AndroidManifest.template.xml` to add *before* the terminating application tag, i.e. `</application>`
+
+  ```
+    <activity android:name="com.delphiworlds.kastri.DWBiometricFragmentActivity" 
+      android:theme="@android:style/Theme.Translucent.NoTitleBar" 
+      android:excludeFromRecents="true" 
+      android:exported="false"/>
+  ```
+
+**Delphi 12.0 or earlier:**
 
 The Android manifest needs additional entries, and the demo project has a Post-Build event to achieve this:
 

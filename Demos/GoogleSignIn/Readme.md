@@ -20,6 +20,49 @@ iOS client for com.yourdomain.projectname (auto created by Google Service)`
 
 where `com.yourdomain.projectname` is the identifier you used for the project in Firebase Console.
 
+### Build Event/Android Manifest
+
+**Delphi 12.1**
+
+Due to changes in the Android build process:
+
+* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
+* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+* Modify `AndroidManifest.template.xml` to add the following *just before* `<%application-metadata%>`
+
+  ```
+  <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+  ```
+
+  ..add the following just *after* `<%services%>`:
+
+  ```
+    <service android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+      android:exported="true"
+      android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+      android:visibleToInstantApps="true" />
+  ```
+
+  ..add the following just *after* the `</application>` end tag:
+
+  ```
+    <activity android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+      android:excludeFromRecents="true"
+      android:exported="false"
+      android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+  ```
+
+**Delphi 12.0 or earlier:**
+
+Configure Build Events in Project Options to add a Post-Build event with the command:  
+
+```
+  [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
+```  
+Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
+
+`AndroidManifest.merge.xml` can be found in the root folder of the demo, and should be copied to the root folder of your project
+
 ### Android (32 bit and 64 bit where required)
 
 * In the Project Options, modify the `Package` value in the Version Info section to be the value specified in your Firebase Project
