@@ -18,6 +18,24 @@ Delphi 12.x, Delphi 11.x. May or may not work in earlier versions.
 
 If you plan to include images in your notifications, you will need to ensure that the image file exists. In the demo, an example image is added to the deployment (AndroidGuy.png) to the default documents directory which is obtained using `TPath.GetDocumentsPath`.
 
+### Android library
+
+The notifications feature relies on:
+
+* Delphi 12.x: 
+
+  `dw-kastri-base-3.0.0.jar`
+
+* Delphi 11.x: 
+  
+  `dw-kastri-base-2.0.0.jar`
+ 
+from the `Lib` folder in Kastri, so add them to the `Libraries` node under the Android 32-bit platform in Project Manager.
+
+**Note**:
+
+Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will need to either apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+
 ### Build Event/Android Manifest
 
 **Delphi 12.1**
