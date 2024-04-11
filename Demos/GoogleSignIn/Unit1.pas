@@ -35,6 +35,11 @@ implementation
 {$R *.fmx}
 
 uses
+  {$IF Defined(ANDROID)}
+  System.Hash, System.NetEncoding,
+  Androidapi.JNI.GraphicsContentViewText, Androidapi.JNIBridge, Androidapi.Helpers, Androidapi.JNI, Androidapi.JNI.JavaTypes,
+  {$ENDIF}
+  DW.OSLog,
   System.Net.HttpClient;
 
 const
@@ -46,6 +51,17 @@ const
   {$ENDIF}
 
 type
+  {$IF Defined(ANDROID)}
+  TAppSignatureHelper = record
+  private
+    class function GetSignatureHash(const APackageName: string; ASignature: string): string; static;
+  public
+    class function GetAppSignatures: TArray<TBytes>; static;
+    class function GetAppSignatureHashes: TArray<string>; static;
+    class function GetSHA1Signature: string; static;
+  end;
+  {$ENDIF}
+
   TURLImageHelper = class helper for TImage
   private
     procedure DoLoadFromURL(const AURL: string);
@@ -54,7 +70,96 @@ type
     procedure LoadFromURL(const AURL: string);
   end;
 
-{ TPhotoImageHelper }
+
+function BytesToHex(const ABytes: TBytes; const ASeparator: string = ''): string;
+var
+  LByte: Byte;
+begin
+  Result := '';
+  for LByte in ABytes do
+  begin
+    if not ASeparator.IsEmpty and not Result.IsEmpty then
+      Result := Result + ASeparator;
+    Result := Result + IntToHex(LByte, 2);
+  end;
+end;
+
+{$IF Defined(ANDROID)}
+class function TAppSignatureHelper.GetAppSignatures: TArray<TBytes>;
+var
+  LPackageManager: JPackageManager;
+  LSignatures: TJavaObjectArray<JSignature>;
+  LBytes: TJavaArray<Byte>;
+  I: Integer;
+begin
+  LPackageManager := TAndroidHelper.Context.getPackageManager;
+  LSignatures := LPackageManager.getPackageInfo(TAndroidHelper.Context.getPackageName, TJPackageManager.JavaClass.GET_SIGNATURES).signatures;
+  if LSignatures <> nil then
+  try
+    for I := 0 to LSignatures.Length - 1 do
+    begin
+      LBytes := LSignatures[I].toByteArray;
+      try
+        Result := Result + [TJavaArrayToTBytes(LBytes)];
+      finally
+        LBytes.Free;
+      end;
+    end;
+  finally
+    LSignatures.Free;
+  end;
+end;
+
+class function TAppSignatureHelper.GetAppSignatureHashes: TArray<string>;
+var
+  LPackageManager: JPackageManager;
+  LSignatures: TJavaObjectArray<JSignature>;
+  I: Integer;
+  LHash: string;
+begin
+  LPackageManager := TAndroidHelper.Context.getPackageManager;
+  LSignatures := LPackageManager.getPackageInfo(TAndroidHelper.Context.getPackageName, TJPackageManager.JavaClass.GET_SIGNATURES).signatures;
+  try
+    for I := 0 to LSignatures.Length - 1 do
+    begin
+      LHash := GetSignatureHash(JStringToString(TAndroidHelper.Context.getPackageName), JStringToString(LSignatures[I].toCharsString));
+      if not LHash.IsEmpty then
+        Result := Result + [LHash];
+    end;
+  finally
+    LSignatures.Free;
+  end;
+end;
+
+class function TAppSignatureHelper.GetSignatureHash(const APackageName: string; ASignature: string): string;
+const
+  cNumHashedBytes = 10;
+  cNumBase64Char = 11;
+var
+  LBytes: TBytes;
+begin
+  LBytes := THashSHA2.GetHashBytes(APackageName + ' ' + ASignature);
+  Result := TNetEncoding.Base64.EncodeBytesToString(Copy(LBytes, 0, cNumHashedBytes)).Substring(0, cNumBase64Char);
+end;
+
+class function TAppSignatureHelper.GetSHA1Signature: string;
+var
+  LSignatures: TArray<TBytes>;
+  LSHA1: THashSHA1;
+begin
+  Result := '';
+  LSignatures := GetAppSignatures;
+  if Length(LSignatures) > 0 then
+  begin
+    LSHA1 := THashSHA1.Create;
+    LSHA1.Update(LSignatures[0]);
+    Result := BytesToHex(LSHA1.HashAsBytes, ':').ToLower;
+  end;
+end;
+
+{$ENDIF}
+
+{ TURLImageHelper }
 
 procedure TURLImageHelper.Clear;
 begin
@@ -87,6 +192,7 @@ end;
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
+  TOSLog.d('SHA1: %s', [TAppSignatureHelper.GetSHA1Signature]);
   FGoogleSignIn := TGoogleSignIn.Create;
   FGoogleSignIn.OnSignInResult := GoogleSignInResultHandler;
   FGoogleSignIn.OnSignInError := GoogleSignInErrorHandler;
