@@ -24,12 +24,57 @@ If you are creating a new project (i.e. other than the demo) you will need to ad
 
 ### Project Configuration
 
+#### Building the application
+
+When building the application, please ensure that the Target Platform for **both the application and service match**, i.e. if you have the application set to Android 32-bit, ensure that the service is also Android 32-bit. The same applies to Android 64-bit.
+
+#### Build Event/Android Manifest
+
+**Delphi 12.1:**
+
+Due to changes in the Android build process:
+
+* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
+* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+* Modify `AndroidManifest.template.xml` to add *after* `<%application-meta-data%>`
+
+  ```
+    <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_SERVICE_ON_BOOT" android:value="CrossPlatformLocationService" />
+    <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+  ```
+  ..add *before* `<%receivers%>`
+  ```
+    <receiver
+      android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver"
+      android:exported="true">
+        <intent-filter>
+            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_ALARM_TIMER" />
+            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_SERVICE_ALARM" />
+            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_SERVICE_RESTART" />
+            <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+        </intent-filter>
+    </receiver>
+  ```
+
+**Delphi 12.0 or earlier:**
+
 When configuring your **own** project for Android, configure Build Events in Project Options to add a Post-Build event with the command:  
 
 ```
 [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
 ```  
 Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
+
+#### Permissions
+
+Please ensure that the following permissions are checked in the Project Options:
+
+* Foreground service
+* Foreground servuce location (Delphi 12.x)
+* Access background location (Dangerous permissions, Delphi 11.x and up)
+* Access coarse location (Dangerous permissions)
+* Access fine location (Dangerous permissions)
 
 ## iOS
 
