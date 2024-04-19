@@ -22,6 +22,14 @@ type
 
   TProjConfigs = TArray<TProjConfig>;
 
+  TProjCompilerOption = record
+    Name: string;
+    Switch: string;
+    Value: string;
+  end;
+
+  TProjCompilerOptions = TArray<TProjCompilerOption>;
+
 implementation
 
 { TProjConfig }
