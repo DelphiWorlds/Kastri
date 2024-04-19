@@ -21,6 +21,7 @@ type
   TListBoxHelper = class helper for TCustomListBox
   public
     function CheckedCount(const AMustBeEnabled: Boolean = False): Integer;
+    function CheckedItems: TArray<string>;
     function DeletedSelected: Boolean;
     function HasChecked: Boolean;
     function HasSelections: Boolean;
@@ -94,6 +95,21 @@ begin
   Result := '';
   if ItemIndex > -1 then
     Result := Items[ItemIndex];
+end;
+
+function TListBoxHelper.CheckedItems: TArray<string>;
+var
+  I: Integer;
+begin
+  Result := [];
+  if Self is TCheckListBox then
+  begin
+    for I := 0 to Items.Count - 1 do
+    begin
+      if TCheckListBox(Self).Checked[I] then
+        Result := Result + [Items[I]];
+    end;
+  end;
 end;
 
 function TListBoxHelper.SelectItem(const AItem: string): Integer;
