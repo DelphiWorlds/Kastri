@@ -152,6 +152,7 @@ For the `Options passed to the LD linker` option in the Project Options for iOS 
 ```
 -ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib  -weak_library /usr/lib/swift/libswiftFileProvider.dylib
 ``` 
+
 #### NSUserTrackingUsageDescription
 
 For iOS, when you specify in App Store Connect that your app collects data from users, you will need to add a `NSUserTrackingUsageDescription` key and value to the Version Info section of the project options
