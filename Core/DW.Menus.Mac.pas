@@ -508,7 +508,6 @@ begin
   inherited Create;
   FStatusItem := StatusBar.statusItemWithLength(NSVariableStatusItemLength);
   FStatusItem.setMenu(AMenu);
-  FStatusItem.setHighlightMode(True);
 end;
 
 destructor TPlatformStatusItem.Destroy;
