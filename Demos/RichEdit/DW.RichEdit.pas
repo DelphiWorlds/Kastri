@@ -8,8 +8,6 @@ unit DW.RichEdit;
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses
