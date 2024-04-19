@@ -66,7 +66,7 @@ type
 
 class procedure TPermissionsHelper.LogPermissions(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray);
 const
-  cGrantedCaptions: array[TPermissionStatus] of string = ('Granted', 'Denied');
+  cGrantedCaptions: array[TPermissionStatus] of string = ('Granted', 'Denied' {$IF CompilerVersion < 36}, 'Permanently Denied'{$ENDIF});
 var
   I: Integer;
 begin
