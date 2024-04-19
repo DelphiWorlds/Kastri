@@ -60,8 +60,8 @@ public class DWNotificationPresenter
     return context.getResources().getIdentifier(id, null, context.getPackageName()); 
   }
  
-  private static RemoteViews getCustomContentView(Context context, String title, String body, String imageUrl) {
-    int layoutId = getResourceId(context, "layout/notification_custom");
+  private static RemoteViews getCustomContentView(Context context, String layout, String title, String body, String imageUrl) {
+    int layoutId = getResourceId(context, "layout/" + layout); // notification_custom
     RemoteViews remoteViews = null;
     if (layoutId > 0) {
       remoteViews = new RemoteViews(context.getPackageName(), layoutId);
@@ -69,6 +69,7 @@ public class DWNotificationPresenter
       remoteViews.setTextViewText(getResourceId(context, "id/notification_custom_body"), body);
       Bitmap bitmap = null;
       if (imageUrl != null && !imageUrl.isEmpty()) {
+        Log.d(TAG, "imageUrl: " + imageUrl);
         try {
           bitmap = getBitmap(new URL(imageUrl));
         } catch (MalformedURLException e) {
@@ -83,7 +84,8 @@ public class DWNotificationPresenter
       } 
     } else {
       Log.w("DWNotificationPresenter", "Unable to locate resource notification_custom");
-    }  return remoteViews;
+    }  
+    return remoteViews;
   }
 
   private static String getChannelId(Intent intent, String defaultChannelId) {
@@ -114,14 +116,19 @@ public class DWNotificationPresenter
     // presentNotification can be called from more than one origin, so if it is silent, stop it here..
     if (intent.hasExtra("isSilent") && intent.getStringExtra("isSilent").equals("1"))
       return;
-    mUniqueId++;
+    int notifyId = intent.getIntExtra("notifyId", 0);
+    if (notifyId == 0) {
+      mUniqueId++;
+      notifyId = mUniqueId;
+    }
     intent.setClassName(context, "com.embarcadero.firemonkey.FMXNativeActivity");
     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     PendingIntent pendingIntent = PendingIntent.getActivity(context, mUniqueId, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     String title = intent.hasExtra("title") ? intent.getStringExtra("title") : "";
     String body = intent.hasExtra("body") ? intent.getStringExtra("body") : "";
     String imageUrl = intent.hasExtra("imageUrl") ? intent.getStringExtra("imageUrl") : "";
-    RemoteViews remoteViews = getCustomContentView(context, title, body, imageUrl);
+    RemoteViews smallView = getCustomContentView(context, "notification_custom", title, body, imageUrl);
+    RemoteViews bigView = getCustomContentView(context, "notification_custom_big", title, body, imageUrl);
     NotificationManager notificationManager = (NotificationManager)context.getSystemService("notification");
     String notificationChannelId = DWNotificationPresenter.getChannelId(intent, channelId);
     notificationChannelId = (notificationChannelId != null) ? notificationChannelId : getDefaultChannelId(notificationManager);
@@ -134,10 +141,14 @@ public class DWNotificationPresenter
       .setWhen(System.currentTimeMillis())
       .setShowWhen(true)
       .setAutoCancel(true);
-    if (remoteViews != null)
-      builder = builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle()).setCustomContentView(remoteViews);
+    if ((smallView != null) || (bigView != null))
+      builder = builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+    if (smallView != null)
+      builder = builder.setCustomContentView(smallView);
+    if (bigView != null)
+      builder = builder.setCustomBigContentView(bigView);
     if (intent.hasExtra("isFullScreen"))
       builder = builder.setFullScreenIntent(pendingIntent, true); 
-    notificationManager.notify(mUniqueId, builder.build());
+    notificationManager.notify(notifyId, builder.build());
   }
 }
