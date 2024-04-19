@@ -62,7 +62,7 @@ begin
         LURL := string.Empty;
       LContext := TOpenApplicationContext.Create(LURL);
       LMessage := TApplicationEventMessage.Create(TApplicationEventData.Create(TApplicationEvent.OpenURL, LContext));
-      TMessageManager.DefaultManager.SendMessage(nil, LMessage);
+      TMessageManager.DefaultManager.SendMessage(nil, LMessage, True);
     end;
   end;
 end;
