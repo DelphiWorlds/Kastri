@@ -162,8 +162,7 @@ end;
 
 destructor TLocation.Destroy;
 begin
-  FTimerTask.DisposeOf;
-  FTimerTask := nil;
+  FTimerTask.Free;
   inherited;
 end;
 
