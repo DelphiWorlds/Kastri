@@ -103,7 +103,7 @@ begin
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_TECH_DISCOVERED);
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_TAG_DISCOVERED);
   LIntent := TJIntent.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Activity.getClass).addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP);
-  FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent, TJPendingIntent.JavaClass.FLAG_IMMUTABLE);
+  FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent, TJPendingIntent.JavaClass.FLAG_MUTABLE);
 end;
 
 destructor TPlatformNFCReader.Destroy;
