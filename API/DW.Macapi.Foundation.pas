@@ -63,6 +63,7 @@ type
   NSFileProtectionType = NSString;
   NSAttributedStringKey = NSString;
   NSKeyValueSetMutationKind = NSInteger;
+  NSErrorUserInfoKey = NSString;
 
   NSProgressUnpublishingHandler = procedure of object;
   NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
