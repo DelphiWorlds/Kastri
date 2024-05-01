@@ -53,15 +53,29 @@ type
     constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
   end;
 
+  // The following class is yet to be in use:
+  TScriptMessageHandler = class(TOCLocal, WKScriptMessageHandler)
+  private
+    FPlatformWebBrowserExt: TPlatformWebBrowserExt;
+  public
+    { WKScriptMessageHandler }
+    [MethodName('userContentController:didReceiveScriptMessage:')]
+    procedure userContentController(userContentController: WKUserContentController; message: WKScriptMessage); cdecl;
+  public
+    constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+  end;
+
   TPlatformWebBrowserExt = class(TCustomPlatformWebBrowserExt)
   private
     FJavaScriptResultHandler: TJavaScriptResultProc;
     FNavigationDelegate: TWebBrowserExtNavigationDelegate;
+    FScriptMessageHandler: TScriptMessageHandler;
     FWebView: WKWebView;
     procedure JavaScriptCompletionHandler(obj: Pointer; error: NSError);
     procedure NOPCompletionHandler;
     procedure TakeSnapshotCompletionHandler(snapshotImage: UIImage; error: NSError);
   protected
+    procedure DidReceiveScriptMessage(const AMessage: WKScriptMessage);
     procedure DoCaptureBitmap; override;
     procedure DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean); override;
     procedure ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc); override;
@@ -86,7 +100,15 @@ uses
   // FMX
   FMX.Graphics,
   // DW
-  DW.OSDevice, DW.Graphics.Helpers.Mac;
+  DW.OSLog, DW.OSDevice, DW.Graphics.Helpers.Mac;
+
+type
+  WKWebViewEx = interface(WKWebView)
+    ['{2CAA2A17-458F-4CEB-8C34-5C35C8026B9D}']
+    function isInspectable: Boolean; cdecl;
+    procedure setInspectable(inspectable: Boolean); cdecl;
+  end;
+  TWKWebViewEx = class(TOCGenericImport<WKWebViewClass, WKWebViewEx>) end;
 
 { TWebBrowserExtNavigationDelegate }
 
@@ -153,6 +175,20 @@ begin
   FWebViewNavigationDelegate.webViewDidStartProvisionalNavigation(webView, navigation);
 end;
 
+
+{ TScriptMessageHandler }
+
+constructor TScriptMessageHandler.Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+begin
+  inherited Create;
+  FPlatformWebBrowserExt := APlatformWebBrowserExt;
+end;
+
+procedure TScriptMessageHandler.userContentController(userContentController: WKUserContentController; message: WKScriptMessage);
+begin
+  FPlatformWebBrowserExt.DidReceiveScriptMessage(message);
+end;
+
 { TPlatformWebBrowserExt }
 
 constructor TPlatformWebBrowserExt.Create(const AWebBrowserExt: TWebBrowserExt);
@@ -162,12 +198,46 @@ begin
   // Hijack the original navigation delegate
   FNavigationDelegate := TWebBrowserExtNavigationDelegate.Create(Self);
   FWebView.setNavigationDelegate(FNavigationDelegate.GetObjectID);
+
+// Apparently WKScriptMessageHandler works ONLY with Javascript that is executed in the app code, e.g.: window.webkit.messageHandlers.logger.postMessage(message);
+//  FScriptMessageHandler := TScriptMessageHandler.Create(Self);
+//  FWebView.configuration.userContentController.addScriptMessageHandler(FScriptMessageHandler.GetObjectID, StrToNSStr('ScriptMessageHandler'));
+
+// The code at the end of this method makes the app inspectable in Safari on a Mac, however the following steps need to be performed in order for that to happen:
+
+// Enable Developer Mode on your iOS Device:
+//   Go to Settings > Privacy & Security.
+//   Scroll down and tap on Developer Mode.
+//   Turn on Developer Mode and follow any prompts to authorize this mode.
+
+// Enable Web Inspector in Safari Settings:
+//   On your iOS device, open Settings.
+//   Scroll down and select Safari.
+//   Scroll to the bottom to find the Advanced section.
+//   Toggle on the Web Inspector option.
+
+// Connect your iOS device to a Mac via a cable.
+// Open Safari on your Mac. Ensure you have the Develop menu enabled:
+//   Go to Safari > Preferences > Advanced.
+//   Check the box at the bottom that says "Show Develop menu in menu bar".
+// In Safari on your Mac, go to the Develop menu.
+//   You should see your iOS device listed in the menu. Hover over it, and it should list all open WKWebViews in your app.
+//   Select the app you want to inspect. This will open a Web Inspector window similar to Safari's developer tools on macOS.
+
+  if TOSVersion.Check(16, 4) then
+    TWKWebViewEx.Wrap(NSObjectToID(FWebView)).setInspectable(True);
 end;
 
 destructor TPlatformWebBrowserExt.Destroy;
 begin
   FNavigationDelegate.Free;
+  FScriptMessageHandler.Free;
   inherited;
+end;
+
+procedure TPlatformWebBrowserExt.DidReceiveScriptMessage(const AMessage: WKScriptMessage);
+begin
+  TOSLog.d('WBExt Console Message: %s', [NSStrToStr(TNSString.Wrap(AMessage.body))]);
 end;
 
 procedure TPlatformWebBrowserExt.TakeSnapshotCompletionHandler(snapshotImage: UIImage; error: NSError);
