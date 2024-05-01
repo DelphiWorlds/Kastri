@@ -60,6 +60,12 @@ type
   NSProgressUnpublishingHandler = procedure of object;
   NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
 
+  NSOperatingSystemVersion = record
+    majorVersion: NSInteger;
+    minorVersion: NSInteger;
+    patchVersion: NSInteger;
+  end;
+
   TNSItemProviderBlockMethod1 = procedure of object;
   TNSItemProviderBlockMethod2 = procedure(completionHandler: TNSItemProviderBlockMethod1) of object;
   TNSItemProviderBlockMethod3 = procedure(data: NSData; error: NSError) of object;
