@@ -6,7 +6,7 @@ The controls have been created to support proper z-order with other "native" con
 
 Note that at present, most of the controls will function only on Android and iOS, however the controls are rendered in the designer close to what they will look like on the target platform.
 
-Please refer to the [native controls documentation](../Controls/NativeControls.md) for details about the controls themselves, **including installation**
+Please refer to the [native controls documentation](https://github.com/DelphiWorlds/Kastri/blob/master/Controls/NativeControls.md) for details about the controls themselves, **including installation**
 
 <br>
 
