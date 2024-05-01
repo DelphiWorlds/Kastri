@@ -17,7 +17,7 @@ uses
   // macOS
   Macapi.CoreFoundation, Macapi.ObjCRuntime, Macapi.ObjectiveC, Macapi.Dispatch,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.AVFoundation, iOSapi.CoreMedia, iOSapi.CoreGraphics, iOSapi.CoreVideo,
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.AVFoundation, iOSapi.CoreMedia, iOSapi.CoreGraphics, iOSapi.CoreVideo, iOSapi.QuartzCore,
   // DW
   DW.Macapi.Simd;
 
@@ -72,6 +72,9 @@ const
   AVPlayerTimeControlStatusPaused = 0;
   AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate = 1;
   AVPlayerTimeControlStatusPlaying = 2;
+  AVQueuedSampleBufferRenderingStatusUnknown = 0;
+  AVQueuedSampleBufferRenderingStatusRendering = 1;
+  AVQueuedSampleBufferRenderingStatusFailed = 2;
 
 type
   AVAssetExportSession = interface;
@@ -97,6 +100,8 @@ type
   AVAudioUnitEQFilterParameters = interface;
   AVAudioEnvironmentReverbParameters = interface;
   AVMetadataItemFilter = interface;
+  AVSampleBufferVideoRenderer = interface;
+  AVSampleBufferDisplayLayer = interface;
 
   PInt32 = ^Int32;
   AVAuthorizationStatus = NSInteger;
@@ -143,8 +148,12 @@ type
   AVAssetImageGeneratorApertureMode = NSString;
   AVAssetImageGeneratorResult = NSInteger;
   PCMTime = ^CMTime;
+  AVQueuedSampleBufferRenderingStatus = NSInteger;
 
+  // CoreGraphics:
   CGImagePropertyOrientation = NSUInteger;
+  // CoreMedia:
+  CMTimebaseRef = Pointer;
 
   AVAssetImageGeneratorCompletionHandler = procedure(requestedTime: CMTime; image: CGImageRef; actualTime: CMTime;
     result: AVAssetImageGeneratorResult; error: NSError) of object;
@@ -182,6 +191,8 @@ type
   TAVAssetExportSessionBlockMethod4 = procedure(estimatedMaximumDuration: CMTime; error: NSError) of object;
   TAVAssetExportSessionBlockMethod5 = procedure(estimatedOutputFileLength: Int64; error: NSError) of object;
   TAVAssetImageGeneratorBlockMethod1 = procedure(image: CGImageRef; actualTime: CMTime; error: NSError) of object;
+  TAVSampleBufferDisplayLayerBlockMethod1 = procedure of object;
+  TAVSampleBufferVideoRendererBlockMethod1 = procedure of object;
 
   AVAudioSessionRouteDescriptionClass = interface(NSObjectClass)
     ['{A7524349-5447-431C-A1A9-D09F2C1F6588}']
@@ -655,89 +666,6 @@ type
   end;
   TAVDepthData = class(TOCGenericImport<AVDepthDataClass, AVDepthData>) end;
 
-  AVPlayerClass = interface(NSObjectClass)
-    ['{8B1775DB-D230-4202-9D43-8ED8BACF1D48}']
-    {class} function availableHDRModes: AVPlayerHDRMode; cdecl;
-    {class} function eligibleForHDRPlayback: Boolean; cdecl;
-    {class} function playerWithPlayerItem(item: AVPlayerItem): Pointer; cdecl;
-    {class} function playerWithURL(URL: NSURL): Pointer; cdecl;
-  end;
-
-  AVPlayer = interface(NSObject)
-    ['{ECF23C67-9F21-4166-8328-66F0B5413F74}']
-    function actionAtItemEnd: AVPlayerActionAtItemEnd; cdecl;
-    [MethodName('addBoundaryTimeObserverForTimes:queue:usingBlock:')]
-    function addBoundaryTimeObserverForTimes(times: NSArray; queue: dispatch_queue_t; block: TAVPlayerBlockMethod3): Pointer; cdecl;
-    [MethodName('addPeriodicTimeObserverForInterval:queue:usingBlock:')]
-    function addPeriodicTimeObserverForInterval(interval: CMTime; queue: dispatch_queue_t; block: TAVPlayerBlockMethod2): Pointer; cdecl;
-    function allowsAirPlayVideo: Boolean; cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
-    function allowsExternalPlayback: Boolean; cdecl;
-    function appliesMediaSelectionCriteriaAutomatically: Boolean; cdecl;
-    function audioOutputDeviceUniqueID: NSString; cdecl;
-    function automaticallyWaitsToMinimizeStalling: Boolean; cdecl;
-    procedure cancelPendingPrerolls; cdecl;
-    function currentItem: AVPlayerItem; cdecl;
-    function currentTime: CMTime; cdecl;
-    function error: NSError; cdecl;
-    function externalPlaybackVideoGravity: AVLayerVideoGravity; cdecl;
-    function initWithPlayerItem(item: AVPlayerItem): Pointer; cdecl;
-    function initWithURL(URL: NSURL): Pointer; cdecl;
-    function isAirPlayVideoActive: Boolean; cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
-    function isClosedCaptionDisplayEnabled: Boolean; cdecl; // API_DEPRECATED("Allow AVPlayer to enable closed captions automatically according to user preferences by ensuring that the value of appliesMediaSelectionCriteriaAutomatically is YES.", macos(10.7, 10.13), ios(4.0, 11.0), tvos(9.0, 11.0))
-    function isExternalPlaybackActive: Boolean; cdecl;
-    function isMuted: Boolean; cdecl;
-    function masterClock: CMClockRef; cdecl;
-    function mediaSelectionCriteriaForMediaCharacteristic(mediaCharacteristic: AVMediaCharacteristic): AVPlayerMediaSelectionCriteria; cdecl;
-    function outputObscuredDueToInsufficientExternalProtection: Boolean; cdecl;
-    procedure pause; cdecl;
-    procedure play; cdecl;
-    procedure playImmediatelyAtRate(rate: Single); cdecl;
-    function preferredVideoDecoderGPURegistryID: UInt64; cdecl;
-    [MethodName('prerollAtRate:completionHandler:')]
-    procedure prerollAtRate(rate: Single; completionHandler: TAVPlayerBlockMethod1); cdecl;
-    function preventsDisplaySleepDuringVideoPlayback: Boolean; cdecl;
-    function rate: Single; cdecl;
-    function reasonForWaitingToPlay: AVPlayerWaitingReason; cdecl;
-    procedure removeTimeObserver(observer: Pointer); cdecl;
-    procedure replaceCurrentItemWithPlayerItem(item: AVPlayerItem); cdecl;
-    [MethodName('seekToDate:completionHandler:')]
-    procedure seekToDate(date: NSDate; completionHandler: TAVPlayerBlockMethod1); overload; cdecl;
-    procedure seekToDate(date: NSDate); overload; cdecl;
-    [MethodName('seekToTime:completionHandler:')]
-    procedure seekToTime(time: CMTime; completionHandler: TAVPlayerBlockMethod1); overload; cdecl;
-    [MethodName('seekToTime:toleranceBefore:toleranceAfter:completionHandler:')]
-    procedure seekToTime(time: CMTime; toleranceBefore: CMTime; toleranceAfter: CMTime; completionHandler: TAVPlayerBlockMethod1); overload; cdecl;
-    [MethodName('seekToTime:toleranceBefore:toleranceAfter:')]
-    procedure seekToTime(time: CMTime; toleranceBefore: CMTime; toleranceAfter: CMTime); overload; cdecl;
-    procedure seekToTime(time: CMTime); overload; cdecl;
-    procedure setActionAtItemEnd(actionAtItemEnd: AVPlayerActionAtItemEnd); cdecl;
-    procedure setAllowsAirPlayVideo(allowsAirPlayVideo: Boolean); cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
-    procedure setAllowsExternalPlayback(allowsExternalPlayback: Boolean); cdecl;
-    procedure setAppliesMediaSelectionCriteriaAutomatically(appliesMediaSelectionCriteriaAutomatically: Boolean); cdecl;
-    procedure setAudioOutputDeviceUniqueID(audioOutputDeviceUniqueID: NSString); cdecl;
-    procedure setAutomaticallyWaitsToMinimizeStalling(automaticallyWaitsToMinimizeStalling: Boolean); cdecl;
-    procedure setClosedCaptionDisplayEnabled(closedCaptionDisplayEnabled: Boolean); cdecl; // API_DEPRECATED("Allow AVPlayer to enable closed captions automatically according to user preferences by ensuring that the value of appliesMediaSelectionCriteriaAutomatically is YES.", macos(10.7, 10.13), ios(4.0, 11.0), tvos(9.0, 11.0))
-    procedure setExternalPlaybackVideoGravity(externalPlaybackVideoGravity: AVLayerVideoGravity); cdecl;
-    procedure setMasterClock(masterClock: CMClockRef); cdecl;
-    [MethodName('setMediaSelectionCriteria:forMediaCharacteristic:')]
-    procedure setMediaSelectionCriteria(criteria: AVPlayerMediaSelectionCriteria; mediaCharacteristic: AVMediaCharacteristic); cdecl;
-    procedure setMuted(muted: Boolean); cdecl;
-    procedure setPreferredVideoDecoderGPURegistryID(preferredVideoDecoderGPURegistryID: UInt64); cdecl;
-    procedure setPreventsDisplaySleepDuringVideoPlayback(preventsDisplaySleepDuringVideoPlayback: Boolean); cdecl;
-    procedure setRate(rate: Single); overload; cdecl;
-    [MethodName('setRate:time:atHostTime:')]
-    procedure setRate(rate: Single; itemTime: CMTime; hostClockTime: CMTime); overload; cdecl;
-    procedure setUsesAirPlayVideoWhileAirPlayScreenIsActive(usesAirPlayVideoWhileAirPlayScreenIsActive: Boolean); cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
-    procedure setUsesExternalPlaybackWhileExternalScreenIsActive(usesExternalPlaybackWhileExternalScreenIsActive: Boolean); cdecl;
-    procedure setVolume(volume: Single); cdecl;
-    function status: AVPlayerStatus; cdecl;
-    function timeControlStatus: AVPlayerTimeControlStatus; cdecl;
-    function usesAirPlayVideoWhileAirPlayScreenIsActive: Boolean; cdecl; // API_DEPRECATED("No longer supported", ios(5.0, 6.0), tvos(9.0, 9.0))
-    function usesExternalPlaybackWhileExternalScreenIsActive: Boolean; cdecl;
-    function volume: Single; cdecl;
-  end;
-  TAVPlayer = class(TOCGenericImport<AVPlayerClass, AVPlayer>) end;
-
   AVMetadataItemFilterClass = interface(NSObjectClass)
     ['{D7EE4AFB-C4A9-4FE5-A971-EF13F9FBDEB0}']
     {class} function metadataItemFilterForSharing: AVMetadataItemFilter; cdecl;
@@ -831,6 +759,51 @@ type
     function videoComposition: AVVideoComposition; cdecl;
   end;
   TAVAssetImageGenerator = class(TOCGenericImport<AVAssetImageGeneratorClass, AVAssetImageGenerator>) end;
+
+  AVSampleBufferVideoRendererClass = interface(NSObjectClass)
+    ['{01F35428-29E1-4C07-9021-4756EEEF23EE}']
+  end;
+
+  AVSampleBufferVideoRenderer = interface(NSObject)
+    ['{D2D24FE6-6329-4CE7-BA3A-0E6DD5F2ECFB}']
+    function error: NSError; cdecl;
+    procedure flushWithRemovalOfDisplayedImage(removeDisplayedImage: Boolean; completionHandler: TAVSampleBufferVideoRendererBlockMethod1); cdecl;
+    function requiresFlushToResumeDecoding: Boolean; cdecl;
+    function status: AVQueuedSampleBufferRenderingStatus; cdecl;
+  end;
+  TAVSampleBufferVideoRenderer = class(TOCGenericImport<AVSampleBufferVideoRendererClass, AVSampleBufferVideoRenderer>) end;
+
+  AVSampleBufferDisplayLayerClass = interface(CALayerClass)
+    ['{B993E5DA-82B2-45B3-92E4-98402D3C6367}']
+  end;
+
+  AVSampleBufferDisplayLayer = interface(CALayer)
+    ['{FC14BFD3-4ECD-41AE-BFF1-F1A8820E89D1}']
+    function controlTimebase: CMTimebaseRef; cdecl;
+    procedure enqueueSampleBuffer(sampleBuffer: CMSampleBufferRef); cdecl; // API_DEPRECATED("Use sampleBufferRenderer's enqueueSampleBuffer: instead", macos(10.8, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    function error: NSError; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's error instead", macos(10.10, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    procedure flush; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's flush instead", macos(10.8, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    procedure flushAndRemoveImage; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's flushWithRemovalOfDisplayedImage:completionHandler: instead", macos(10.8, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    function hasSufficientMediaDataForReliablePlaybackStart: Boolean; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's hasSufficientMediaDataForReliablePlaybackStart instead", macos(11.3, API_TO_BE_DEPRECATED), ios(14.5, API_TO_BE_DEPRECATED), tvos(14.5, API_TO_BE_DEPRECATED))
+    function isReadyForMoreMediaData: Boolean; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's readyForMoreMediaData instead", macos(10.8, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    function outputObscuredDueToInsufficientExternalProtection: Boolean; cdecl;
+    function preventsAutomaticBackgroundingDuringVideoPlayback: Boolean; cdecl;
+    function preventsCapture: Boolean; cdecl;
+    function preventsDisplaySleepDuringVideoPlayback: Boolean; cdecl;
+    procedure requestMediaDataWhenReadyOnQueue(queue: dispatch_queue_t; usingBlock: TAVSampleBufferDisplayLayerBlockMethod1); cdecl; // API_DEPRECATED("Use sampleBufferRenderer's requestMediaDataWhenReadyOnQueue:usingBlock: instead", macos(10.8, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    function requiresFlushToResumeDecoding: Boolean; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's requiresFlushToResumeDecoding instead", macos(11.0, API_TO_BE_DEPRECATED), ios(14.0, API_TO_BE_DEPRECATED), tvos(14.0, API_TO_BE_DEPRECATED))
+    function sampleBufferRenderer: AVSampleBufferVideoRenderer; cdecl;
+    procedure setControlTimebase(controlTimebase: CMTimebaseRef); cdecl;
+    procedure setPreventsAutomaticBackgroundingDuringVideoPlayback(preventsAutomaticBackgroundingDuringVideoPlayback: Boolean); cdecl;
+    procedure setPreventsCapture(preventsCapture: Boolean); cdecl;
+    procedure setPreventsDisplaySleepDuringVideoPlayback(preventsDisplaySleepDuringVideoPlayback: Boolean); cdecl;
+    procedure setVideoGravity(videoGravity: AVLayerVideoGravity); cdecl;
+    function status: AVQueuedSampleBufferRenderingStatus; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's status instead", macos(10.10, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    procedure stopRequestingMediaData; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's stopRequestingMediaData instead", macos(10.8, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    function timebase: CMTimebaseRef; cdecl; // API_DEPRECATED("Use sampleBufferRenderer's timebase instead", macos(10.8, API_TO_BE_DEPRECATED), ios(8.0, API_TO_BE_DEPRECATED), tvos(10.2, API_TO_BE_DEPRECATED))
+    function videoGravity: AVLayerVideoGravity; cdecl;
+  end;
+  TAVSampleBufferDisplayLayer = class(TOCGenericImport<AVSampleBufferDisplayLayerClass, AVSampleBufferDisplayLayer>) end;
 
 function AVAudioSessionCategoryRecord: NSString;
 function AVAudioSessionModeMeasurement: NSString;
