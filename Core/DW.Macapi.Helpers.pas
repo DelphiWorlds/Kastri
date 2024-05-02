@@ -24,7 +24,8 @@ uses
   {$IF Defined(IOS)}
   iOSapi.Foundation;
   {$ELSEIF Defined(MACOS)}
-  Macapi.Foundation, Macapi.AppKit;
+  Macapi.Foundation, Macapi.AppKit,
+  DW.Macapi.Foundation;
   {$ENDIF}
 
 type
