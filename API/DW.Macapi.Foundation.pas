@@ -28,6 +28,10 @@ const
   NSJSONWritingSortedKeys = 1 shl 1;
   NSJSONWritingFragmentsAllowed = 1 shl 2;
   NSJSONWritingWithoutEscapingSlashes = 1 shl 3;
+  NSKeyValueObservingOptionNew = 1;
+  NSKeyValueObservingOptionOld = 2;
+  NSKeyValueObservingOptionInitial = 4;
+  NSKeyValueObservingOptionPrior = 8;
 
 type
   NSData = interface;
@@ -64,6 +68,7 @@ type
   NSAttributedStringKey = NSString;
   NSKeyValueSetMutationKind = NSInteger;
   NSErrorUserInfoKey = NSString;
+  NSKeyValueObservingOptions = NSInteger;
 
   NSProgressUnpublishingHandler = procedure of object;
   NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
