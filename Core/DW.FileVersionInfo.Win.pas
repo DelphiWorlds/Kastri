@@ -319,19 +319,22 @@ var
 begin
   Result := [];
   LFixedInfo := GetFixedFileInfo;
-  LMasked := LFixedInfo^.dwFileFlags and LFixedInfo^.dwFileFlagsMask;
-  if (LMasked and VS_FF_DEBUG) <> 0 then
-    Include(Result, TFileFlag.Debug);
-  if (LMasked and VS_FF_INFOINFERRED) <> 0 then
-    Include(Result, TFileFlag.InfoInferred);
-  if (LMasked and VS_FF_PATCHED) <> 0 then
-    Include(Result, TFileFlag.Patched);
-  if (LMasked and VS_FF_PRERELEASE) <> 0 then
-    Include(Result, TFileFlag.PreRelease);
-  if (LMasked and VS_FF_PRIVATEBUILD) <> 0 then
-    Include(Result, TFileFlag.PrivateBuild);
-  if (LMasked and VS_FF_SPECIALBUILD) <> 0 then
-    Include(Result, TFileFlag.SpecialBuild);
+  if LFixedInfo <> nil then
+  begin
+    LMasked := LFixedInfo^.dwFileFlags and LFixedInfo^.dwFileFlagsMask;
+    if (LMasked and VS_FF_DEBUG) <> 0 then
+      Include(Result, TFileFlag.Debug);
+    if (LMasked and VS_FF_INFOINFERRED) <> 0 then
+      Include(Result, TFileFlag.InfoInferred);
+    if (LMasked and VS_FF_PATCHED) <> 0 then
+      Include(Result, TFileFlag.Patched);
+    if (LMasked and VS_FF_PRERELEASE) <> 0 then
+      Include(Result, TFileFlag.PreRelease);
+    if (LMasked and VS_FF_PRIVATEBUILD) <> 0 then
+      Include(Result, TFileFlag.PrivateBuild);
+    if (LMasked and VS_FF_SPECIALBUILD) <> 0 then
+      Include(Result, TFileFlag.SpecialBuild);
+  end;
 end;
 
 function TFileVersionInfo.GetFileVersion: string;
