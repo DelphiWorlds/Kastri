@@ -8,26 +8,31 @@ const
   cJavaScriptNullResult = 'null';
   cJavaScriptSetInputValueById = '(function() { document.getElementById("%s").value = "%s"; })()';
   cJavaScriptSetInputValueByName = '(function() { '#13#10 +
-   '  var element = document.querySelector("input[name=''%s'']"); '#13#10 +
-   '  var inputValue = "%s"; '#13#10 +
-   '  if (element && (element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0)) {'#13#10 +
-   '    element.value = inputValue;'#13#10 +
-   '    element.setAttribute("value", inputValue);'#13#10 +
-   '    element.focus(); '#13#10 +
-   '    var event = new Event("input", { bubbles: true, cancelable: true });'#13#10 +
-   '    element.dispatchEvent(event);'#13#10 +
-   '    return element.value == inputValue; '#13#10 +
-   '  } else return false; '#13#10 +
-   '})()';
+    '  var element = document.querySelector("input[name=''%s'']"); '#13#10 +
+    '  var inputValue = "%s"; '#13#10 +
+    '  if (element && (element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0)) {'#13#10 +
+    '    element.value = inputValue;'#13#10 +
+    '    element.setAttribute("value", inputValue);'#13#10 +
+    '    element.focus(); '#13#10 +
+    '    var event = new Event("input", { bubbles: true, cancelable: true });'#13#10 +
+    '    element.dispatchEvent(event);'#13#10 +
+    '    return element.value == inputValue; '#13#10 +
+    '  } else return false; '#13#10 +
+    '})()';
   cJavaScriptClickButtonWithText = '(function() { '#13#10 +
-   '  var buttons = document.getElementsByTagName("button"); '#13#10 +
-   '  for (var i = 0; i < buttons.length; i++) {'#13#10 +
-   '    if (buttons[i].innerText.trim() === "%s") {'#13#10 +
-   '      buttons[i].click();'#13#10 +
-   '      return true;'#13#10 +
-   '    }'#13#10 +
-   '  } return false;'#13#10 +
-   '})()';
+    '  var buttons = document.getElementsByTagName("button"); '#13#10 +
+    '  for (var i = 0; i < buttons.length; i++) {'#13#10 +
+    '    if (buttons[i].innerText.trim() === "%s") {'#13#10 +
+    '      buttons[i].click();'#13#10 +
+    '      return true;'#13#10 +
+    '    }'#13#10 +
+    '  } return false;'#13#10 +
+    '})()';
+  cJavaScriptRemoveBlankTargets = '(function() { '#13#10 +
+    ' document.querySelectorAll("a").forEach(anchor => { '#13#10 +
+    '   anchor.removeAttribute("target"); '#13#10 +
+    ' }); '#13#10 +
+    '})()';
 
 const
   cJSEventScheme = 'about'; // This is being used so as to support Android (EMBT's code otherwise interferes)
