@@ -90,10 +90,6 @@ uses
   {$ENDIF}
   DW.Android.Helpers;
 
-type
-  JContextCompat = interface;
-
-
 { TMultiBroadcastReceiverDelegate }
 
 constructor TMultiBroadcastReceiverDelegate.Create(const AMultiReceiver: TCustomMultiReceiver);
