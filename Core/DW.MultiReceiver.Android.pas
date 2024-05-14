@@ -64,6 +64,8 @@ type
   private
     FIntentFilter: JIntentFilter;
     FLocal: Boolean;
+    function HasNonSystemActions: Boolean;
+    procedure RegisterReceiver;
   protected
     procedure ConfigureActions; virtual; abstract;
     function GetResultCode: Integer;
@@ -76,10 +78,21 @@ type
 implementation
 
 uses
+  // RTL
+  System.SysUtils,
   // Android
-  Androidapi.Helpers,
+  Androidapi.Helpers, Androidapi.JNI.Os,
   // DW
-  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.Androidx.LocalBroadcastManager, {$ENDIF} DW.Android.Helpers;
+  {$IF CompilerVersion < 35}
+  DW.Androidapi.JNI.SupportV4,
+  {$ELSE}
+  DW.Androidapi.JNI.AndroidX.Content, DW.Androidapi.JNI.AndroidX.LocalBroadcastManager,
+  {$ENDIF}
+  DW.Android.Helpers;
+
+type
+  JContextCompat = interface;
+
 
 { TMultiBroadcastReceiverDelegate }
 
@@ -111,10 +124,7 @@ begin
   FLocal := ALocal;
   FIntentFilter := TJIntentFilter.JavaClass.init;
   ConfigureActions;
-  if not FLocal then
-    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter)
-  else
-    TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FReceiver, FIntentFilter);
+  RegisterReceiver;
 end;
 
 destructor TMultiReceiver.Destroy;
@@ -128,6 +138,46 @@ end;
 function TMultiReceiver.GetResultCode: Integer;
 begin
   Result := FReceiver.getResultCode;
+end;
+
+function TMultiReceiver.HasNonSystemActions: Boolean;
+var
+  I: Integer;
+  LAction: string;
+begin
+  Result := False;
+  for I := 0 to FIntentFilter.countActions - 1 do
+  begin
+    LAction := JStringToString(FIntentFilter.getAction(I));
+    // Crude way of determining whether or not this is a system broadcast
+    if not (LAction.StartsWith('android.') or LAction.StartsWith('com.android.')) then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+procedure TMultiReceiver.RegisterReceiver;
+{$IF CompilerVersion > 35}
+var
+  LFlags: Integer;
+{$ENDIF}
+begin
+  if not FLocal then
+  begin
+    {$IF CompilerVersion > 35}
+    // https://developer.android.com/about/versions/14/behavior-changes-14#runtime-receivers-exported
+    LFlags := 0;
+    if HasNonSystemActions then
+      LFlags := TJContextCompat.JavaClass.RECEIVER_EXPORTED;
+    TJContextCompat.JavaClass.registerReceiver(TAndroidHelper.Context, FReceiver, FIntentFilter, LFlags);
+    {$ELSE}
+    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter);
+    {$ENDIF}
+  end
+  else
+    TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FReceiver, FIntentFilter);
 end;
 
 end.
