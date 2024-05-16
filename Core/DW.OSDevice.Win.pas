@@ -212,7 +212,7 @@ begin
   begin
     LBasePIDL := ILCreateFromPath(PChar(LFolder));
     try
-      SHOpenFolderAndSelectItems(LBasePIDL, Length(LPIDLList), @LPIDLList[0], 0);
+      SHOpenFolderAndSelectItems(LBasePIDL, Length(LPIDLList), LPIDLList[0], 0);
     finally
       ILFree(LBasePIDL);
       for I := 0 to Length(LPIDLList) - 1 do
