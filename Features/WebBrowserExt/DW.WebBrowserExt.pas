@@ -28,6 +28,10 @@ type
 
   THitTestKind = (Unknown, EditText, Email, Geo, Image, Phone, SrcAnchor, SrcImageAnchor);
 
+  TCacheDataKind = (Cookies, LocalStorage, SessionStorage, IndexedDBDatabases, WebSQLDatabases);
+
+  TCacheDataKinds = set of TCacheDataKind;
+
   TCaptureBitmapProc = reference to procedure(const ABitmap: TBitmap);
 
   TWebBrowserExt = class;
@@ -40,6 +44,7 @@ type
   protected
     procedure BitmapCaptured(const ABitmap: TBitmap);
     procedure CaptureBitmap(const AHandler: TCaptureBitmapProc);
+    procedure ClearCache(const ADataKinds: TCacheDataKinds); virtual;
     procedure DoCaptureBitmap; virtual;
     procedure DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean); virtual;
     procedure ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc); virtual;
@@ -68,6 +73,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure CaptureBitmap(const AHandler: TCaptureBitmapProc);
+    procedure ClearCache(const ADataKinds: TCacheDataKinds = []);
     procedure ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc = nil);
     procedure GetElementValueByName(const AName: string; const AHandler: TJavaScriptResultProc);
     function GetPrintAdapter(const ADocumentName: string): IInterface;
@@ -117,6 +123,11 @@ begin
     FCaptureBitmapHandler := AHandler;
     DoCaptureBitmap;
   end;
+end;
+
+procedure TCustomPlatformWebBrowserExt.ClearCache(const ADataKinds: TCacheDataKinds);
+begin
+  //
 end;
 
 procedure TCustomPlatformWebBrowserExt.DoCaptureBitmap;
@@ -181,6 +192,11 @@ end;
 procedure TWebBrowserExt.CaptureBitmap(const AHandler: TCaptureBitmapProc);
 begin
   FPlatformWebBrowserExt.CaptureBitmap(AHandler);
+end;
+
+procedure TWebBrowserExt.ClearCache(const ADataKinds: TCacheDataKinds = []);
+begin
+  FPlatformWebBrowserExt.ClearCache(ADataKinds);
 end;
 
 constructor TWebBrowserExt.Create(AOwner: TComponent);
