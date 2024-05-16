@@ -75,6 +75,7 @@ type
     procedure NOPCompletionHandler;
     procedure TakeSnapshotCompletionHandler(snapshotImage: UIImage; error: NSError);
   protected
+    procedure ClearCache(const ADataKinds: TCacheDataKinds); override;
     procedure DidReceiveScriptMessage(const AMessage: WKScriptMessage);
     procedure DoCaptureBitmap; override;
     procedure DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean); override;
@@ -235,6 +236,41 @@ begin
   inherited;
 end;
 
+procedure TPlatformWebBrowserExt.ClearCache(const ADataKinds: TCacheDataKinds);
+var
+  LDataTypes: NSSet;
+  LArray: NSMutableArray;
+  LKind: TCacheDataKind;
+  LValue: NSString;
+  LSinceDate: NSDate;
+begin
+  LArray := TNSMutableArray.Create;
+  for LKind := Low(TCacheDataKind) to High(TCacheDataKind) do
+  begin
+    if (ADataKinds = []) or (LKind in ADataKinds) then
+    begin
+      LValue := nil;
+      case LKind of
+        TCacheDataKind.Cookies:
+          LValue := WKWebsiteDataTypeCookies;
+        TCacheDataKind.LocalStorage:
+          LValue := WKWebsiteDataTypeLocalStorage;
+        TCacheDataKind.SessionStorage:
+          LValue := WKWebsiteDataTypeSessionStorage;
+        TCacheDataKind.IndexedDBDatabases:
+          LValue := WKWebsiteDataTypeIndexedDBDatabases;
+        TCacheDataKind.WebSQLDatabases:
+          LValue := WKWebsiteDataTypeWebSQLDatabases;
+      end;
+      if LValue <> nil then
+        LArray.addObject(NSObjectToID(WKWebsiteDataTypeCookies))
+    end;
+  end;
+  LDataTypes := TNSSet.Wrap(TNSSet.OCClass.setWithArray(LArray));
+  LSinceDate := TNSDate.Wrap(TNSDate.OCClass.dateWithTimeIntervalSince1970(0));
+  TWKWebsiteDataStore.OCClass.defaultDataStore.removeDataOfTypes(LDataTypes, LSinceDate, nil);
+end;
+
 procedure TPlatformWebBrowserExt.DidReceiveScriptMessage(const AMessage: WKScriptMessage);
 begin
   TOSLog.d('WBExt Console Message: %s', [NSStrToStr(TNSString.Wrap(AMessage.body))]);
@@ -348,7 +384,7 @@ begin
     else
       LCachePolicy := NSURLRequestReloadIgnoringLocalCacheData;
     LURL := TNSUrl.Wrap(TNSUrl.OCClass.URLWithString(StrToNSStr(AURL)));
-    LRequest:= TNSURLRequest.Wrap(TNSURLRequest.OCClass.requestWithURL(LURL, LCachePolicy, 0));
+    LRequest := TNSURLRequest.Wrap(TNSURLRequest.OCClass.requestWithURL(LURL, LCachePolicy, 0));
     FWebView.loadRequest(LRequest);
   end;
 end;
