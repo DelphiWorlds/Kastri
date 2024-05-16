@@ -1,8 +1,22 @@
 unit DW.JavaScript;
 
+{*******************************************************}
+{                                                       }
+{                      Kastri                           }
+{                                                       }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
+{  which is located in the root folder of this library  }
+{                                                       }
+{*******************************************************}
+
 interface
 
 const
+  cJSEventScheme = 'jsevent';
+  cJSEventProtocol = cJSEventScheme + ':blank?';
+
   cJavaScriptGetInputValueByName = '(function() { return document.getElementsByName("%s")[0].value; })()';
   cJavaScriptGetPageContents = '(function() { return document.getElementsByTagName("html")[0].innerHTML; })()';
   cJavaScriptNullResult = 'null';
@@ -29,14 +43,25 @@ const
     '  } return false;'#13#10 +
     '})()';
   cJavaScriptRemoveBlankTargets = '(function() { '#13#10 +
-    ' document.querySelectorAll("a").forEach(anchor => { '#13#10 +
-    '   anchor.removeAttribute("target"); '#13#10 +
-    ' }); '#13#10 +
+    '  document.querySelectorAll("a").forEach(anchor => { '#13#10 +
+    '    anchor.removeAttribute("target"); '#13#10 +
+    '  }); '#13#10 +
     '})()';
-
-const
-  cJSEventScheme = 'about'; // This is being used so as to support Android (EMBT's code otherwise interferes)
-  cJSEventProtocol = cJSEventScheme + '://';
+  // Parameters. Using "about:" works around an issue with TWebBrowser on Android
+  cJavaScriptSendEvent = 'var iframe = document.createElement("iframe"); '#13#10 +
+    '  iframe.setAttribute("src", "' + cJSEventProtocol + '%s"); '#13#10 +
+    '  document.documentElement.appendChild(iframe); '#13#10 +
+    '  iframe.parentNode.removeChild(iframe); '#13#10 +
+    '  iframe = null;';
+  // Element ID, Event name, Parameters
+  cJavaScriptAddEventById = '(function() { '#13#10 +
+    '  document.getElementById("%s").addEventListener("%s", function() {' +
+    '  console.log("Event triggered"); '#13#10 +
+    cJavaScriptSendEvent + #13#10 +
+    '    '#13#10 +
+    '  }); '#13#10 +
+    '  console.log("Event added"); '#13#10 +
+    '})()';
 
 type
   TJSEventParam = record
@@ -66,7 +91,8 @@ function IsTrue(const AJavaScriptResult: string): Boolean;
 implementation
 
 uses
-  System.SysUtils;
+  // RTL
+  System.SysUtils, System.NetEncoding;
 
 function IsTrue(const AJavaScriptResult: string): Boolean;
 begin
@@ -165,7 +191,7 @@ begin
   Params := [];
   if AURL.ToLower.StartsWith(cJSEventProtocol) then
   begin
-    LParts := AURL.Substring(cJSEventProtocol.Length).Split([':']);
+    LParts := TNetEncoding.URL.Decode(AURL.Substring(cJSEventProtocol.Length)).Split([':']);
     if Length(LParts) > 0 then
     begin
       Name := LParts[0].Replace('/', '');
