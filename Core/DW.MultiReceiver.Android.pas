@@ -86,7 +86,7 @@ uses
   {$IF CompilerVersion < 35}
   DW.Androidapi.JNI.SupportV4,
   {$ELSE}
-  DW.Androidapi.JNI.AndroidX.Content, DW.Androidapi.JNI.AndroidX.LocalBroadcastManager,
+  DW.Androidapi.JNI.AndroidX.LocalBroadcastManager,
   {$ENDIF}
   DW.Android.Helpers;
 
@@ -155,22 +155,16 @@ begin
 end;
 
 procedure TMultiReceiver.RegisterReceiver;
-{$IF CompilerVersion > 35}
 var
   LFlags: Integer;
-{$ENDIF}
 begin
   if not FLocal then
   begin
-    {$IF CompilerVersion > 35}
     // https://developer.android.com/about/versions/14/behavior-changes-14#runtime-receivers-exported
     LFlags := 0;
-    if HasNonSystemActions then
-      LFlags := TJContextCompat.JavaClass.RECEIVER_EXPORTED;
-    TJContextCompat.JavaClass.registerReceiver(TAndroidHelper.Context, FReceiver, FIntentFilter, LFlags);
-    {$ELSE}
-    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter);
-    {$ENDIF}
+    if TAndroidHelperEx.CheckBuildAndTarget(TAndroidHelperEx.UPSIDE_DOWN_CAKE) and HasNonSystemActions then
+      LFlags := TJContext.JavaClass.RECEIVER_EXPORTED;
+    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter, LFlags);
   end
   else
     TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FReceiver, FIntentFilter);
