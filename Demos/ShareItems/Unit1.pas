@@ -30,8 +30,7 @@ implementation
 {$R *.fmx}
 
 uses
-  System.IOUtils, System.Permissions,
-  DW.Consts.Android, DW.Permissions.Helpers;
+  System.IOUtils;
 
 { TForm1 }
 
@@ -61,13 +60,7 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  PermissionsService.RequestPermissions([cPermissionReadExternalStorage, cPermissionWriteExternalStorage],
-    procedure(const APermissions: TPermissionArray; const AGrantResults: TPermissionStatusArray)
-    begin
-      if AGrantResults.AreAllGranted then
-        Share;
-    end
-  );
+  Share;
 end;
 
 procedure TForm1.Share;
@@ -79,8 +72,7 @@ begin
   // FShareItems.AddText('Share Test');
   // Uncomment the following line and comment out the next one, to test sharing of a file
   // FShareItems.AddFile(TPath.Combine(TPath.GetDocumentsPath, LSharedFileName));
-  FShareItems.AddImage(Image1.Bitmap); // On Android, don't attempt to share an image as well as text
-  // FShareItems.AddImage(Image1.Bitmap); // On Android, don't attempt to share an image as well as text
+  FShareItems.AddImage(Image1.Bitmap);
   FShareItems.Share(Button1, FExcluded);
 end;
 

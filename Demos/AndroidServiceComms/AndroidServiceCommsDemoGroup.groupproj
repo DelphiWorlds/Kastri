@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{CD2F57EA-E050-4D85-A845-F4F206FA07DB}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="AndroidServiceCommsDemo.dproj">
+            <Dependencies>Service\AndroidServiceCommsDemoService.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Service\AndroidServiceCommsDemoService.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="AndroidServiceCommsDemo" DependsOnTargets="AndroidServiceCommsDemoService">
+        <MSBuild Projects="AndroidServiceCommsDemo.dproj"/>
+    </Target>
+    <Target Name="AndroidServiceCommsDemo:Clean" DependsOnTargets="AndroidServiceCommsDemoService:Clean">
+        <MSBuild Projects="AndroidServiceCommsDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AndroidServiceCommsDemo:Make" DependsOnTargets="AndroidServiceCommsDemoService:Make">
+        <MSBuild Projects="AndroidServiceCommsDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AndroidServiceCommsDemoService">
+        <MSBuild Projects="Service\AndroidServiceCommsDemoService.dproj"/>
+    </Target>
+    <Target Name="AndroidServiceCommsDemoService:Clean">
+        <MSBuild Projects="Service\AndroidServiceCommsDemoService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AndroidServiceCommsDemoService:Make">
+        <MSBuild Projects="Service\AndroidServiceCommsDemoService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="AndroidServiceCommsDemo;AndroidServiceCommsDemoService"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="AndroidServiceCommsDemo:Clean;AndroidServiceCommsDemoService:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="AndroidServiceCommsDemo:Make;AndroidServiceCommsDemoService:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

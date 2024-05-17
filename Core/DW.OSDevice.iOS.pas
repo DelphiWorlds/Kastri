@@ -6,12 +6,10 @@ unit DW.OSDevice.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -37,6 +35,7 @@ type
     class function GetUniqueDeviceID: string; static;
     class function IsLocationServiceEnabled: Boolean; static;
     class function IsScreenLocked: Boolean; static;
+    class function IsTablet: Boolean; static;
     class function IsTouchDevice: Boolean; static;
     class procedure OpenURL(const AURL: string); static;
     class procedure OpenAppSettings; static;
@@ -118,6 +117,11 @@ end;
 class function TPlatformOSDevice.IsScreenLocked: Boolean;
 begin
   Result := False; // To be implemented
+end;
+
+class function TPlatformOSDevice.IsTablet: Boolean;
+begin
+  Result := TiOSHelper.CurrentDevice.userInterfaceIdiom = UIUserInterfaceIdiomPad;
 end;
 
 class function TPlatformOSDevice.IsTouchDevice: Boolean;

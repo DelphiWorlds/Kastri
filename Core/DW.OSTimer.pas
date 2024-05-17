@@ -6,12 +6,10 @@ unit DW.OSTimer;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -168,7 +166,7 @@ var
 begin
   LTimer := GetTimer(ATimer.TimerID);
   LTimer.RemoveTimer;
-  LTimer.DisposeOf;
+  LTimer.Free;
 end;
 
 class function TCustomPlatformOSTimer.GetTimer(const ATimerID: Cardinal): TCustomPlatformOSTimer;

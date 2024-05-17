@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="256dp"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/notification_custom_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textStyle="bold"
+        style="@android:style/TextAppearance.Material.Notification.Title"/>
+    <TextView
+        android:id="@+id/notification_custom_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Body"
+        android:ellipsize="end"
+        android:maxLines="5"
+        android:layout_marginTop="8dp"
+        style="@android:style/TextAppearance.Material.Notification"/>
+    <ImageView
+        android:id="@+id/notification_custom_image"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:scaleType="fitStart"/>
+</LinearLayout>

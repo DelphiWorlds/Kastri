@@ -6,12 +6,11 @@ unit DW.ADB;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // NOTE: This unit is dependent on DW.RunProcess.Win, which is dependent on JCL/JVCL:
 //   https://github.com/project-jedi/jcl

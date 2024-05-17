@@ -33,6 +33,7 @@ object frmMain: TfrmMain
     Size.Width = 442.000000000000000000
     Size.Height = 20.000000000000000000
     Size.PlatformDefault = False
+    TextSettings.Trimming = None
     TabOrder = 1
   end
   object BottomLayout: TLayout
@@ -49,7 +50,25 @@ object frmMain: TfrmMain
       Size.PlatformDefault = False
       TabOrder = 0
       Text = 'Record'
+      TextSettings.Trimming = None
       OnClick = RecordButtonClick
+    end
+    object BottomContentsLayout: TLayout
+      Align = Contents
+      Size.Width = 450.000000000000000000
+      Size.Height = 59.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object ContinuousCheckBox: TCheckBox
+        Align = Left
+        Margins.Left = 12.000000000000000000
+        Position.X = 12.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 59.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Text = 'Continuous'
+      end
     end
   end
 end

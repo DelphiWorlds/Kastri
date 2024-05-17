@@ -6,14 +6,14 @@ unit DW.BarcodeReader;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
+
+{$SCOPEDENUMS ON}
 
 uses
   // FMX
@@ -53,8 +53,8 @@ type
   private
     FPlatformReader: TCustomPlatformBarcodeReader;
     FOnBarcode: TBarcodeEvent;
-    procedure SetFormats(const Value: TBarcodeFormats);
     function GetFormats: TBarcodeFormats;
+    procedure SetFormats(const Value: TBarcodeFormats);
   protected
     procedure DoBarcodes(const ABarcodes: TBarcodes; const AError: string);
   public

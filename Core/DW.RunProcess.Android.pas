@@ -6,12 +6,11 @@ unit DW.RunProcess.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // NOTE: This unit is a work in progress, hence a number of log statements remaining
 //   It is unknown whether the Write and WriteLine methods actually work

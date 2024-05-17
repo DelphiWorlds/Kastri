@@ -1,6 +1,12 @@
 # Firebase Cloud Messaging (FCM) Demo
 
-A new, simplified FCM implementation is being worked on, which you can find [here](https://github.com/DelphiWorlds/Playground/tree/main/Demos/FCMRebooted). The new implementation is targeted at Delphi 11.x, however it might be possible to make it work on earlier versions.
+## **NOTE**
+
+**This implementation is now considered legacy, and should be used only in Delphi 10.3.3 or earlier.**
+
+You can find the newer implementation [here](https://github.com/DelphiWorlds/Playground/tree/main/Demos/FCMRebooted).
+
+_No further changes will be made to this demo, or the code that it uses_
 
 ## IMPORTANT change for iOS users
 

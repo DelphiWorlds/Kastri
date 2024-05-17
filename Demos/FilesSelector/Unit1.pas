@@ -52,7 +52,7 @@ uses
   {$IF Defined(ANDROID)}
   DW.Android.Helpers,
   {$ENDIF}
-  System.Permissions,
+  System.Permissions, System.IOUtils,
   FMX.TextLayout,
   DW.UIHelper;
 
@@ -84,6 +84,7 @@ begin
   TabControl.ActiveTab := FilesTab;
   FSelector := TFilesSelector.Create;
   FSelector.Title := 'Select a file';
+  FSelector.DocumentsFolder := TPath.Combine(TPath.GetDocumentsPath, 'TempFiles');
   FSelector.OnComplete := SelectorCompleteHandler;
   FSelector.OnImageStream := SelectorImageStreamHandler;
 end;
@@ -170,7 +171,10 @@ procedure TForm1.SelectorImageStreamHandler(Sender: TObject; const AFileName: st
 var
   LImage: TImage;
 begin
-  TOSLog.d('Photo stream: %s', [AFileName]);
+  // **** This routine handles photos *and* videos. ****
+  // If the result is a video, AFileName will contain the *full* path to a copy of the original (it uses the DocumentsFolder property)
+  //   and AImageStream will be a *preview* image
+  DisplayNameLabel.Text := TPath.GetFileName(AFileName);
   TabControl.ActiveTab := PhotosTab;
   LImage := TImage.Create(Self);
   LImage.Width := PhotosFlowLayout.Width / 3;

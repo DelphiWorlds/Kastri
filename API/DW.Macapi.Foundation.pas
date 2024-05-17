@@ -6,12 +6,10 @@ unit DW.Macapi.Foundation;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -30,6 +28,10 @@ const
   NSJSONWritingSortedKeys = 1 shl 1;
   NSJSONWritingFragmentsAllowed = 1 shl 2;
   NSJSONWritingWithoutEscapingSlashes = 1 shl 3;
+  NSKeyValueObservingOptionNew = 1;
+  NSKeyValueObservingOptionOld = 2;
+  NSKeyValueObservingOptionInitial = 4;
+  NSKeyValueObservingOptionPrior = 8;
 
 type
   NSData = interface;
@@ -59,6 +61,14 @@ type
   NSProgressUserInfoKey = NSString;
   NSProgressFileOperationKind = NSString;
   NSQualityOfService = NSInteger;
+  NSUserActivityPersistentIdentifier = NSString;
+  PNSRange = ^NSRange;
+  NSRangePointer = PNSRange;
+  NSFileProtectionType = NSString;
+  NSAttributedStringKey = NSString;
+  NSKeyValueSetMutationKind = NSInteger;
+  NSErrorUserInfoKey = NSString;
+  NSKeyValueObservingOptions = NSInteger;
 
   NSProgressUnpublishingHandler = procedure of object;
   NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
@@ -69,6 +79,8 @@ type
   TNSProgressBlockMethod4 = procedure of object;
   TNSDataBlockMethod1 = procedure(bytes: Pointer; byteRange: NSRange; stop: PBoolean) of object;
   TNSDataBlockMethod2 = procedure(bytes: Pointer; length: NSUInteger) of object;
+  TNSUserActivityBlockMethod1 = procedure(inputStream: NSInputStream; outputStream: NSOutputStream; error: NSError) of object;
+  TNSUserActivityBlockMethod2 = procedure of object;
 
   NSDataClass = interface(NSObjectClass)
     ['{D4B36676-DE03-44A5-B04E-D4CC6BB4E9B2}']
@@ -382,6 +394,57 @@ type
     procedure setPhoneticRepresentation(phoneticRepresentation: NSPersonNameComponents); cdecl;
   end;
   TNSPersonNameComponents = class(TOCGenericImport<NSPersonNameComponentsClass, NSPersonNameComponents>) end;
+
+  NSUserActivityClass = interface(NSObjectClass)
+    ['{412EAEBF-5927-4D01-B83F-69D3B5DFE7B5}']
+    {class} procedure deleteAllSavedUserActivitiesWithCompletionHandler(handler: TNSUserActivityBlockMethod2); cdecl;
+    [MethodName('deleteSavedUserActivitiesWithPersistentIdentifiers:completionHandler:')]
+    {class} procedure deleteSavedUserActivitiesWithPersistentIdentifiers(persistentIdentifiers: NSArray; handler: TNSUserActivityBlockMethod2); cdecl;
+  end;
+
+  NSUserActivity = interface(NSObject)
+    ['{B8C2F6C9-31FE-4282-B7CA-98C96E163033}']
+    function activityType: NSString; cdecl;
+    procedure addUserInfoEntriesFromDictionary(otherDictionary: NSDictionary); cdecl;
+    procedure becomeCurrent; cdecl;
+    function delegate: Pointer; cdecl;
+    function expirationDate: NSDate; cdecl;
+    procedure getContinuationStreamsWithCompletionHandler(completionHandler: TNSUserActivityBlockMethod1); cdecl;
+    function initWithActivityType(activityType: NSString): Pointer; cdecl;
+    procedure invalidate; cdecl;
+    function isEligibleForHandoff: Boolean; cdecl;
+    function isEligibleForPrediction: Boolean; cdecl;
+    function isEligibleForPublicIndexing: Boolean; cdecl;
+    function isEligibleForSearch: Boolean; cdecl;
+    function keywords: NSSet; cdecl;
+    function needsSave: Boolean; cdecl;
+    function persistentIdentifier: NSUserActivityPersistentIdentifier; cdecl;
+    function referrerURL: NSURL; cdecl;
+    function requiredUserInfoKeys: NSSet; cdecl;
+    procedure resignCurrent; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setEligibleForHandoff(eligibleForHandoff: Boolean); cdecl;
+    procedure setEligibleForPrediction(eligibleForPrediction: Boolean); cdecl;
+    procedure setEligibleForPublicIndexing(eligibleForPublicIndexing: Boolean); cdecl;
+    procedure setEligibleForSearch(eligibleForSearch: Boolean); cdecl;
+    procedure setExpirationDate(expirationDate: NSDate); cdecl;
+    procedure setKeywords(keywords: NSSet); cdecl;
+    procedure setNeedsSave(needsSave: Boolean); cdecl;
+    procedure setPersistentIdentifier(persistentIdentifier: NSUserActivityPersistentIdentifier); cdecl;
+    procedure setReferrerURL(referrerURL: NSURL); cdecl;
+    procedure setRequiredUserInfoKeys(requiredUserInfoKeys: NSSet); cdecl;
+    procedure setSupportsContinuationStreams(supportsContinuationStreams: Boolean); cdecl;
+    procedure setTargetContentIdentifier(targetContentIdentifier: NSString); cdecl;
+    procedure setTitle(title: NSString); cdecl;
+    procedure setUserInfo(userInfo: NSDictionary); cdecl;
+    procedure setWebpageURL(webpageURL: NSURL); cdecl;
+    function supportsContinuationStreams: Boolean; cdecl;
+    function targetContentIdentifier: NSString; cdecl;
+    function title: NSString; cdecl;
+    function userInfo: NSDictionary; cdecl;
+    function webpageURL: NSURL; cdecl;
+  end;
+  TNSUserActivity = class(TOCGenericImport<NSUserActivityClass, NSUserActivity>) end;
 
 implementation
 

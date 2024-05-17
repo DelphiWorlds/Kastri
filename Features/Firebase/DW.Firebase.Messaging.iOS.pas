@@ -6,12 +6,10 @@ unit DW.Firebase.Messaging.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -89,6 +87,11 @@ begin
   Result := StrToNSStr(AString).dataUsingEncoding(NSUTF8StringEncoding);
 end;
 
+function UserNotificationCenter: UNUserNotificationCenter;
+begin
+  Result := TUNUserNotificationCenter.OCClass.currentNotificationCenter;
+end;
+
 { TFIRMessagingDelegate }
 
 constructor TFIRMessagingDelegate.Create(const AFirebaseMessaging: TPlatformFirebaseMessaging);
@@ -143,7 +146,6 @@ function TPlatformFirebaseMessaging.Start: Boolean;
 begin
   Result := False;
   try
-    TFirebaseCommon.Initialize;
     FFIRMessagingDelegate := TFIRMessagingDelegate.Create(self);
     Messaging.setDelegate(FFIRMessagingDelegate.GetObjectID);
     Result := True;

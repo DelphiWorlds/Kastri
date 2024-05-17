@@ -6,12 +6,10 @@ unit DW.Androidapi.JNI.DWMultiBroadcastReceiver;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -28,6 +26,7 @@ type
     {class} function _GetACTION_SERVICE_ALARM: JString; cdecl;
     {class} function _GetEXTRA_NOTIFICATION: JString; cdecl;
     {class} function _GetEXTRA_NOTIFICATION_ID: JString; cdecl;
+    {class} function _GetEXTRA_NOTIFICATION_IMAGE: JString; cdecl;
     {class} function _GetEXTRA_NOTIFICATION_NAME: JString; cdecl;
     {class} function _GetEXTRA_NOTIFICATION_REPEATINTERVAL: JString; cdecl;
     {class} function init: JDWMultiBroadcastReceiver; cdecl;
@@ -35,6 +34,7 @@ type
     {class} property ACTION_SERVICE_ALARM: JString read _GetACTION_SERVICE_ALARM;
     {class} property EXTRA_NOTIFICATION: JString read _GetEXTRA_NOTIFICATION;
     {class} property EXTRA_NOTIFICATION_ID: JString read _GetEXTRA_NOTIFICATION_ID;
+    {class} property EXTRA_NOTIFICATION_IMAGE: JString read _GetEXTRA_NOTIFICATION_IMAGE;
     {class} property EXTRA_NOTIFICATION_NAME: JString read _GetEXTRA_NOTIFICATION_NAME;
     {class} property EXTRA_NOTIFICATION_REPEATINTERVAL: JString read _GetEXTRA_NOTIFICATION_REPEATINTERVAL;
   end;

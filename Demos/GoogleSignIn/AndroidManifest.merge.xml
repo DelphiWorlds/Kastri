@@ -1,0 +1,13 @@
+<manifest xmlns:merge="http://www.delphiworlds.com/xmlns/merge" xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+    <activity android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+      android:excludeFromRecents="true"
+      android:exported="false"
+      android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+    <service android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+      android:exported="true"
+      android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+      android:visibleToInstantApps="true" />
+  </application>
+</manifest>

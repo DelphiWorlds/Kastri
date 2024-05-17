@@ -6,24 +6,21 @@ unit DW.OSTimer.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
 uses
   // macOS
   Macapi.ObjectiveC,
-  {$IF Defined(MACDEV)}
-  Macapi.Foundation,
-  {$ENDIF}
   // iOS
   {$IF Defined(IOS)}
   iOSapi.Foundation,
+  {$ELSEIF Defined(MACOS)}
+  Macapi.Foundation,
   {$ENDIF}
   // DW
   DW.OSTimer;

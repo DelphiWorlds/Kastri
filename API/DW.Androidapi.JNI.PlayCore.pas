@@ -6,12 +6,11 @@ unit DW.Androidapi.JNI.PlayCore;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // Imported from https://mvnrepository.com/artifact/com.google.android.play/core/1.10.0
 
@@ -900,7 +899,7 @@ type
     function addOnCompleteListener(listener: JOnCompleteListener): JTask; cdecl; overload;
     function addOnCompleteListener(executor: JExecutor; listener: JOnCompleteListener): JTask; cdecl; overload;
     function addOnFailureListener(listener: JOnFailureListener): JTask; cdecl; overload;
-    function addOnFailureListener(executor: JExecutor; lonFailureListener: JOnFailureListener): JTask; cdecl; overload;
+    function addOnFailureListener(executor: JExecutor; listener: JOnFailureListener): JTask; cdecl; overload;
     function addOnSuccessListener(listener: JOnSuccessListener): JTask; cdecl; overload;
     function addOnSuccessListener(executor: JExecutor; listener: JOnSuccessListener): JTask; cdecl; overload;
     function getException: JException; cdecl;

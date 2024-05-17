@@ -6,12 +6,10 @@ unit DW.SMS.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -66,8 +64,6 @@ uses
   System.Permissions, System.SysUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNI.Support, Androidapi.JNI.Net, Androidapi.JNI.Provider,
-  // FMX
-  FMX.Platform,
   // DW
   DW.OSLog, DW.Consts.Android, DW.Permissions.Helpers;
 

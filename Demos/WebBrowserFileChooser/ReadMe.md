@@ -4,15 +4,17 @@
 
 Demonstrates the implementation of handling choosing of files when tapping an upload link in a page in `TWebBrowser`, on Android
 
-The code/demo was built for Delphi 11.x, however it should also work in Delphi 10.4.2, and perhaps earlier.
+## Supported Delphi versions
+
+Delphi 12, Delphi 11.x. May also work 10.4.x or earlier.
 
 ## Project Configuration
 
-When configuring your own project for Android, please add `dw-webchromeclient.jar` from the `Lib` folder in Kastri to the Libraries node of the Android 32-bit target in Project Manager.
+When configuring your own project for Android, please add `dw-webchromeclient.jar` from the `Lib` folder in Kastri to the Libraries node of the Android target in Project Manager.
 
-**Note if using Delphi 11.3** (as at May 16th, 2023):
+**Note**:
 
-Due to a bug in Delphi 11.3, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy `dw-webchromeclient.jar` to _another folder_, and add it to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file to Android 64-bit does _not_ work)
+Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
 
 ## Usage
 

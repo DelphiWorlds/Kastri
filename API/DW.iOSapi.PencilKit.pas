@@ -6,12 +6,10 @@ unit DW.iOSapi.PencilKit;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -22,11 +20,15 @@ uses
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics;
 
 const
+  PKContentVersion1 = 1;
+  PKContentVersion2 = 2;
+  PKContentVersionLatest = PKContentVersion2;
   PKCanvasViewDrawingPolicyDefault = 0;
   PKCanvasViewDrawingPolicyAnyInput = 1;
   PKCanvasViewDrawingPolicyPencilOnly = 2;
   PKEraserTypeVector = 0;
   PKEraserTypeBitmap = 1;
+  PKEraserTypeFixedWidthBitmap = 2;
 
 type
   PKToolPickerObserver = interface;
@@ -45,6 +47,7 @@ type
   PKInk = interface;
 
   PBoolean = ^Boolean;
+  PKContentVersion = NSInteger;
   PKCanvasViewDrawingPolicy = NSInteger;
   PKEraserType = NSInteger;
   PKInkType = NSString;
@@ -70,10 +73,12 @@ type
     function frameObscuredInView(view: UIView): CGRect; cdecl;
     function isRulerActive: Boolean; cdecl;
     function isVisible: Boolean; cdecl;
+    function maximumSupportedContentVersion: PKContentVersion; cdecl;
     function overrideUserInterfaceStyle: UIUserInterfaceStyle; cdecl;
     procedure removeObserver(observer: Pointer); cdecl;
     function selectedTool: PKTool; cdecl;
     procedure setColorUserInterfaceStyle(colorUserInterfaceStyle: UIUserInterfaceStyle); cdecl;
+    procedure setMaximumSupportedContentVersion(maximumSupportedContentVersion: PKContentVersion); cdecl;
     procedure setOverrideUserInterfaceStyle(overrideUserInterfaceStyle: UIUserInterfaceStyle); cdecl;
     procedure setRulerActive(rulerActive: Boolean); cdecl;
     procedure setSelectedTool(selectedTool: PKTool); cdecl;
@@ -105,10 +110,12 @@ type
     function drawingGestureRecognizer: UIGestureRecognizer; cdecl;
     function drawingPolicy: PKCanvasViewDrawingPolicy; cdecl;
     function isRulerActive: Boolean; cdecl;
+    function maximumSupportedContentVersion: PKContentVersion; cdecl;
     procedure setAllowsFingerDrawing(allowsFingerDrawing: Boolean); cdecl; // API_DEPRECATED("Use 'drawingPolicy' property.", ios(13_0, 14_0))
     procedure setDelegate(delegate: Pointer); cdecl;
     procedure setDrawing(drawing: PKDrawing); cdecl;
     procedure setDrawingPolicy(drawingPolicy: PKCanvasViewDrawingPolicy); cdecl;
+    procedure setMaximumSupportedContentVersion(maximumSupportedContentVersion: PKContentVersion); cdecl;
     procedure setRulerActive(rulerActive: Boolean); cdecl;
     procedure setTool(tool: PKTool); cdecl;
     function tool: PKTool; cdecl;
@@ -135,12 +142,17 @@ type
 
   PKEraserToolClass = interface(PKToolClass)
     ['{9351FE77-D1ED-4A8B-96A6-BCFCF300D08A}']
+    {class} function defaultWidthForEraserType(eraserType: PKEraserType): CGFloat; cdecl;
+    {class} function maximumWidthForEraserType(eraserType: PKEraserType): CGFloat; cdecl;
+    {class} function minimumWidthForEraserType(eraserType: PKEraserType): CGFloat; cdecl;
   end;
 
   PKEraserTool = interface(PKTool)
     ['{18C54BAB-2872-4B2A-B4FB-97D23798A1D0}']
     function eraserType: PKEraserType; cdecl;
-    function initWithEraserType(eraserType: PKEraserType): Pointer; cdecl;
+    function initWithEraserType(eraserType: PKEraserType; width: CGFloat): Pointer; overload; cdecl;
+    function initWithEraserType(eraserType: PKEraserType): Pointer; overload; cdecl;
+    function width: CGFloat; cdecl;
   end;
   TPKEraserTool = class(TOCGenericImport<PKEraserToolClass, PKEraserTool>) end;
 
@@ -160,6 +172,7 @@ type
     function initWithInkType(&type: PKInkType; color: UIColor; width: CGFloat): Pointer; overload; cdecl;
     function ink: PKInk; cdecl;
     function inkType: PKInkType; cdecl;
+    function requiredContentVersion: PKContentVersion; cdecl;
     function width: CGFloat; cdecl;
   end;
   TPKInkingTool = class(TOCGenericImport<PKInkingToolClass, PKInkingTool>) end;
@@ -178,6 +191,7 @@ type
     function imageFromRect(rect: CGRect; scale: CGFloat): UIImage; cdecl;
     function initWithData(data: NSData; error: PPointer): Pointer; cdecl;
     function initWithStrokes(strokes: NSArray): Pointer; cdecl;
+    function requiredContentVersion: PKContentVersion; cdecl;
     function strokes: NSArray; cdecl;
   end;
   TPKDrawing = class(TOCGenericImport<PKDrawingClass, PKDrawing>) end;
@@ -188,12 +202,16 @@ type
 
   PKStroke = interface(NSObject)
     ['{0B26287E-94CC-4C2E-A3BF-DC36A6E7DD2D}']
-    function initWithInk(ink: PKInk; strokePath: PKStrokePath; transform: CGAffineTransform; mask: UIBezierPath): Pointer; cdecl;
+    function initWithInk(ink: PKInk; strokePath: PKStrokePath; transform: CGAffineTransform; mask: UIBezierPath): Pointer; overload; cdecl;
+    function initWithInk(ink: PKInk; strokePath: PKStrokePath; transform: CGAffineTransform; mask: UIBezierPath;
+      randomSeed: UInt32): Pointer; overload; cdecl;
     function ink: PKInk; cdecl;
     function mask: UIBezierPath; cdecl;
     function maskedPathRanges: NSArray; cdecl;
     function path: PKStrokePath; cdecl;
+    function randomSeed: UInt32; cdecl;
     function renderBounds: CGRect; cdecl;
+    function requiredContentVersion: PKContentVersion; cdecl;
     function transform: CGAffineTransform; cdecl;
   end;
   TPKStroke = class(TOCGenericImport<PKStrokeClass, PKStroke>) end;
@@ -231,9 +249,9 @@ type
     function interpolatedLocationAt(parametricValue: CGFloat): CGPoint; cdecl;
     function interpolatedPointAt(parametricValue: CGFloat): PKStrokePoint; cdecl;
     function objectAtIndexedSubscript(i: NSUInteger): PKStrokePoint; cdecl;
-    function parametricValue(parametricValue: CGFloat; offsetByTime: NSTimeInterval): CGFloat; overload; cdecl;
+    function parametricValue(parametricValue: CGFloat; offsetByTime: NSTimeInterval): CGFloat; cdecl;
     [MethodName('parametricValue:offsetByDistance:')]
-    function parametricValueOffsetByDistance(parametricValue: CGFloat; offsetByDistance: CGFloat): CGFloat; overload; cdecl;
+    function parametricValueOffsetByDistance(parametricValue: CGFloat; offsetByDistance: CGFloat): CGFloat; cdecl;
     function pointAtIndex(i: NSUInteger): PKStrokePoint; cdecl;
   end;
   TPKStrokePath = class(TOCGenericImport<PKStrokePathClass, PKStrokePath>) end;
@@ -248,9 +266,12 @@ type
     function azimuth: CGFloat; cdecl;
     function force: CGFloat; cdecl;
     function initWithLocation(location: CGPoint; timeOffset: NSTimeInterval; size: CGSize; opacity: CGFloat; force: CGFloat; azimuth: CGFloat;
-      altitude: CGFloat): Pointer; cdecl;
+      altitude: CGFloat): Pointer; overload; cdecl;
+    function initWithLocation(location: CGPoint; timeOffset: NSTimeInterval; size: CGSize; opacity: CGFloat; force: CGFloat; azimuth: CGFloat;
+      altitude: CGFloat; secondaryScale: CGFloat): Pointer; overload; cdecl;
     function location: CGPoint; cdecl;
     function opacity: CGFloat; cdecl;
+    function secondaryScale: CGFloat; cdecl;
     function size: CGSize; cdecl;
     function timeOffset: NSTimeInterval; cdecl;
   end;
@@ -265,12 +286,17 @@ type
     function color: UIColor; cdecl;
     function initWithInkType(&type: PKInkType; color: UIColor): Pointer; cdecl;
     function inkType: PKInkType; cdecl;
+    function requiredContentVersion: PKContentVersion; cdecl;
   end;
   TPKInk = class(TOCGenericImport<PKInkClass, PKInk>) end;
 
 function PKInkTypePen: PKInkType;
 function PKInkTypePencil: PKInkType;
 function PKInkTypeMarker: PKInkType;
+function PKInkTypeMonoline: PKInkType;
+function PKInkTypeFountainPen: PKInkType;
+function PKInkTypeWatercolor: PKInkType;
+function PKInkTypeCrayon: PKInkType;
 function PKAppleDrawingTypeIdentifier: CFStringRef;
 
 const
@@ -298,6 +324,26 @@ end;
 function PKInkTypeMarker: PKInkType;
 begin
   Result := CocoaNSStringConst(libPencilKit, 'PKInkTypeMarker');
+end;
+
+function PKInkTypeMonoline: PKInkType;
+begin
+  Result := CocoaNSStringConst(libPencilKit, 'PKInkTypeMonoline');
+end;
+
+function PKInkTypeFountainPen: PKInkType;
+begin
+  Result := CocoaNSStringConst(libPencilKit, 'PKInkTypeFountainPen');
+end;
+
+function PKInkTypeWatercolor: PKInkType;
+begin
+  Result := CocoaNSStringConst(libPencilKit, 'PKInkTypeWatercolor');
+end;
+
+function PKInkTypeCrayon: PKInkType;
+begin
+  Result := CocoaNSStringConst(libPencilKit, 'PKInkTypeCrayon');
 end;
 
 function PKAppleDrawingTypeIdentifier: CFStringRef;

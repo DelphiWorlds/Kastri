@@ -4,7 +4,9 @@
 
 Demonstrates implementation of starting an app at boot time on Android.
 
-There are 2 projects, one for Delphi 10.4.2 or earlier (`AndroidStartAtBoot.dproj`), and one for Delphi 11.x or later. (`AndroidStartAtBootD11.dproj`)
+## Supported Delphi versions
+
+Delphi 12, Delphi 11.x, Delphi 12. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
 
 ## Project Configuration
 
@@ -19,9 +21,13 @@ Start at boot requires these permissions to be checked in the Project Options:
 
 ### Android libraries
 
-Add the [`dw-kastri-base-2.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base-2.0.0.jar) library to the Libraries node, under the Android target in Project Manager.
+Add the Kastri base jar:
 
-If using Delphi 10.4.2 or earlier, add [`dw-kastri-base.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base.jar) instead.
+* Delphi 10.4.2 or earlier: [`dw-kastri-base.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base.jar)
+* Delphi 11.x: [`dw-kastri-base-2.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base-2.0.0.jar) 
+* Delphi 12: [`dw-kastri-base-3.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base-3.0.0.jar) 
+ 
+..to the Libraries node, under the Android target in Project Manager.
 
 ### Build Events
 
@@ -29,7 +35,7 @@ Please refer to the Build Events section of the Project Options of the demo. The
 
 ### Startup notification resource
 
-By default, the notification sent at startup (required on Android x or higher) is: 
+By default, the notification sent at startup (required on Android 8 or higher) is: 
 
 * Title: "Start At Boot"
 * Body: "Please tap this notification for the application to start"

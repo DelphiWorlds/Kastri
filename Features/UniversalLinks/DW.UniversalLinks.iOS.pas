@@ -6,12 +6,10 @@ unit DW.UniversalLinks.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -64,7 +62,7 @@ begin
         LURL := string.Empty;
       LContext := TOpenApplicationContext.Create(LURL);
       LMessage := TApplicationEventMessage.Create(TApplicationEventData.Create(TApplicationEvent.OpenURL, LContext));
-      TMessageManager.DefaultManager.SendMessage(nil, LMessage);
+      TMessageManager.DefaultManager.SendMessage(nil, LMessage, True);
     end;
   end;
 end;

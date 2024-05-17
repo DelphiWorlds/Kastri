@@ -6,12 +6,10 @@ unit DW.StyleHelpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -27,7 +25,7 @@ type
     /// <summary>
     ///   Loads a stylebook from a resource compiled (default name: StyleBook) into the application
     /// </summary>
-    procedure LoadFromResource(const AResourceName: string = '');
+    function LoadFromResource(const AResourceName: string = ''): Boolean;
   end;
 
   TStyleResource = record
@@ -60,11 +58,12 @@ const
 
 { TStyleBookHelper }
 
-procedure TStyleBookHelper.LoadFromResource(const AResourceName: string = '');
+function TStyleBookHelper.LoadFromResource(const AResourceName: string = ''): Boolean;
 var
   LStream: TStream;
   LResourceName: string;
 begin
+  Result := False;
   if LResourceName.IsEmpty then
     LResourceName := cStyleBookResourceNameDefault
   else
@@ -74,6 +73,7 @@ begin
     LStream := TResourceStream.Create(HInstance, LResourceName, RT_RCDATA);
     try
       LoadFromStream(LStream);
+      Result := True;
     finally
       LStream.Free;
     end;

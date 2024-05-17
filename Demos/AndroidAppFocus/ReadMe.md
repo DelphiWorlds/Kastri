@@ -4,6 +4,10 @@
 
 Demonstrates the use of the `DW.StartupHook.Android` unit in the `Core` folder
 
+## Supported Delphi versions
+
+Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
+
 ### Technical details
 
 Application events can be handled by using `TMessageManager` to `Subscribe` to events by using `TApplicationEventMessage`, however there are at least two events that are missing. 
@@ -19,7 +23,7 @@ Examples of when an app might "lose focus" but not ectually enter the background
 * The user swipes down from the top of the screen to display the settings icons, Notifications area etc
 * The user taps the microphone icon on the virtual keyboard to invoke Google Voice Typing
 
-There may be a number of other scenarios, however these can be common. 
+There may be a number of other scenarios, however the above scenarios can be common. 
 
 
 

@@ -6,12 +6,11 @@ unit DW.Macapi.Dispatch;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // This is an extension of the dispatch functions
 // See also: http://ridingdelphi.blogspot.com.au/2014/01/the-quest-to-migrate-ios-squarecam-app_3169.html
@@ -96,9 +95,7 @@ begin
   dispatch_sync_f(queue, LCallback, DispatchCallback);
 end;
 
-
 { TGrandCentral }
-
 
 class procedure TGrandCentral.DispatchAsync(const AProc: dispatch_work_t; const AQueue: dispatch_queue_t = 0);
 

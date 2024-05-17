@@ -6,12 +6,10 @@ unit DW.IOUtils.Helpers.Win;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -30,7 +28,7 @@ type
 
   TPlatformDirectory = record
   public
-    class function Delete(const ADirectory: string): Boolean; static;
+    class function Delete(const ADirectory: string; const ACanRecycle: Boolean): Boolean; static;
   end;
 
 implementation
@@ -111,16 +109,18 @@ end;
 
 { TPlatformDirectory }
 
-class function TPlatformDirectory.Delete(const ADirectory: string): Boolean;
+class function TPlatformDirectory.Delete(const ADirectory: string; const ACanRecycle: Boolean): Boolean;
 var
   LShFileOp: TSHFileOpStruct;
 begin
-  // Don't use this function in a service!!
-  LShFileOp.Wnd := GetDesktopWindow;
+  FillChar(LShFileOp, SizeOf(LShFileOp), 0);
   LShFileOp.wFunc := FO_DELETE;
   LShFileOp.pFrom := PChar(ADirectory + #0);
   LShFileOp.pTo := nil;
-  LShFileOp.fFlags := FOF_NO_UI;
+  if ACanRecycle then
+    LShFileOp.fFlags := FOF_ALLOWUNDO or FOF_NOCONFIRMATION or FOF_SILENT
+  else
+    LShFileOp.fFlags := FOF_NO_UI;
   Result := SHFileOperation(LShFileOp) = 0;
 end;
 

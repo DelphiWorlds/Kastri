@@ -6,12 +6,10 @@ unit DW.Consts.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -34,6 +32,7 @@ const
   cPermissionReceiveSMS = 'android.permission.RECEIVE_SMS';
   cPermissionReceiveWAPPush = 'android.permission.RECEIVE_WAP_PUSH';
   cPermissionRecordAudio = 'android.permission.RECORD_AUDIO';
+  cPermissionScheduleExactAlarm = 'android.permission.SCHEDULE_EXACT_ALARM';
   cPermissionSendSMS = 'android.permission.SEND_SMS';
   cPermissionUseFingerprint = 'android.permission.USE_FINGERPRINT';
   cPermissionWriteContacts = 'android.permission.WRITE_CONTACTS';

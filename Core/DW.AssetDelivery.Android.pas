@@ -6,17 +6,18 @@ unit DW.AssetDelivery.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // Based in part on:
 //   https://medium.com/mindful-engineering/google-play-asset-delivery-in-android-dcc2059e5a63
 
 interface
+
+{$SCOPEDENUMS ON}
 
 uses
   // Android

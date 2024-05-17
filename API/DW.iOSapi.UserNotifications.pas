@@ -6,18 +6,16 @@ unit DW.iOSapi.UserNotifications;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
 uses
   // macOS
-  Macapi.CoreFoundation, Macapi.ObjCRuntime, Macapi.ObjectiveC,
+  Macapi.ObjectiveC, Macapi.CoreFoundation,
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreLocation;
 
@@ -31,374 +29,425 @@ const
   UNErrorCodeAttachmentCorrupt = 105;
   UNErrorCodeNotificationInvalidNoDate = 1400;
   UNErrorCodeNotificationInvalidNoContent = 1401;
-  UNNotificationActionOptionAuthenticationRequired = (1 shl 0);
-  UNNotificationActionOptionDestructive = (1 shl 1);
-  UNNotificationActionOptionForeground = (1 shl 2);
-  UNNotificationCategoryOptionNone = (0);
-  UNNotificationCategoryOptionCustomDismissAction = (1 shl 0);
-  UNNotificationCategoryOptionAllowInCarPlay = (2 shl 0);
+  UNErrorCodeContentProvidingObjectNotAllowed = 1500;
+  UNErrorCodeContentProvidingInvalid = 1501;
+  UNErrorCodeBadgeInputInvalid = 1600;
+  UNNotificationActionOptionAuthenticationRequired = 1;
+  UNNotificationActionOptionDestructive = 2;
+  UNNotificationActionOptionForeground = 4;
+  UNNotificationCategoryOptionCustomDismissAction = 1;
+  UNNotificationCategoryOptionAllowInCarPlay = 2;
+  UNNotificationCategoryOptionHiddenPreviewsShowTitle = 4;
+  UNNotificationCategoryOptionHiddenPreviewsShowSubtitle = 8;
+  UNNotificationCategoryOptionAllowAnnouncement = 16;
+  UNNotificationInterruptionLevelPassive = 0;
+  UNNotificationInterruptionLevelActive = 1;
+  UNNotificationInterruptionLevelTimeSensitive = 2;
+  UNNotificationInterruptionLevelCritical = 3;
   UNAuthorizationStatusNotDetermined = 0;
   UNAuthorizationStatusDenied = 1;
   UNAuthorizationStatusAuthorized = 2;
+  UNAuthorizationStatusProvisional = 3;
+  UNAuthorizationStatusEphemeral = 4;
+  UNShowPreviewsSettingAlways = 0;
+  UNShowPreviewsSettingWhenAuthenticated = 1;
+  UNShowPreviewsSettingNever = 2;
   UNNotificationSettingNotSupported = 0;
   UNNotificationSettingDisabled = 1;
   UNNotificationSettingEnabled = 2;
   UNAlertStyleNone = 0;
   UNAlertStyleBanner = 1;
   UNAlertStyleAlert = 2;
-  UNAuthorizationOptionBadge = (1 shl 0);
-  UNAuthorizationOptionSound = (1 shl 1);
-  UNAuthorizationOptionAlert = (1 shl 2);
-  UNAuthorizationOptionCarPlay = (1 shl 3);
-  UNAuthorizationOptionCriticalAlert = (1 shl 4);
-  UNAuthorizationOptionProvidesAppNotificationSettings = (1 shl 5);
-  UNAuthorizationOptionProvisional = (1 shl 6);
-  UNNotificationPresentationOptionBadge = (1 shl 0);
-  UNNotificationPresentationOptionSound = (1 shl 1);
-  UNNotificationPresentationOptionAlert = (1 shl 2);
-  UNNotificationPresentationOptionNone = 0;
+  UNAuthorizationOptionBadge = 1;
+  UNAuthorizationOptionSound = 2;
+  UNAuthorizationOptionAlert = 4;
+  UNAuthorizationOptionCarPlay = 8;
+  UNAuthorizationOptionCriticalAlert = 16;
+  UNAuthorizationOptionProvidesAppNotificationSettings = 32;
+  UNAuthorizationOptionProvisional = 64;
+  UNAuthorizationOptionAnnouncement = 128;
+  UNAuthorizationOptionTimeSensitive = 256;
+  UNNotificationPresentationOptionBadge = 1;
+  UNNotificationPresentationOptionSound = 2;
+  UNNotificationPresentationOptionAlert = 4;
+  UNNotificationPresentationOptionList = 8;
+  UNNotificationPresentationOptionBanner = 16;
 
 type
-  UNUserNotificationCenterSupport = interface;
-  UNNotificationRequest = interface;
   UNNotification = interface;
   UNNotificationAction = interface;
   UNTextInputNotificationAction = interface;
+  UNNotificationActionIcon = interface;
   UNNotificationAttachment = interface;
   UNNotificationCategory = interface;
-  UNNotificationSound = interface;
+  UNNotificationContentProviding = interface;
   UNNotificationContent = interface;
   UNMutableNotificationContent = interface;
-  UNNotificationTrigger = interface;
+  UNNotificationRequest = interface;
   UNNotificationResponse = interface;
   UNTextInputNotificationResponse = interface;
   UNNotificationServiceExtension = interface;
   UNNotificationSettings = interface;
+  UNNotificationSound = interface;
+  UNNotificationTrigger = interface;
   UNPushNotificationTrigger = interface;
   UNTimeIntervalNotificationTrigger = interface;
   UNCalendarNotificationTrigger = interface;
   UNLocationNotificationTrigger = interface;
-  UNUserNotificationCenterDelegate = interface;
   UNUserNotificationCenter = interface;
+  UNUserNotificationCenterDelegate = interface;
 
   UNErrorCode = NSInteger;
-  UNNotificationActionOptions = NSUInteger;
-  UNNotificationCategoryOptions = NSUInteger;
-  TUserNotificationsWithContentHandler = procedure(param1: UNNotificationContent) of object;
+  UNNotificationActionOptions = NSInteger;
+  UNNotificationCategoryOptions = NSInteger;
+  UNNotificationInterruptionLevel = NSInteger;
   UNAuthorizationStatus = NSInteger;
+  UNShowPreviewsSetting = NSInteger;
   UNNotificationSetting = NSInteger;
   UNAlertStyle = NSInteger;
-  UNAuthorizationOptions = NSUInteger;
-  TUserNotificationsCompletionHandler = procedure(granted: Boolean; error: NSError) of object;
-  TUserNotificationsCompletionHandler1 = procedure(param1: NSSet) of object;
-  TUserNotificationsCompletionHandler2 = procedure(param1: UNNotificationSettings) of object;
-  TUserNotificationsWithCompletionHandler = procedure(error: NSError) of object;
-  TUserNotificationsCompletionHandler3 = procedure(param1: NSArray) of object;
-  UNNotificationPresentationOptions = NSUInteger;
-  TUserNotificationsWithCompletionHandler1 = procedure(param1: UNNotificationPresentationOptions) of object;
-  TUserNotificationsWithCompletionHandler2 = procedure of object;
-
-  UNUserNotificationCenterSupport = interface(IObjectiveC)
-    ['{0D9872BF-27AB-46A9-928E-7AB0AB5C22CD}']
-    function localizedUserNotificationStringForKey(key: NSString; arguments: NSArray): NSString; cdecl;
-  end;
-
-  UNNotificationRequestClass = interface(NSObjectClass)
-    ['{766845C9-A53C-409A-A893-8FF5E2A3A295}']
-    { class } function requestWithIdentifier(identifier: NSString; content: UNNotificationContent; trigger: UNNotificationTrigger): Pointer; cdecl;
-  end;
-
-  UNNotificationRequest = interface(NSObject)
-    ['{E820727F-A92E-4FD1-932D-DEA46FDE531A}']
-    function identifier: NSString; cdecl;
-    function content: UNNotificationContent; cdecl;
-    function trigger: UNNotificationTrigger; cdecl;
-  end;
-  TUNNotificationRequest = class(TOCGenericImport<UNNotificationRequestClass, UNNotificationRequest>)
-  end;
+  UNNotificationSoundName = NSString;
+  UNAuthorizationOptions = NSInteger;
+  UNNotificationPresentationOptions = NSInteger;
+  TUNNotificationServiceExtensionBlockMethod1 = procedure(contentToDeliver: UNNotificationContent) of object;
+  TUNUserNotificationCenterBlockMethod1 = procedure(granted: Boolean; error: NSError) of object;
+  TUNUserNotificationCenterBlockMethod2 = procedure(categories: NSSet) of object;
+  TUNUserNotificationCenterBlockMethod3 = procedure(settings: UNNotificationSettings) of object;
+  TUNUserNotificationCenterBlockMethod4 = procedure(error: NSError) of object;
+  TUNUserNotificationCenterBlockMethod5 = procedure(requests: NSArray) of object;
+  TUNUserNotificationCenterBlockMethod6 = procedure(notifications: NSArray) of object;
+  TUNUserNotificationCenterDelegateBlockMethod1 = procedure(options: UNNotificationPresentationOptions) of object;
+  TUNUserNotificationCenterDelegateBlockMethod2 = procedure of object;
 
   UNNotificationClass = interface(NSObjectClass)
-    ['{4A126250-84C2-4B9A-B3F3-BE5EA13BE722}']
+    ['{D8EAEC48-F31F-4729-AC97-369777DEE85A}']
   end;
 
   UNNotification = interface(NSObject)
-    ['{ABF55DA5-D3BF-4595-8624-939F911EAC73}']
+    ['{9BD08FB1-EAD4-409F-99B9-07C6B2233AD9}']
     function date: NSDate; cdecl;
     function request: UNNotificationRequest; cdecl;
   end;
-  TUNNotification = class(TOCGenericImport<UNNotificationClass, UNNotification>)
-  end;
+  TUNNotification = class(TOCGenericImport<UNNotificationClass, UNNotification>) end;
 
   UNNotificationActionClass = interface(NSObjectClass)
-    ['{AAD80C86-7813-45E2-9E04-5A351819A2C4}']
-    { class } function actionWithIdentifier(identifier: NSString; title: NSString;
-      options: UNNotificationActionOptions): Pointer; cdecl;
+    ['{54642E05-431C-4BE0-AD71-8A6BF71ACF54}']
+    {class} function actionWithIdentifier(identifier: NSString; title: NSString; options: UNNotificationActionOptions): Pointer; overload; cdecl;
+    {class} function actionWithIdentifier(identifier: NSString; title: NSString; options: UNNotificationActionOptions;
+      icon: UNNotificationActionIcon): Pointer; overload; cdecl;
   end;
 
   UNNotificationAction = interface(NSObject)
-    ['{611AA3F4-23E3-4DA6-B754-705686F9F44A}']
+    ['{5F4A9A21-9A1C-423D-B941-6D46D057723B}']
+    function icon: UNNotificationActionIcon; cdecl;
     function identifier: NSString; cdecl;
-    function title: NSString; cdecl;
     function options: UNNotificationActionOptions; cdecl;
+    function title: NSString; cdecl;
   end;
-  TUNNotificationAction = class(TOCGenericImport<UNNotificationActionClass, UNNotificationAction>)
-  end;
+  TUNNotificationAction = class(TOCGenericImport<UNNotificationActionClass, UNNotificationAction>) end;
 
   UNTextInputNotificationActionClass = interface(UNNotificationActionClass)
-    ['{0A7AB4DD-B2D0-4639-9343-FB32BBB7B928}']
-    { class } function actionWithIdentifier(identifier: NSString; title: NSString; options: UNNotificationActionOptions;
-      textInputButtonTitle: NSString; textInputPlaceholder: NSString): Pointer; cdecl;
+    ['{C5C379F3-B15C-47CE-9350-FD5D667BA261}']
+    {class} function actionWithIdentifier(identifier: NSString; title: NSString; options: UNNotificationActionOptions; textInputButtonTitle: NSString;
+      textInputPlaceholder: NSString): Pointer; overload; cdecl;
+    {class} function actionWithIdentifier(identifier: NSString; title: NSString; options: UNNotificationActionOptions; icon: UNNotificationActionIcon;
+      textInputButtonTitle: NSString; textInputPlaceholder: NSString): Pointer; overload; cdecl;
   end;
 
   UNTextInputNotificationAction = interface(UNNotificationAction)
-    ['{8E4C487C-EEB2-48D9-8C06-14A00F8F8216}']
+    ['{3C8417B0-79A1-41D0-AECC-DE95852D8C18}']
     function textInputButtonTitle: NSString; cdecl;
     function textInputPlaceholder: NSString; cdecl;
   end;
-  TUNTextInputNotificationAction = class(TOCGenericImport<UNTextInputNotificationActionClass, UNTextInputNotificationAction>)
+  TUNTextInputNotificationAction = class(TOCGenericImport<UNTextInputNotificationActionClass, UNTextInputNotificationAction>) end;
+
+  UNNotificationActionIconClass = interface(NSObjectClass)
+    ['{4477A59E-E677-4414-A81E-B5E13377ED63}']
+    {class} function iconWithSystemImageName(systemImageName: NSString): Pointer; cdecl;
+    {class} function iconWithTemplateImageName(templateImageName: NSString): Pointer; cdecl;
   end;
 
+  UNNotificationActionIcon = interface(NSObject)
+    ['{D9457529-8255-45AA-A655-890506E2430E}']
+  end;
+  TUNNotificationActionIcon = class(TOCGenericImport<UNNotificationActionIconClass, UNNotificationActionIcon>) end;
+
   UNNotificationAttachmentClass = interface(NSObjectClass)
-    ['{140486D0-F352-4687-8BF4-272014BDD8AF}']
-    { class } function attachmentWithIdentifier(identifier: NSString; URL: NSURL; options: NSDictionary; error: NSError): Pointer; cdecl;
+    ['{0053282C-2113-46EF-8EE3-4F60FFD4F676}']
+    {class} function attachmentWithIdentifier(identifier: NSString; URL: NSURL; options: NSDictionary; error: PPointer): Pointer; cdecl;
   end;
 
   UNNotificationAttachment = interface(NSObject)
-    ['{A28C94FE-2CFF-45AA-A684-569BF30BF56B}']
+    ['{5E92FD3B-F8F6-4E2A-9512-91800A616D54}']
+    function &type: NSString; cdecl;
     function identifier: NSString; cdecl;
     function URL: NSURL; cdecl;
-    function &type: NSString; cdecl;
   end;
-  TUNNotificationAttachment = class(TOCGenericImport<UNNotificationAttachmentClass, UNNotificationAttachment>)
-  end;
+  TUNNotificationAttachment = class(TOCGenericImport<UNNotificationAttachmentClass, UNNotificationAttachment>) end;
 
   UNNotificationCategoryClass = interface(NSObjectClass)
-    ['{EB8B0B0A-65EC-403A-9372-DAD56B2CEA1A}']
-    { class } function categoryWithIdentifier(identifier: NSString; actions: NSArray; intentIdentifiers: NSArray;
-      options: UNNotificationCategoryOptions): Pointer; cdecl;
+    ['{149254AF-CF62-4925-BE81-EEF141B34A8B}']
+    {class} function categoryWithIdentifier(identifier: NSString; actions: NSArray; intentIdentifiers: NSArray;
+      hiddenPreviewsBodyPlaceholder: NSString; categorySummaryFormat: NSString; options: UNNotificationCategoryOptions): Pointer; overload; cdecl;
+    {class} function categoryWithIdentifier(identifier: NSString; actions: NSArray; intentIdentifiers: NSArray;
+      hiddenPreviewsBodyPlaceholder: NSString; options: UNNotificationCategoryOptions): Pointer; overload; cdecl;
+    {class} function categoryWithIdentifier(identifier: NSString; actions: NSArray; intentIdentifiers: NSArray;
+      options: UNNotificationCategoryOptions): Pointer; overload; cdecl;
   end;
 
   UNNotificationCategory = interface(NSObject)
-    ['{B4152D45-2CDD-4DB9-A8C1-8068E400E880}']
-    function identifier: NSString; cdecl;
+    ['{896DC04D-E269-4635-9B00-7C9DCC3CCA0C}']
     function actions: NSArray; cdecl;
+    function categorySummaryFormat: NSString; cdecl;
+    function hiddenPreviewsBodyPlaceholder: NSString; cdecl;
+    function identifier: NSString; cdecl;
     function intentIdentifiers: NSArray; cdecl;
     function options: UNNotificationCategoryOptions; cdecl;
   end;
-  TUNNotificationCategory = class(TOCGenericImport<UNNotificationCategoryClass, UNNotificationCategory>)
-  end;
+  TUNNotificationCategory = class(TOCGenericImport<UNNotificationCategoryClass, UNNotificationCategory>) end;
 
-  UNNotificationSoundClass = interface(NSObjectClass)
-    ['{FCE6B805-3175-4248-BB72-1FE34575B153}']
-    { class } function defaultSound: Pointer; cdecl;
-    { class } function soundNamed(name: NSString): Pointer; cdecl;
-  end;
-
-  UNNotificationSound = interface(NSObject)
-    ['{34307A81-6AE8-459F-8403-21B36D2D1493}']
-  end;
-  TUNNotificationSound = class(TOCGenericImport<UNNotificationSoundClass, UNNotificationSound>)
+  UNNotificationContentProviding = interface(IObjectiveC)
+    ['{B3CA65D1-3C10-4A1E-BAE4-F716C10B965E}']
   end;
 
   UNNotificationContentClass = interface(NSObjectClass)
-    ['{5905664A-B654-4AAE-9CD1-B133744C5CC7}']
+    ['{A511FCE0-8237-4DC4-8395-8C4D40B38AD3}']
   end;
 
   UNNotificationContent = interface(NSObject)
-    ['{79B9EAF0-E737-439E-9198-62A4D1FE6934}']
+    ['{6677A931-BA25-43A1-A4E9-8A5357BFD01B}']
     function attachments: NSArray; cdecl;
     function badge: NSNumber; cdecl;
     function body: NSString; cdecl;
     function categoryIdentifier: NSString; cdecl;
+    function contentByUpdatingWithProvider(provider: Pointer; error: PPointer): UNNotificationContent; cdecl;
+    function filterCriteria: NSString; cdecl;
+    function interruptionLevel: UNNotificationInterruptionLevel; cdecl;
     function launchImageName: NSString; cdecl;
+    function relevanceScore: Double; cdecl;
     function sound: UNNotificationSound; cdecl;
     function subtitle: NSString; cdecl;
+    function summaryArgument: NSString; cdecl; // API_DEPRECATED("summaryArgument is ignored", ios(12.0, 15.0), watchos(5.0, 8.0), tvos(12.0, 15.0))
+    function summaryArgumentCount: NSUInteger; cdecl; // API_DEPRECATED("summaryArgumentCount is ignored", ios(12.0, 15.0), watchos(5.0, 8.0), tvos(12.0, 15.0))
+    function targetContentIdentifier: NSString; cdecl;
     function threadIdentifier: NSString; cdecl;
     function title: NSString; cdecl;
     function userInfo: NSDictionary; cdecl;
   end;
-  TUNNotificationContent = class(TOCGenericImport<UNNotificationContentClass, UNNotificationContent>)
-  end;
+  TUNNotificationContent = class(TOCGenericImport<UNNotificationContentClass, UNNotificationContent>) end;
 
   UNMutableNotificationContentClass = interface(UNNotificationContentClass)
-    ['{23144A48-3417-4DDC-9880-6EA2FA41FB94}']
+    ['{E69F0275-A73A-4B3C-89CF-D8DE3EB7841C}']
   end;
 
   UNMutableNotificationContent = interface(UNNotificationContent)
-    ['{23D4F7BE-4009-4C3A-A3FB-EF9A5B0271D4}']
-    procedure setAttachments(attachments: NSArray); cdecl;
+    ['{A6A844EE-2088-4A54-B5FE-B136C5200425}']
     function attachments: NSArray; cdecl;
-    procedure setBadge(badge: NSNumber); cdecl;
     function badge: NSNumber; cdecl;
-    procedure setBody(body: NSString); cdecl;
     function body: NSString; cdecl;
-    procedure setCategoryIdentifier(categoryIdentifier: NSString); cdecl;
     function categoryIdentifier: NSString; cdecl;
-    procedure setLaunchImageName(launchImageName: NSString); cdecl;
+    function filterCriteria: NSString; cdecl;
+    function interruptionLevel: UNNotificationInterruptionLevel; cdecl;
     function launchImageName: NSString; cdecl;
+    function relevanceScore: Double; cdecl;
+    procedure setAttachments(attachments: NSArray); cdecl;
+    procedure setBadge(badge: NSNumber); cdecl;
+    procedure setBody(body: NSString); cdecl;
+    procedure setCategoryIdentifier(categoryIdentifier: NSString); cdecl;
+    procedure setFilterCriteria(filterCriteria: NSString); cdecl;
+    procedure setInterruptionLevel(interruptionLevel: UNNotificationInterruptionLevel); cdecl;
+    procedure setLaunchImageName(launchImageName: NSString); cdecl;
+    procedure setRelevanceScore(relevanceScore: Double); cdecl;
     procedure setSound(sound: UNNotificationSound); cdecl;
-    function sound: UNNotificationSound; cdecl;
     procedure setSubtitle(subtitle: NSString); cdecl;
-    function subtitle: NSString; cdecl;
+    procedure setSummaryArgument(summaryArgument: NSString); cdecl; // API_DEPRECATED("summaryArgument is ignored", ios(12.0, 15.0), watchos(5.0, 8.0), tvos(12.0, 15.0))
+    procedure setSummaryArgumentCount(summaryArgumentCount: NSUInteger); cdecl; // API_DEPRECATED("summaryArgumentCount is ignored", ios(12.0, 15.0), watchos(5.0, 8.0), tvos(12.0, 15.0))
+    procedure setTargetContentIdentifier(targetContentIdentifier: NSString); cdecl;
     procedure setThreadIdentifier(threadIdentifier: NSString); cdecl;
-    function threadIdentifier: NSString; cdecl;
     procedure setTitle(title: NSString); cdecl;
-    function title: NSString; cdecl;
     procedure setUserInfo(userInfo: NSDictionary); cdecl;
+    function sound: UNNotificationSound; cdecl;
+    function subtitle: NSString; cdecl;
+    function summaryArgument: NSString; cdecl; // API_DEPRECATED("summaryArgument is ignored", ios(12.0, 15.0), watchos(5.0, 8.0), tvos(12.0, 15.0))
+    function summaryArgumentCount: NSUInteger; cdecl; // API_DEPRECATED("summaryArgumentCount is ignored", ios(12.0, 15.0), watchos(5.0, 8.0), tvos(12.0, 15.0))
+    function targetContentIdentifier: NSString; cdecl;
+    function threadIdentifier: NSString; cdecl;
+    function title: NSString; cdecl;
     function userInfo: NSDictionary; cdecl;
   end;
-  TUNMutableNotificationContent = class(TOCGenericImport<UNMutableNotificationContentClass, UNMutableNotificationContent>)
+  TUNMutableNotificationContent = class(TOCGenericImport<UNMutableNotificationContentClass, UNMutableNotificationContent>) end;
+
+  UNNotificationRequestClass = interface(NSObjectClass)
+    ['{0304D133-51C7-4CBA-808A-54FB64735895}']
+    {class} function requestWithIdentifier(identifier: NSString; content: UNNotificationContent; trigger: UNNotificationTrigger): Pointer; cdecl;
   end;
 
-  UNNotificationTriggerClass = interface(NSObjectClass)
-    ['{DF3BF20A-1545-47BB-971B-93CEA63AFF19}']
+  UNNotificationRequest = interface(NSObject)
+    ['{E5B2593F-7DEC-49ED-806A-2CD11BA60643}']
+    function content: UNNotificationContent; cdecl;
+    function identifier: NSString; cdecl;
+    function trigger: UNNotificationTrigger; cdecl;
   end;
-
-  UNNotificationTrigger = interface(NSObject)
-    ['{FAFC8592-3F5B-4374-8FC3-8D5E9F5FAFA9}']
-    function repeats: Boolean; cdecl;
-  end;
-  TUNNotificationTrigger = class(TOCGenericImport<UNNotificationTriggerClass, UNNotificationTrigger>)
-  end;
+  TUNNotificationRequest = class(TOCGenericImport<UNNotificationRequestClass, UNNotificationRequest>) end;
 
   UNNotificationResponseClass = interface(NSObjectClass)
-    ['{F42D92EC-5C1E-4EB9-879F-1ADD4C18D908}']
+    ['{0E791895-8446-4C84-9587-A48C7E3CD3F7}']
   end;
 
   UNNotificationResponse = interface(NSObject)
-    ['{818F4DC8-18ED-4783-AB22-B35BC2422E2F}']
-    function notification: UNNotification; cdecl;
+    ['{6E76568C-AB77-4514-90CF-0438031DA243}']
     function actionIdentifier: NSString; cdecl;
+    function notification: UNNotification; cdecl;
   end;
-  TUNNotificationResponse = class(TOCGenericImport<UNNotificationResponseClass, UNNotificationResponse>)
-  end;
+  TUNNotificationResponse = class(TOCGenericImport<UNNotificationResponseClass, UNNotificationResponse>) end;
 
   UNTextInputNotificationResponseClass = interface(UNNotificationResponseClass)
-    ['{9A3AE889-4DCE-445C-8B9B-CCE340AB904F}']
+    ['{8DDF4C38-FBFF-4B63-9111-089D2973E806}']
   end;
 
   UNTextInputNotificationResponse = interface(UNNotificationResponse)
-    ['{5A12C54D-52BD-41DA-BFC5-ABF43900A11A}']
+    ['{356EE7C3-ED11-46C1-8739-ADE3BE2CDEE3}']
     function userText: NSString; cdecl;
   end;
-  TUNTextInputNotificationResponse = class(TOCGenericImport<UNTextInputNotificationResponseClass, UNTextInputNotificationResponse>)
-  end;
+  TUNTextInputNotificationResponse = class(TOCGenericImport<UNTextInputNotificationResponseClass, UNTextInputNotificationResponse>) end;
 
   UNNotificationServiceExtensionClass = interface(NSObjectClass)
-    ['{0C1B0248-5108-4276-A55C-E05B2D937BF3}']
+    ['{C36A3480-9577-4186-8234-64AD3C645AC2}']
   end;
 
   UNNotificationServiceExtension = interface(NSObject)
-    ['{2B180EA3-5AEB-42A6-8E7D-84B9D1F22D10}']
-    procedure didReceiveNotificationRequest(request: UNNotificationRequest; withContentHandler: TUserNotificationsWithContentHandler); cdecl;
+    ['{A24A646C-110C-4FCB-9DD1-8212F3E644FB}']
+    procedure didReceiveNotificationRequest(request: UNNotificationRequest; withContentHandler: TUNNotificationServiceExtensionBlockMethod1); cdecl;
     procedure serviceExtensionTimeWillExpire; cdecl;
   end;
-  TUNNotificationServiceExtension = class(TOCGenericImport<UNNotificationServiceExtensionClass, UNNotificationServiceExtension>)
-  end;
+  TUNNotificationServiceExtension = class(TOCGenericImport<UNNotificationServiceExtensionClass, UNNotificationServiceExtension>) end;
 
   UNNotificationSettingsClass = interface(NSObjectClass)
-    ['{83B7F625-FBAE-4EE3-8AC8-BD557B6124D3}']
+    ['{ECA72DC2-1A0D-4ACB-A454-53BE0EC2F751}']
   end;
 
   UNNotificationSettings = interface(NSObject)
-    ['{587D433B-89B3-4607-8532-B8FD83DBDFBB}']
-    function authorizationStatus: UNAuthorizationStatus; cdecl;
-    function soundSetting: UNNotificationSetting; cdecl;
-    function badgeSetting: UNNotificationSetting; cdecl;
+    ['{FE7B4A3A-5FF8-413C-98A5-7C0C5B0C96BD}']
     function alertSetting: UNNotificationSetting; cdecl;
-    function notificationCenterSetting: UNNotificationSetting; cdecl;
-    function lockScreenSetting: UNNotificationSetting; cdecl;
-    function carPlaySetting: UNNotificationSetting; cdecl;
     function alertStyle: UNAlertStyle; cdecl;
+    function announcementSetting: UNNotificationSetting; cdecl;
+    function authorizationStatus: UNAuthorizationStatus; cdecl;
+    function badgeSetting: UNNotificationSetting; cdecl;
+    function carPlaySetting: UNNotificationSetting; cdecl;
+    function criticalAlertSetting: UNNotificationSetting; cdecl;
+    function directMessagesSetting: UNNotificationSetting; cdecl;
+    function lockScreenSetting: UNNotificationSetting; cdecl;
+    function notificationCenterSetting: UNNotificationSetting; cdecl;
+    function providesAppNotificationSettings: Boolean; cdecl;
+    function scheduledDeliverySetting: UNNotificationSetting; cdecl;
+    function showPreviewsSetting: UNShowPreviewsSetting; cdecl;
+    function soundSetting: UNNotificationSetting; cdecl;
+    function timeSensitiveSetting: UNNotificationSetting; cdecl;
   end;
-  TUNNotificationSettings = class(TOCGenericImport<UNNotificationSettingsClass, UNNotificationSettings>)
+  TUNNotificationSettings = class(TOCGenericImport<UNNotificationSettingsClass, UNNotificationSettings>) end;
+
+  UNNotificationSoundClass = interface(NSObjectClass)
+    ['{2EFAB85B-26F6-4002-9303-C22A46162616}']
+    {class} function criticalSoundNamed(name: UNNotificationSoundName; withAudioVolume: Single): Pointer; overload; cdecl;
+    {class} function criticalSoundNamed(name: UNNotificationSoundName): Pointer; overload; cdecl;
+    {class} function defaultCriticalSound: UNNotificationSound; cdecl;
+    {class} function defaultCriticalSoundWithAudioVolume(volume: Single): Pointer; cdecl;
+    {class} function defaultRingtoneSound: UNNotificationSound; cdecl;
+    {class} function defaultSound: UNNotificationSound; cdecl;
+    {class} function ringtoneSoundNamed(name: UNNotificationSoundName): Pointer; cdecl;
+    {class} function soundNamed(name: UNNotificationSoundName): Pointer; cdecl;
   end;
 
+  UNNotificationSound = interface(NSObject)
+    ['{7382ACA4-FD53-4252-B1E2-04D714EAADEC}']
+  end;
+  TUNNotificationSound = class(TOCGenericImport<UNNotificationSoundClass, UNNotificationSound>) end;
+
+  UNNotificationTriggerClass = interface(NSObjectClass)
+    ['{828A983B-39D1-486B-9EF9-4216A85C24C4}']
+  end;
+
+  UNNotificationTrigger = interface(NSObject)
+    ['{8AA763D6-3B88-446D-AC0E-882F74BE9649}']
+    function repeats: Boolean; cdecl;
+  end;
+  TUNNotificationTrigger = class(TOCGenericImport<UNNotificationTriggerClass, UNNotificationTrigger>) end;
+
   UNPushNotificationTriggerClass = interface(UNNotificationTriggerClass)
-    ['{54519FC8-B579-41E0-94F0-C21602C55941}']
+    ['{51137A8C-EE89-44C6-AA3E-0CC6122CC49D}']
   end;
 
   UNPushNotificationTrigger = interface(UNNotificationTrigger)
-    ['{19A824D2-8C7B-4DAE-954A-4E134FD5F16F}']
+    ['{B9DF26A6-9A81-41E7-A841-B87FE858D296}']
   end;
-  TUNPushNotificationTrigger = class(TOCGenericImport<UNPushNotificationTriggerClass, UNPushNotificationTrigger>)
-  end;
+  TUNPushNotificationTrigger = class(TOCGenericImport<UNPushNotificationTriggerClass, UNPushNotificationTrigger>) end;
 
   UNTimeIntervalNotificationTriggerClass = interface(UNNotificationTriggerClass)
-    ['{E297E94F-B29B-40E9-A1F1-8B8897B87714}']
-    { class } function triggerWithTimeInterval(timeInterval: NSTimeInterval; repeats: Boolean): Pointer; cdecl;
+    ['{CF30B6A0-EB14-45D9-865C-6783BF0AE5AD}']
+    {class} function triggerWithTimeInterval(timeInterval: NSTimeInterval; repeats: Boolean): Pointer; cdecl;
   end;
 
   UNTimeIntervalNotificationTrigger = interface(UNNotificationTrigger)
-    ['{F2FD0FB8-B3A0-4475-8CA6-8B4969069144}']
-    function timeInterval: NSTimeInterval; cdecl;
+    ['{327665CA-1BDD-4EA3-ABF6-5F3F357EC3AE}']
     function nextTriggerDate: NSDate; cdecl;
+    function timeInterval: NSTimeInterval; cdecl;
   end;
-  TUNTimeIntervalNotificationTrigger = class(TOCGenericImport<UNTimeIntervalNotificationTriggerClass, UNTimeIntervalNotificationTrigger>)
-  end;
+  TUNTimeIntervalNotificationTrigger = class(TOCGenericImport<UNTimeIntervalNotificationTriggerClass, UNTimeIntervalNotificationTrigger>) end;
 
   UNCalendarNotificationTriggerClass = interface(UNNotificationTriggerClass)
-    ['{FA2817E5-7BC5-444E-9940-CAC2ED682160}']
-    { class } function triggerWithDateMatchingComponents(dateComponents: NSDateComponents; repeats: Boolean): Pointer; cdecl;
+    ['{D9D1FDC6-41E2-40DD-B9E4-AE572DC2CB3E}']
+    {class} function triggerWithDateMatchingComponents(dateComponents: NSDateComponents; repeats: Boolean): Pointer; cdecl;
   end;
 
   UNCalendarNotificationTrigger = interface(UNNotificationTrigger)
-    ['{CA10EE0F-D83E-40CA-AFE1-937B7B08C8E1}']
+    ['{C4A9940F-F15D-43A8-9C82-0CA0A94B213E}']
     function dateComponents: NSDateComponents; cdecl;
     function nextTriggerDate: NSDate; cdecl;
   end;
-  TUNCalendarNotificationTrigger = class(TOCGenericImport<UNCalendarNotificationTriggerClass, UNCalendarNotificationTrigger>)
-  end;
+  TUNCalendarNotificationTrigger = class(TOCGenericImport<UNCalendarNotificationTriggerClass, UNCalendarNotificationTrigger>) end;
 
   UNLocationNotificationTriggerClass = interface(UNNotificationTriggerClass)
-    ['{8C7EF509-C0A0-4DB8-9ED1-3EE2CF08FC71}']
-    { class } function triggerWithRegion(region: CLRegion; repeats: Boolean): Pointer; cdecl;
+    ['{6229CA2B-FCBC-4071-95E3-574AE723A089}']
+    {class} function triggerWithRegion(region: CLRegion; repeats: Boolean): Pointer; cdecl;
   end;
 
   UNLocationNotificationTrigger = interface(UNNotificationTrigger)
-    ['{58F20440-A87C-4CC4-8A74-DE6C4BCB7823}']
+    ['{3104E48C-DD2D-490B-97B2-7C292F831A45}']
     function region: CLRegion; cdecl;
   end;
-  TUNLocationNotificationTrigger = class(TOCGenericImport<UNLocationNotificationTriggerClass, UNLocationNotificationTrigger>)
-  end;
-
-  PUNLocationNotificationTrigger = Pointer;
+  TUNLocationNotificationTrigger = class(TOCGenericImport<UNLocationNotificationTriggerClass, UNLocationNotificationTrigger>) end;
 
   UNUserNotificationCenterClass = interface(NSObjectClass)
-    ['{73086005-B709-44DF-A489-05E771ABAD66}']
-    { class } function currentNotificationCenter: UNUserNotificationCenter; cdecl;
+    ['{0803C60D-41E5-4988-876D-7B064DF0D1EC}']
+    {class} function currentNotificationCenter: UNUserNotificationCenter; cdecl;
   end;
 
   UNUserNotificationCenter = interface(NSObject)
-    ['{43FE4570-8CAB-44D9-8F7A-85060C962305}']
-    procedure addNotificationRequest(request: UNNotificationRequest; withCompletionHandler: TUserNotificationsWithCompletionHandler); cdecl;
+    ['{7FC1C7A7-87E9-4EA2-BC63-B6B8ABC2A72B}']
+    procedure addNotificationRequest(request: UNNotificationRequest; withCompletionHandler: TUNUserNotificationCenterBlockMethod4); cdecl;
     function delegate: Pointer; cdecl;
-    procedure getDeliveredNotificationsWithCompletionHandler(completionHandler: TUserNotificationsCompletionHandler3); cdecl;
-    procedure getNotificationCategoriesWithCompletionHandler(completionHandler: TUserNotificationsCompletionHandler1); cdecl;
-    procedure getNotificationSettingsWithCompletionHandler(completionHandler: TUserNotificationsCompletionHandler2); cdecl;
-    procedure getPendingNotificationRequestsWithCompletionHandler(completionHandler: TUserNotificationsCompletionHandler3); cdecl;
+    procedure getDeliveredNotificationsWithCompletionHandler(completionHandler: TUNUserNotificationCenterBlockMethod6); cdecl;
+    procedure getNotificationCategoriesWithCompletionHandler(completionHandler: TUNUserNotificationCenterBlockMethod2); cdecl;
+    procedure getNotificationSettingsWithCompletionHandler(completionHandler: TUNUserNotificationCenterBlockMethod3); cdecl;
+    procedure getPendingNotificationRequestsWithCompletionHandler(completionHandler: TUNUserNotificationCenterBlockMethod5); cdecl;
     procedure removeAllDeliveredNotifications; cdecl;
     procedure removeAllPendingNotificationRequests; cdecl;
     procedure removeDeliveredNotificationsWithIdentifiers(identifiers: NSArray); cdecl;
     procedure removePendingNotificationRequestsWithIdentifiers(identifiers: NSArray); cdecl;
-    procedure requestAuthorizationWithOptions(options: UNAuthorizationOptions; completionHandler: TUserNotificationsCompletionHandler); cdecl;
+    procedure requestAuthorizationWithOptions(options: UNAuthorizationOptions; completionHandler: TUNUserNotificationCenterBlockMethod1); cdecl;
+    procedure setBadgeCount(newBadgeCount: NSInteger; withCompletionHandler: TUNUserNotificationCenterBlockMethod4); cdecl;
     procedure setDelegate(delegate: Pointer); cdecl;
     procedure setNotificationCategories(categories: NSSet); cdecl;
     function supportsContentExtensions: Boolean; cdecl;
   end;
-  TUNUserNotificationCenter = class(TOCGenericImport<UNUserNotificationCenterClass, UNUserNotificationCenter>)
-  end;
-
-  PUNUserNotificationCenter = Pointer;
+  TUNUserNotificationCenter = class(TOCGenericImport<UNUserNotificationCenterClass, UNUserNotificationCenter>) end;
 
   UNUserNotificationCenterDelegate = interface(IObjectiveC)
-    ['{53E6E4D3-F99B-4E8C-AA6B-6CCAF31F7252}']
-    [MethodName('userNotificationCenter:openSettingsForNotification:')]
-    procedure userNotificationCenter(center: UNUserNotificationCenter; notification: UNNotification); overload; cdecl;
-    [MethodName('userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:')]
-    procedure userNotificationCenter(center: UNUserNotificationCenter; response: UNNotificationResponse; completionHandler: Pointer); overload; cdecl;
-    [MethodName('userNotificationCenter:willPresentNotification:withCompletionHandler:')]
-    procedure userNotificationCenter(center: UNUserNotificationCenter; notification: UNNotification; completionHandler: Pointer); overload; cdecl;
+    ['{19F3D3EF-C1F3-416D-B619-568BF96D74EB}']
+    procedure userNotificationCenter(center: UNUserNotificationCenter; openSettingsForNotification: UNNotification); overload; cdecl;
+    procedure userNotificationCenter(center: UNUserNotificationCenter; didReceiveNotificationResponse: UNNotificationResponse;
+      withCompletionHandler: Pointer); overload; cdecl;
+    procedure userNotificationCenter(center: UNUserNotificationCenter; willPresentNotification: UNNotification;
+      withCompletionHandler: Pointer); overload; cdecl;
   end;
 
 function UNErrorDomain: NSString;
@@ -408,25 +457,17 @@ function UNNotificationAttachmentOptionsThumbnailClippingRectKey: NSString;
 function UNNotificationAttachmentOptionsThumbnailTimeKey: NSString;
 function UNNotificationDefaultActionIdentifier: NSString;
 function UNNotificationDismissActionIdentifier: NSString;
-function UserNotificationCenter: UNUserNotificationCenter;
 
 const
   libUserNotifications = '/System/Library/Frameworks/UserNotifications.framework/UserNotifications';
 
 implementation
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 uses
   Posix.Dlfcn;
 
 var
   UserNotificationsModule: THandle;
-{$ENDIF IOS}
-
-function UserNotificationCenter: UNUserNotificationCenter;
-begin
-  Result := TUNUserNotificationCenter.OCClass.currentNotificationCenter;
-end;
 
 function UNErrorDomain: NSString;
 begin
@@ -463,12 +504,10 @@ begin
   Result := CocoaNSStringConst(libUserNotifications, 'UNNotificationDismissActionIdentifier');
 end;
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 initialization
   UserNotificationsModule := dlopen(MarshaledAString(libUserNotifications), RTLD_LAZY);
 
 finalization
   dlclose(UserNotificationsModule);
-{$ENDIF IOS}
 
 end.

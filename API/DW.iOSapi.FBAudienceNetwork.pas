@@ -6,7 +6,7 @@ unit DW.iOSapi.FBAudienceNetwork;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -15,8 +15,6 @@ unit DW.iOSapi.FBAudienceNetwork;
 //
 // *** NOTE: This unit has not been verified as being 100% correct.
 // Please report issues to: https://github.com/DelphiWorlds/KastriFree/issues
-
-{$I DW.GlobalDefines.inc}
 
 interface
 

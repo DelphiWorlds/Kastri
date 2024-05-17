@@ -1,0 +1,51 @@
+21c21,22
+<   iOSapi.Foundation, iOSapi.UIKit, iOSapi.UserNotifications, iOSapi.FirebaseCommon, iOSapi.FirebaseMessaging, iOSapi.Helpers,
+---
+>   iOSapi.Foundation, iOSapi.UIKit, iOSapi.UserNotifications, iOSapi.Helpers,
+>   DW.iOSapi.FirebaseCore, DW.iOSapi.FirebaseMessaging,
+41d41
+<     procedure ReceivedMessage(remoteMessage: FIRMessagingRemoteMessage);
+44,50c44
+<     procedure applicationReceivedRemoteMessage(remoteMessage: FIRMessagingRemoteMessage); cdecl;
+<     [MethodName('messaging:didReceiveMessage:')]
+<     procedure didReceiveMessage(messaging: FIRMessaging; remoteMessage: FIRMessagingRemoteMessage); cdecl;
+<     [MethodName('messaging:didRefreshRegistrationToken:')]
+<     procedure didRefreshRegistrationToken(messaging: FIRMessaging; fcmToken: NSString); cdecl;
+<     [MethodName('messaging:didReceiveRegistrationToken:')]
+<     procedure didReceiveRegistrationToken(messaging: FIRMessaging; fcmToken: NSString); cdecl;
+---
+>     procedure messaging(messaging: FIRMessaging; didReceiveRegistrationToken: NSString); cdecl;
+159,169c153
+< procedure TFIRMessagingDelegate.applicationReceivedRemoteMessage(remoteMessage: FIRMessagingRemoteMessage);
+< begin
+<   ReceivedMessage(remoteMessage);
+< end;
+< 
+< procedure TFIRMessagingDelegate.didReceiveMessage(messaging: FIRMessaging; remoteMessage: FIRMessagingRemoteMessage);
+< begin
+<   ReceivedMessage(remoteMessage);
+< end;
+< 
+< procedure TFIRMessagingDelegate.didReceiveRegistrationToken(messaging: FIRMessaging; fcmToken: NSString);
+---
+> procedure TFIRMessagingDelegate.messaging(messaging: FIRMessaging; didReceiveRegistrationToken: NSString);
+171,181c155
+<   FPushService.SetDeviceToken(NSStrToStr(fcmToken));
+< end;
+< 
+< procedure TFIRMessagingDelegate.didRefreshRegistrationToken(messaging: FIRMessaging; fcmToken: NSString);
+< begin
+<   FPushService.SetDeviceToken(NSStrToStr(fcmToken));
+< end;
+< 
+< procedure TFIRMessagingDelegate.ReceivedMessage(remoteMessage: FIRMessagingRemoteMessage);
+< begin
+<   FPushService.MessageReceived(NSDictionaryToJSON(remoteMessage.appData));
+---
+>   FPushService.SetDeviceToken(NSStrToStr(didReceiveRegistrationToken));
+253d226
+<   TFIRApp.OCClass.configure;
+269d241
+<   Register;
+270a243
+>   Register;

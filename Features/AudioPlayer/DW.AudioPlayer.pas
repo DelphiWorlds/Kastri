@@ -6,14 +6,14 @@ unit DW.AudioPlayer;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2021 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
+
+{$SCOPEDENUMS ON}
 
 type
   TAudioPlayer = class;
@@ -35,6 +35,7 @@ type
   private
     FAudioPlayer: TAudioPlayer;
     FAudioState: TAudioState;
+    FIsLooped: Boolean;
     FIsReady: Boolean;
   protected
     procedure DoAudioStateChange(const AState: TAudioState); virtual;
@@ -48,6 +49,7 @@ type
     procedure Stop; virtual;
     property AudioPlayer: TAudioPlayer read FAudioPlayer;
     property AudioState: TAudioState read FAudioState;
+    property IsLooped: Boolean read FIsLooped write FIsLooped;
     property IsReady: Boolean read FIsReady;
   public
     constructor Create(const AAudioPlayer: TAudioPlayer); virtual;
@@ -61,6 +63,8 @@ type
     FOnAudioStateChange: TAudioStateChangeEvent;
     function GetDelay: Integer;
     function GetAudioState: TAudioState;
+    function GetIsLooped: Boolean;
+    procedure SetIsLooped(const Value: Boolean);
   protected
     procedure DoAudioStateChange;
   public
@@ -83,6 +87,7 @@ type
     /// </remarks>
     property Delay: Integer read GetDelay;
     property FileName: string read FFileName;
+    property IsLooped: Boolean read GetIsLooped write SetIsLooped;
     property OnAudioStateChange: TAudioStateChangeEvent read FOnAudioStateChange write FOnAudioStateChange;
   end;
 
@@ -119,9 +124,17 @@ begin
 end;
 
 procedure TCustomPlatformAudioPlayer.DoAudioStateChange(const AState: TAudioState);
+var
+  LIsPlaying: Boolean;
 begin
-  FAudioState := AState;
-  FAudioPlayer.DoAudioStateChange;
+  LIsPlaying := AState = TAudioState.Playing;
+  if FAudioState <> AState then
+  begin
+    FAudioState := AState;
+    FAudioPlayer.DoAudioStateChange;
+    if LIsPlaying and (FAudioState = TAudioState.Stopped) and FIsLooped then
+      DoPlay;
+  end;
 end;
 
 procedure TCustomPlatformAudioPlayer.DoPlay;
@@ -199,6 +212,11 @@ begin
   Result := FPlatformAudioPlayer.GetDelay;
 end;
 
+function TAudioPlayer.GetIsLooped: Boolean;
+begin
+  Result := FPlatformAudioPlayer.IsLooped;
+end;
+
 function TAudioPlayer.IsPaused: Boolean;
 begin
   Result := AudioState = TAudioState.Paused;
@@ -228,6 +246,11 @@ end;
 procedure TAudioPlayer.SeekTo(const AMilliseconds: Int64);
 begin
   FPlatformAudioPlayer.SeekTo(AMilliseconds);
+end;
+
+procedure TAudioPlayer.SetIsLooped(const Value: Boolean);
+begin
+  FPlatformAudioPlayer.IsLooped := Value;
 end;
 
 procedure TAudioPlayer.Stop;

@@ -6,12 +6,10 @@ unit DW.ShareItems.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -95,7 +93,7 @@ var
   LItem: TSharingItem;
   LMIMETypes: TStrings;
   LURIs, LTexts: JArrayList;
-  LFileName, LType: string;
+  LFileName, LType, LText: string;
   LKind: TMimeTypes.TKind;
   LClipData: JClipData;
   I: Integer;
@@ -110,8 +108,12 @@ begin
     begin
       if LItem is TSharingItemText then
       begin
-        LTexts.add(StringToJString(TSharingItemFile(LItem).Text));
-        LMIMETypes.Add('text/plain');
+        LText := TSharingItemFile(LItem).Text;
+        LTexts.add(StringToJString(LText));
+        if LText.StartsWith('http://', True) or LText.StartsWith('https://', True) then
+          LMIMETypes.Add('text/url')
+        else
+          LMIMETypes.Add('text/plain');
       end
       else if LItem is TSharingItemFile then
       begin
@@ -135,7 +137,7 @@ begin
   finally
     LMIMETypes.Free;
   end;
-  if (LURIs.size + LTexts.size) > 1 then
+  if (LURIs.size > 1) or (LTexts.size > 1) then
   begin
     LIntent.setAction(TJIntent.JavaClass.ACTION_SEND_MULTIPLE);
     LIntent.putParcelableArrayListExtra(TJIntent.JavaClass.EXTRA_TEXT, LTexts);

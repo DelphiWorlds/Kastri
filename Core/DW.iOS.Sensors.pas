@@ -2,15 +2,16 @@ unit DW.iOS.Sensors;
 
 {*******************************************************}
 {                                                       }
-{                    Kastri Free                        }
+{                      Kastri                           }
 {                                                       }
-{          DelphiWorlds Cross-Platform Library          }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
+{  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
 // This is a "patch-in" unit to be used in conjunction with patches to System.iOS.Sensors
-
-{$I DW.GlobalDefines.inc}
 
 interface
 

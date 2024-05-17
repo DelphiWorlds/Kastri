@@ -6,12 +6,10 @@ unit DW.FilesSelector.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{    Copyright 2020 Dave Nottage under MIT license      }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -56,7 +54,9 @@ uses
   // Android
   Androidapi.Helpers, Androidapi.JNI.App, Androidapi.JNI.JavaTypes, Androidapi.JNIBridge, Androidapi.JNI.Provider,
   // FMX
-  FMX.Platform.Android;
+  FMX.Platform.Android,
+  // DW
+  DW.Androidapi.JNI.Content;
 
 { TPlatformFilesSelector }
 
@@ -80,6 +80,8 @@ begin
       Result := 'image/*';
     TFileKind.Audio:
       Result := 'audio/*';
+    TFileKind.Item:
+      Result := '*/*';
     TFileKind.Movie:
       Result := 'video/*';
     TFileKind.Text, TFileKind.Content, TFileKind.SourceCode:
@@ -231,9 +233,16 @@ var
   LApplicationInfo: JApplicationInfo;
   I: Integer;
   LActivityClassName: string;
+  LFlags: JPackageManager_ResolveInfoFlags;
 begin
   Activities.Clear;
-  LList := TAndroidHelper.Context.getPackageManager.queryIntentActivities(FIntent, 0);
+  if TOSVersion.Check(13) then
+  begin
+    LFlags := TJPackageManager_ResolveInfoFlags.JavaClass.&of(0);
+    LList := TJPackageManagerEx.Wrap(TAndroidHelper.Context.getPackageManager).queryIntentActivities(FIntent, LFlags)
+  end
+  else
+    LList := TAndroidHelper.Context.getPackageManager.queryIntentActivities(FIntent, 0);
   for I := 0 to LList.size - 1 do
   begin
     LResolveInfo := TJResolveInfo.Wrap(LList.get(i));

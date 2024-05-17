@@ -6,7 +6,7 @@ package com.delphiworlds.kastri;
  *                                                     *
  *        Delphi Worlds Cross-Platform Library         *
  *                                                     *
- * Copyright 2020-2023 Dave Nottage under MIT license  *
+ * Copyright 2020-2024 Dave Nottage under MIT license  *
  * which is located in the root folder of this library *
  *                                                     *
  *******************************************************/
@@ -233,7 +233,7 @@ public class DWFusedLocationClient {
               // mRequestingLocationUpdates = false;
               break;
             }
-            mDelegate.onLocationSettingsChange(false);
+            mDelegate.onLocationUpdatesChange(false);
           }
         });
   }

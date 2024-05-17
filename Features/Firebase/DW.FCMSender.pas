@@ -6,12 +6,11 @@ unit DW.FCMSender;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // ********* NOTE *************
 // This unit is dependent on code/binaries from Grijjy, which can be found here:
@@ -22,6 +21,8 @@ unit DW.FCMSender;
 // The DLLs for the relevant platform (i.e. Win32 or Win64) will need to be in the same folder as your executable, or in the system path
 
 interface
+
+{$SCOPEDENUMS ON}
 
 uses
   // RTL

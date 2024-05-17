@@ -6,23 +6,20 @@ unit DW.Graphics.Helpers.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
 
 uses
-  // macOS
-  {$IF Defined(MACDEV)}
-  Macapi.CocoaTypes,
-  {$ENDIF}
-  // iOS
   {$IF Defined(IOS)}
+  // iOS
   iOSapi.CoreVideo, iOSapi.CoreGraphics,
+  {$ELSEIF Defined(MACOS)}
+  // macOS
+  Macapi.CocoaTypes,
   {$ENDIF}
   // FMX
   FMX.Graphics;
@@ -55,11 +52,10 @@ uses
   System.Types, System.UITypes,
   // macOS
   Macapi.Helpers, Macapi.CoreFoundation, Macapi.ObjectiveC,
-  {$IF Defined(MACDEV)}
-  Macapi.CoreGraphics, Macapi.CoreVideo, Macapi.Foundation,
-  {$ENDIF}
   {$IF Defined(IOS)}
   iOSapi.Foundation, DW.iOSapi.CoreVideo,
+  {$ELSEIF Defined(MACOS)}
+  Macapi.CoreGraphics, Macapi.CoreVideo, Macapi.Foundation,
   {$ENDIF}
   // FMX
   FMX.Surfaces, FMX.Types;

@@ -6,18 +6,16 @@ unit DW.Androidapi.JNI.GoogleSignIn;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
 uses
   // DW
-  {$IF RTLVersion = 35.00}
+  {$IF RTLVersion >= 35.00}
   DW.Androidapi.JNI.PlayServices,
   {$ENDIF}
   // Android

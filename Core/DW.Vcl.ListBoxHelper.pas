@@ -6,12 +6,10 @@ unit DW.Vcl.ListBoxHelper;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -23,6 +21,7 @@ type
   TListBoxHelper = class helper for TCustomListBox
   public
     function CheckedCount(const AMustBeEnabled: Boolean = False): Integer;
+    function CheckedItems: TArray<string>;
     function DeletedSelected: Boolean;
     function HasChecked: Boolean;
     function HasSelections: Boolean;
@@ -31,6 +30,7 @@ type
     function SelectItem(const AItem: string): Integer;
     function SelectLastItem: Boolean;
     procedure ToggleChecked(const AIndex: Integer = -1);
+    procedure UncheckAll;
   end;
 
 implementation
@@ -97,6 +97,21 @@ begin
     Result := Items[ItemIndex];
 end;
 
+function TListBoxHelper.CheckedItems: TArray<string>;
+var
+  I: Integer;
+begin
+  Result := [];
+  if Self is TCheckListBox then
+  begin
+    for I := 0 to Items.Count - 1 do
+    begin
+      if TCheckListBox(Self).Checked[I] then
+        Result := Result + [Items[I]];
+    end;
+  end;
+end;
+
 function TListBoxHelper.SelectItem(const AItem: string): Integer;
 begin
   Result := Items.IndexOf(AItem);
@@ -125,6 +140,17 @@ begin
     end
     else if (AIndex > -1) and (AIndex < Items.Count) then
       TCheckListBox(Self).Checked[AIndex] := not TCheckListBox(Self).Checked[AIndex];
+  end;
+end;
+
+procedure TListBoxHelper.UncheckAll;
+var
+  I: Integer;
+begin
+  if Self is TCheckListBox then
+  begin
+    for I := 0 to Count - 1 do
+      TCheckListBox(Self).Checked[I] := False;
   end;
 end;
 

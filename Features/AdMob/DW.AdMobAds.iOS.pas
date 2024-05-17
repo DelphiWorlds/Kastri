@@ -6,12 +6,10 @@ unit DW.AdMobAds.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -50,7 +48,7 @@ type
     procedure PaidEventHandler(value: GADAdValue);
    protected
     procedure DoAdDismissedFullScreenContent; override;
-    procedure Load; override;
+    procedure DoLoad; override;
   public
     constructor Create(const AInterstitialAd: TInterstitialAd); override;
     destructor Destroy; override;
@@ -65,7 +63,7 @@ type
     procedure UserDidEarnRewardHandler;
   protected
     procedure DoAdDismissedFullScreenContent; override;
-    procedure Load; override;
+    procedure DoLoad; override;
   public
     constructor Create(const ARewardedAd: TRewardedAd); override;
     destructor Destroy; override;
@@ -81,7 +79,7 @@ type
     procedure UserDidEarnRewardHandler;
   protected
     procedure DoAdDismissedFullScreenContent; override;
-    procedure Load; override;
+    procedure DoLoad; override;
   public
     constructor Create(const ARewardedInterstitialAd: TRewardedInterstitialAd); override;
     destructor Destroy; override;
@@ -227,7 +225,7 @@ begin
   inherited;
 end;
 
-procedure TPlatformInterstitialAd.Load;
+procedure TPlatformInterstitialAd.DoLoad;
 begin
   TGADInterstitialAd.OCClass.loadWithAdUnitID(StrToNSStr(AdUnitID), TGADHelper.GetRequest, AdLoadCompletionHandler);
 end;
@@ -274,7 +272,7 @@ begin
   inherited;
 end;
 
-procedure TPlatformRewardedAd.Load;
+procedure TPlatformRewardedAd.DoLoad;
 begin
   TGADRewardedAd.OCClass.loadWithAdUnitID(StrToNSStr(AdUnitID), TGADHelper.GetRequest, AdLoadCompletionHandler);
 end;
@@ -326,7 +324,7 @@ begin
     DoAdFailedToLoad(TGADHelper.GetAdError(error));
 end;
 
-procedure TPlatformRewardedInterstitialAd.Load;
+procedure TPlatformRewardedInterstitialAd.DoLoad;
 begin
   LoadAd;
 end;

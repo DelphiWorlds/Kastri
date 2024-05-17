@@ -6,14 +6,14 @@ unit DW.FilesSelector;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
-
 interface
+
+{$SCOPEDENUMS ON}
 
 uses
   // RTL
@@ -32,13 +32,14 @@ type
 
   TSelectedFiles = TArray<TSelectedFile>;
 
-  TFileKind = (Image, Audio, Movie, Text, Item, Content, SourceCode, PDF, X509Certificate, Key, Photo);
+  TFileKind = (Image, Audio, Movie, Text, Item, Content, SourceCode, PDF, X509Certificate, Key, Photo, QuickTimeMovie);
 
   TFileKinds = set of TFileKind;
 
   TCustomPlatformFilesSelector = class(TObject)
   private
     FActivities: TStrings;
+    FDocumentsFolder: string;
     FFileName: string;
     FSelectedFiles: TSelectedFiles;
     FSelectionLimit: Integer;
@@ -57,6 +58,7 @@ type
     procedure FileTypesChanged; virtual;
     procedure Select(const AMode: TSelectionMode);
     property Activities: TStrings read FActivities;
+    property DocumentsFolder: string read FDocumentsFolder write FDocumentsFolder;
     property FileKinds: TFileKinds read FFileKinds write SetFileKinds;
     property FileName: string read FFileName write FFileName;
     property FileTypes: TStrings read FFileTypes;
@@ -79,11 +81,13 @@ type
     FOnComplete: TSelectorCompleteEvent;
     FOnImageStream: TSelectorImageStreamEvent;
     function GetActivities: TStrings;
+    function GetDocumentsFolder: string;
     function GetFileKinds: TFileKinds;
     function GetFileTypes: TStrings;
     function GetSelectedFiles: TSelectedFiles;
     function GetSelectionLimit: Integer;
     function GetTitle: string;
+    procedure SetDocumentsFolder(const Value: string);
     procedure SetFileKinds(const Value: TFileKinds);
     procedure SetSelectionLimit(const Value: Integer);
     procedure SetTitle(const Value: string);
@@ -101,6 +105,7 @@ type
     ///   List of activities that can handle the file selection based on FileKinds/FileTypes - ANDROID ONLY
     /// </summary>
     property Activities: TStrings read GetActivities;
+    property DocumentsFolder: string read GetDocumentsFolder write SetDocumentsFolder;
     /// <summary>
     ///   Set of TFileKind to indicate which kinds of files should be selectable.
     ///   An empty set implies all file types unless the FileTypes property is not empty
@@ -136,14 +141,19 @@ type
 
 implementation
 
+// DW
+{$IF Defined(IOS)}
 uses
-  // DW
-  {$IF Defined(IOS)}
   DW.FilesSelector.iOS;
-  {$ENDIF}
-  {$IF Defined(ANDROID)}
+{$ELSEIF Defined(ANDROID)}
+uses
   DW.FilesSelector.Android;
-  {$ENDIF}
+{$ENDIF}
+
+{$IF not Defined(IOS) and not Defined(ANDROID)}
+type
+  TPlatformFilesSelector = class(TCustomPlatformFilesSelector);
+{$ENDIF}
 
 { TCustomPlatformFilesSelector }
 
@@ -246,6 +256,11 @@ begin
   Result := FPlatformSelector.Activities;
 end;
 
+function TFilesSelector.GetDocumentsFolder: string;
+begin
+  Result := FPlatformSelector.DocumentsFolder;
+end;
+
 function TFilesSelector.GetFileKinds: TFileKinds;
 begin
   Result := FPlatformSelector.FileKinds;
@@ -274,6 +289,11 @@ end;
 procedure TFilesSelector.Select(const AMode: TSelectionMode = TSelectionMode.Documents);
 begin
   FPlatformSelector.Select(AMode);
+end;
+
+procedure TFilesSelector.SetDocumentsFolder(const Value: string);
+begin
+  FPlatformSelector.DocumentsFolder := Value;
 end;
 
 procedure TFilesSelector.SetFileKinds(const Value: TFileKinds);

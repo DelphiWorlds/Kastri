@@ -6,12 +6,10 @@ unit DW.Macapi.CloudKit;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -263,7 +261,8 @@ type
   TCKFetchRecordZoneChangesOperationBlockMethod3 = procedure(param1: CKRecordID; param2: CKRecord; param3: NSError) of object;
   TCKFetchRecordZoneChangesOperationBlockMethod4 = procedure(param1: CKRecordID; param2: CKRecordType) of object;
   TCKFetchRecordZoneChangesOperationBlockMethod5 = procedure(param1: CKRecordZoneID; param2: CKServerChangeToken; param3: NSData) of object;
-  TCKFetchRecordZoneChangesOperationBlockMethod6 = procedure(param1: CKRecordZoneID; param2: CKServerChangeToken; param3: NSData; param4: Boolean; param5: NSError) of object;
+  TCKFetchRecordZoneChangesOperationBlockMethod6 = procedure(param1: CKRecordZoneID; param2: CKServerChangeToken; param3: NSData;
+    param4: Boolean; param5: NSError) of object;
   TCKFetchRecordZoneChangesOperationBlockMethod7 = procedure(param1: NSError) of object;
   TCKFetchRecordZonesOperationBlockMethod1 = procedure(param1: CKRecordZoneID; param2: CKRecordZone; param3: NSError) of object;
   TCKFetchRecordZonesOperationBlockMethod2 = procedure() of object;
@@ -1354,7 +1353,6 @@ function CKRecordNameZoneWideShare: NSString;
 function CKShareTitleKey: CKRecordFieldKey;
 function CKShareThumbnailImageDataKey: CKRecordFieldKey;
 function CKShareTypeKey: CKRecordFieldKey;
-// Exported const CKQueryOperationMaximumResults has an unsupported type: const NSUInteger
 
 const
   libCloudKit = '/System/Library/Frameworks/CloudKit.framework/CloudKit';

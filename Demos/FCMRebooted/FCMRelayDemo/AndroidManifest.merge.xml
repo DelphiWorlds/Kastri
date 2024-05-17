@@ -1,6 +1,7 @@
 <manifest xmlns:merge="http://www.delphiworlds.com/xmlns/merge" xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <meta-data android:name="com.delphiworlds.kastri.FIREBASE_RELAY_SERVICE" android:value="com.embarcadero.services.FCMRelayService" />
+        <meta-data android:name="com.delphiworlds.kastri.FIREBASE_RELAY_SERVICE_JOB_ID" android:value="12345" />
         <service merge:replace="android:name=&quot;com.embarcadero.firebase.messaging.ProxyFirebaseMessagingService&quot;" android:exported="false" android:name="com.delphiworlds.kastri.DWFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

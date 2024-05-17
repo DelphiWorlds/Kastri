@@ -6,12 +6,10 @@ unit DW.Android.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -65,6 +63,9 @@ type
     ///   Returns the alarm manager
     /// </summary>
     class function AlarmManager: JAlarmManager; static;
+    /// <summary>
+    ///   Determines whether or not exact alarms can be scheduled. Applies to Android 14+
+    class function CanScheduleExactAlarms: Boolean; static;
     /// <summary>
     ///   Checks if both build and target are greater or equal to the tested value
     /// </summary>
@@ -222,6 +223,10 @@ type
     /// </remarks>
     class function ShowAllFilesAccessPermissionSettings: Boolean; static;
     /// <summary>
+    ///   Shows the exact alarms permissions activity if they are yet to be enabled
+    /// </summary>
+    class function ShowExactAlarmPermissionSettings: Boolean; static;
+    /// <summary>
     ///   Sends the device to the home screen
     /// </summary>
     class procedure ShowHome; static;
@@ -304,16 +309,40 @@ type
     constructor Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
   end;
 
-  TPlayCoreOnCompleteMethod = procedure(const ATask: JTask) of object;
+  TPlayCoreOnCompleteProc = reference to procedure(const ATask: JTask);
 
   TPlayCoreOnCompleteListener = class(TJavaLocal, JOnCompleteListener)
   private
-    FOnCompleteHandler: TPlayCoreOnCompleteMethod;
+    FHandler: TPlayCoreOnCompleteProc;
   public
     { JOnCompleteListener }
     procedure onComplete(task: JTask); cdecl;
   public
-    constructor Create(const AOnCompleteHandler: TPlayCoreOnCompleteMethod);
+    constructor Create(const AHandler: TPlayCoreOnCompleteProc);
+  end;
+
+  TPlayCoreOnSuccessProc = reference to procedure(const Obj: JObject);
+
+  TPlayCoreOnSuccessListener = class(TJavaLocal, JOnSuccessListener)
+  private
+    FHandler: TPlayCoreOnSuccessProc;
+  public
+    { JOnSuccessListener }
+    procedure onSuccess(result: JObject); cdecl;
+  public
+    constructor Create(const AHandler: TPlayCoreOnSuccessProc);
+  end;
+
+  TPlayCoreOnFailureProc = reference to procedure(const exception: JException);
+
+  TPlayCoreOnFailureListener = class(TJavaLocal, JOnFailureListener)
+  private
+    FHandler: TPlayCoreOnFailureProc;
+  public
+    { JOnFailureListener }
+    procedure onFailure(exception: JException); cdecl;
+  public
+    constructor Create(const AHandler: TPlayCoreOnFailureProc);
   end;
 
   TAndroidFileStream = class(TBytesStream)
@@ -350,7 +379,18 @@ uses
   Androidapi.Helpers, Androidapi.JNI.Provider, Androidapi.JNI, Androidapi.JNI.Support,
   // DW
   {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.AndroidX.FileProvider, {$ENDIF}
-  DW.Consts.Android, DW.Androidapi.JNI.Util, DW.Toast.Android;
+  DW.Consts.Android, DW.Androidapi.JNI.Android.Util, DW.Toast.Android, DW.Permissions.Helpers;
+
+const
+  cActionRequestScheduledExactAlarm = 'android.settings.REQUEST_SCHEDULE_EXACT_ALARM';
+
+type
+  [JavaSignature('android/app/AlarmManager')]
+  JAlarmManagerEx = interface(JObject)
+    ['{A03543C2-BB1C-4857-9E68-8EA1328C23A4}']
+    function canScheduleExactAlarms: Boolean; cdecl;
+  end;
+  TJAlarmManagerEx = class(TJavaGenericImport<JAlarmManagerClass, JAlarmManagerEx>) end;
 
 { TUncaughtExceptionHandler }
 
@@ -386,6 +426,11 @@ begin
       FAlarmManager := TJAlarmManager.Wrap(LService);
   end;
   Result := FAlarmManager;
+end;
+
+class function TAndroidHelperEx.CanScheduleExactAlarms: Boolean;
+begin
+  Result := not TOSVersion.Check(14) or TJAlarmManagerEx.Wrap(AlarmManager).canScheduleExactAlarms;
 end;
 
 class function TAndroidHelperEx.CheckBuildAndTarget(const AValue: Integer): Boolean;
@@ -796,7 +841,12 @@ begin
   LStartAt := GetTimeFromNowInMillis(SecondsBetween(Now, AAlarm));
   // Allow for alarms while in "doze" mode
   if TOSVersion.Check(6) then
-    TAndroidHelper.AlarmManager.setExactAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result)
+  begin
+    if CanScheduleExactAlarms then
+      AlarmManager.setExactAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result)
+    else
+      AlarmManager.setAndAllowWhileIdle(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result);
+  end
   else
     TAndroidHelper.AlarmManager.&set(TJAlarmManager.JavaClass.RTC_WAKEUP, LStartAt, Result);
 end;
@@ -835,6 +885,16 @@ begin
     LAction := StringToJString('android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION');
     LIntent := TJIntent.JavaClass.init(LAction, LUri);
     TAndroidHelper.Context.startActivity(LIntent);
+    Result := True;
+  end;
+end;
+
+class function TAndroidHelperEx.ShowExactAlarmPermissionSettings: Boolean;
+begin
+  Result := False;
+  if not CanScheduleExactAlarms then
+  begin
+    TAndroidHelper.Context.startActivity(TJIntent.JavaClass.init(StringToJString(cActionRequestScheduledExactAlarm)));
     Result := True;
   end;
 end;
@@ -893,13 +953,19 @@ end;
 class function TJImageHelper.JImageToByteArray(const AImage: JImage): TJavaArray<Byte>;
 var
   LBuffer: JByteBuffer;
+  LPlanes: TJavaObjectArray<JImage_Plane>;
 begin
   Result := nil;
   if AImage.getFormat = TJImageFormat.JavaClass.JPEG then
   begin
-    LBuffer := AImage.getPlanes.Items[0].getBuffer;
-    Result := TJavaArray<Byte>.Create(LBuffer.capacity);
-    LBuffer.get(Result);
+    LPlanes := AImage.getPlanes;
+    try
+      LBuffer := LPlanes.Items[0].getBuffer;
+      Result := TJavaArray<Byte>.Create(LBuffer.capacity);
+      LBuffer.get(Result);
+    finally
+      LPlanes.Free;
+    end;
   end
   else if AImage.getFormat = TJImageFormat.JavaClass.YUV_420_888 then
     Result := NV21ToJPEG(YUV_420_888ToNV21(AImage), AImage.getWidth, AImage.getHeight);
@@ -1018,15 +1084,44 @@ end;
 
 { TPlayCoreOnCompleteListener }
 
-constructor TPlayCoreOnCompleteListener.Create(const AOnCompleteHandler: TPlayCoreOnCompleteMethod);
+constructor TPlayCoreOnCompleteListener.Create(const AHandler: TPlayCoreOnCompleteProc);
 begin
-  FOnCompleteHandler := AOnCompleteHandler;
+  inherited Create;
+  FHandler := AHandler;
 end;
 
 procedure TPlayCoreOnCompleteListener.onComplete(task: JTask);
 begin
-  if Assigned(FOnCompleteHandler) then
-    FOnCompleteHandler(task);
+  if Assigned(FHandler) then
+    FHandler(task);
+end;
+
+{ TPlayCoreSuccessListener }
+
+constructor TPlayCoreOnSuccessListener.Create(const AHandler: TPlayCoreOnSuccessProc);
+begin
+  inherited Create;
+  FHandler := AHandler;
+end;
+
+procedure TPlayCoreOnSuccessListener.onSuccess(result: JObject);
+begin
+  if Assigned(FHandler) then
+    FHandler(result);
+end;
+
+{ TPlayCoreOnFailureListener }
+
+constructor TPlayCoreOnFailureListener.Create(const AHandler: TPlayCoreOnFailureProc);
+begin
+  inherited Create;
+  FHandler := AHandler;
+end;
+
+procedure TPlayCoreOnFailureListener.onFailure(exception: JException);
+begin
+  if Assigned(FHandler) then
+    FHandler(exception);
 end;
 
 { TAndroidFileStream }

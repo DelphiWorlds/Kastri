@@ -6,12 +6,10 @@ unit DW.WebBrowserExt.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -24,7 +22,7 @@ uses
   // FMX
   FMX.Graphics,
   // DW
-  DW.WebBrowserExt;
+  DW.WebBrowserExt, DW.JavaScript;
 
 type
   TPlatformWebBrowserExt = class;
@@ -60,6 +58,7 @@ type
     function CreateValueCallback(const AHandler: TJavaScriptResultProc): JValueCallback;
     procedure RemoveValueCallback(const ACallback: JValueCallback);
   protected
+    procedure ClearCache(const ADataKinds: TCacheDataKinds); override;
     procedure DoCaptureBitmap; override;
     procedure ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc); override;
     procedure FlushCookies(const ARemove: Boolean); override;
@@ -130,6 +129,27 @@ destructor TPlatformWebBrowserExt.Destroy;
 begin
   //
   inherited;
+end;
+
+procedure TPlatformWebBrowserExt.ClearCache(const ADataKinds: TCacheDataKinds);
+var
+  LHasAll, LHasAnyStorage: Boolean;
+begin
+  if FWebView <> nil then
+  begin
+    LHasAll := ADataKinds = [];
+    if not LHasAll then
+    begin
+      if TCacheDataKind.Cookies in ADataKinds then
+        FlushCookies(True);
+      LHasAnyStorage := (ADataKinds * [TCacheDataKind.LocalStorage, TCacheDataKind.SessionStorage,
+        TCacheDataKind.IndexedDBDatabases, TCacheDataKind.WebSQLDatabases]) <> [];
+      if LHasAnyStorage then
+        TJWebStorage.JavaClass.getInstance.deleteAllData;
+    end
+    else
+      FWebView.clearCache(True);
+  end;
 end;
 
 function TPlatformWebBrowserExt.CreateValueCallback(const AHandler: TJavaScriptResultProc): JValueCallback;
@@ -218,9 +238,22 @@ begin
 end;
 
 procedure TPlatformWebBrowserExt.Navigate(const AURL: string);
+var
+  LHeaders: JMap;
 begin
   if FWebView <> nil then
-    FWebView.loadUrl(StringToJString(AURL));
+  begin
+    // https://stackoverflow.com/a/14545315/3164070
+    if not Browser.EnableCaching then
+    begin
+      LHeaders := TJMap.Wrap(TJHashMap.JavaClass.init(2));
+      LHeaders.put(StringToJString('Pragma'), StringToJString('no-cache'));
+      LHeaders.put(StringToJString('Cache-Control'), StringToJString('no-cache'));
+      FWebView.loadUrl(StringToJString(AURL), LHeaders);
+    end
+    else
+      FWebView.loadUrl(StringToJString(AURL));
+  end;
 end;
 
 class function TPlatformWebBrowserExt.GetHitTestKind(const AType: Integer): THitTestKind;

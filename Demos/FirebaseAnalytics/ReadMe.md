@@ -4,8 +4,6 @@
 
 Demonstrates the Firebase Analytics features implemented in Kastri.
 
-**NOTE**: **The Android implementation will work only in Delphi 11 or higher.** The technical requirements for supporting Delphi 10.4.2 or lower are quite substantial. 
-
 ## IMPORTANT
 
 Please read the Android Notes and iOS Notes sections below - they are important for configuration, especially if you are creating your own project and wish to include the Firebase Analytics implementation
@@ -31,7 +29,7 @@ The rest of the video can be ignored, since it deals specifically with Android S
 
 In Project Options of the Delphi project, select the Version Info section, and select the applicable target. For Android, update the `Package` property to match the package name specified for Android in the Firebase project. For iOS, update the `CFBundleIdentifier` value to match the App ID specified for iOS in the Firebase project.
 
-### Android configuration
+### Android
 
 #### Import the `google-services.json` file
 
@@ -61,18 +59,24 @@ The following 3 were obtained from the [Maven Repository](https://mvnrepository.
 
 The other file, `play-services-basement-17.6.0.R.jar` is compiled from files in the Android Archive file (`aar`) located [here](https://mvnrepository.com/artifact/com.google.android.gms/play-services-basement/17.6.0)
 
-## iOS Notes
+### iOS
 
-### Firebase iOS SDK
+#### Firebase SDK
 
-The default Firebase SDK used is 8.7.0, which you can download from [here](https://github.com/firebase/firebase-ios-sdk/releases/download/8.7.0/Firebase.zip). 
+Firebase support in Kastri has now been aligned with Firebase SDK for iOS version 10.8.0. Firebase SDK versions 9.x and older have now been **deprecated*, and are not guaranteed to work, so support for them has been removed entirely.
 
-You will need to either go to Tools|Options, IDE > Environment Variables, and create a User Override called Firebase_8_7 that points to the root of the Firebase SDK, or modify the Framework Search Path value in the Project Options so that the folders match the Firebase SDK you wish to compile against, if it is compatible (known to be compatible with version 8.2.0 - 8.7.0).
+Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
 
-### Linker option
+In order to compile successfully for iOS, it's also necessary to add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
 
-As is the case for other Firebase projects that target iOS, in the `Linker` options of the Delphi project, the `Options passed to the LD linker` option has a value of `-ObjC`
+#### Deployment of GoogleServices-info.plist
 
-### GoogleService-info.plist
+Download the `GoogleServices-info.plist` file from your project configured in [Firebase Console](https://console.firebase.google.com/), and save it to the Resources folder in the demo. Add `GoogleServices-info.plist` to the deployment, as per the demo, as described above.
 
-As per the notes above, in the demo **this file needs to be placed in the root folder of the project.**
+#### Linker Options
+
+Ensure you have a value of: `-ObjC -rpath /usr/lib/swift` for the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit:
+
+   <img src="../AdMob//Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
+
+

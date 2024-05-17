@@ -6,12 +6,10 @@ unit DW.ShareItems.Mac;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -129,7 +127,6 @@ var
   ColorSpace: CGColorSpaceRef;
   BitmapData: TBitmapData;
   BitmapInfo: CGBitmapInfo;
-  LSize: NSSize;
 begin
   if Bitmap.IsEmpty then
     Result := TNSImage.Create
@@ -167,6 +164,8 @@ var
   LItem: TSharingItem;
   LView: NSView;
   LURL: NSURL;
+  LRect: TRectF;
+  LNativeRect: NSRect;
 begin
   if (AControl <> nil) and (AControl.Root <> nil) and (AControl.Root.GetObject is TCommonCustomForm) then
   begin
@@ -179,7 +178,7 @@ begin
       else if LItem is TSharingItemFile then
       begin
         LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(TSharingItemFile(LItem).Text)));
-        LActivityItems.addObject(TNSFileWrapper.Alloc.initWithURL(LURL, 0));
+        LActivityItems.addObject(TNSitemProvider.Alloc.initWithContentsOfURL(LURL));
       end
       else if LItem is TSharingItemImage then
         LActivityItems.addObject(NSObjectToID(BitmapToNSImage(TSharingItemImage(LItem).Image)))
@@ -187,7 +186,9 @@ begin
     FPicker := nil;
     FPicker := TNSSharingServicePicker.Wrap(TNSSharingServicePicker.Alloc.initWithItems(LActivityItems));
     FPicker.setDelegate(FPickerDelegate.GetObjectID);
-    FPicker.showRelativeToRect(MakeNSRect(0, 0, 0, 0), LView, CGRectMinYEdge); // <----- Might need to adjust the values in MakeNSRect
+    LRect := AControl.AbsoluteRect;
+    LNativeRect := MakeNSRect(LRect.Left, LView.Bounds.size.height - LRect.Bottom, LRect.Width, LRect.Height);
+    FPicker.showRelativeToRect(LNativeRect, LView, CGRectMinYEdge);
   end;
 end;
 

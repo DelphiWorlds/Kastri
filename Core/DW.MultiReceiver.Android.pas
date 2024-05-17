@@ -6,12 +6,10 @@ unit DW.MultiReceiver.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -39,28 +37,38 @@ type
   end;
   TJDWMultiBroadcastReceiver = class(TJavaGenericImport<JDWMultiBroadcastReceiverClass, JDWMultiBroadcastReceiver>) end;
 
-  TMultiReceiver = class;
+  TCustomMultiReceiver = class;
 
   TMultiBroadcastReceiverDelegate = class(TJavaLocal, JDWMultiBroadcastReceiverDelegate)
   private
-    FMultiReceiver: TMultiReceiver;
+    FMultiReceiver: TCustomMultiReceiver;
   public
     { JDWMultiBroadcastReceiverDelegate }
     procedure onReceive(context: JContext; intent: JIntent); cdecl;
   public
-    constructor Create(const AMultiReceiver: TMultiReceiver);
+    constructor Create(const AMultiReceiver: TCustomMultiReceiver);
   end;
 
-  TMultiReceiver = class(TObject)
+  TCustomMultiReceiver = class(TObject)
   private
-    FIntentFilter: JIntentFilter;
-    FLocal: Boolean;
     FReceiver: JBroadcastReceiver;
     FReceiverDelegate: JDWMultiBroadcastReceiverDelegate;
   protected
+    procedure Receive(context: JContext; intent: JIntent); virtual; abstract;
+  public
+    constructor Create;
+    property Receiver: JBroadcastReceiver read FReceiver;
+  end;
+
+  TMultiReceiver = class(TCustomMultiReceiver)
+  private
+    FIntentFilter: JIntentFilter;
+    FLocal: Boolean;
+    function HasNonSystemActions: Boolean;
+    procedure RegisterReceiver;
+  protected
     procedure ConfigureActions; virtual; abstract;
     function GetResultCode: Integer;
-    procedure Receive(context: JContext; intent: JIntent); virtual; abstract;
     property IntentFilter: JIntentFilter read FIntentFilter;
   public
     constructor Create(const ALocal: Boolean = False);
@@ -70,14 +78,21 @@ type
 implementation
 
 uses
+  // RTL
+  System.SysUtils,
   // Android
-  Androidapi.Helpers,
+  Androidapi.Helpers, Androidapi.JNI.Os,
   // DW
-  {$IF CompilerVersion < 35} DW.Androidapi.JNI.SupportV4, {$ELSE} DW.Androidapi.JNI.Androidx.LocalBroadcastManager, {$ENDIF} DW.Android.Helpers;
+  {$IF CompilerVersion < 35}
+  DW.Androidapi.JNI.SupportV4,
+  {$ELSE}
+  DW.Androidapi.JNI.AndroidX.LocalBroadcastManager,
+  {$ENDIF}
+  DW.Android.Helpers;
 
 { TMultiBroadcastReceiverDelegate }
 
-constructor TMultiBroadcastReceiverDelegate.Create(const AMultiReceiver: TMultiReceiver);
+constructor TMultiBroadcastReceiverDelegate.Create(const AMultiReceiver: TCustomMultiReceiver);
 begin
   inherited Create;
   FMultiReceiver := AMultiReceiver;
@@ -88,20 +103,24 @@ begin
   FMultiReceiver.Receive(context, intent);
 end;
 
+{ TCustomMultiReceiver }
+
+constructor TCustomMultiReceiver.Create;
+begin
+  inherited;
+  FReceiverDelegate := TMultiBroadcastReceiverDelegate.Create(Self);
+  FReceiver := TJDWMultiBroadcastReceiver.JavaClass.init(FReceiverDelegate);
+end;
+
 { TMultiReceiver }
 
 constructor TMultiReceiver.Create(const ALocal: Boolean = False);
 begin
   inherited Create;
   FLocal := ALocal;
-  FReceiverDelegate := TMultiBroadcastReceiverDelegate.Create(Self);
-  FReceiver := TJDWMultiBroadcastReceiver.JavaClass.init(FReceiverDelegate);
   FIntentFilter := TJIntentFilter.JavaClass.init;
   ConfigureActions;
-  if not FLocal then
-    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter)
-  else
-    TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FReceiver, FIntentFilter);
+  RegisterReceiver;
 end;
 
 destructor TMultiReceiver.Destroy;
@@ -115,6 +134,40 @@ end;
 function TMultiReceiver.GetResultCode: Integer;
 begin
   Result := FReceiver.getResultCode;
+end;
+
+function TMultiReceiver.HasNonSystemActions: Boolean;
+var
+  I: Integer;
+  LAction: string;
+begin
+  Result := False;
+  for I := 0 to FIntentFilter.countActions - 1 do
+  begin
+    LAction := JStringToString(FIntentFilter.getAction(I));
+    // Crude way of determining whether or not this is a system broadcast
+    if not (LAction.StartsWith('android.') or LAction.StartsWith('com.android.')) then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+procedure TMultiReceiver.RegisterReceiver;
+var
+  LFlags: Integer;
+begin
+  if not FLocal then
+  begin
+    // https://developer.android.com/about/versions/14/behavior-changes-14#runtime-receivers-exported
+    LFlags := 0;
+    if TAndroidHelperEx.CheckBuildAndTarget(TAndroidHelperEx.UPSIDE_DOWN_CAKE) and HasNonSystemActions then
+      LFlags := TJContext.JavaClass.RECEIVER_EXPORTED;
+    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter, LFlags);
+  end
+  else
+    TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FReceiver, FIntentFilter);
 end;
 
 end.

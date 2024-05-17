@@ -1,0 +1,95 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 668
+  ClientWidth = 430
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object ConnectButton: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 35.000000000000000000
+    Size.Width = 414.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Connect/Start'
+    TextSettings.Trimming = None
+    OnClick = ConnectButtonClick
+  end
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Client
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Size.Width = 414.000000000000000000
+    Size.Height = 314.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    Viewport.Width = 410.000000000000000000
+    Viewport.Height = 310.000000000000000000
+  end
+  object PingButton: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 80.000000000000000000
+    Size.Width = 414.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Ping'
+    TextSettings.Trimming = None
+    OnClick = PingButtonClick
+  end
+  object UseBindingCheckBox: TCheckBox
+    Align = Top
+    IsChecked = True
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Size.Width = 414.000000000000000000
+    Size.Height = 19.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Text = 'Use Binding'
+  end
+  object Image1: TImage
+    MultiResBitmap = <
+      item
+      end>
+    Align = Bottom
+    Position.Y = 492.000000000000000000
+    Size.Width = 430.000000000000000000
+    Size.Height = 176.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object ImageButton: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 125.000000000000000000
+    Size.Width = 414.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'Get Image'
+    TextSettings.Trimming = None
+    OnClick = ImageButtonClick
+  end
+end

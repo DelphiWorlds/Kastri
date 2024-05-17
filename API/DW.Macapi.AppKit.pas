@@ -6,12 +6,10 @@ unit DW.Macapi.AppKit;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -23,6 +21,11 @@ uses
 
 type
   NSCloudSharingServiceDelegate = interface;
+  NSEvent = interface;
+  NSLayoutAnchor = interface;
+  NSLayoutConstraint = interface;
+  NSLayoutDimension = interface;
+  NSLayoutGuide = interface;
   NSOpenPanel = interface;
   NSSavePanel = interface;
   NSSharingService = interface;
@@ -34,9 +37,21 @@ type
   NSStoryboard = interface;
   NSViewController = interface;
 
+  NSEventButtonMask = NSInteger;
+  NSEventMask = NSInteger;
+  NSEventModifierFlags = NSInteger;
+  NSEventPhase = NSInteger;
+  NSEventSubtype = NSInteger;
+  NSEventSwipeTrackingOptions = NSInteger;
+  NSLayoutConstraintOrientation = NSInteger;
+  NSLayoutPriority = Single;
+  NSLayoutRelation = NSInteger;
+  NSLayoutAttribute = NSInteger;
+  NSLayoutFormatOptions = NSInteger;
   NSModalResponse = NSInteger;
   NSNibName = NSString;
   NSPopoverBehavior = NSInteger;
+  NSPressureBehavior = NSInteger;
   NSViewControllerTransitionOptions = NSInteger;
   NSStoryboardName = NSString;
   NSStoryboardSceneIdentifier = NSString;
@@ -46,12 +61,15 @@ type
   NSTouchBarItemIdentifier = NSString;
   NSTouchBarItemPriority = Single;
   NSTouchBarCustomizationIdentifier = NSString;
+  NSUserInterfaceItemIdentifier = NSString;
 
   PNSRectEdge = ^NSRectEdge;
   PNSSharingContentScope = ^NSSharingContentScope;
 
   NSStoryboardControllerCreator = function(coder: NSCoder): Pointer of object;
 
+  TNSEventBlockMethod1 = procedure(gestureAmount: CGFloat; phase: NSEventPhase; isComplete: Boolean; stop: PBoolean) of object;
+  TNSEventBlockMethod2 = function(event: NSEvent): NSEvent of object;
   TNSSavePanelBlockMethod1 = procedure(result: NSModalResponse) of object;
   TNSViewControllerBlockMethod1 = procedure of object;
   TNSSharingServiceBlockMethod1 = procedure of object;
@@ -411,6 +429,227 @@ type
     ['{DD2F8398-5CB1-4D68-A483-ACAE4EB47223}']
     function itemsForSharingServicePickerTouchBarItem(pickerTouchBarItem: NSSharingServicePickerTouchBarItem): NSArray; cdecl;
   end;
+
+  NSEventClass = interface(NSObjectClass)
+    ['{2C522522-2141-40BA-A61D-16C0362EFB95}']
+    {class} function addGlobalMonitorForEventsMatchingMask(mask: NSEventMask; handler: TNSEventBlockMethod2): Pointer; cdecl;
+    {class} function addLocalMonitorForEventsMatchingMask(mask: NSEventMask; handler: TNSEventBlockMethod2): Pointer; cdecl;
+    {class} function doubleClickInterval: NSTimeInterval; cdecl;
+    {class} function enterExitEventWithType(&type: NSEventType; location: NSPoint; modifierFlags: NSEventModifierFlags; timestamp: NSTimeInterval;
+      windowNumber: NSInteger; context: NSGraphicsContext; eventNumber: NSInteger; trackingNumber: NSInteger; userData: Pointer): NSEvent; cdecl;
+    {class} function eventWithCGEvent(cgEvent: CGEventRef): NSEvent; cdecl;
+    {class} function eventWithEventRef(eventRef: Pointer): NSEvent; cdecl;
+    {class} function isMouseCoalescingEnabled: Boolean; cdecl;
+    {class} function isSwipeTrackingFromScrollEventsEnabled: Boolean; cdecl;
+    {class} function keyEventWithType(&type: NSEventType; location: NSPoint; modifierFlags: NSEventModifierFlags; timestamp: NSTimeInterval;
+      windowNumber: NSInteger; context: NSGraphicsContext; characters: NSString; charactersIgnoringModifiers: NSString; isARepeat: Boolean;
+      keyCode: Word): NSEvent; cdecl;
+    {class} function keyRepeatDelay: NSTimeInterval; cdecl;
+    {class} function keyRepeatInterval: NSTimeInterval; cdecl;
+    {class} function modifierFlags: NSEventModifierFlags; cdecl;
+    {class} function mouseEventWithType(&type: NSEventType; location: NSPoint; modifierFlags: NSEventModifierFlags; timestamp: NSTimeInterval;
+      windowNumber: NSInteger; context: NSGraphicsContext; eventNumber: NSInteger; clickCount: NSInteger; pressure: Single): NSEvent; cdecl;
+    {class} function mouseLocation: NSPoint; cdecl;
+    {class} function otherEventWithType(&type: NSEventType; location: NSPoint; modifierFlags: NSEventModifierFlags; timestamp: NSTimeInterval;
+      windowNumber: NSInteger; context: NSGraphicsContext; subtype: Smallint; data1: NSInteger; data2: NSInteger): NSEvent; cdecl;
+    {class} function pressedMouseButtons: NSUInteger; cdecl;
+    {class} procedure removeMonitor(eventMonitor: Pointer); cdecl;
+    {class} procedure setMouseCoalescingEnabled(mouseCoalescingEnabled: Boolean); cdecl;
+    {class} procedure startPeriodicEventsAfterDelay(delay: NSTimeInterval; withPeriod: NSTimeInterval); cdecl;
+    {class} procedure stopPeriodicEvents; cdecl;
+  end;
+
+  NSEvent = interface(NSObject)
+    ['{66D96C14-65F4-4A71-AC65-246823864F5D}']
+    function absoluteX: NSInteger; cdecl;
+    function absoluteY: NSInteger; cdecl;
+    function absoluteZ: NSInteger; cdecl;
+    function allTouches: NSSet; cdecl;
+    function associatedEventsMask: NSEventMask; cdecl;
+    function buttonMask: NSEventButtonMask; cdecl;
+    function buttonNumber: NSInteger; cdecl;
+    function capabilityMask: NSUInteger; cdecl;
+    function CGEvent: CGEventRef; cdecl;
+    function characters: NSString; cdecl;
+    function charactersByApplyingModifiers(modifiers: NSEventModifierFlags): NSString; cdecl;
+    function charactersIgnoringModifiers: NSString; cdecl;
+    function clickCount: NSInteger; cdecl;
+    function coalescedTouchesForTouch(touch: NSTouch): NSArray; cdecl;
+    function context: NSGraphicsContext; cdecl;
+    function data1: NSInteger; cdecl;
+    function data2: NSInteger; cdecl;
+    function deltaX: CGFloat; cdecl;
+    function deltaY: CGFloat; cdecl;
+    function deltaZ: CGFloat; cdecl;
+    function deviceID: NSUInteger; cdecl;
+    function eventNumber: NSInteger; cdecl;
+    function eventRef: Pointer; cdecl;
+    function hasPreciseScrollingDeltas: Boolean; cdecl;
+    function isARepeat: Boolean; cdecl;
+    function isDirectionInvertedFromDevice: Boolean; cdecl;
+    function isEnteringProximity: Boolean; cdecl;
+    function keyCode: Word; cdecl;
+    function locationInWindow: NSPoint; cdecl;
+    function magnification: CGFloat; cdecl;
+    function modifierFlags: NSEventModifierFlags; cdecl;
+    function momentumPhase: NSEventPhase; cdecl;
+    function phase: NSEventPhase; cdecl;
+    function pointingDeviceID: NSUInteger; cdecl;
+    function pointingDeviceSerialNumber: NSUInteger; cdecl;
+    function pointingDeviceType: NSPointingDeviceType; cdecl;
+    function pressure: Single; cdecl;
+    function pressureBehavior: NSPressureBehavior; cdecl;
+    function rotation: Single; cdecl;
+    function scrollingDeltaX: CGFloat; cdecl;
+    function scrollingDeltaY: CGFloat; cdecl;
+    function stage: NSInteger; cdecl;
+    function stageTransition: CGFloat; cdecl;
+    function subtype: NSEventSubtype; cdecl;
+    function systemTabletID: NSUInteger; cdecl;
+    function tabletID: NSUInteger; cdecl;
+    function tangentialPressure: Single; cdecl;
+    function tilt: NSPoint; cdecl;
+    function timestamp: NSTimeInterval; cdecl;
+    function touchesForView(view: NSView): NSSet; cdecl;
+    function touchesMatchingPhase(phase: NSTouchPhase; inView: NSView): NSSet; cdecl;
+    function trackingArea: NSTrackingArea; cdecl;
+    function trackingNumber: NSInteger; cdecl;
+    procedure trackSwipeEventWithOptions(options: NSEventSwipeTrackingOptions; dampenAmountThresholdMin: CGFloat; max: CGFloat;
+      usingHandler: TNSEventBlockMethod1); cdecl;
+    function &type: NSEventType; cdecl;
+    function uniqueID: UInt64; cdecl;
+    function userData: Pointer; cdecl;
+    function vendorDefined: Pointer; cdecl;
+    function vendorID: NSUInteger; cdecl;
+    function vendorPointingDeviceType: NSUInteger; cdecl;
+    function window: NSWindow; cdecl;
+    function windowNumber: NSInteger; cdecl;
+  end;
+  TNSEvent = class(TOCGenericImport<NSEventClass, NSEvent>) end;
+
+  NSLayoutAnchorClass = interface(NSObjectClass)
+    ['{162111AA-D951-47B2-9BE2-9203E3F70BDF}']
+  end;
+
+  NSLayoutAnchor = interface(NSObject)
+    ['{7359665A-59DB-42D7-A6CE-E7A12F686196}']
+    function constraintEqualToAnchor(anchor: NSLayoutAnchor): NSLayoutConstraint; overload; cdecl;
+    function constraintEqualToAnchor(anchor: NSLayoutAnchor; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintGreaterThanOrEqualToAnchor(anchor: NSLayoutAnchor; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintGreaterThanOrEqualToAnchor(anchor: NSLayoutAnchor): NSLayoutConstraint; overload; cdecl;
+    function constraintLessThanOrEqualToAnchor(anchor: NSLayoutAnchor; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintLessThanOrEqualToAnchor(anchor: NSLayoutAnchor): NSLayoutConstraint; overload; cdecl;
+    function constraintsAffectingLayout: NSArray; cdecl;
+    function hasAmbiguousLayout: Boolean; cdecl;
+    function item: Pointer; cdecl;
+    function name: NSString; cdecl;
+  end;
+  TNSLayoutAnchor = class(TOCGenericImport<NSLayoutAnchorClass, NSLayoutAnchor>) end;
+
+  NSLayoutXAxisAnchorClass = interface(NSLayoutAnchorClass)
+    ['{819BCA30-428F-4EB0-8C8C-7438270B4343}']
+  end;
+
+  NSLayoutXAxisAnchor = interface(NSLayoutAnchor)
+    ['{BEA53529-A1B5-439C-BE52-C3239760DA1C}']
+    function anchorWithOffsetToAnchor(otherAnchor: NSLayoutXAxisAnchor): NSLayoutDimension; cdecl;
+    function constraintEqualToSystemSpacingAfterAnchor(anchor: NSLayoutXAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintGreaterThanOrEqualToSystemSpacingAfterAnchor(anchor: NSLayoutXAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintLessThanOrEqualToSystemSpacingAfterAnchor(anchor: NSLayoutXAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+  end;
+  TNSLayoutXAxisAnchor = class(TOCGenericImport<NSLayoutXAxisAnchorClass, NSLayoutXAxisAnchor>) end;
+
+  NSLayoutYAxisAnchorClass = interface(NSLayoutAnchorClass)
+    ['{97FCDCB7-7B0A-4242-A8D8-6C3F7DFD5CB3}']
+  end;
+
+  NSLayoutYAxisAnchor = interface(NSLayoutAnchor)
+    ['{29ADC51C-0583-4053-8F6B-FEEDD7F8CE62}']
+    function anchorWithOffsetToAnchor(otherAnchor: NSLayoutYAxisAnchor): NSLayoutDimension; cdecl;
+    function constraintEqualToSystemSpacingBelowAnchor(anchor: NSLayoutYAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintGreaterThanOrEqualToSystemSpacingBelowAnchor(anchor: NSLayoutYAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintLessThanOrEqualToSystemSpacingBelowAnchor(anchor: NSLayoutYAxisAnchor; multiplier: CGFloat): NSLayoutConstraint; cdecl;
+  end;
+  TNSLayoutYAxisAnchor = class(TOCGenericImport<NSLayoutYAxisAnchorClass, NSLayoutYAxisAnchor>) end;
+
+  NSLayoutDimensionClass = interface(NSLayoutAnchorClass)
+    ['{5E895587-E52D-4ADA-8511-9A37D806503B}']
+  end;
+
+  NSLayoutDimension = interface(NSLayoutAnchor)
+    ['{06161B24-C456-4837-9FCE-AD43D7C1364F}']
+    function constraintEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintEqualToConstant(c: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintGreaterThanOrEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat;
+      constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintGreaterThanOrEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintGreaterThanOrEqualToConstant(c: CGFloat): NSLayoutConstraint; cdecl;
+    function constraintLessThanOrEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat; constant: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintLessThanOrEqualToAnchor(anchor: NSLayoutDimension; multiplier: CGFloat): NSLayoutConstraint; overload; cdecl;
+    function constraintLessThanOrEqualToConstant(c: CGFloat): NSLayoutConstraint; cdecl;
+  end;
+  TNSLayoutDimension = class(TOCGenericImport<NSLayoutDimensionClass, NSLayoutDimension>) end;
+
+  NSLayoutConstraintClass = interface(NSObjectClass)
+    ['{CE3B22AA-E0C1-4AF8-9063-4AC887F80EC3}']
+    {class} procedure activateConstraints(constraints: NSArray); cdecl;
+    {class} function constraintsWithVisualFormat(format: NSString; options: NSLayoutFormatOptions; metrics: NSDictionary;
+      views: NSDictionary): NSArray; cdecl;
+    [MethodName('constraintWithItem:attribute:relatedBy:toItem:attribute:multiplier:constant:')]
+    {class} function constraintWithItem(view1: Pointer; attribute: NSLayoutAttribute; relatedBy: NSLayoutRelation; toItem: Pointer;
+      attr2: NSLayoutAttribute; multiplier: CGFloat; constant: CGFloat): Pointer; cdecl;
+    {class} procedure deactivateConstraints(constraints: NSArray); cdecl;
+  end;
+
+  NSLayoutConstraint = interface(NSObject)
+    ['{B5D1D7E7-23B6-4BF7-A7E8-26BFEF6351EA}']
+    function constant: CGFloat; cdecl;
+    function firstAnchor: NSLayoutAnchor; cdecl;
+    function firstAttribute: NSLayoutAttribute; cdecl;
+    function firstItem: Pointer; cdecl;
+    function identifier: NSString; cdecl;
+    function isActive: Boolean; cdecl;
+    function multiplier: CGFloat; cdecl;
+    function priority: NSLayoutPriority; cdecl;
+    function relation: NSLayoutRelation; cdecl;
+    function secondAnchor: NSLayoutAnchor; cdecl;
+    function secondAttribute: NSLayoutAttribute; cdecl;
+    function secondItem: Pointer; cdecl;
+    procedure setActive(active: Boolean); cdecl;
+    procedure setConstant(constant: CGFloat); cdecl;
+    procedure setIdentifier(identifier: NSString); cdecl;
+    procedure setPriority(priority: NSLayoutPriority); cdecl;
+    procedure setShouldBeArchived(shouldBeArchived: Boolean); cdecl;
+    function shouldBeArchived: Boolean; cdecl;
+  end;
+  TNSLayoutConstraint = class(TOCGenericImport<NSLayoutConstraintClass, NSLayoutConstraint>) end;
+
+  NSLayoutGuideClass = interface(NSObjectClass)
+    ['{E341546F-9110-4A60-9636-5E59EF9377B2}']
+  end;
+
+  NSLayoutGuide = interface(NSObject)
+    ['{2FF3DAD7-B6F8-4197-8DCD-0B23AC886B31}']
+    function bottomAnchor: NSLayoutYAxisAnchor; cdecl;
+    function centerXAnchor: NSLayoutXAxisAnchor; cdecl;
+    function centerYAnchor: NSLayoutYAxisAnchor; cdecl;
+    function constraintsAffectingLayoutForOrientation(orientation: NSLayoutConstraintOrientation): NSArray; cdecl;
+    function frame: NSRect; cdecl;
+    function hasAmbiguousLayout: Boolean; cdecl;
+    function heightAnchor: NSLayoutDimension; cdecl;
+    function identifier: NSUserInterfaceItemIdentifier; cdecl;
+    function leadingAnchor: NSLayoutXAxisAnchor; cdecl;
+    function leftAnchor: NSLayoutXAxisAnchor; cdecl;
+    function owningView: NSView; cdecl;
+    function rightAnchor: NSLayoutXAxisAnchor; cdecl;
+    procedure setIdentifier(identifier: NSUserInterfaceItemIdentifier); cdecl;
+    procedure setOwningView(owningView: NSView); cdecl;
+    function topAnchor: NSLayoutYAxisAnchor; cdecl;
+    function trailingAnchor: NSLayoutXAxisAnchor; cdecl;
+    function widthAnchor: NSLayoutDimension; cdecl;
+  end;
+  TNSLayoutGuide = class(TOCGenericImport<NSLayoutGuideClass, NSLayoutGuide>) end;
 
 implementation
 

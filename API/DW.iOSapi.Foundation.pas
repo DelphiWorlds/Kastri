@@ -6,12 +6,10 @@ unit DW.iOSapi.Foundation;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -61,6 +59,12 @@ type
   NSItemProviderErrorCode = NSInteger;
   NSProgressUnpublishingHandler = procedure of object;
   NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
+
+  NSOperatingSystemVersion = record
+    majorVersion: NSInteger;
+    minorVersion: NSInteger;
+    patchVersion: NSInteger;
+  end;
 
   TNSItemProviderBlockMethod1 = procedure of object;
   TNSItemProviderBlockMethod2 = procedure(completionHandler: TNSItemProviderBlockMethod1) of object;
@@ -252,11 +256,13 @@ type
     procedure setPersistentIdentifier(persistentIdentifier: NSUserActivityPersistentIdentifier); cdecl;
     procedure setReferrerURL(referrerURL: NSURL); cdecl;
     procedure setRequiredUserInfoKeys(requiredUserInfoKeys: NSSet); cdecl;
+    procedure setSuggestedInvocationPhrase(phrase: NSString); cdecl;
     procedure setSupportsContinuationStreams(supportsContinuationStreams: Boolean); cdecl;
     procedure setTargetContentIdentifier(targetContentIdentifier: NSString); cdecl;
     procedure setTitle(title: NSString); cdecl;
     procedure setUserInfo(userInfo: NSDictionary); cdecl;
     procedure setWebpageURL(webpageURL: NSURL); cdecl;
+    function suggestedInvocationPhrase: NSString; cdecl;
     function supportsContinuationStreams: Boolean; cdecl;
     function targetContentIdentifier: NSString; cdecl;
     function title: NSString; cdecl;

@@ -5,12 +5,11 @@ unit DW.iOSapi.SpriteKitExtra;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // This unit is required so as to avoid circular references to DW.iOSapi.SceneKit
 

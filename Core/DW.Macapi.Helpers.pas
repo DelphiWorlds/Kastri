@@ -6,12 +6,10 @@ unit DW.Macapi.Helpers;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -20,17 +18,35 @@ uses
   System.Classes, System.SysUtils,
   // macOS
   {$IF Defined(MACOS)}
-  Macapi.CoreFoundation,
-  {$ENDIF}
-  {$IF Defined(MACDEV)}
-  Macapi.Foundation, Macapi.AppKit;
+  Macapi.CoreFoundation, Macapi.ObjectiveC,
   {$ENDIF}
   // iOS
   {$IF Defined(IOS)}
   iOSapi.Foundation;
+  {$ELSEIF Defined(MACOS)}
+  Macapi.Foundation, Macapi.AppKit,
+  DW.Macapi.Foundation;
   {$ENDIF}
 
 type
+  IKeyValueObserver = interface(IObjectiveC)
+    ['{F2E1218B-ACE3-4FCA-9083-7A488F26E14A}']
+    procedure observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer); cdecl;
+  end;
+
+  TKeyValueChangeProc = reference to procedure(const KeyPath: string; const Change: NSDictionary);
+
+  TKeyValueObserver = class(TOCLocal, IKeyValueObserver)
+  private
+    FKeyValueChangeHandler: TKeyValueChangeProc;
+  public
+    { IKeyValueObserver }
+    procedure observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer); cdecl;
+  public
+    constructor Create(const AKeyValueChangeHandler: TKeyValueChangeProc);
+    procedure Observe(const AObject: NSObject; const APath: string; const AOptions: NSKeyValueObservingOptions);
+  end;
+
   TNSDictionaryHelper = record
   private
     FDictionary: NSDictionary;
@@ -69,7 +85,7 @@ type
     class function GetBundleValue(const AKey: string): string; static;
     class function GetBundleValueNS(const AKey: string): NSString; static;
     class function MainBundle: NSBundle; static;
-    {$IF Defined(MACDEV)}
+    {$IF not Defined(IOS)}
     class function SharedApplication: NSApplication; static;
     {$ENDIF}
     class function StandardUserDefaults: NSUserDefaults; static;
@@ -119,7 +135,26 @@ uses
   // RTL
   System.DateUtils,
   // macOS
-  Macapi.ObjectiveC, Macapi.Helpers;
+  Macapi.Helpers;
+
+{ TKeyValueObserver }
+
+constructor TKeyValueObserver.Create(const AKeyValueChangeHandler: TKeyValueChangeProc);
+begin
+  inherited Create;
+  FKeyValueChangeHandler := AKeyValueChangeHandler;
+end;
+
+procedure TKeyValueObserver.Observe(const AObject: NSObject; const APath: string; const AOptions: NSKeyValueObservingOptions);
+begin
+  AObject.addObserver(TNSObject.Wrap(GetObjectID), StrToNSStr(APath), AOptions, nil);
+end;
+
+procedure TKeyValueObserver.observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer);
+begin
+  if Assigned(FKeyValueChangeHandler) then
+    FKeyValueChangeHandler(NSStrToStr(keyPath), change);
+end;
 
 { TNSDictionaryHelper }
 
@@ -319,7 +354,7 @@ begin
   Result := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
 end;
 
-{$IF Defined(MACDEV)}
+{$IF not Defined(IOS)}
 class function TMacHelperEx.SharedApplication: NSApplication;
 begin
   Result := TNSApplication.Wrap(TNSApplication.OCClass.sharedApplication);

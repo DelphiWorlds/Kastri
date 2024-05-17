@@ -6,12 +6,10 @@ unit DW.Androidapi.JNI.AndroidX.Camera;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 // (androidx-)camera-core-1.0.1
 // (androidx-)camera-view-1.0.0-alpha25.jar
@@ -24,7 +22,7 @@ uses
   Androidapi.JNI.Net, Androidapi.JNI.Os, Androidapi.JNI.Util, Androidapi.JNI.Widget,
   // DW
   DW.Androidapi.JNI.Util, DW.Androidapi.JNI.Hardware.Camera2, DW.Androidapi.JNI.View, DW.Androidapi.JNI.Concurrent,
-  DW.Androidapi.JNI.AndroidX.Lifecycle;
+  DW.Androidapi.JNI.AndroidX.Lifecycle, DW.Androidapi.JNI.Guava;
 
 type
   JImageAnalysis = interface;

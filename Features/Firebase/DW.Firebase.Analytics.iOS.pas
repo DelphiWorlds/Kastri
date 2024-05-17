@@ -6,12 +6,10 @@ unit DW.Firebase.Analytics.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -38,8 +36,6 @@ type
     procedure SetSessionTimeoutDuration(const ATimeout: Int64); override;
     procedure SetUserId(const AName: string); override;
     procedure SetUserProperty(const AName, AValue: string); override;
-  public
-    constructor Create(const AFirebaseAnalytics: TFirebaseAnalytics); override;
   end;
 
 implementation
@@ -58,13 +54,6 @@ const
   cConsentTypeValues: array[TConsentType] of string = ('ConsentStatus.adStorage', 'ConsentStatus.analyticsStorage');
 
 { TPlatformFirebaseAnalytics }
-
-constructor TPlatformFirebaseAnalytics.Create(const AFirebaseAnalytics: TFirebaseAnalytics);
-begin
-  inherited;
-  // https://firebase.google.com/docs/analytics/get-started?platform=ios
-  TFirebaseCommon.Initialize;
-end;
 
 function TPlatformFirebaseAnalytics.GetNativeConsent(const ASettings: TConsentSettings): NSDictionary;
 var

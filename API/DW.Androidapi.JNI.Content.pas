@@ -6,12 +6,10 @@ unit DW.Androidapi.JNI.Content;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -20,6 +18,7 @@ uses
 
 type
   JContextWrapper = interface;
+  JPackageManager_ResolveInfoFlags = interface;
 
   JContextWrapperClass = interface(JContextClass)
     ['{EA8706C6-B2D2-41C0-935D-838BB8704209}']
@@ -37,7 +36,8 @@ type
     function checkPermission(permission: JString; pid: Integer; uid: Integer): Integer; cdecl;
     function checkSelfPermission(permission: JString): Integer; cdecl;
     function checkUriPermission(uri: Jnet_Uri; pid: Integer; uid: Integer; modeFlags: Integer): Integer; cdecl; overload;
-    function checkUriPermission(uri: Jnet_Uri; readPermission: JString; writePermission: JString; pid: Integer; uid: Integer; modeFlags: Integer): Integer; cdecl; overload;
+    function checkUriPermission(uri: Jnet_Uri; readPermission: JString; writePermission: JString; pid: Integer; uid: Integer;
+      modeFlags: Integer): Integer; cdecl; overload;
     procedure clearWallpaper; cdecl;
     function createConfigurationContext(overrideConfiguration: JConfiguration): JContext; cdecl;
     function createDisplayContext(display: JDisplay): JContext; cdecl;
@@ -51,7 +51,8 @@ type
     procedure enforceCallingUriPermission(uri: Jnet_Uri; modeFlags: Integer; message: JString); cdecl;
     procedure enforcePermission(permission: JString; pid: Integer; uid: Integer; message: JString); cdecl;
     procedure enforceUriPermission(uri: Jnet_Uri; pid: Integer; uid: Integer; modeFlags: Integer; message: JString); cdecl; overload;
-    procedure enforceUriPermission(uri: Jnet_Uri; readPermission: JString; writePermission: JString; pid: Integer; uid: Integer; modeFlags: Integer; message: JString); cdecl; overload;
+    procedure enforceUriPermission(uri: Jnet_Uri; readPermission: JString; writePermission: JString; pid: Integer; uid: Integer; modeFlags: Integer;
+      message: JString); cdecl; overload;
     function fileList: TJavaObjectArray<JString>; cdecl;
     function getApplicationContext: JContext; cdecl;
     function getApplicationInfo: JApplicationInfo; cdecl;
@@ -91,10 +92,12 @@ type
     function openFileInput(name: JString): JFileInputStream; cdecl;
     function openFileOutput(name: JString; mode: Integer): JFileOutputStream; cdecl;
     function openOrCreateDatabase(name: JString; mode: Integer; factory: JSQLiteDatabase_CursorFactory): JSQLiteDatabase; cdecl; overload;
-    function openOrCreateDatabase(name: JString; mode: Integer; factory: JSQLiteDatabase_CursorFactory; errorHandler: JDatabaseErrorHandler): JSQLiteDatabase; cdecl; overload;
+    function openOrCreateDatabase(name: JString; mode: Integer; factory: JSQLiteDatabase_CursorFactory;
+      errorHandler: JDatabaseErrorHandler): JSQLiteDatabase; cdecl; overload;
     function peekWallpaper: JDrawable; cdecl;
     function registerReceiver(receiver: JBroadcastReceiver; filter: JIntentFilter): JIntent; cdecl; overload;
-    function registerReceiver(receiver: JBroadcastReceiver; filter: JIntentFilter; broadcastPermission: JString; scheduler: JHandler): JIntent; cdecl; overload;
+    function registerReceiver(receiver: JBroadcastReceiver; filter: JIntentFilter; broadcastPermission: JString;
+      scheduler: JHandler): JIntent; cdecl; overload;
     procedure removeStickyBroadcast(intent: JIntent); cdecl;
     procedure removeStickyBroadcastAsUser(intent: JIntent; user: JUserHandle); cdecl;
     procedure revokeUriPermission(uri: Jnet_Uri; modeFlags: Integer); cdecl;
@@ -103,12 +106,16 @@ type
     procedure sendBroadcastAsUser(intent: JIntent; user: JUserHandle); cdecl; overload;
     procedure sendBroadcastAsUser(intent: JIntent; user: JUserHandle; receiverPermission: JString); cdecl; overload;
     procedure sendOrderedBroadcast(intent: JIntent; receiverPermission: JString); cdecl; overload;
-    procedure sendOrderedBroadcast(intent: JIntent; receiverPermission: JString; resultReceiver: JBroadcastReceiver; scheduler: JHandler; initialCode: Integer; initialData: JString; initialExtras: JBundle); cdecl; overload;
-    procedure sendOrderedBroadcastAsUser(intent: JIntent; user: JUserHandle; receiverPermission: JString; resultReceiver: JBroadcastReceiver; scheduler: JHandler; initialCode: Integer; initialData: JString; initialExtras: JBundle); cdecl;
+    procedure sendOrderedBroadcast(intent: JIntent; receiverPermission: JString; resultReceiver: JBroadcastReceiver; scheduler: JHandler;
+      initialCode: Integer; initialData: JString; initialExtras: JBundle); cdecl; overload;
+    procedure sendOrderedBroadcastAsUser(intent: JIntent; user: JUserHandle; receiverPermission: JString; resultReceiver: JBroadcastReceiver;
+      scheduler: JHandler; initialCode: Integer; initialData: JString; initialExtras: JBundle); cdecl;
     procedure sendStickyBroadcast(intent: JIntent); cdecl;
     procedure sendStickyBroadcastAsUser(intent: JIntent; user: JUserHandle); cdecl;
-    procedure sendStickyOrderedBroadcast(intent: JIntent; resultReceiver: JBroadcastReceiver; scheduler: JHandler; initialCode: Integer; initialData: JString; initialExtras: JBundle); cdecl;
-    procedure sendStickyOrderedBroadcastAsUser(intent: JIntent; user: JUserHandle; resultReceiver: JBroadcastReceiver; scheduler: JHandler; initialCode: Integer; initialData: JString; initialExtras: JBundle); cdecl;
+    procedure sendStickyOrderedBroadcast(intent: JIntent; resultReceiver: JBroadcastReceiver; scheduler: JHandler; initialCode: Integer;
+      initialData: JString; initialExtras: JBundle); cdecl;
+    procedure sendStickyOrderedBroadcastAsUser(intent: JIntent; user: JUserHandle; resultReceiver: JBroadcastReceiver; scheduler: JHandler;
+      initialCode: Integer; initialData: JString; initialExtras: JBundle); cdecl;
     procedure setTheme(resid: Integer); cdecl;
     procedure setWallpaper(bitmap: JBitmap); cdecl; overload;
     procedure setWallpaper(data: JInputStream); cdecl; overload;
@@ -118,14 +125,35 @@ type
     procedure startActivity(intent: JIntent; options: JBundle); cdecl; overload;
     function startForegroundService(service: JIntent): JComponentName; cdecl;
     function startInstrumentation(className: JComponentName; profileFile: JString; arguments: JBundle): Boolean; cdecl;
-    procedure startIntentSender(intent: JIntentSender; fillInIntent: JIntent; flagsMask: Integer; flagsValues: Integer; extraFlags: Integer); cdecl; overload;
-    procedure startIntentSender(intent: JIntentSender; fillInIntent: JIntent; flagsMask: Integer; flagsValues: Integer; extraFlags: Integer; options: JBundle); cdecl; overload;
+    procedure startIntentSender(intent: JIntentSender; fillInIntent: JIntent; flagsMask: Integer; flagsValues: Integer;
+      extraFlags: Integer); cdecl; overload;
+    procedure startIntentSender(intent: JIntentSender; fillInIntent: JIntent; flagsMask: Integer; flagsValues: Integer; extraFlags: Integer;
+      options: JBundle); cdecl; overload;
     function startService(service: JIntent): JComponentName; cdecl;
     function stopService(name: JIntent): Boolean; cdecl;
     procedure unbindService(conn: JServiceConnection); cdecl;
     procedure unregisterReceiver(receiver: JBroadcastReceiver); cdecl;
   end;
   TJContextWrapper = class(TJavaGenericImport<JContextWrapperClass, JContextWrapper>) end;
+
+  JPackageManager_ResolveInfoFlagsClass = interface(JObjectClass)
+    ['{2CC19E0E-D9BF-4D4C-80B9-56CE237AFF4E}']
+    {class} function &of(value: Int64): JPackageManager_ResolveInfoFlags; cdecl;
+  end;
+
+  [JavaSignature('android/content/pm/PackageManager$ResolveInfoFlags')]
+  JPackageManager_ResolveInfoFlags = interface(JObject)
+    ['{38063245-43B2-40BF-98B5-97FA314C9B64}']
+    function getValue: Int64; cdecl;
+  end;
+  TJPackageManager_ResolveInfoFlags = class(TJavaGenericImport<JPackageManager_ResolveInfoFlagsClass, JPackageManager_ResolveInfoFlags>) end;
+
+  [JavaSignature('android/content/pm/PackageManager')]
+  JPackageManagerEx = interface(JPackageManager)
+    ['{B725AB6E-18B1-4B2D-B31F-494249F77EE3}']
+    function queryIntentActivities(intent: JIntent; flags: JPackageManager_ResolveInfoFlags): JList; cdecl;
+  end;
+  TJPackageManagerEx = class(TJavaGenericImport<JPackageManagerClass, JPackageManagerEx>) end;
 
 implementation
 

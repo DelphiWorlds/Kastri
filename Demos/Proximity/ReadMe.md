@@ -6,7 +6,7 @@ Run the app, and place your hand over the proximity detector (usually at the top
 
 ### Supported Delphi versions
 
-The demo should compile and work for at least versions 10.3.3 and 10.4.x
+The demo should compile and work for Delphi 12, Delphi 11.x, Delphi 10.4.x and possibly earlier
 
 ### Supported Platforms
 

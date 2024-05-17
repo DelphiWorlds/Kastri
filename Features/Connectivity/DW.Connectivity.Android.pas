@@ -6,12 +6,11 @@ unit DW.Connectivity.Android;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
-{$I DW.GlobalDefines.inc}
 
 // **** NOTE **** If the target device has API level 21 or greater, you need to add dw-kastri-base.jar from the Lib folder to the Libraries node of the 
 // Android platform of the project in Project Manager
@@ -96,7 +95,7 @@ type
 constructor TNetworkCallbackDelegate.Create(const APlatformConnectivity: TPlatformConnectivity);
 begin
   inherited Create;
-  FCallback := TJDWNetworkCallback.JavaClass.init(TAndroidHelper.Context, Self);
+  FCallback := TJDWNetworkCallback.JavaClass.init(TAndroidHelper.Context, Self, False);
   FPlatformConnectivity := APlatformConnectivity;
 end;
 
@@ -123,7 +122,8 @@ end;
 
 procedure TNetworkCallbackDelegate.CheckConnectivityChange;
 begin
-  Sleep(250);
+  // TOSLog.d('TDWNetworkCallbackDelegate.CheckConnectivityChange');
+  Sleep(500);
   if FIsPendingAvailable then
     TThread.Synchronize(nil, ConnectivityChange);
 end;
@@ -217,7 +217,8 @@ begin
   LInfo := nil;
   LCapabilities := ConnectivityManager.getNetworkCapabilities(ANetwork);
   // Check if the network has internet capability
-  if (LCapabilities <> nil) and LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_INTERNET) then
+  if (LCapabilities <> nil) and LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_INTERNET) and
+    LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_NOT_VPN) then
   begin
     // ..and is Validated or SDK < 23
     if ASkipValidation or (TJBuild_VERSION.JavaClass.SDK_INT < 23) or LCapabilities.hasCapability(TJNetworkCapabilities.JavaClass.NET_CAPABILITY_VALIDATED) then

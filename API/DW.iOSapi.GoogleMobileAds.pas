@@ -6,12 +6,10 @@ unit DW.iOSapi.GoogleMobileAds;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2023 Dave Nottage under MIT license   }
+{  Copyright 2020-2024 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
-
-{$I DW.GlobalDefines.inc}
 
 interface
 
@@ -1630,6 +1628,9 @@ function kGADAdSizeLeaderboard: GADAdSize;
 
 implementation
 
+uses
+  DW.iOSapi.SwiftCompat;
+
 function kGADAdSizeBanner: GADAdSize;
 begin
   Result.size.width := 320;
@@ -1660,13 +1661,18 @@ begin
   Result.size.height := 90;
 end;
 
-procedure CLangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
+procedure CLangRTLoader; cdecl;
+  {$IF not Defined(IOSSIMULATOR)}
+  external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+  {$ELSE}
+  external '/usr/lib/clang/lib/darwin/libclang_rt.iossim.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+  {$ENDIF}
+procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
 procedure GoogleAppMeasurementLoader; cdecl; external framework 'GoogleAppMeasurement' dependency 'sqlite3';
 procedure GoogleAppMeasurementIdentitySupportLoader; cdecl; external framework 'GoogleAppMeasurementIdentitySupport';
 procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
 procedure JavaScriptCoreLoader; cdecl; external framework 'JavaScriptCore';
 procedure nanoPBLoader; cdecl; external framework 'nanoPB';
-procedure PromisesObjCLoader; cdecl; external framework 'PromisesObjC';
 procedure UserMessagingPlatformLoader; cdecl; external framework 'UserMessagingPlatform';
 
 end.

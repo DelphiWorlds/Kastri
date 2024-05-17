@@ -10,8 +10,64 @@ There are 2 project groups, one named `AGDemoAndroidGroup` and the other `AGDemo
 
 ## Configuration
 
+If you are creating your own project:
+
+### Java libraries
+
+Geofencing support relies on:
+
+* Delphi 12.x: 
+
+  `dw-fusedlocation-3.0.0.jar`
+
+  `dw-geofence-3.0.0.jar`
+
+  `dw-kastri-base-3.0.0.jar`
+
+  `gson-2.8.6.jar`
+
+* Delphi 11.x: 
+
+  `dw-fusedlocation.jar`
+  
+  `dw-geofence-2.0.0.jar`
+  
+  `dw-kastri-base-2.0.0.jar`
+  
+  `gson-2.8.6.jar`
+ 
+from the `Lib` folder in Kastri, so add them to the `Libraries` node under the Android 32-bit platform in Project Manager.
+
+**Note**:
+
+Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will need to either apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+
+### Build Event/Android Manifest
+
+**Delphi 12.1:**
+
+Due to changes in the Android build process:
+
+* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
+* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+* Modify `AndroidManifest.template.xml` to add *after* `<%application-meta-data%>`
+
+  ```
+    <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+    <meta-data android:name="com.delphiworlds.kastri.GeofenceIntentReceiver.SERVICE_CLASS_NAME" android:value="com.embarcadero.services.AGDemoService" />
+  ```
+
+  and add *after* `<%receivers%>`:
+
+  ```
+    <receiver android:name="com.delphiworlds.kastri.GeofenceIntentReceiver" android:enabled="true" android:exported="true" />
+  ``` 
+
+**Delphi 12.0 or earlier:**
+
 The demo project has a file called `AndroidManifest.merge.xml`, and there is a `Post-Build` build event in the Project Options (Under Building > Build Events) that uses the `manifestmerge` tool (from the `Tools` folder in Kastri) to merge the entries into the final `AndroidManifest.xml` file.
-The merge adds a metadata entry to indicate the class name of the service to which the geofence transition intents will be sent. This is required for when geofence transitions need to be monitored when the application is in the background, and when the application is not running (see [Monitoring geofence transitions](#monitoring-geofence-transitions), below)
+
+The above changes adds a metadata entry to indicate the class name of the service to which the geofence transition intents will be sent. This is required for when geofence transitions need to be monitored when the application is in the background, and when the application is not running (see [Monitoring geofence transitions](#monitoring-geofence-transitions), below)
 
 ## Background location permissions
 

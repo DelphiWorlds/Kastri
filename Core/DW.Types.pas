@@ -2,6 +2,8 @@ unit DW.Types;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 const
   CRLF = #13#10;
 
@@ -41,7 +43,8 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  // RTL
+  System.SysUtils, System.Generics.Collections;
 
 { TStringArrayItem }
 
