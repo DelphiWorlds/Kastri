@@ -59,6 +59,7 @@ type
       OREO_MR1 = 27;
       PIE = 28;
       Q = 29;
+      UPSIDE_DOWN_CAKE = 0;
     /// <summary>
     ///   Returns the alarm manager
     /// </summary>
