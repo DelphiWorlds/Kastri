@@ -21,7 +21,7 @@ uses
   // iOS
   iOSapi.Foundation,
   // DW
-  DW.Firebase.Messaging, DW.iOSapi.UserNotifications, DW.iOSapi.FirebaseMessaging, DW.iOSapi.Firebase, DW.Notifications.iOS;
+  DW.Firebase.Messaging, DW.iOSapi.UserNotifications, DW.iOSapi.FirebaseMessaging;
 
 type
   TPlatformFirebaseMessaging = class;
@@ -80,7 +80,7 @@ uses
   // FMX
   FMX.Platform,
   // DW
-  DW.OSLog, DW.Macapi.ObjCRuntime, DW.iOSapi.Helpers, DW.iOSapi.FirebaseCore, DW.Macapi.Helpers, DW.Firebase.Common.iOS;
+  DW.OSLog, DW.Macapi.ObjCRuntime, DW.iOSapi.Helpers, DW.iOSapi.FirebaseCore, DW.Notifications.iOS, DW.Macapi.Helpers, DW.Firebase.Common.iOS;
 
 function StringToNSData(const AString: string): NSData;
 begin
