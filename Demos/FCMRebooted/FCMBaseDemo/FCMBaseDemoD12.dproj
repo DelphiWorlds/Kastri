@@ -5,7 +5,7 @@
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Android64</Platform>
+        <Platform Condition="'$(Platform)'==''">iOSDevice64</Platform>
         <TargetedPlatforms>693267</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>FCMBaseDemoD12.dpr</MainSource>
@@ -312,7 +312,17 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_1_iOSDevice64)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
-        <VerInfo_BundleId>com.delphiworlds.fcmtest</VerInfo_BundleId>
+        <VerInfo_BundleId>br.com.fiorilli.emunicipio</VerInfo_BundleId>
+        <VerInfo_Keys>CFBundleName=emunicipio;CFBundleDevelopmentRegion=pt;CFBundleDisplayName=e-Município;CFBundleIdentifier=br.com.fiorilli.emunicipio;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundleShortVersionString=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=iPhone;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&apos;s speech recognition servers</VerInfo_Keys>
+        <PF_DevDebug>Apple Development: Nedder  Fiorilli (499W6HT8X8)</PF_DevDebug>
+        <PF_MobileProvisionDebug>28d61196-98f8-4ccd-81be-62b47942e7ca</PF_MobileProvisionDebug>
+        <PF_DevTeamIdDebug>97M9SRD3UN</PF_DevTeamIdDebug>
+        <PF_MobileProvisionPathDebug>/Users/plantaodatacenter/Library/MobileDevice/Provisioning Profiles/28d61196-98f8-4ccd-81be-62b47942e7ca.mobileprovision</PF_MobileProvisionPathDebug>
+        <PF_KeyChainAccessDebug>97M9SRD3UN.br.com.fiorilli.emunicipio;com.apple.token;</PF_KeyChainAccessDebug>
+        <PF_AppIdentifierDebug>97M9SRD3UN.br.com.fiorilli.emunicipio</PF_AppIdentifierDebug>
+        <PF_EntitlementExtraKeyValuesDebug>&lt;key&gt;aps-environment&lt;/key&gt;&lt;string&gt;development&lt;/string&gt;&lt;key&gt;get-task-allow&lt;/key&gt;&lt;true/&gt;&lt;key&gt;com.apple.developer.team-identifier&lt;/key&gt;&lt;string&gt;97M9SRD3UN&lt;/string&gt;</PF_EntitlementExtraKeyValuesDebug>
+        <PF_AutoMobileProvisionDebug>False</PF_AutoMobileProvisionDebug>
+        <PF_AutoCertificateDebug>False</PF_AutoCertificateDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_iOSSimARM64)'!=''">
         <Cfg_1>true</Cfg_1>
@@ -350,6 +360,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
             <Form>frmMain</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="..\FMX.PushNotification.FCM.iOS.pas"/>
         <JavaReference Include="..\..\..\Lib\dw-fcm-3.0.0.jar">
             <ContainerId>ClassesdexFile</ContainerId>
             <Disabled/>
@@ -1882,6 +1893,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     <Platform Name="Win64">
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Win64x">
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectiOSDeviceDebug">
                     <Platform Name="iOSDevice32">
@@ -2175,6 +2189,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
                 <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win64x" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
                 <Platform value="Android">True</Platform>

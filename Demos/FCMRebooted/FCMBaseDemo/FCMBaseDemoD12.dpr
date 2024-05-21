@@ -3,7 +3,8 @@ program FCMBaseDemoD12;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  MainFrm in '..\MainFrm.pas' {frmMain};
+  MainFrm in '..\MainFrm.pas' {frmMain},
+  FMX.PushNotification.FCM.iOS in '..\FMX.PushNotification.FCM.iOS.pas';
 
 {$R *.res}
 

@@ -26,6 +26,7 @@ object frmMain: TfrmMain
       Size.PlatformDefault = False
       TabOrder = 0
       Text = 'Clear Messages'
+      TextSettings.Trimming = None
       OnClick = ClearMessagesButtonClick
     end
     object FirebaseCMLabel: TLabel
@@ -85,6 +86,8 @@ object frmMain: TfrmMain
       Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
       DataDetectorTypes = []
       ReadOnly = True
+      StyledSettings = [Family, Size, Style]
+      TextSettings.FontColor = claFuchsia
       TextSettings.WordWrap = True
       Align = Top
       Margins.Left = 4.000000000000000000
