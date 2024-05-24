@@ -65,21 +65,20 @@ end;
 
 procedure TTokenizer.Tokenize(const ATokenProc: TTokenProc);
 var
-  LIndex, LLastIndex, LStartIndex, LLow: Integer;
+  LIndex, LLastIndex, LStartIndex: Integer;
 begin
   if not Text.Trim.IsEmpty then
   begin
-    LLow := Low(string);
     LIndex := 0;
-    LLastIndex := Length(Text) + LLow;
+    LLastIndex := Length(Text);
     while LIndex < LLastIndex do
     begin
-      while IsWhitespace(Text[LIndex + LLow]) and (LIndex < LLastIndex) do
+      while IsWhitespace(Text.Chars[LIndex]) and (LIndex < LLastIndex) do
         Inc(LIndex);
       if LIndex < LLastIndex then
       begin
         LStartIndex := LIndex;
-        while not IsWhitespace(Text[LIndex + LLow]) and (LIndex < Length(Text) + LLow) do
+        while not IsWhitespace(Text.Chars[LIndex]) and (LIndex < Length(Text)) do
           Inc(LIndex);
         ATokenProc(Text.Substring(LStartIndex, LIndex - LStartIndex));
       end;
@@ -89,23 +88,22 @@ end;
 
 function TTokenizer.Tokenize(const ATokenFunc: TTokenFunc): Boolean;
 var
-  LIndex, LLastIndex, LStartIndex, LLow: Integer;
+  LIndex, LLastIndex, LStartIndex: Integer;
 begin
   Result := False;
   if not Text.Trim.IsEmpty then
   begin
     Result := True;
-    LLow := Low(string);
     LIndex := 0;
-    LLastIndex := Length(Text) + LLow;
+    LLastIndex := Length(Text);
     while LIndex < LLastIndex do
     begin
-      while IsWhitespace(Text[LIndex + LLow]) and (LIndex < LLastIndex) do
+      while IsWhitespace(Text.Chars[LIndex]) and (LIndex < LLastIndex) do
         Inc(LIndex);
       if LIndex < LLastIndex then
       begin
         LStartIndex := LIndex;
-        while not IsWhitespace(Text[LIndex + LLow]) and (LIndex < Length(Text) + LLow) do
+        while not IsWhitespace(Text.Chars[LIndex]) and (LIndex < Length(Text)) do
           Inc(LIndex);
         if not ATokenFunc(Text.Substring(LStartIndex, LIndex - LStartIndex)) then
           Result := False;
@@ -118,22 +116,21 @@ end;
 
 function TTokenizer.Replace(const AReplaceFunction: TTextReplaceFunc): string;
 var
-  LIndex, LStartIndex, LLow: Integer;
+  LIndex, LStartIndex: Integer;
   LToken, LReplaceWith: string;
 begin
   Result := Text;
   if not Text.Trim.IsEmpty then
   begin
-    LLow := Low(string); // 0 on mobile, 1 on Win etc
     LIndex := 0;
-    while LIndex < Length(Result) + LLow do
+    while LIndex < Length(Result) do
     begin
-      while IsWhitespace(Result[LIndex + LLow]) and (LIndex < Length(Result) + LLow) do
+      while IsWhitespace(Result.Chars[LIndex]) and (LIndex < Length(Result)) do
         Inc(LIndex);
-      if LIndex < Length(Result) + LLow then
+      if LIndex < Length(Result) then
       begin
         LStartIndex := LIndex;
-        while not IsWhitespace(Result[LIndex + LLow]) and (LIndex < Length(Result) + LLow) do
+        while not IsWhitespace(Result.Chars[LIndex]) and (LIndex < Length(Result)) do
           Inc(LIndex);
         LToken := Result.Substring(LStartIndex, LIndex - LStartIndex);
         LReplaceWith := AReplaceFunction(LToken);
