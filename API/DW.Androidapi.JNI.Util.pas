@@ -15,10 +15,11 @@ interface
 
 uses
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes;
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.App, Androidapi.JNI.Os;
 
 type
   JArrayDeque = interface;
+  JExecutors = interface;
   JFormatter = interface;
   JInflater = interface;
   JLinkedHashSet = interface;
@@ -29,6 +30,37 @@ type
   JTimerTask = interface;
   JTimer = interface;
   JTreeMap = interface;
+  JStatus = interface;
+
+  JExecutorsClass = interface(JObjectClass)
+    ['{83F13D1F-378D-4541-A348-A863638BF5DF}']
+    {class} function callable(task: JRunnable; result: JObject): JCallable; cdecl; overload;
+    {class} function callable(task: JRunnable): JCallable; cdecl; overload;
+    // {class} function callable(action: JPrivilegedAction): JCallable; cdecl; overload;
+    // {class} function callable(action: JPrivilegedExceptionAction): JCallable; cdecl; overload;
+    {class} function defaultThreadFactory: JThreadFactory; cdecl;
+    {class} function newCachedThreadPool: JExecutorService; cdecl; overload;
+    {class} function newCachedThreadPool(threadFactory: JThreadFactory): JExecutorService; cdecl; overload;
+    {class} function newFixedThreadPool(nThreads: Integer): JExecutorService; cdecl; overload;
+    {class} function newFixedThreadPool(nThreads: Integer; threadFactory: JThreadFactory): JExecutorService; cdecl; overload;
+    {class} function newScheduledThreadPool(corePoolSize: Integer): JScheduledExecutorService; cdecl; overload;
+    {class} function newScheduledThreadPool(corePoolSize: Integer; threadFactory: JThreadFactory): JScheduledExecutorService; cdecl; overload;
+    {class} function newSingleThreadExecutor: JExecutorService; cdecl; overload;
+    {class} function newSingleThreadExecutor(threadFactory: JThreadFactory): JExecutorService; cdecl; overload;
+    {class} function newSingleThreadScheduledExecutor: JScheduledExecutorService; cdecl; overload;
+    {class} function newSingleThreadScheduledExecutor(threadFactory: JThreadFactory): JScheduledExecutorService; cdecl; overload;
+    {class} function privilegedCallable(callable: JCallable): JCallable; cdecl;
+    {class} function privilegedCallableUsingCurrentClassLoader(callable: JCallable): JCallable; cdecl;
+    {class} function privilegedThreadFactory: JThreadFactory; cdecl;
+    {class} function unconfigurableExecutorService(executor: JExecutorService): JExecutorService; cdecl;
+    {class} function unconfigurableScheduledExecutorService(executor: JScheduledExecutorService): JScheduledExecutorService; cdecl;
+  end;
+
+  [JavaSignature('java/util/concurrent/Executors')]
+  JExecutors = interface(JObject)
+    ['{D30B9FC6-F15A-4D3C-B7A3-306A992AC24F}']
+  end;
+  TJExecutors = class(TJavaGenericImport<JExecutorsClass, JExecutors>) end;
 
   JArrayDequeClass = interface(JAbstractCollectionClass)
     ['{53FE7FDB-6B49-4ABF-AC02-0871A9E52A05}']
@@ -327,6 +359,48 @@ type
     function toString: JString; cdecl;
   end;
   TJFormatter = class(TJavaGenericImport<JFormatterClass, JFormatter>) end;
+
+  JStatusClass = interface(JObjectClass)
+    ['{76253226-A9EE-401F-9BD3-C4C855024C93}']
+    function _GetCREATOR: JParcelable_Creator; cdecl;
+    function _GetRESULT_CANCELED: JStatus; cdecl;
+    function _GetRESULT_DEAD_CLIENT: JStatus; cdecl;
+    function _GetRESULT_INTERNAL_ERROR: JStatus; cdecl;
+    function _GetRESULT_INTERRUPTED: JStatus; cdecl;
+    function _GetRESULT_SUCCESS: JStatus; cdecl;
+    function _GetRESULT_TIMEOUT: JStatus; cdecl;
+    function init(statusCode: Integer): JStatus; cdecl; overload;
+    function init(statusCode: Integer; statusMessage: JString): JStatus; cdecl; overload;
+    function init(statusCode: Integer; statusMessage: JString; pendingIntent: JPendingIntent): JStatus; cdecl; overload;
+    // function init(connectionResult: JConnectionResult; statusMessage: JString): JStatus; cdecl; overload;
+    property CREATOR: JParcelable_Creator read _GetCREATOR;
+    property RESULT_CANCELED: JStatus read _GetRESULT_CANCELED;
+    property RESULT_DEAD_CLIENT: JStatus read _GetRESULT_DEAD_CLIENT;
+    property RESULT_INTERNAL_ERROR: JStatus read _GetRESULT_INTERNAL_ERROR;
+    property RESULT_INTERRUPTED: JStatus read _GetRESULT_INTERRUPTED;
+    property RESULT_SUCCESS: JStatus read _GetRESULT_SUCCESS;
+    property RESULT_TIMEOUT: JStatus read _GetRESULT_TIMEOUT;
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/Status')]
+  JStatus = interface(JObject)
+    ['{ED216A5D-56BA-4362-96E2-FDDADEF0E4AD}']
+    function equals(obj: JObject): boolean; cdecl;
+    // function getConnectionResult: JConnectionResult; cdecl;
+    function getResolution: JPendingIntent; cdecl;
+    function getStatus: JStatus; cdecl;
+    function getStatusCode: Integer; cdecl;
+    function getStatusMessage: JString; cdecl;
+    function hasResolution: boolean; cdecl;
+    function hashCode: Integer; cdecl;
+    function isCanceled: boolean; cdecl;
+    function isInterrupted: boolean; cdecl;
+    function isSuccess: boolean; cdecl;
+    function toString: JString; cdecl;
+    procedure startResolutionForResult(activity: JActivity; requestCode: Integer); cdecl;
+    procedure writeToParcel(parcel: JParcel; flags: Integer); cdecl;
+  end;
+  TJStatus = class(TJavaGenericImport<JStatusClass, JStatus>) end;
 
 implementation
 
