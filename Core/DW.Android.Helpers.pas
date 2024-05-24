@@ -31,6 +31,7 @@ type
   TAndroidHelperEx = record
   private
     class var FAlarmManager: JAlarmManager;
+    class var FAudioManager: JAudioManager;
     class var FKeyguardManager: JKeyguardManager;
     class var FNotificationManager: JNotificationManager;
     class var FPowerManager: JPowerManager;
@@ -59,10 +60,19 @@ type
       OREO_MR1 = 27;
       PIE = 28;
       Q = 29;
+      R = 30;
+      S = 31;
+      S_V2 = 32;
+      TIRAMISU = 33;
+      UPSIDE_DOWN_CAKE = 34;
     /// <summary>
     ///   Returns the alarm manager
     /// </summary>
     class function AlarmManager: JAlarmManager; static;
+    /// <summary>
+    ///   Returns the audio manager
+    /// </summary>
+    class function AudioManager: JAudioManager; static;
     /// <summary>
     ///   Determines whether or not exact alarms can be scheduled. Applies to Android 14+
     class function CanScheduleExactAlarms: Boolean; static;
@@ -426,6 +436,19 @@ begin
       FAlarmManager := TJAlarmManager.Wrap(LService);
   end;
   Result := FAlarmManager;
+end;
+
+class function TAndroidHelperEx.AudioManager: JAudioManager;
+var
+  LService: JObject;
+begin
+  if FAudioManager = nil then
+  begin
+    LService := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.ALARM_SERVICE);
+    if LService <> nil then
+      FAudioManager := TJAudioManager.Wrap(LService);
+  end;
+  Result := FAudioManager;
 end;
 
 class function TAndroidHelperEx.CanScheduleExactAlarms: Boolean;
