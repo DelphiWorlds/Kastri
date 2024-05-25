@@ -31,6 +31,7 @@ type
   JDataEvent = interface;
   JDataEventBuffer = interface;
   JDataItem = interface;
+  JDataItemBuffer = interface;
   JDataMap = interface;
   JDataMapItem = interface;
   JMessageApi_MessageListener = interface;
@@ -168,6 +169,18 @@ type
     function setData(bytes: TJavaArray<Byte>): JDataItem; cdecl;
   end;
   TJDataItem = class(TJavaGenericImport<JDataItemClass, JDataItem>) end;
+
+  JDataItemBufferClass = interface(JEntityBufferClass)
+    ['{6DAF9058-5FD9-44CE-8A31-6734483C232D}']
+    {class} function init(dataholder: JDataHolder): JDataItemBuffer; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/gms/wearable/DataItemBuffer')]
+  JDataItemBuffer = interface(JEntityBuffer)
+    ['{82878782-4198-4993-BC48-1A0BC8BF41F5}']
+    function getStatus: JStatus; cdecl;
+  end;
+  TJDataItemBuffer = class(TJavaGenericImport<JDataItemBufferClass, JDataItemBuffer>) end;
 
   JDataEventClass = interface(JFreezableClass)
     ['{67EEDA1D-8131-4117-A320-114FF841CF84}']
