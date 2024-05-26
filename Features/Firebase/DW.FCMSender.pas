@@ -120,8 +120,9 @@ type
   TFCMSenderErrorEvent = procedure(Sender: TObject; const Error: TFCMSenderError) of object;
 
   TFCMSenderResponse = record
+    Request: string;
     Response: string;
-    constructor Create(const AResponse: string);
+    constructor Create(const ARequest, AResponse: string);
   end;
 
   TFCMSenderResponseEvent = procedure(Sender: TObject; const Response: TFCMSenderResponse) of object;
@@ -152,7 +153,7 @@ type
     function LoadServiceAccount(const AFileName: string): Boolean;
     function Post(const AJSON: string): Boolean;
     property BearerToken: TBearerToken read FBearerToken;
-    property ServiceAccount: TServiceAccount read FServiceAccount;
+    property ServiceAccount: TServiceAccount read FServiceAccount write FServiceAccount;
     property OnError: TFCMSenderErrorEvent read FOnError write FOnError;
     property OnNewAccessToken: TNotifyEvent read FOnNewAccessToken write FOnNewAccessToken;
     property OnResponse: TFCMSenderResponseEvent read FOnResponse write FOnResponse;
@@ -172,7 +173,7 @@ implementation
 uses
   // RTL
   System.SysUtils, System.DateUtils, System.Net.HttpClient, System.Net.URLClient, System.NetEncoding,  System.NetConsts,
-  System.Hash, System.IOUtils, System.TypInfo,
+  System.Hash, System.IOUtils, System.TypInfo, System.Generics.Collections,
   // Grijjy - from: https://github.com/grijjy/DelphiOpenSsl/blob/master/OpenSSL.Api_11.pas
   OpenSSL.Api_11;
 
@@ -624,8 +625,9 @@ end;
 
 { TFCMSenderResponse }
 
-constructor TFCMSenderResponse.Create(const AResponse: string);
+constructor TFCMSenderResponse.Create(const ARequest, AResponse: string);
 begin
+  Request := ARequest;
   Response := AResponse;
 end;
 
@@ -763,7 +765,7 @@ begin
       DoError(TFCMSenderError.Create(TFCMSenderErrorKind.PostFailure, AJSON, LErrorMessage));
     end
     else
-      DoResponse(TFCMSenderResponse.Create(LResponse.ContentAsString));
+      DoResponse(TFCMSenderResponse.Create(AJSON, LResponse.ContentAsString));
   finally
     LHTTP.Free;
   end;
