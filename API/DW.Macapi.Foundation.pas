@@ -69,6 +69,7 @@ type
   NSKeyValueSetMutationKind = NSInteger;
   NSErrorUserInfoKey = NSString;
   NSKeyValueObservingOptions = NSInteger;
+  NSEnumerationOptions = NSInteger;
 
   NSProgressUnpublishingHandler = procedure of object;
   NSProgressPublishingHandler = function(progress: NSProgress): NSProgressUnpublishingHandler of object;
