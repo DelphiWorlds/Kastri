@@ -1,0 +1,266 @@
+[
+  {
+    "Channel": "NASA Public",
+    "Location": "Global",
+    "URL": "https:\/\/endpnt.com\/hls\/nasa-public\/playlist.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "ABC News",
+    "Location": "Global",
+    "URL": "https:\/\/content.uplynk.com\/channel\/3324f2467c414329b3b0cc5cd987b6be.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "Al Jazeera English",
+    "Location": "Global",
+    "URL": "https:\/\/d1cy85syyhvqz5.cloudfront.net\/v1\/master\/7b67fbda7ab859400a821e9aa0deda20ab7ca3d2\/aljazeeraLive\/AJE\/index.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "Arirang TV UN",
+    "Location": "Global",
+    "URL": "https:\/\/amdlive-ch02-ctnd-com.akamaized.net\/arirang_2ch\/smil:arirang_2ch.smil\/playlist.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "Bahrain International",
+    "Location": "Global",
+    "URL": "https:\/\/5c7b683162943.streamlock.net\/live\/ngrp:bahraininternational_all\/playlist.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "CGTN Documentary",
+    "Location": "Global",
+    "URL": "https:\/\/news.cgtn.com\/resource\/live\/document\/cgtn-doc.m3u8",
+    "MaxResolution": "576p"
+  },
+  {
+    "Channel": "CGTN Français",
+    "Location": "Global",
+    "URL": "https:\/\/news.cgtn.com\/resource\/live\/french\/cgtn-f.m3u8",
+    "MaxResolution": "576p"
+  },
+  {
+    "Channel": "Classic Arts Showcase",
+    "Location": "Global",
+    "URL": "https:\/\/classicarts.akamaized.net\/hls\/live\/1024257\/CAS\/master.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "CNA International",
+    "Location": "Global",
+    "URL": "https:\/\/d2e1asnsl7br7b.cloudfront.net\/7782e205e72f43aeb4a48ec97f66ebbe\/index.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "Dust",
+    "Location": "Global",
+    "URL": "https:\/\/cdn-apse1-prod.tsv2.amagi.tv\/linear\/amg00219-gunpowdersky-dustintlnz-samsungnz\/playlist.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "DW English",
+    "Location": "Global",
+    "URL": "https:\/\/dwamdstream102.akamaized.net\/hls\/live\/2015525\/dwstream102\/index.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "ETB Basque",
+    "Location": "Global",
+    "URL": "https:\/\/multimedia.eitb.eus\/live-content\/eitbbasque-hls\/master.m3u8",
+    "MaxResolution": "480p"
+  },
+  {
+    "Channel": "Euro Indie Music Chart TV",
+    "Location": "Global",
+    "URL": "http:\/\/178.33.224.197:1935\/euroindiemusic\/euroindiemusic\/playlist.m3u8",
+    "MaxResolution": "360p"
+  },
+  {
+    "Channel": "Euronews French",
+    "Location": "Global",
+    "URL": "https:\/\/rakuten-euronews-10-be.samsung.wurl.tv\/playlist.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "Euronews Greek",
+    "Location": "Global",
+    "URL": "https:\/\/ythls.armelin.one\/channel\/UC8HJZNfDPoySgW9DN3YGNaA.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "Euronews Hungary",
+    "Location": "Global",
+    "URL": "https:\/\/ythls.armelin.one\/channel\/UC4Ct8gIf9f0n4mdyGsFiZRA.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "Fast&Fun Box",
+    "Location": "Global",
+    "URL": "http:\/\/ott-cdn.ucom.am\/s79\/index.m3u8",
+    "MaxResolution": "480p"
+  },
+  {
+    "Channel": "FightBox",
+    "Location": "Global",
+    "URL": "http:\/\/stream01.vnet.am\/Fightbox\/mono.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "FTV Taiwan",
+    "Location": "Global",
+    "URL": "http:\/\/seb.sason.top\/ptv\/ftv.php?id=tw",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "FUEL TV",
+    "Location": "Global",
+    "URL": "https:\/\/d35j504z0x2vu2.cloudfront.net\/v1\/manifest\/0bc8e8376bd8417a1b6761138aa41c26c7309312\/fuel-tv\/606c2f67-acff-4152-975a-e5bfef54eb61\/2.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "Gusto TV",
+    "Location": "Global",
+    "URL": "https:\/\/cdn-apse1-prod.tsv2.amagi.tv\/linear\/amg01077-gustoworldwidem-gustotvnz-samsungnz\/playlist.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "I24 News English",
+    "Location": "Global",
+    "URL": "https:\/\/bcovlive-a.akamaihd.net\/6e3dd61ac4c34d6f8fb9698b565b9f50\/eu-central-1\/5377161796001\/playlist-all_dvr.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "Insight TV",
+    "Location": "Global",
+    "URL": "https:\/\/insighttv-vizio.amagi.tv\/playlist.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "KBS World",
+    "Location": "Global",
+    "URL": "http:\/\/mytv.dothome.co.kr\/ch\/catv\/7.php",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "Metro Globe Network",
+    "Location": "Global",
+    "URL": "https:\/\/edge.medcom.id\/live-edge\/smil:mgnch.smil\/playlist.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "Motorvision.TV",
+    "Location": "Global",
+    "URL": "https:\/\/cdn-apse1-prod.tsv2.amagi.tv\/linear\/amg01329-otterainc-motorvisionnz-samsungnz\/playlist.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "MTV Global",
+    "Location": "Global",
+    "URL": "http:\/\/37.18.239.36:8888\/MTV_Adria\/index.m3u8",
+    "MaxResolution": "576p"
+  },
+  {
+    "Channel": "NDR Fernsehen International",
+    "Location": "Global",
+    "URL": "https:\/\/ndrint.akamaized.net\/hls\/live\/2020766\/ndr_int\/index.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "NHK World Japan",
+    "Location": "Global",
+    "URL": "https:\/\/nhkwlive-ojp.akamaized.net\/hls\/live\/2003459\/nhkwlive-ojp-en\/index.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "NHK World Premium",
+    "Location": "Global",
+    "URL": "https:\/\/cdn.nhkworld.jp\/www11\/nhkworld-tv\/pre\/hlscomp.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "NTN24",
+    "Location": "Global",
+    "URL": "https:\/\/ythls.armelin.one\/channel\/UCEJs1fTF3KszRJGxJY14VrA.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "Red Bull TV",
+    "Location": "Global",
+    "URL": "https:\/\/rbmn-live.akamaized.net\/hls\/live\/590964\/BoRB-AT\/master.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "RT Documentary English",
+    "Location": "Global",
+    "URL": "https:\/\/rt-rtd.rttv.com\/dvr\/rtdoc\/playlist.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "RTP Internacional",
+    "Location": "Global",
+    "URL": "https:\/\/streaming-live.rtp.pt\/liverepeater\/smil:rtpi.smil\/playlist.m3u8",
+    "MaxResolution": "504p"
+  },
+  {
+    "Channel": "Russia Today",
+    "Location": "Global",
+    "URL": "https:\/\/cdn-01.bonus-tv.ru\/RussiaToday\/playlist.m3u8",
+    "MaxResolution": ""
+  },
+  {
+    "Channel": "Superyacht TV",
+    "Location": "Global",
+    "URL": "https:\/\/sy.wns.live\/hls\/stream.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "Taiwan Plus TV",
+    "Location": "Global",
+    "URL": "https:\/\/bcovlive-a.akamaihd.net\/rce33d845cb9e42dfa302c7ac345f7858\/ap-northeast-1\/6282251407001\/playlist.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "Three Angels Broadcasting Network International (3ABN)",
+    "Location": "Global",
+    "URL": "https:\/\/3abn-live.akamaized.net\/hls\/live\/2010544\/International\/master.m3u8",
+    "MaxResolution": "720p"
+  },
+  {
+    "Channel": "TRT World",
+    "Location": "Global",
+    "URL": "https:\/\/api.trtworld.com\/livestream\/v1\/WcM3Oa2LHD9iUjWDSRUI335NkMWVTUV351H56dqC\/master.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "TVM Internacional",
+    "Location": "Global",
+    "URL": "http:\/\/online.tvm.co.mz:1935\/live\/smil:Channel2.smil\/playlist.m3u8",
+    "MaxResolution": "480p"
+  },
+  {
+    "Channel": "UN Web TV",
+    "Location": "Global",
+    "URL": "https:\/\/cdnapi.kaltura.com\/p\/2503451\/sp\/250345100\/playManifest\/entryId\/1_gb6tjmle\/protocol\/https\/format\/applehttp\/a.m3u8",
+    "MaxResolution": "540p"
+  },
+  {
+    "Channel": "WION",
+    "Location": "Global",
+    "URL": "https:\/\/d7x8z4yuq42qn.cloudfront.net\/index_7.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "YTN Korean",
+    "Location": "Global",
+    "URL": "https:\/\/ythls.armelin.one\/channel\/UCizGMtU0Lt-O9X0tLJzyZ2Q.m3u8",
+    "MaxResolution": "1080p"
+  },
+  {
+    "Channel": "Zoo Moo (Australia)",
+    "Location": "Global",
+    "URL": "https:\/\/zoomoo-samsungau.amagi.tv\/playlist.m3u8",
+    "MaxResolution": "1080p"
+  }
+]

@@ -1,0 +1,128 @@
+object MainView: TMainView
+  Left = 0
+  Top = 0
+  Caption = 'Video Player'
+  ClientHeight = 874
+  ClientWidth = 546
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnKeyUp = FormKeyUp
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object RootLayout: TLayout
+    Align = Contents
+    Size.Width = 546.000000000000000000
+    Size.Height = 874.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object TabControl: TTabControl
+      Align = Client
+      Size.Width = 546.000000000000000000
+      Size.Height = 874.000000000000000000
+      Size.PlatformDefault = False
+      TabIndex = 3
+      TabOrder = 0
+      TabPosition = None
+      Sizes = (
+        546s
+        874s
+        546s
+        874s
+        546s
+        874s
+        546s
+        874s)
+      object PlayerTab: TTabItem
+        CustomIcon = <
+          item
+          end>
+        TextSettings.Trimming = None
+        IsSelected = False
+        Size.Width = 8.000000000000000000
+        Size.Height = 8.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = ''
+        TabOrder = 0
+        Text = 'PlayerTab'
+        ExplicitSize.cx = 8.000000000000000000
+        ExplicitSize.cy = 8.000000000000000000
+      end
+      object StreamsTab: TTabItem
+        CustomIcon = <
+          item
+          end>
+        TextSettings.Trimming = None
+        IsSelected = False
+        Size.Width = 8.000000000000000000
+        Size.Height = 8.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = ''
+        TabOrder = 0
+        Text = 'Streams'
+        ExplicitSize.cx = 8.000000000000000000
+        ExplicitSize.cy = 8.000000000000000000
+      end
+      object FilesTab: TTabItem
+        CustomIcon = <
+          item
+          end>
+        TextSettings.Trimming = None
+        IsSelected = False
+        Size.Width = 8.000000000000000000
+        Size.Height = 8.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = ''
+        TabOrder = 0
+        Text = 'Files'
+        ExplicitSize.cx = 8.000000000000000000
+        ExplicitSize.cy = 8.000000000000000000
+      end
+      object MenuTab: TTabItem
+        CustomIcon = <
+          item
+          end>
+        TextSettings.Trimming = None
+        IsSelected = True
+        Size.Width = 8.000000000000000000
+        Size.Height = 8.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = ''
+        TabOrder = 0
+        Text = 'Menu'
+        ExplicitSize.cx = 8.000000000000000000
+        ExplicitSize.cy = 8.000000000000000000
+        object FilesButton: TButton
+          Align = Top
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 8.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Position.X = 8.000000000000000000
+          Position.Y = 8.000000000000000000
+          Size.Width = 530.000000000000000000
+          Size.Height = 45.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Text = 'Files'
+          TextSettings.Trimming = None
+          OnClick = FilesButtonClick
+        end
+        object StreamsButton: TButton
+          Align = Top
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 8.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Position.X = 8.000000000000000000
+          Position.Y = 61.000000000000000000
+          Size.Width = 530.000000000000000000
+          Size.Height = 45.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Text = 'Streams'
+          TextSettings.Trimming = None
+          OnClick = StreamsButtonClick
+        end
+      end
+    end
+  end
+end

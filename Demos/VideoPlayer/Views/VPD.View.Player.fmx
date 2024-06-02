@@ -1,0 +1,39 @@
+object PlayerView: TPlayerView
+  Left = 0
+  Top = 0
+  Caption = 'Form2'
+  ClientHeight = 874
+  ClientWidth = 546
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object RootLayout: TLayout
+    Align = Contents
+    Size.Width = 546.000000000000000000
+    Size.Height = 874.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object BackgroundRectangle: TRectangle
+      Align = Contents
+      Fill.Color = claBlack
+      Size.Width = 546.000000000000000000
+      Size.Height = 874.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object PlayerClientLayout: TLayout
+      Align = Client
+      Size.Width = 546.000000000000000000
+      Size.Height = 874.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object PlayerLayout: TLayout
+        Align = Client
+        Size.Width = 546.000000000000000000
+        Size.Height = 874.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+      end
+    end
+  end
+end

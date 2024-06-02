@@ -1,0 +1,113 @@
+object StreamsView: TStreamsView
+  Left = 0
+  Top = 0
+  Caption = 'Form2'
+  ClientHeight = 874
+  ClientWidth = 546
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object RootLayout: TLayout
+    Align = Contents
+    Size.Width = 546.000000000000000000
+    Size.Height = 874.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object ListView: TListView
+      ItemAppearanceClassName = 'TDynamicAppearance'
+      ItemEditAppearanceClassName = 'TDynamicAppearance'
+      HeaderAppearanceClassName = 'TListHeaderObjects'
+      FooterAppearanceClassName = 'TListHeaderObjects'
+      Align = Client
+      Size.Width = 546.000000000000000000
+      Size.Height = 829.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      OnResized = ListViewResized
+      ItemAppearance.ItemHeight = 60
+      ItemAppearance.ItemEditHeight = 60
+      ItemAppearanceObjects.ItemObjects.ObjectsCollection = <
+        item
+          AppearanceObjectName = 'Name'
+          AppearanceClassName = 'TTextObjectAppearance'
+          Appearance.Font.Size = 14.000000000000000000
+          Appearance.Font.StyleExt = {00070000000000000004000000}
+          Appearance.TextAlign = Leading
+          Appearance.Width = 323.000000000000000000
+          Appearance.Height = 33.000000000000000000
+        end
+        item
+          AppearanceObjectName = 'More'
+          AppearanceClassName = 'TAccessoryObjectAppearance'
+          Appearance.Width = 17.000000000000000000
+          Appearance.Height = 57.000000000000000000
+          Appearance.Align = Trailing
+          Appearance.PlaceOffset.X = 2.000000000000000000
+        end
+        item
+          AppearanceObjectName = 'MaxRes'
+          AppearanceClassName = 'TTextObjectAppearance'
+          Appearance.Width = 125.000000000000000000
+          Appearance.Height = 22.000000000000000000
+          Appearance.Align = Trailing
+          Appearance.VertAlign = Trailing
+          Appearance.PlaceOffset.X = -66.000000000000000000
+        end
+        item
+          AppearanceObjectName = 'ID'
+          AppearanceClassName = 'TTextObjectAppearance'
+          Appearance.Visible = False
+        end
+        item
+          AppearanceObjectName = 'Location'
+          AppearanceClassName = 'TTextObjectAppearance'
+          Appearance.TextAlign = Leading
+          Appearance.Width = 167.000000000000000000
+          Appearance.Height = 22.000000000000000000
+          Appearance.VertAlign = Trailing
+          Appearance.PlaceOffset.Y = -4.000000000000000000
+        end
+        item
+          AppearanceObjectName = 'Image'
+          AppearanceClassName = 'TImageObjectAppearance'
+          Appearance.Width = 51.000000000000000000
+          Appearance.Height = 57.000000000000000000
+          Appearance.Align = Trailing
+          Appearance.PlaceOffset.X = -14.000000000000000000
+        end>
+      ItemAppearanceObjects.ItemEditObjects.ObjectsCollection = <
+        item
+          AppearanceObjectName = 'Text1'
+          AppearanceClassName = 'TTextObjectAppearance'
+        end>
+      CanSwipeDelete = False
+      OnItemClick = ListViewItemClick
+      ShowSelection = False
+    end
+    object TopLayout: TLayout
+      Align = Top
+      Padding.Left = 6.000000000000000000
+      Padding.Top = 6.000000000000000000
+      Padding.Right = 6.000000000000000000
+      Padding.Bottom = 6.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Size.Width = 546.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object BackButton: TSpeedButton
+        Align = Left
+        Position.X = 6.000000000000000000
+        Position.Y = 6.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 29.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'arrowlefttoolbutton'
+        Text = 'BackButton'
+        TextSettings.Trimming = None
+        OnClick = BackButtonClick
+      end
+    end
+  end
+end
