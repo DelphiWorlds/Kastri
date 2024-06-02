@@ -1170,15 +1170,28 @@ var
   LInput: JInputStream;
   LJavaBytes: TJavaArray<Byte>;
   LBytes: TBytes;
+  LBytesRead, LOffset: Integer;
 begin
+  LBytes := [];
   LInput := TAndroidHelper.Context.getContentResolver.openInputStream(AJURI);
-  LJavaBytes := TJavaArray<Byte>.Create(LInput.available);
+  if LInput <> nil then
   try
-    LInput.read(LJavaBytes, 0, LJavaBytes.Length);
-    SetLength(LBytes, LJavaBytes.Length);
-    Move(LJavaBytes.Data^, LBytes[0], LJavaBytes.Length);
+    LJavaBytes := TJavaArray<Byte>.Create(4096);
+    try
+      repeat
+        LBytesRead := LInput.read(LJavaBytes, 0, LJavaBytes.Length);
+        if LBytesRead > 0 then
+        begin
+          LOffset := Length(LBytes);
+          SetLength(LBytes, Length(LBytes) + LBytesRead);
+          Move(LJavaBytes.Data^, LBytes[LOffset], LBytesRead);
+        end;
+      until LBytesRead <= 0;
+    finally
+      LJavaBytes.Free;
+    end;
   finally
-    LJavaBytes.Free;
+    LInput.close;
   end;
   inherited Create(LBytes);
 end;
