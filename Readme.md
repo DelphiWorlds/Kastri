@@ -6,13 +6,17 @@ From [Delphi Worlds](http://www.delphiworlds.com)
 
 [![Twitter](https://img.shields.io/badge/-Twitter-1DA1F2?style=plastic&logo=Twitter)](https://twitter.com/DelphiWorlds)  [![Facebook](https://img.shields.io/badge/-Facebook-green?style=plastic&logo=Facebook)](https://www.facebook.com/DelphiWorlds)  [![Instagram](https://img.shields.io/badge/-Instagram-833AB4?style=plastic&logo=Instagram)](https://www.instagram.com/delphiworlds)
 
-Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two point releases of major releases** (e.g. at present that includes Delphi 12 and Delphi 11.3) are "officially" supported. 
+Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two major releases** (e.g. at present that includes Delphi 12.x and Delphi 11.x) are "officially" supported. 
 
 Development of Kastri can be helped along with [Github Sponsorship](https://github.com/sponsors/DelphiWorlds), so please consider sponsoring today!
 
-Alternatively, you might like to make a donation via PayPal: 
+Alternatively, you might like to make a donation via Stripe*: 
 
-[![paypal](https://www.paypalobjects.com/en_AU/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=CGHWQ28MKBGAA)
+<a href="https://donate.stripe.com/5kAdRecDkf7J30k3cc">
+    <img src="https://kinsta.com/wp-content/uploads/2018/05/stripe-donate-button-1-1-360x180.png" height="50">
+</a>
+
+(*Donations were previously being made via another service which I no longer use, as they were unable to keep my funds secure. My apologies for any inconvenience)
 
 Please star this repo by clicking the Star box in the top right corner if you find it useful!
 
@@ -63,7 +67,7 @@ If you encounter an issue, or want to request an enhancement, please [visit the 
 
 The Delphi Worlds Slack workspace has a channel (#kastri) devoted to discussing Kastri. There you will find Dave Nottage (when he is available) and other developers who are passionate about Kastri to discuss how to use Kastri, what is in it etc.
 
-[Sponsors](https://github.com/sponsors/DelphiWorlds) of Kastri have access to the private #sponsors channel where they receive priority support.
+[Sponsors](https://github.com/sponsors/DelphiWorlds) of Kastri can receive priority support via the Slack workspace, and/or via email.
 
 If you would like to join the Delphi Worlds Slack workspace, [please visit this self-invite link](https://slack.delphiworlds.com)
 
@@ -75,7 +79,7 @@ You'll find demo applications in the [Demos](./Demos) folder, including those as
 
 Note: Most demos have a readme associated with them, and **they may have vital configuration information that should be applied when using the feature(s) in your own projects**
 
-**Delphi 11 users please note**: Some of the demos that have Android support have been updated in line with changes in Delphi 11, and now have separate project (`.dproj`) and group project (`.groupproj`) (where applicable) files, which have been suffixed with `D11`. For demos that do not have a suffix of `D11` in the name, you may need to open Project Manager and for each Android target you wish to use, right-click the `Libraries` node and click `Revery System Files to Default` before building the project. 
+**Delphi 11/12 users please note**: Some of the demos that have Android support have been updated in line with changes in Delphi 11/12, and now have separate project (`.dproj`) and group project (`.groupproj`) (where applicable) files, which have been suffixed with `D11` and `D12`. For demos that do not have a suffix in the name, you may need to open Project Manager and for each Android target you wish to use, right-click the `Libraries` node and click `Revery System Files to Default` before building the project. 
 
 ### API imports
 
@@ -93,7 +97,7 @@ Units in the Core folder contain code of a wealth of cross-platform related impl
 * .Posix.pas - for Posix-based platforms (iOS, macOS, Android, Linux)
 * .Win.pas
 
-Implementations include:
+Implementations include (but are not limited to):
 
 * DW.OSLog - logging code that serves to replace Log.d, which relies on FMX, and cannot be used in an Android service
 * DW.OSDevice - code that returns information that is mostly device-specific
@@ -112,6 +116,10 @@ Support for Google Ads on Android and iOS
 #### AndroidPDF 
 
 PDF Renderer for Android
+
+#### AppReview
+
+In-app invocation of App Review for the relevant app store.
 
 #### AppUpdate
 
@@ -149,6 +157,10 @@ Android and iOS implementations of Firebase Cloud Messaging using their native l
 
 Works a little like the regions support does for iOS with [TLocationSensor](http://docwiki.embarcadero.com/Libraries/Sydney/en/System.Sensors.Components.TLocationSensor). Set up geographical regions (each region is a location with a specified radius), and events fire when the user passes in/out of those regions
 
+#### Google SignIn
+
+Google SignIn impolementation for Android and iOS, however as at June 3rd, 2024 the iOS implementation is yet to be functional.
+
 #### Location
 
 Android and iOS framework made specifically for location updates when the application is in any state (e.g. even when it is not running)
@@ -173,6 +185,10 @@ A more feature-rich alternative for the Share Sheet implementation provided with
 
 Support for sending SMS messages on Android and iOS
 
+#### Sound Player
+
+For playing short sounds such as audio effects in games. Support for Android, iOS and macOS
+
 #### Speech Recognition
 
 Android and iOS implementations for speech-to-text services. On Android, the actual speech API is used, rather than via Intents
@@ -189,23 +205,15 @@ Allows your device to speak from the supplied text. Support for Android, iOS, ma
 
 Allows users to follow links to content inside your app from your website.
 
-### Planned Features
+#### Video Player
 
-In addition to the features listed above, several other features are [planned for Kastri](https://github.com/DelphiWorlds/Kastri/milestones), namely:
+Plays video using the latest technologies on the respective platforms, e.g. ExoPlayer on Android. Support for Android and iOS. macOS and Windows support are in development.
 
-#### Google SignIn
+#### Web Browser Ext
 
-A simplified variation on [Grijjy's excellent Google SignIn](https://github.com/grijjy/DelphiGoogleSignIn) implementation, **with added support for iOS**
+Adds and improves functionality of TWebBrowser, such as asynchronous bitmap capture, asynchronous JavaScript execution with results handling, Cookies/Cache clearing, Element click handling, and more!
 
-#### Media Manager
-
-For accessing photos/videos stored on the device via the albums on Android and iOS. This feature is currently in the [Playground](https://github.com/DelphiWorlds/Playground/tree/main/Demos/MediaManager).
-
-#### Simple backend framework for managing push tokens
-
-A simple REST backend for managing push tokens and sending messages that can be customised to your needs. Complements the existing Firebase Cloud Messaging support.
-
-The above features take time and resources to develop. Your help via [sponsorship](https://github.com/sponsors/DelphiWorlds) can help make them a reality!
+The above features take time and resources to develop. Your [sponsorship](https://github.com/sponsors/DelphiWorlds) can help make more/improved features a reality!
 
 ## License
 
