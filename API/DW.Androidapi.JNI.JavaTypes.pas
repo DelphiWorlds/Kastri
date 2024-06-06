@@ -20,6 +20,7 @@ type
   JBufferedInputStream = interface;
   JBufferedOutputStream = interface;
   JBufferedReader = interface;
+  JChannels = interface;
   JFilterInputStream = interface;
   JFilterOutputStream = interface;
   JInputStreamReader = interface;
@@ -156,6 +157,28 @@ type
     procedure write(str: JString; off: Integer; len: Integer); cdecl; overload;
   end;
   TJStringWriter = class(TJavaGenericImport<JStringWriterClass, JStringWriter>) end;
+
+  JChannelsClass = interface(JObjectClass)
+    ['{1A3ABB1F-6C26-4928-A83D-C7E45A5B491A}']
+    {class} function newChannel(stream: JOutputStream): JWritableByteChannel; cdecl; overload;
+    {class} function newChannel(stream: JInputStream): JReadableByteChannel; cdecl; overload;
+    // {class} function newInputStream(asynchronousbytechannel: JAsynchronousByteChannel): JInputStream; cdecl; overload;
+    {class} function newInputStream(channel: JReadableByteChannel): JInputStream; cdecl; overload;
+    {class} function newOutputStream(channel: JWritableByteChannel): JOutputStream; cdecl; overload;
+    // {class} function newOutputStream(asynchronousbytechannel: JAsynchronousByteChannel): JOutputStream; cdecl; overload;
+    {class} function newReader(channel: JReadableByteChannel; charset: JCharset): JReader; cdecl; overload;
+    {class} function newReader(channel: JReadableByteChannel; string_1: JString): JReader; cdecl; overload;
+    {class} function newReader(channel: JReadableByteChannel; charsetdecoder: JCharsetDecoder; int: Integer): JReader; cdecl; overload;
+    {class} function newWriter(channel: JWritableByteChannel; charset: JCharset): JWriter; cdecl; overload;
+    {class} function newWriter(channel: JWritableByteChannel; string_1: JString): JWriter; cdecl; overload;
+    {class} function newWriter(channel: JWritableByteChannel; charsetencoder: JCharsetEncoder; int: Integer): JWriter; cdecl; overload;
+  end;
+
+  [JavaSignature('java/nio/channels/Channels')]
+  JChannels = interface(JObject)
+    ['{0F74A6B4-A7FC-4573-BA34-3E722E971C7A}']
+  end;
+  TJChannels = class(TJavaGenericImport<JChannelsClass, JChannels>) end;
 
 implementation
 
