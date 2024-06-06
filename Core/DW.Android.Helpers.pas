@@ -356,6 +356,13 @@ type
   end;
 
   TAndroidFileStream = class(TBytesStream)
+  private
+    class function InternalCopy(const AJURI: Jnet_Uri; const AFileName: string): Boolean;
+  public
+    /// <summary>
+    ///   Copies a file from the specified URI to the destination filename
+    /// </summary>
+    class function Copy(const AURI, AFileName: string): Boolean;
   public
     constructor Create(const AFile: JFile); overload;
     constructor Create(const AURI: string); overload;
@@ -1163,6 +1170,50 @@ var
 begin
   LURI := TJnet_Uri.JavaClass.parse(StringToJString(AURI));
   Create(LURI);
+end;
+
+class function TAndroidFileStream.InternalCopy(const AJURI: Jnet_Uri; const AFileName: string): Boolean;
+var
+  LInputStream: JInputStream;
+  LOutputStream: JFileOutputStream;
+  LInputChannel: JReadableByteChannel;
+  LOutputChannel: JFileChannel;
+begin
+  Result := False;
+  LInputStream := TAndroidHelper.Context.getContentResolver.openInputStream(AJURI);
+  if LInputStream <> nil then
+  try
+    LOutputStream := TJFileOutputStream.JavaClass.init(StringToJString(AFileName));
+    if LOutputStream <> nil then
+    try
+      LInputChannel := TJChannels.JavaClass.newChannel(LInputStream);
+      if LInputChannel <> nil then
+      try
+        LOutputChannel := LOutputStream.getChannel;
+        if LOutputChannel <> nil then
+        try
+          LOutputStream.getChannel.transferFrom(LInputChannel, 0, Int64.MaxValue);
+          Result := True;
+        finally
+          LOutputChannel.close;
+        end;
+      finally
+        LInputChannel.close;
+      end;
+    finally
+      LOutputStream.close;
+    end;
+  finally
+    LInputStream.close;
+  end;
+end;
+
+class function TAndroidFileStream.Copy(const AURI, AFileName: string): Boolean;
+var
+  LURI: Jnet_Uri;
+begin
+  LURI := TJnet_Uri.JavaClass.parse(StringToJString(AURI));
+  Result := InternalCopy(LURI, AFileName);
 end;
 
 constructor TAndroidFileStream.Create(const AJURI: Jnet_Uri);
