@@ -13,6 +13,7 @@ package com.delphiworlds.kastri;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -28,8 +29,29 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
   private static final String FIREBASE_DEFAULT_SMALL_ICON = "com.google.firebase.messaging.default_notification_icon";
   private static final String FIREBASE_RELAY_SERVICE = "com.delphiworlds.kastri.FIREBASE_RELAY_SERVICE";
   private static final String FIREBASE_RELAY_SERVICE_JOB_ID = "com.delphiworlds.kastri.FIREBASE_RELAY_SERVICE_JOB_ID";
+  private static final int APP_STATE_NOT_RUNNING = 0;
+  private static final int APP_STATE_BACKGROUND = 1;
+  private static final int APP_STATE_FOREGROUND = 2;
   private static Bundle mMetaData = null;
   private static DWFirebaseMessagingServiceCallback mCallback = null;
+
+  private int getApplicationState() {
+    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+    if (activityManager != null) {
+      String packageName = this.getPackageName();
+      for (ActivityManager.RunningAppProcessInfo processInfo : activityManager.getRunningAppProcesses()) {
+        if (processInfo.processName.equals(packageName)) {
+          ActivityManager.RunningAppProcessInfo info = new ActivityManager.RunningAppProcessInfo();
+          ActivityManager.getMyMemoryState(info);
+          if (info.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
+              return APP_STATE_FOREGROUND;
+          else
+              return APP_STATE_BACKGROUND;
+        }
+      }
+    }
+    return APP_STATE_NOT_RUNNING;
+  }
 
   public static void setCallback(DWFirebaseMessagingServiceCallback callback) {
     mCallback = callback;
@@ -74,11 +96,9 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
           Log.e(TAG, "No job id specified for " + relayService);
       }
     }
-    RunningAppProcessInfo info = new RunningAppProcessInfo();
-    ActivityManager.getMyMemoryState(info);
-    boolean isAppForeground = info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
-    // If no callback, or app is foreground and needs the notification, present it
-    if ((mCallback == null) || (mCallback.getShowNotificationWhenForeground() && isAppForeground))
+    int appState = this.getApplicationState();
+    // If app is not running, or no callback is assigned, or app is foreground and needs the notification, present it
+    if ((appState == APP_STATE_NOT_RUNNING) || (mCallback == null) || (mCallback.getShowNotificationWhenForeground() && (appState == APP_STATE_FOREGROUND)))
       DWNotificationPresenter.presentNotification(this, intent, channelId, icon);
     if (mCallback != null) {
       Log.d(TAG, "> mCallback.onNotificationReceived");
