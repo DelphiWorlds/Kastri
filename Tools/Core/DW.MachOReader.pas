@@ -52,7 +52,7 @@ type
     function ReadMagic(const AOffset: Int64): TMagic;
     procedure Extract;
   public
-    constructor Create(const AFilename: string);
+    constructor Create(const AFileName: string);
     property Items: TMachOItems read FItems;
   end;
 
@@ -151,7 +151,7 @@ end;
 
 { TMachOReader }
 
-constructor TMachOReader.Create(const AFilename: string);
+constructor TMachOReader.Create(const AFileName: string);
 begin
   inherited Create(AFileName);
   Extract;
