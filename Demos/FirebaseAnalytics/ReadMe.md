@@ -43,9 +43,22 @@ In the EntitlementList section of Project Options, select the `Receive push noti
 
 Official Firebase Analytics support for Android is yet to be added to Delphi (though the foundations are present in Delphi 11), so a couple of "tweaks" are required to make it work.
 
-### Merging of the manifest 
+#### Build Event/Android Manifest
 
-A Post-Build build event for the Android target has been added to the demo project. This event uses the `manifestmerge` command line tool to merge the entries in the `AndroidManifest.merge.xml` file that is included with the demo, in order to add entries required for Firebase Analytics.
+**Delphi 12.1 ONLY**
+
+Please see [this link](../../Delphi12.1.AndroidManifestIssue.md).
+
+**Delphi 12.0 or earlier:**
+
+Configure Build Events in Project Options to add a Post-Build event with the command:  
+
+```
+  [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
+```  
+Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
+
+`AndroidManifest.merge.xml` can be found in the root folder of the respective demo (i.e. FCMBaseDemo and FCMRelayDemo), and should be copied to the root folder of your project
 
 ### Additional jar files
 

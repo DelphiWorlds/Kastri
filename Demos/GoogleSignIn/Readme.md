@@ -22,7 +22,7 @@ where `com.yourdomain.projectname` is the identifier you used for the project in
 
 ### Build Event/Android Manifest
 
-**Delphi 12.1**
+**Delphi 12.1, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md):**
 
 Due to changes in the Android build process:
 

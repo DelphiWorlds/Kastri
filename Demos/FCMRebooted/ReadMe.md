@@ -100,21 +100,9 @@ Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit,
 
 #### Build Event/Android Manifest
 
-**Delphi 12.1**
+**Delphi 12.1 ONLY**
 
-Due to changes in the Android build process:
-
-* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
-* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
-* Modify `AndroidManifest.template.xml` to add the following *just before* `<%services%>`
-
-  ```
-  <service android:name="com.delphiworlds.kastri.DWFirebaseMessagingService" android:exported="false">
-      <intent-filter>
-          <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-      </intent-filter>
-  </service>
-  ```
+Please see [this link](../../Delphi12.1.AndroidManifestIssue.md).
 
 **Delphi 12.0 or earlier:**
 

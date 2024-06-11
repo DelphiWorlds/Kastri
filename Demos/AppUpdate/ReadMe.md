@@ -27,7 +27,7 @@ Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit,
 
 ### Build Event/Android Manifest
 
-**Delphi 12.1:**
+**Delphi 12.1, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md):**
 
 Due to changes in the Android build process:
 

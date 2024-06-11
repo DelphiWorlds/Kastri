@@ -27,31 +27,11 @@ When building the application, please ensure that the Target Platform for **both
 
 ### Build Event/Android Manifest
 
-**Delphi 12.x**
+**Delphi 12.1 ONLY**
 
-* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
-* Modify `AndroidManifest.template.xml` to add *after* `<%application-meta-data%>`
+Please see [this link](../../Delphi12.1.AndroidManifestIssue.md).
 
-  ```
-    <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_SERVICE_ON_BOOT" android:value="CrossPlatformLocationService" />
-    <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
-  ```
-  ..add *before* `<%receivers%>`
-  ```
-    <receiver
-      android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver"
-      android:exported="true">
-        <intent-filter>
-            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_ALARM_TIMER" />
-            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_SERVICE_ALARM" />
-            <action android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver.ACTION_SERVICE_RESTART" />
-            <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-        </intent-filter>
-    </receiver>
-  ```
-
-**Delphi 11.x**
+**Delphi 12.0 and 11.x**
 
 When configuring your **own** project for Android, configure Build Events in Project Options to add a Post-Build event with the command:  
 

@@ -6,7 +6,7 @@ Demonstrates implementation of starting an app at boot time on Android.
 
 ## Supported Delphi versions
 
-Delphi 12, Delphi 11.x, Delphi 12. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
+Delphi 12, Delphi 11.x.
 
 ## Project Configuration
 
@@ -23,13 +23,41 @@ Start at boot requires these permissions to be checked in the Project Options:
 
 Add the Kastri base jar:
 
-* Delphi 10.4.2 or earlier: [`dw-kastri-base.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base.jar)
 * Delphi 11.x: [`dw-kastri-base-2.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base-2.0.0.jar) 
-* Delphi 12: [`dw-kastri-base-3.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base-3.0.0.jar) 
+* Delphi 12.x: [`dw-kastri-base-3.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base-3.0.0.jar) 
  
 ..to the Libraries node, under the Android target in Project Manager.
 
-### Build Events
+### Build Event/Android Manifest
+
+**Delphi 12.1 ONLY, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md):**
+
+Due to changes in the Android build process in Delphi:
+
+* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
+* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+* Modify `AndroidManifest.template.xml` to add *after* `<%application-meta-data%>`
+
+  ```
+    <meta-data android:name="DWMultiBroadcastReceiver.KEY_START_ON_BOOT" android:value="true" />
+    <meta-data android:name="DWMultiBroadcastReceiver.KEY_RESTART_AFTER_REPLACE" android:value="true" />
+  ```
+
+  and add *after* `<%receivers%>`:
+
+  ```
+    <receiver
+      android:name="com.delphiworlds.kastri.DWMultiBroadcastReceiver"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+        <action android:name="android.intent.action.BOOT_COMPLETED"/>
+        <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+      </intent-filter>
+    </receiver>
+  ``` 
+
+**Delphi 12.0 or earlier:**
 
 Please refer to the Build Events section of the Project Options of the demo. The command merges `AndroidManifest.template.xml` using the `manifestmerge` tool in the Tools folder of Kastri. You may need to modify the command in the Project Options of your own project to suit your file locations.
 

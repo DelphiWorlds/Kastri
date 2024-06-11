@@ -12,19 +12,45 @@ Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earl
 
 ## Project Configuration
 
-When configuring your **own** project for Android:
+### Build Event/Android Manifest
 
-1. Configure Build Events in Project Options to add a Post-Build event with the command:  
-    ```
-    [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
-    ```  
-    Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
+**Delphi 12.1 ONLY, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md):**
 
-2. Add `play-core-1.10.0.jar` from the `ThirdParty\Android` folder in Kastri to the Libraries node of the Android 32-bit target in Project Manager.
+Due to changes in the Android build process in Delphi:
 
-    **Note**:
+* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
+* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+* Modify `AndroidManifest.template.xml` to add inside the `<application>` tag:
 
-    Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+  ```
+    <activity android:name="com.google.android.play.core.missingsplits.PlayCoreMissingSplitsActivity" 
+      android:enabled="false" 
+      android:exported="false" 
+      android:process=":playcore_missing_splits_activity" 
+      android:launchMode="singleInstance" 
+      android:stateNotNeeded="true"/>
+    <activity android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity" 
+      android:enabled="false" 
+      android:exported="false" 
+      android:stateNotNeeded="true" 
+      android:process=":playcore_dialog_wrapper_activity" 
+      android:theme="@android:style/Theme.NoTitleBar"/>
+    <service android:name="com.google.android.play.core.assetpacks.AssetPackExtractionService" 
+      android:enabled="false" 
+      android:exported="true"/>
+  ```
+
+**Delphi 12.0 or earlier:**
+
+Please refer to the Build Events section of the Project Options of the demo. The command merges `AndroidManifest.template.xml` using the `manifestmerge` tool in the Tools folder of Kastri. You may need to modify the command in the Project Options of your own project to suit your file locations.
+
+### Java libraries
+
+Add `play-core-1.10.0.jar` from the `ThirdParty\Android` folder in Kastri to the Libraries node of the Android 32-bit target in Project Manager.
+
+**Note**:
+
+Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
 
 ## Usage
 
