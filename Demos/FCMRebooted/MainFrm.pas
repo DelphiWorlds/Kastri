@@ -17,7 +17,9 @@ type
     MessagesMemo: TMemo;
     TokenLabel: TLabel;
     TokenMemo: TMemo;
+    RemoveNotificationsButton: TButton;
     procedure ClearMessagesButtonClick(Sender: TObject);
+    procedure RemoveNotificationsButtonClick(Sender: TObject);
   private
     FShown: Boolean;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
@@ -49,8 +51,7 @@ constructor TfrmMain.Create(AOwner: TComponent);
 begin
   inherited;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
-  // Turn ShowBannerIfForeground OFF when using data ONLY messages
-  FCM.ShowBannerIfForeground := False;
+  FCM.ShowBannerIfForeground := True;
   FCM.OnMessageReceived := FCMMessageReceivedHandler;
   FCM.OnStarted := FCMStartedHandler;
   FCM.OnTokenReceived := FCMTokenReceivedHandler;
@@ -85,6 +86,11 @@ end;
 procedure TfrmMain.ClearMessagesButtonClick(Sender: TObject);
 begin
   MessagesMemo.Lines.Clear;
+end;
+
+procedure TfrmMain.RemoveNotificationsButtonClick(Sender: TObject);
+begin
+  FCM.RemoveNotifications;
 end;
 
 procedure TfrmMain.Resize;
