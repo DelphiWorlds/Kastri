@@ -132,8 +132,8 @@ type
     FOnAdFailedToLoad: TAdErrorEvent;
     FOnAdLoaded: TNotifyEvent;
     function GetAdUnitId: string;
-    procedure SetAdUnitId(const Value: string);
     function GetTestMode: Boolean;
+    procedure SetAdUnitId(const Value: string);
     procedure SetTestMode(const Value: Boolean);
   protected
     procedure DoAdFailedToLoad(const AError: TAdError);
