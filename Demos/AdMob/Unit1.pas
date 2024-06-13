@@ -82,6 +82,8 @@ begin
   FRewAd.OnAdDismissedFullScreenContent := AdDismissedFullScreenContentHandler;
   FRewAd.OnAdFailedToShowFullScreenContent := AdFailedToShowFullScreenContentHandler;
   FRewAd.OnAdWillPresentFullScreenContent := AdWillPresentFullScreenContentHandler;
+  FRewAd.OnAdLoaded := AdLoadedHander;
+  FRewAd.OnAdFailedToLoad := AdFailedToLoadHandler;
   // RewardAds only
   FRewAd.OnUserEarnedReward := UserEarnedRewardHandler;
 
@@ -118,12 +120,14 @@ end;
 
 procedure TForm1.ShowInterstitialClick(Sender: TObject);
 begin
-  FIntAd.Load;
+  ShowInterstitial.Enabled := False;
+  FIntAd.Show;
 end;
 
 procedure TForm1.ShowRewardClick(Sender: TObject);
 begin
-  FRewAd.Load;
+  ShowReward.Enabled := False;
+  FRewAd.Show;
 end;
 
 procedure TForm1.UserEarnedRewardHandler(Sender: TObject; const AReward: TAdReward);
@@ -133,7 +137,12 @@ end;
 
 procedure TForm1.AdDismissedFullScreenContentHandler(Sender: TObject);
 begin
-  Memo.Lines.Add('Fullscreen Ad Dismissed '+Sender.ClassName);
+  Memo.Lines.Add('Fullscreen Ad Dismissed ' + Sender.ClassName);
+  // Dismissed current ad - load the next one
+  if Sender = FIntAd then
+    FIntAd.Load(False)
+  else if Sender = FRewAd then
+    FRewAd.Load(False);
 end;
 
 procedure TForm1.AdFailedToLoadHandler(Sender: TObject; const AError: TAdError);
@@ -149,6 +158,10 @@ end;
 procedure TForm1.AdLoadedHander(Sender: TObject);
 begin
   Memo.Lines.Add('Ad Loaded '+ Sender.ClassName);
+  if Sender = FIntAd then
+    ShowInterstitial.Enabled := True
+  else if Sender = FRewAd then
+    ShowReward.Enabled := True;
 end;
 
 procedure TForm1.AdWillPresentFullScreenContentHandler(Sender: TObject);
@@ -190,8 +203,10 @@ procedure TForm1.AdMobConsentCompleteHandler(Sender: TObject; const AStatus: TCo
 begin
   Memo.Lines.Add(Format('Consent complete - Status: %s, CanRequestAds: %s', [cConsentStatusValues[AStatus], BoolToStr(AdMob.CanRequestAds, True)]));
   ShowBanner.Enabled := True;
-  ShowInterstitial.Enabled := True;
-  ShowReward.Enabled := True;
+  // ShowInterstitial.Enabled := True;
+  // ShowReward.Enabled := True;
+  FIntAd.Load(False);
+  FRewAd.Load(False);
 end;
 
 procedure TForm1.AdMobConsentErrorHandler(Sender: TObject; const AError: TConsentError);
