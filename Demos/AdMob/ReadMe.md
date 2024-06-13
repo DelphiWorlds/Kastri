@@ -18,6 +18,20 @@ Delphi 12, Delphi 11.x.
 
 **NOTE: The project for Delphi 12 is `AdTestD12.dproj` and the project for Delphi 11.x is `AdTest.dproj`**
 
+## Usage Notes
+
+The "full screen" ad types:
+
+* TInterstitialAd
+* TRewardedInterstitialAd
+* TRewardedAd
+
+Have an option of performing the load of an ad, and showing an ad, all in one call by calling `Load` with no parameters, **OR** the load can be performed separately by calling `Load(False)`, and once the ad is loaded (which happens in the background), the `OnAdLoaded` event is called, and at that point the `Show` method can be called to show the ad.  
+
+The latter method means that ads can be "preloaded" so that when it comes time to show an ad, it shows **immediately**. The demo has been changed from the originally published version to use this method.
+
+The former method may result in a poor user experience, given that it takes a little while for the ad to load first, then be shown.
+
 ## Project configuration
 
 ### Component
