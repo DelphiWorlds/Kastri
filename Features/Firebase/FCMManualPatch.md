@@ -17,7 +17,7 @@ uses
   System.SysUtils, System.Classes, System.JSON, System.PushNotification, System.Messaging, System.Notification, System.RTLConsts,
   Macapi.ObjectiveC, Macapi.Helpers, Macapi.ObjCRuntime,
   iOSapi.Foundation, iOSapi.UIKit, iOSapi.UserNotifications, iOSapi.Helpers,
-  DW.iOSapi.FirebaseCore, DW.iOSapi.FirebaseMessaging,
+  DW.iOSapi.FirebaseCore, DW.iOSapi.FirebaseMessaging, DW.FCMManager,
   FMX.Forms, FMX.Platform;
 ```
 
@@ -56,7 +56,7 @@ begin
 end;
 ```
 
-In the procedure TFcmPushService.Register method, **REMOVE** this line:
+In the procedure `TFcmPushService.Register` method, **REMOVE** this line:
 
 ```delphi
   TFIRApp.OCClass.configure;
@@ -75,3 +75,12 @@ end;
 ```
 
 i.e. the calls to `RequestAuthorization` and `Register` are **swapped**.
+
+Modify the `TFcmPushService.RegisterRemoteNotificationsIOS8OrLater` method to change the line where LSettings is assigned, to look like this:
+
+```delphi
+  LSettings := TUIUserNotificationSettings.Wrap(TUIUserNotificationSettings.OCClass.settingsForTypes(FCM.GetNativeAuthOptions, nil));
+```
+
+This enables the support for the full authorization options available via the `AuthOptions` property of `IFCMManager`
+

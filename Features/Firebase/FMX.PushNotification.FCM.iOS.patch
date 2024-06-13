@@ -1,8 +1,9 @@
+diff -r C:\Program Files (x86)\Embarcadero\Studio\23.0\source\fmx\FMX.PushNotification.FCM.iOS.pas Z:\Kastri\Features\Firebase\FMX.PushNotification.FCM.iOS.pas
 21c21,22
 <   iOSapi.Foundation, iOSapi.UIKit, iOSapi.UserNotifications, iOSapi.FirebaseCommon, iOSapi.FirebaseMessaging, iOSapi.Helpers,
 ---
 >   iOSapi.Foundation, iOSapi.UIKit, iOSapi.UserNotifications, iOSapi.Helpers,
->   DW.iOSapi.FirebaseCore, DW.iOSapi.FirebaseMessaging,
+>   DW.iOSapi.FirebaseCore, DW.iOSapi.FirebaseMessaging, DW.FCMManager,
 41d41
 <     procedure ReceivedMessage(remoteMessage: FIRMessagingRemoteMessage);
 44,50c44
@@ -45,7 +46,15 @@
 >   FPushService.SetDeviceToken(NSStrToStr(didReceiveRegistrationToken));
 253d226
 <   TFIRApp.OCClass.configure;
+262c235
+<   FreeAndNil(FFIRMessagingDelegate);
+---
+>   FFIRMessagingDelegate.Free;
 269d241
 <   Register;
 270a243
 >   Register;
+340c313
+<   LSettings := TUIUserNotificationSettings.Wrap(TUIUserNotificationSettings.OCClass.settingsForTypes(FAuthOptions, nil));
+---
+>   LSettings := TUIUserNotificationSettings.Wrap(TUIUserNotificationSettings.OCClass.settingsForTypes(FCM.GetNativeAuthOptions, nil));
