@@ -384,6 +384,10 @@
             <ContainerId>ClassesdexFile</ContainerId>
             <Disabled/>
         </JavaReference>
+        <JavaReference Include="..\..\ThirdParty\Android\media3-exoplayer-rtsp-1.3.0.jar">
+            <ContainerId>ClassesdexFile</ContainerId>
+            <Disabled/>
+        </JavaReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
