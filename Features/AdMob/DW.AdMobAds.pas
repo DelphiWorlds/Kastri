@@ -24,12 +24,15 @@ uses
 type
   TBaseAd = class;
 
+  TNeedsLoadState = (None, Load, Show);
+
   TCustomPlatformBaseAd = class(TObject)
   private
     class var FIsWarmStart: Boolean;
   private
     FBaseAd: TBaseAd;
-    FNeedsLoad: Boolean;
+    FNeedsLoadState: TNeedsLoadState;
+    FShouldShow: Boolean;
     FTestMode: Boolean;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     procedure AdsStartedMessageHandler(const Sender: TObject; const M: TMessage);
@@ -39,11 +42,14 @@ type
     procedure ApplicationEnteredBackground; virtual;
     procedure DoAdFailedToLoad(const AError: TAdError); virtual;
     procedure DoAdLoaded; virtual;
-    function GetAdUnitId: string; virtual;
-    procedure Load;
     procedure DoLoad; virtual;
+    procedure DoShow; virtual;
+    function GetAdUnitId: string; virtual;
+    procedure Load(const AShow: Boolean);
     function IsWarmStart: Boolean;
+    procedure Show;
     property AdUnitId: string read GetAdUnitId write FAdUnitId;
+    property ShouldShow: Boolean read FShouldShow write FShouldShow;
     property TestMode: Boolean read FTestMode write FTestMode;
   public
     constructor Create(const ABaseAd: TBaseAd);
@@ -129,6 +135,7 @@ type
 
   TBaseAd = class(TObject)
   private
+    FIsLoaded: Boolean;
     FOnAdFailedToLoad: TAdErrorEvent;
     FOnAdLoaded: TNotifyEvent;
     function GetAdUnitId: string;
@@ -141,7 +148,8 @@ type
     function GetPlatformBaseAd: TCustomPlatformBaseAd; virtual; abstract;
     property PlatformBaseAd: TCustomPlatformBaseAd read GetPlatformBaseAd;
   public
-    procedure Load;
+    procedure Load(const AShow: Boolean = True);
+    procedure Show;
     property AdUnitId: string read GetAdUnitId write SetAdUnitId;
     property TestMode: Boolean read GetTestMode write SetTestMode;
     property OnAdFailedToLoad: TAdErrorEvent read FOnAdFailedToLoad write FOnAdFailedToLoad;
@@ -266,6 +274,8 @@ end;
 procedure TCustomPlatformBaseAd.DoAdLoaded;
 begin
   FBaseAd.DoAdLoaded;
+  if FShouldShow then
+    Show;
 end;
 
 function TCustomPlatformBaseAd.GetAdUnitId: string;
@@ -278,12 +288,21 @@ begin
   Result := FIsWarmStart;
 end;
 
-procedure TCustomPlatformBaseAd.Load;
+procedure TCustomPlatformBaseAd.Load(const AShow: Boolean);
 begin
   if AdMob.IsStarted then
-    DoLoad
-  else
-    FNeedsLoad := True;
+  begin
+    FShouldShow := AShow;
+    DoLoad;
+  end
+  else if AShow then
+    FNeedsLoadState := TNeedsLoadState.Show;
+end;
+
+procedure TCustomPlatformBaseAd.Show;
+begin
+  FShouldShow := False;
+  DoShow;
 end;
 
 procedure TCustomPlatformBaseAd.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
@@ -301,8 +320,12 @@ end;
 
 procedure TCustomPlatformBaseAd.AdsStartedMessageHandler(const Sender: TObject; const M: TMessage);
 begin
-  if FNeedsLoad then
+  if FNeedsLoadState <> TNeedsLoadState.None then
+  begin
+    FShouldShow := FNeedsLoadState = TNeedsLoadState.Show;
+    FNeedsLoadState := TNeedsLoadState.None;
     DoLoad;
+  end;
 end;
 
 procedure TCustomPlatformBaseAd.ApplicationBecameActive;
@@ -316,6 +339,11 @@ begin
 end;
 
 procedure TCustomPlatformBaseAd.DoLoad;
+begin
+  //
+end;
+
+procedure TCustomPlatformBaseAd.DoShow;
 begin
   //
 end;
@@ -425,12 +453,14 @@ end;
 procedure TBaseAd.DoAdFailedToLoad(const AError: TAdError);
 begin
   TOSLog.d('DoAdFailedToLoad (%s) - %d: %s', [ClassName, AError.ErrorCode, AError.Message]);
+  FIsLoaded := False;
   if Assigned(FOnAdFailedToLoad) then
     FOnAdFailedToLoad(Self, AError);
 end;
 
 procedure TBaseAd.DoAdLoaded;
 begin
+  FIsLoaded := True;
   if Assigned(FOnAdLoaded) then
     FOnAdLoaded(Self);
 end;
@@ -445,10 +475,11 @@ begin
   Result := PlatformBaseAd.TestMode;
 end;
 
-procedure TBaseAd.Load;
+procedure TBaseAd.Load(const AShow: Boolean = True);
 begin
+  FIsLoaded := False;
   if not AdUnitId.IsEmpty then
-    PlatformBaseAd.Load;
+    PlatformBaseAd.Load(AShow);
 end;
 
 procedure TBaseAd.SetAdUnitId(const Value: string);
@@ -459,6 +490,12 @@ end;
 procedure TBaseAd.SetTestMode(const Value: Boolean);
 begin
   PlatformBaseAd.TestMode := Value;
+end;
+
+procedure TBaseAd.Show;
+begin
+  if FIsLoaded then
+    PlatformBaseAd.Show;
 end;
 
 { TFullScreenAd }

@@ -167,6 +167,7 @@ type
     procedure DoAdFailedToShowFullScreenContent(const AError: TAdError); override;
     procedure DoAdWillPresentFullScreenContent; override;
     procedure DoLoad; override;
+    procedure DoShow; override;
   public
     constructor Create(const AInterstitialAd: TInterstitialAd); override;
     destructor Destroy; override;
@@ -215,6 +216,7 @@ type
     procedure DoAdWillPresentFullScreenContent; override;
     procedure DoUserEarnedReward(const AReward: TAdReward); override;
     procedure DoLoad; override;
+    procedure DoShow; override;
   public
     constructor Create(const ARewardedAd: TRewardedAd); override;
     destructor Destroy; override;
@@ -252,6 +254,7 @@ type
     procedure DoAdWillPresentFullScreenContent; override;
     procedure DoUserEarnedReward(const AReward: TAdReward); override;
     procedure DoLoad; override;
+    procedure DoShow; override;
   public
     constructor Create(const ARewardedInterstitialAd: TRewardedInterstitialAd); override;
     destructor Destroy; override;
@@ -372,7 +375,6 @@ procedure TPlatformInterstitialAd.AdLoaded(const AInterstitialAd: JInterstitial_
 begin
   FAd := AInterstitialAd;
   DoAdLoaded;
-  FAd.show(TAndroidHelper.Activity);
 end;
 
 procedure TPlatformInterstitialAd.DoAdWillPresentFullScreenContent;
@@ -392,6 +394,12 @@ begin
     TJinterstitial_InterstitialAd.JavaClass.load(TAndroidHelper.Context, LAdUnitId, LRequest, FCallbackDelegate.Callback);
   end;
   // else ad already showing
+end;
+
+procedure TPlatformInterstitialAd.DoShow;
+begin
+  if FAd <> nil then
+    FAd.show(TAndroidHelper.Activity);
 end;
 
 { TUserEarnedRewardListener }
@@ -463,7 +471,13 @@ end;
 procedure TPlatformRewardedAd.AdLoaded(const ARewardedAd: JRewardedAd);
 begin
   FAd := ARewardedAd;
-  FAd.show(TAndroidHelper.Activity, FUserEarnedRewardListener);
+  DoAdLoaded;
+end;
+
+procedure TPlatformRewardedAd.DoShow;
+begin
+  if FAd <> nil then
+    FAd.show(TAndroidHelper.Activity, FUserEarnedRewardListener);
 end;
 
 procedure TPlatformRewardedAd.DoAdDismissedFullScreenContent;
@@ -558,7 +572,6 @@ procedure TPlatformRewardedInterstitialAd.AdLoaded(const ARewardedInterstitialAd
 begin
   FAd := ARewardedInterstitialAd;
   DoAdLoaded;
-  FAd.show(TAndroidHelper.Activity, FUserEarnedRewardListener);
 end;
 
 procedure TPlatformRewardedInterstitialAd.DoAdDismissedFullScreenContent;
@@ -584,6 +597,12 @@ end;
 procedure TPlatformRewardedInterstitialAd.DoLoad;
 begin
   LoadAd;
+end;
+
+procedure TPlatformRewardedInterstitialAd.DoShow;
+begin
+  if FAd <> nil then
+    FAd.show(TAndroidHelper.Activity, FUserEarnedRewardListener);
 end;
 
 procedure TPlatformRewardedInterstitialAd.LoadAd;
