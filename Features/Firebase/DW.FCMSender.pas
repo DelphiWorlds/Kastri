@@ -499,6 +499,8 @@ begin
     begin
       LData.AddPair('title', TJSONString.Create(FTitle));
       LData.AddPair('body', TJSONString.Create(FBody));
+      if not FChannelID.IsEmpty then
+        LData.AddPair('channel_id', FChannelID);
       // imageUrl is used in FCM handling code in Kastri
       if not FImageURL.IsEmpty then
         LData.AddPair('imageUrl', TJSONString.Create(FImageURL));
