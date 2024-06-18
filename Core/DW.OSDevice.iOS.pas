@@ -50,7 +50,7 @@ uses
   // macOS
   Macapi.Helpers,
   // iOS
-  iOSapi.Helpers, iOSapi.UIKit, iOSapi.AVFoundation, iOSapi.CoreLocation,
+  iOSapi.Helpers, iOSapi.AVFoundation, iOSapi.CoreLocation,
   // Posix
   Posix.SysUtsname,
   // DW
