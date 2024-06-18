@@ -17,7 +17,7 @@ uses
   // macOS
   Macapi.ObjectiveC, 
   // iOS
-  iOSapi.Foundation, iOSapi.UIKit, iOSapi.CocoaTypes, iOSapi.AVFoundation,
+  iOSapi.Foundation, iOSapi.CocoaTypes, iOSapi.AVFoundation,
   // DW
   DW.iOSapi.Foundation, DW.iOSapi.UIKit, DW.iOSapi.PhotosUI, DW.FilesSelector;
 
