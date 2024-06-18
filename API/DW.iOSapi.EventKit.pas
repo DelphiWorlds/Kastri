@@ -14,8 +14,12 @@ unit DW.iOSapi.EventKit;
 interface
 
 uses
+  // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation,
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreGraphics, iOSapi.CoreLocation, iOSapi.MapKit, iOSapi.AddressBook;
+  // iOS
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreGraphics, iOSapi.CoreLocation, iOSapi.MapKit, iOSapi.AddressBook,
+  // DW
+  DW.iOSapi.EventKit.Common;
 
 const
   EKAuthorizationStatusNotDetermined = 0;
@@ -120,7 +124,6 @@ type
   EKParticipant = interface;
   EKRecurrenceDayOfWeek = interface;
   EKRecurrenceEnd = interface;
-  EKRecurrenceRule = interface;
   EKReminder = interface;
   EKSource = interface;
   EKStructuredLocation = interface;
@@ -362,43 +365,6 @@ type
   end;
   TEKRecurrenceDayOfWeek = class(TOCGenericImport<EKRecurrenceDayOfWeekClass, EKRecurrenceDayOfWeek>) end;
 
-  EKRecurrenceEndClass = interface(NSObjectClass)
-    ['{270AE147-E764-47A6-A1EB-DC67B27529FB}']
-    {class} function recurrenceEndWithEndDate(endDate: NSDate): Pointer; cdecl;
-    {class} function recurrenceEndWithOccurrenceCount(occurrenceCount: NSUInteger): Pointer; cdecl;
-  end;
-
-  EKRecurrenceEnd = interface(NSObject)
-    ['{FE8F6198-17B3-49FA-B6DE-9420570D2752}']
-    function endDate: NSDate; cdecl;
-    function occurrenceCount: NSUInteger; cdecl;
-  end;
-  TEKRecurrenceEnd = class(TOCGenericImport<EKRecurrenceEndClass, EKRecurrenceEnd>) end;
-
-  EKRecurrenceRuleClass = interface(EKObjectClass)
-    ['{D404D131-5C39-4E95-8E59-F48DF0299392}']
-  end;
-
-  EKRecurrenceRule = interface(EKObject)
-    ['{610106FD-6A64-46A4-9DA3-24A0BA3EE7A7}']
-    function calendarIdentifier: NSString; cdecl;
-    function daysOfTheMonth: NSArray; cdecl;
-    function daysOfTheWeek: NSArray; cdecl;
-    function daysOfTheYear: NSArray; cdecl;
-    function firstDayOfTheWeek: NSInteger; cdecl;
-    function frequency: EKRecurrenceFrequency; cdecl;
-    function initRecurrenceWithFrequency(&type: EKRecurrenceFrequency; interval: NSInteger; &end: EKRecurrenceEnd): Pointer; overload; cdecl;
-    function initRecurrenceWithFrequency(&type: EKRecurrenceFrequency; interval: NSInteger; daysOfTheWeek: NSArray; daysOfTheMonth: NSArray;
-      monthsOfTheYear: NSArray; weeksOfTheYear: NSArray; daysOfTheYear: NSArray; setPositions: NSArray; &end: EKRecurrenceEnd): Pointer; overload; cdecl;
-    function interval: NSInteger; cdecl;
-    function monthsOfTheYear: NSArray; cdecl;
-    function recurrenceEnd: EKRecurrenceEnd; cdecl;
-    function setPositions: NSArray; cdecl;
-    procedure setRecurrenceEnd(recurrenceEnd: EKRecurrenceEnd); cdecl;
-    function weeksOfTheYear: NSArray; cdecl;
-  end;
-  TEKRecurrenceRule = class(TOCGenericImport<EKRecurrenceRuleClass, EKRecurrenceRule>) end;
-
   EKReminderClass = interface(EKCalendarItemClass)
     ['{C1994F54-E7FE-4F6A-BE15-3C6B5A1D2760}']
     {class} function reminderWithEventStore(eventStore: EKEventStore): EKReminder; cdecl;
@@ -505,31 +471,6 @@ type
 function EKEventStoreChangedNotification: NSString;
 function EKErrorDomain: NSString;
 
-const
-  libEventKit = '/System/Library/Frameworks/EventKit.framework/EventKit';
-
 implementation
-
-uses
-  Posix.Dlfcn;
-
-var
-  EventKitModule: THandle;
-
-function EKEventStoreChangedNotification: NSString;
-begin
-  Result := CocoaNSStringConst(libEventKit, 'EKEventStoreChangedNotification');
-end;
-
-function EKErrorDomain: NSString;
-begin
-  Result := CocoaNSStringConst(libEventKit, 'EKErrorDomain');
-end;
-
-initialization
-  EventKitModule := dlopen(MarshaledAString(libEventKit), RTLD_LAZY);
-
-finalization
-  dlclose(EventKitModule);
 
 end.

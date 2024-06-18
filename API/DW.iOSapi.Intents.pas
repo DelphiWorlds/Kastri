@@ -19,7 +19,7 @@ uses
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreLocation, iOSapi.UserNotifications, iOSapi.CoreGraphics,
   // DW
-  DW.iOSapi.Foundation, DW.iOSapi.EventKit;
+  DW.iOSapi.Foundation, DW.iOSapi.EventKit.Common;
 
 const
   INShortcutAvailabilityOptionSleepMindfulness = 1;
