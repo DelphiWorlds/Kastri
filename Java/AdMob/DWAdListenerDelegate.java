@@ -15,11 +15,11 @@ import com.google.android.gms.ads.LoadAdError;
 
 public interface DWAdListenerDelegate { 
 
-   void onAdClicked();
-   void onAdClosed();
-   void onAdFailedToLoad(LoadAdError adError);
-   void onAdImpression();
-   void onAdLoaded();
-   void onAdOpened();
+  void onAdClicked();
+  void onAdClosed();
+  void onAdFailedToLoad(LoadAdError adError);
+  void onAdImpression();
+  void onAdLoaded();
+  void onAdOpened();
 
 }
