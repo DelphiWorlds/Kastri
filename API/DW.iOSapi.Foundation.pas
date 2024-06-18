@@ -31,12 +31,21 @@ const
   NSPersonNameComponentsFormatterStyleLong = 3;
   NSPersonNameComponentsFormatterStyleAbbreviated = 4;
   NSPersonNameComponentsFormatterPhonetic = 2;
+  NSStringEnumerationByLines = 0;
+  NSStringEnumerationByParagraphs = 1;
+  NSStringEnumerationByComposedCharacterSequences = 2;
+  NSStringEnumerationByWords = 3;
+  NSStringEnumerationBySentences = 4;
+  NSStringEnumerationByCaretPositions = 5;
+  NSStringEnumerationByDeletionClusters = 6;
 
 type
   NSDateInterval = interface;
   NSItemProvider = interface;
   NSLocale = interface;
   NSMeasurement = interface;
+  NSOrderedCollectionChange = interface;
+  NSOrderedCollectionDifference = interface;
   NSPersonNameComponents = interface;
   NSProgress = interface;
   NSUnit = interface;
@@ -53,6 +62,15 @@ type
   NSProgressFileOperationKind = NSString;
   NSItemProviderRepresentationVisibility = NSInteger;
   NSItemProviderFileOptions = NSInteger;
+  NSCollectionChangeType = NSInteger;
+  NSRangePointer = ^NSRange;
+  NSExceptionName = NSString;
+  NSRunLoopMode = NSString;
+  NSComparisonResult = NSInteger;
+  NSStringEnumerationOptions = NSInteger;
+  NSAttributedStringKey = NSString;
+  NSAttributedStringFormattingContextKey = NSString;
+  NSAttributedStringEnumerationOptions = NSInteger;
 
   NSItemProviderCompletionHandler = procedure(item: Pointer; error: NSError) of object;
   NSItemProviderLoadHandler = procedure(completionHandler: NSItemProviderCompletionHandler; expectedValueClass: Pointer; options: NSDictionary) of object;
@@ -78,6 +96,41 @@ type
   TNSProgressBlockMethod4 = procedure of object;
   TNSUserActivityBlockMethod1 = procedure(inputStream: NSInputStream; outputStream: NSOutputStream; error: NSError) of object;
   TNSUserActivityBlockMethod2 = procedure of object;
+  TNSOrderedCollectionDifferenceBlockMethod1 = procedure(param1: NSOrderedCollectionChange) of object;
+
+  NSOrderedCollectionChangeClass = interface(NSObjectClass)
+    ['{C976F40F-1B7E-4F47-A9FA-82F2632794A1}']
+    {class} function changeWithObject(anObject: Pointer; &type: NSCollectionChangeType; index: NSUInteger): NSOrderedCollectionChange; overload; cdecl;
+    {class} function changeWithObject(anObject: Pointer; &type: NSCollectionChangeType; index: NSUInteger; associatedIndex: NSUInteger): NSOrderedCollectionChange; overload; cdecl;
+  end;
+
+  NSOrderedCollectionChange = interface(NSObject)
+    ['{A602C161-CFFD-43C1-9C1E-595C2AF86EB0}']
+    function &object: Pointer; cdecl;
+    function associatedIndex: NSUInteger; cdecl;
+    function changeType: NSCollectionChangeType; cdecl;
+    function index: NSUInteger; cdecl;
+    function initWithObject(anObject: Pointer; &type: NSCollectionChangeType; index: NSUInteger): Pointer; overload; cdecl;
+    function initWithObject(anObject: Pointer; &type: NSCollectionChangeType; index: NSUInteger; associatedIndex: NSUInteger): Pointer; overload; cdecl;
+  end;
+  TNSOrderedCollectionChange = class(TOCGenericImport<NSOrderedCollectionChangeClass, NSOrderedCollectionChange>) end;
+
+  NSOrderedCollectionDifferenceClass = interface(NSObjectClass)
+    ['{C974E07C-048A-4D32-9CFA-8A2CADF6687E}']
+  end;
+
+  NSOrderedCollectionDifference = interface(NSObject)
+    ['{A94E9D8F-CD49-44B1-96F6-756CB61D47AA}']
+    function differenceByTransformingChangesWithBlock(block: TNSOrderedCollectionDifferenceBlockMethod1): NSOrderedCollectionDifference; cdecl;
+    function hasChanges: Boolean; cdecl;
+    function initWithChanges(changes: NSArray): Pointer; cdecl;
+    function initWithInsertIndexes(inserts: NSIndexSet; insertedObjects: NSArray; removeIndexes: NSIndexSet; removedObjects: NSArray; additionalChanges: NSArray): Pointer; overload; cdecl;
+    function initWithInsertIndexes(inserts: NSIndexSet; insertedObjects: NSArray; removeIndexes: NSIndexSet; removedObjects: NSArray): Pointer; overload; cdecl;
+    function insertions: NSArray; cdecl;
+    function inverseDifference: Pointer; cdecl;
+    function removals: NSArray; cdecl;
+  end;
+  TNSOrderedCollectionDifference = class(TOCGenericImport<NSOrderedCollectionDifferenceClass, NSOrderedCollectionDifference>) end;
 
   NSDateIntervalClass = interface(NSObjectClass)
     ['{B19E17B2-394D-45B8-AB71-E70138251973}']
