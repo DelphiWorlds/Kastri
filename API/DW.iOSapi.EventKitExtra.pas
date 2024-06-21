@@ -1,4 +1,4 @@
-unit DW.iOSapi.EventKit.Common;
+unit DW.iOSapi.EventKitExtra;
 
 {*******************************************************}
 {                                                       }
@@ -18,9 +18,6 @@ uses
   Macapi.ObjectiveC,
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation;
-
-const
-  libEventKit = '/System/Library/Frameworks/EventKit.framework/EventKit';
 
 type
   EKObject = interface;
@@ -81,28 +78,5 @@ type
   TEKRecurrenceRule = class(TOCGenericImport<EKRecurrenceRuleClass, EKRecurrenceRule>) end;
 
 implementation
-
-
-uses
-  Posix.Dlfcn;
-
-var
-  EventKitModule: THandle;
-
-function EKEventStoreChangedNotification: NSString;
-begin
-  Result := CocoaNSStringConst(libEventKit, 'EKEventStoreChangedNotification');
-end;
-
-function EKErrorDomain: NSString;
-begin
-  Result := CocoaNSStringConst(libEventKit, 'EKErrorDomain');
-end;
-
-initialization
-  EventKitModule := dlopen(MarshaledAString(libEventKit), RTLD_LAZY);
-
-finalization
-  dlclose(EventKitModule);
 
 end.

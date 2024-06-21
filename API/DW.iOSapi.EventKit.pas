@@ -19,7 +19,7 @@ uses
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreGraphics, iOSapi.CoreLocation, iOSapi.MapKit, iOSapi.AddressBook,
   // DW
-  DW.iOSapi.EventKit.Common;
+  DW.iOSapi.EventKitExtra;
 
 const
   EKAuthorizationStatusNotDetermined = 0;
@@ -123,7 +123,6 @@ type
   EKEventStore = interface;
   EKParticipant = interface;
   EKRecurrenceDayOfWeek = interface;
-  EKRecurrenceEnd = interface;
   EKReminder = interface;
   EKSource = interface;
   EKStructuredLocation = interface;
@@ -468,9 +467,34 @@ type
   end;
   TEKVirtualConferenceProvider = class(TOCGenericImport<EKVirtualConferenceProviderClass, EKVirtualConferenceProvider>) end;
 
+const
+  libEventKit = '/System/Library/Frameworks/EventKit.framework/EventKit';
+
 function EKEventStoreChangedNotification: NSString;
 function EKErrorDomain: NSString;
 
 implementation
+
+uses
+  Posix.Dlfcn;
+
+var
+  EventKitModule: THandle;
+
+function EKEventStoreChangedNotification: NSString;
+begin
+  Result := CocoaNSStringConst(libEventKit, 'EKEventStoreChangedNotification');
+end;
+
+function EKErrorDomain: NSString;
+begin
+  Result := CocoaNSStringConst(libEventKit, 'EKErrorDomain');
+end;
+
+initialization
+  EventKitModule := dlopen(MarshaledAString(libEventKit), RTLD_LAZY);
+
+finalization
+  dlclose(EventKitModule);
 
 end.
