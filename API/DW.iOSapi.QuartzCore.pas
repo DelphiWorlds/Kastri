@@ -80,6 +80,31 @@ type
   PPCATextLayerPrivate = ^PCATextLayerPrivate;
   PCATransform3D = ^CATransform3D;
   PCAFrameRateRange = ^CAFrameRateRange;
+
+  CVSMPTETime = record
+    subframes: SInt16;
+    subframeDivisor: SInt16;
+    counter: UInt32;
+    type_: UInt32;
+    flags: UInt32;
+    hours: SInt16;
+    minutes: SInt16;
+    seconds: SInt16;
+    frames: SInt16;
+  end;
+  SMPTETime = CVSMPTETime;
+
+  CVTimeStamp = record
+    version: UInt32;
+    videoTimeScale: Integer;
+    videoTime: Int64;
+    hostTime: UInt64;
+    rateScalar: Double;
+    videoRefreshPeriod: Int64;
+    smpteTime: CVSMPTETime;
+    flags: UInt64;
+    reserved: UInt64;
+  end;
   PCVTimeStamp = ^CVTimestamp;
 
   CATransform3D = record
