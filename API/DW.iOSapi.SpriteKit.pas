@@ -17,7 +17,7 @@ uses
   // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation, Macapi.ObjCRuntime, Macapi.Dispatch,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics, iOSapi.CoreImage, iOSapi.GLKit,
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics, iOSapi.CoreImage, iOSapi.GLKit, iOSapi.AVFoundation,
   // DW
   DW.Macapi.Simd, DW.Macapi.Dispatch, DW.iOSapi.AVFoundation, DW.iOSapi.Metal;
 
