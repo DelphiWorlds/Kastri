@@ -1,4 +1,4 @@
-unit DW.iOSapi.UIKit.Common;
+unit DW.iOSapi.UIKitExtra;
 
 {*******************************************************}
 {                                                       }
@@ -19,7 +19,7 @@ uses
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation,
   // DW
-  DW.iOSapi.UIKit, DW.iOSapi.Foundation;
+  DW.iOSapi.Foundation;
 
 type
   NSDiffableDataSourceSectionSnapshotClass = interface(NSObjectClass)
@@ -128,5 +128,8 @@ type
   TNSDiffableDataSourceTransaction = class(TOCGenericImport<NSDiffableDataSourceTransactionClass, NSDiffableDataSourceTransaction>) end;
 
 implementation
+
+uses
+  DW.iOSapi.UIKit;
 
 end.

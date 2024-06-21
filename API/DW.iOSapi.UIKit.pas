@@ -2871,7 +2871,7 @@ type
   TUIApplicationDelegateBlockMethod2 = procedure(result: UIBackgroundFetchResult) of object;
   TUIApplicationDelegateBlockMethod3 = procedure(succeeded: Boolean) of object;
   TUIApplicationDelegateBlockMethod4 = procedure(replyInfo: NSDictionary) of object;
-  //!!!! Intents - circular ref with UIKit TUIApplicationDelegateBlockMethod5 = procedure(intentResponse: INIntentResponse) of object;
+  TUIApplicationDelegateBlockMethod5 = procedure(intentResponse: INIntentResponse) of object;
   TUIApplicationDelegateBlockMethod6 = procedure(restorableObjects: NSArray) of object;
   TUISceneBlockMethod1 = procedure(success: Boolean) of object;
   TUIViewControllerBlockMethod1 = procedure of object;
@@ -5325,7 +5325,8 @@ type
     function positionFromPosition(position: UITextPosition; inDirection: UITextLayoutDirection; offset: NSInteger): UITextPosition; overload; cdecl;
     function positionFromPosition(position: UITextPosition; offset: NSInteger): UITextPosition; overload; cdecl;
     function positionWithinRange(range: UITextRange; atCharacterOffset: NSInteger): UITextPosition; overload; cdecl;
-    //!!!! Collision function positionWithinRange(range: UITextRange; farthestInDirection: UITextLayoutDirection): UITextPosition; overload; cdecl;
+    [MethodName('positionWithinRange:farthestInDirection:')]
+    function positionWithinRangeFarthestInDirection(range: UITextRange; farthestInDirection: UITextLayoutDirection): UITextPosition; overload; cdecl;
     procedure removeDictationResultPlaceholder(placeholder: Pointer; willInsertResult: Boolean); cdecl;
     procedure removeTextPlaceholder(textPlaceholder: UITextPlaceholder); cdecl;
     procedure replaceRange(range: UITextRange; withText: NSString); cdecl;
@@ -6065,7 +6066,9 @@ type
     function application(application: UIApplication; viewControllerWithRestorationIdentifierPath: NSArray;
       coder: NSCoder): UIViewController; overload; cdecl;
     function application(application: UIApplication; shouldSaveSecureApplicationState: NSCoder): Boolean; overload; cdecl;
-    //!!!! function application(application: UIApplication; willContinueUserActivityWithType: NSString): Boolean; overload; cdecl;
+    [MethodName('application:willContinueUserActivityWithType:')]
+    function applicationWillContinueUserActivityWithType(application: UIApplication;
+      willContinueUserActivityWithType: NSString): Boolean; overload; cdecl;
     function application(application: UIApplication; continueUserActivity: NSUserActivity; restorationHandler: Pointer): Boolean; overload; cdecl;
     procedure application(application: UIApplication; handleActionWithIdentifier: NSString; forLocalNotification: UILocalNotification;
       completionHandler: Pointer); overload; cdecl; // API_DEPRECATED("Use UserNotifications Framework's -[UNUserNotificationCenterDelegate didReceiveNotificationResponse:withCompletionHandler:]", ios(8.0, 10.0))
@@ -11687,7 +11690,9 @@ type
       willPresentViewController: UIViewController); overload; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("splitViewController:willChangeToDisplayMode:", ios(2.0, 8.0))
     function splitViewController(splitViewController: UISplitViewController;
       separateSecondaryViewControllerFromPrimaryViewController: UIViewController): UIViewController; overload; cdecl;
-    procedure splitViewController(svc: UISplitViewController; willChangeToDisplayMode: UISplitViewControllerDisplayMode); overload; cdecl;
+    [MethodName('splitViewController:willChangeToDisplayMode:')]
+    procedure splitViewControllerWillChangeToDisplayMode(svc: UISplitViewController;
+      willChangeToDisplayMode: UISplitViewControllerDisplayMode); overload; cdecl;
     function splitViewController(splitViewController: UISplitViewController; showViewController: UIViewController;
       sender: Pointer): Boolean; overload; cdecl;
     function splitViewController(splitViewController: UISplitViewController; collapseSecondaryViewController: UIViewController;
@@ -15778,8 +15783,8 @@ type
 
   UISearchTextFieldDelegate = interface(UITextFieldDelegate)
     ['{FA8AB7D2-983B-4E3B-92DE-9C9D1D837D9E}']
-    function searchTextField(searchTextField: UISearchTextField; itemProviderForCopyingToken: UISearchToken): NSItemProvider; cdecl;
-    procedure searchTextField(searchTextField: UISearchTextField; didSelectSuggestion: UISearchSuggestion); cdecl;
+    function searchTextField(searchTextField: UISearchTextField; itemProviderForCopyingToken: UISearchToken): NSItemProvider; overload; cdecl;
+    procedure searchTextField(searchTextField: UISearchTextField; didSelectSuggestion: UISearchSuggestion); overload; cdecl;
   end;
 
   UISearchTextFieldPasteItem = interface(UITextPasteItem)
