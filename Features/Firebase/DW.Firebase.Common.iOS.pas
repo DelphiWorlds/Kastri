@@ -20,6 +20,6 @@ uses
   DW.iOSapi.FirebaseCore;
 
 initialization
-  TFIRApp.OCClass.configure;
+  //TFIRApp.OCClass.configure;
 
 end.
