@@ -19,7 +19,7 @@ uses
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation,
   //
-  DW.iOSapi.CloudKit, DW.iOSapi.Foundation, DW.iOSapi.UIKit.Common;
+  DW.iOSapi.Foundation, DW.iOSapi.CloudKit, DW.iOSapi.UIKitExtra;
 
 const
   NSCoreDataVersionNumber10_4 = 46.0;
