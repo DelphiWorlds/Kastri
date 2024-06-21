@@ -163,7 +163,13 @@ begin
     // https://developer.android.com/about/versions/14/behavior-changes-14#runtime-receivers-exported
     LFlags := 0;
     if TAndroidHelperEx.CheckBuildAndTarget(TAndroidHelperEx.UPSIDE_DOWN_CAKE) and HasNonSystemActions then
+    begin
+      {$IF CompilerVersion > 35}
       LFlags := TJContext.JavaClass.RECEIVER_EXPORTED;
+      {$ELSE}
+      LFlags := 2;
+      {$ENDIF}
+    end;
     TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter, LFlags);
   end
   else
