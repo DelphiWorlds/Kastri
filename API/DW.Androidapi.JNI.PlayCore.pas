@@ -19,7 +19,9 @@ interface
 uses
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.App, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Java.Security,
-  Androidapi.JNI.JavaTypes, Androidapi.JNI.Os, Androidapi.JNI.Util;
+  Androidapi.JNI.JavaTypes, Androidapi.JNI.Os, Androidapi.JNI.Util,
+  // DW
+  DW.Androidapi.JNI.AndroidX.Activity;
 
 type
   JActivityResult = interface;
@@ -39,6 +41,7 @@ type
   JAssetPackStateUpdateListener = interface;
   JAssetPackStatus = interface;
   JAssetPackStorageMethod = interface;
+  JAssetPackUpdateAvailability = interface;
   JFakeAppUpdateManager = interface;
   JFakeSplitInstallManager = interface;
   JFakeSplitInstallManagerFactory = interface;
@@ -214,6 +217,22 @@ type
   end;
   TJFakeAppUpdateManager = class(TJavaGenericImport<JFakeAppUpdateManagerClass, JFakeAppUpdateManager>) end;
 
+  JAssetPackUpdateAvailabilityClass = interface(JAnnotationClass)
+    ['{BD7D8124-7F27-4F93-845B-0BF54A327B7C}']
+    {class} function _GetUNKNOWN: Integer; cdecl;
+    {class} function _GetUPDATE_AVAILABLE: Integer; cdecl;
+    {class} function _GetUPDATE_NOT_AVAILABLE: Integer; cdecl;
+    {class} property UNKNOWN: Integer read _GetUNKNOWN;
+    {class} property UPDATE_AVAILABLE: Integer read _GetUPDATE_AVAILABLE;
+    {class} property UPDATE_NOT_AVAILABLE: Integer read _GetUPDATE_NOT_AVAILABLE;
+  end;
+
+  [JavaSignature('com/google/android/play/core/assetpacks/model/AssetPackUpdateAvailability')]
+  JAssetPackUpdateAvailability = interface(JAnnotation)
+    ['{0BF75B0A-EEA5-4499-B6C4-ED4FF83C3A81}']
+  end;
+  TJAssetPackUpdateAvailability = class(TJavaGenericImport<JAssetPackUpdateAvailabilityClass, JAssetPackUpdateAvailability>) end;
+
   JAssetLocationClass = interface(JObjectClass)
     ['{CA677523-263C-43C6-9E58-C1E1DCE35F90}']
     {class} function init: JAssetLocation; cdecl;
@@ -258,8 +277,11 @@ type
     function getPackStates(packNames: JList): JTask; cdecl;
     procedure registerListener(listener: JAssetPackStateUpdateListener); cdecl;
     function removePack(packName: JString): JTask; cdecl;
-    function showCellularDataConfirmation(activity: JActivity): JTask; cdecl;
-    procedure unregisterListener(listener: JAssetPackStateUpdateListener); cdecl;
+    function showCellularDataConfirmation(activityresultlauncher: JActivityResultLauncher): Boolean; cdecl; overload;
+    function showCellularDataConfirmation(activity: JActivity): JTask; cdecl; overload;
+    function showConfirmationDialog(activityresultlauncher: JActivityResultLauncher): Boolean; cdecl; overload;
+    function showConfirmationDialog(activity: JActivity): JTask; cdecl; overload;
+    procedure unregisterListener(assetpackstateupdatelistener: JAssetPackStateUpdateListener); cdecl;
   end;
   TJAssetPackManager = class(TJavaGenericImport<JAssetPackManagerClass, JAssetPackManager>) end;
 
@@ -283,12 +305,15 @@ type
   [JavaSignature('com/google/android/play/core/assetpacks/AssetPackState')]
   JAssetPackState = interface(JObject)
     ['{7FA9AC47-01E9-4E9E-B2B2-0B4C8171CA4E}']
+    function availableVersionTag: JString; cdecl;
     function bytesDownloaded: Int64; cdecl;
     function errorCode: Integer; cdecl;
+    function installedVersionTag: JString; cdecl;
     function name: JString; cdecl;
     function status: Integer; cdecl;
     function totalBytesToDownload: Int64; cdecl;
     function transferProgressPercentage: Integer; cdecl;
+    function updateAvailability: Integer; cdecl;
   end;
   TJAssetPackState = class(TJavaGenericImport<JAssetPackStateClass, JAssetPackState>) end;
 
@@ -354,6 +379,7 @@ type
     {class} function _GetAPI_NOT_AVAILABLE: Integer; cdecl;
     {class} function _GetAPP_NOT_OWNED: Integer; cdecl;
     {class} function _GetAPP_UNAVAILABLE: Integer; cdecl;
+    {class} function _GetCONFIRMATION_NOT_REQUIRED: Integer; cdecl;
     {class} function _GetDOWNLOAD_NOT_FOUND: Integer; cdecl;
     {class} function _GetINSUFFICIENT_STORAGE: Integer; cdecl;
     {class} function _GetINTERNAL_ERROR: Integer; cdecl;
@@ -361,10 +387,12 @@ type
     {class} function _GetNETWORK_ERROR: Integer; cdecl;
     {class} function _GetNO_ERROR: Integer; cdecl;
     {class} function _GetPACK_UNAVAILABLE: Integer; cdecl;
+    {class} function _GetUNRECOGNIZED_INSTALLATION: Integer; cdecl;
     {class} property ACCESS_DENIED: Integer read _GetACCESS_DENIED;
     {class} property API_NOT_AVAILABLE: Integer read _GetAPI_NOT_AVAILABLE;
     {class} property APP_NOT_OWNED: Integer read _GetAPP_NOT_OWNED;
     {class} property APP_UNAVAILABLE: Integer read _GetAPP_UNAVAILABLE;
+    {class} property CONFIRMATION_NOT_REQUIRED: Integer read _GetCONFIRMATION_NOT_REQUIRED;
     {class} property DOWNLOAD_NOT_FOUND: Integer read _GetDOWNLOAD_NOT_FOUND;
     {class} property INSUFFICIENT_STORAGE: Integer read _GetINSUFFICIENT_STORAGE;
     {class} property INTERNAL_ERROR: Integer read _GetINTERNAL_ERROR;
@@ -372,6 +400,7 @@ type
     {class} property NETWORK_ERROR: Integer read _GetNETWORK_ERROR;
     {class} property NO_ERROR: Integer read _GetNO_ERROR;
     {class} property PACK_UNAVAILABLE: Integer read _GetPACK_UNAVAILABLE;
+    {class} property UNRECOGNIZED_INSTALLATION: Integer read _GetUNRECOGNIZED_INSTALLATION;
   end;
 
   [JavaSignature('com/google/android/play/core/assetpacks/model/AssetPackErrorCode')]
@@ -388,6 +417,7 @@ type
     {class} function _GetFAILED: Integer; cdecl;
     {class} function _GetNOT_INSTALLED: Integer; cdecl;
     {class} function _GetPENDING: Integer; cdecl;
+    {class} function _GetREQUIRES_USER_CONFIRMATION: Integer; cdecl;
     {class} function _GetTRANSFERRING: Integer; cdecl;
     {class} function _GetUNKNOWN: Integer; cdecl;
     {class} function _GetWAITING_FOR_WIFI: Integer; cdecl;
@@ -397,6 +427,7 @@ type
     {class} property FAILED: Integer read _GetFAILED;
     {class} property NOT_INSTALLED: Integer read _GetNOT_INSTALLED;
     {class} property PENDING: Integer read _GetPENDING;
+    {class} property REQUIRES_USER_CONFIRMATION: Integer read _GetREQUIRES_USER_CONFIRMATION;
     {class} property TRANSFERRING: Integer read _GetTRANSFERRING;
     {class} property UNKNOWN: Integer read _GetUNKNOWN;
     {class} property WAITING_FOR_WIFI: Integer read _GetWAITING_FOR_WIFI;
