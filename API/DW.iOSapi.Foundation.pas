@@ -71,6 +71,7 @@ type
   NSAttributedStringKey = NSString;
   NSAttributedStringFormattingContextKey = NSString;
   NSAttributedStringEnumerationOptions = NSInteger;
+  NSQualityOfService = NSInteger;
 
   NSItemProviderCompletionHandler = procedure(item: Pointer; error: NSError) of object;
   NSItemProviderLoadHandler = procedure(completionHandler: NSItemProviderCompletionHandler; expectedValueClass: Pointer; options: NSDictionary) of object;
