@@ -19,6 +19,29 @@ uses
   // DW
   DW.Macapi.CloudKit;
 
+const
+  NSBezelStyleAutomatic = 0;
+  NSBezelStylePush = 1;
+  NSBezelStyleFlexiblePush = 2;
+  NSBezelStyleDisclosure = 5;
+  NSBezelStyleCircular = 7;
+  NSBezelStyleHelpButton = 9;
+  NSBezelStyleSmallSquare = 10;
+  NSBezelStyleToolbar = 11;
+  NSBezelStyleAccessoryBarAction = 12;
+  NSBezelStyleAccessoryBar = 13;
+  NSBezelStylePushDisclosure = 14;
+  NSBezelStyleBadge = 15;
+  NSBezelStyleShadowlessSquare = 6;
+  NSBezelStyleTexturedSquare = 8;
+  NSBezelStyleRounded = NSBezelStylePush;
+  NSBezelStyleRegularSquare = NSBezelStyleFlexiblePush;
+  NSBezelStyleTexturedRounded = NSBezelStyleToolbar;
+  NSBezelStyleRoundRect = NSBezelStyleAccessoryBarAction;
+  NSBezelStyleRecessed = NSBezelStyleAccessoryBar;
+  NSBezelStyleRoundedDisclosure = NSBezelStylePushDisclosure;
+  NSBezelStyleInline = NSBezelStyleBadge;
+
 type
   NSCloudSharingServiceDelegate = interface;
   NSEvent = interface;
