@@ -31,16 +31,22 @@ set ASSET_PACKS_DIR=%7
 set SDK_DIR=%8
 set API_LEVEL=%9
 
-set BASE_FILE=base.zip
+:: Supported versions below 12.1
+set DELPHI_VER=0
+if exist "%BDS%\bin\android\aapt2-8.2.1.exe" set DELPHI_VER=121
+
+set BASE_FILE=BaseModule.zip
 set MANIFEST_FILE=AndroidManifest.xml
 set BASE_DIR=%TARGET_DIR%\base
 set OUTPUT_DIR=%TARGET_DIR%\bin
 set BUNDLE_FILE=%OUTPUT_DIR%\%PROJECT%.aab
 set MODULE_FILES="%TARGET_DIR%\%BASE_FILE%"
 
-if not exist "%BASE_DIR%" (
-  echo %BASE_DIR:"=% does not exist - please ensure that you supply the correct folder path, and you use Project, Deploy in Delphi first
-  goto finish
+if %DELPHI_VER% NEQ 121 (
+  if not exist "%BASE_DIR%" (
+    echo %BASE_DIR:"=% does not exist - please ensure that you supply the correct folder path, and you use Project, Deploy in Delphi first
+    goto finish
+  )
 )
 
 :: Stripping quotes to test existence
@@ -54,8 +60,13 @@ if not "%PACKS_DIR%" == "" (
 
 :: Set variables
 set ANDROID_JAR=%SDK_DIR%\platforms\%API_LEVEL%\android.jar
-set AAPT2_PATH=%BDS%\bin\android\aapt2.exe
-set BUNDLETOOL_JAR=%BDS%\bin\android\bundletool-all-1.2.0.jar
+if %DELPHI_VER% == 121 (
+  set "AAPT2_PATH=%BDS%\bin\android\aapt2-8.2.1.exe"
+  set "BUNDLETOOL_JAR=%BDS%\bin\android\bundletool-1.15.6.jar"
+) else (
+  set "AAPT2_PATH=%BDS%\bin\android\aapt2.exe"
+  set "BUNDLETOOL_JAR=%BDS%\bin\android\bundletool-all-1.2.0.jar"
+)
 
 if not exist "%SDK_DIR%\platforms\%API_LEVEL%" (
   echo SDK API level %SDK_DIR%\platforms\%API_LEVEL% does not exist
@@ -64,6 +75,7 @@ if not exist "%SDK_DIR%\platforms\%API_LEVEL%" (
 
 :: Build asset pack modules
 :: **** Inside the for loop, all variables being SET in the loop must be expanded using the ! character
+echo Building asset pack modules..
 setlocal enabledelayedexpansion
 for /D %%d in (%ASSET_PACKS_DIR%\*) do (
   set ROOT_DIR=%%d
@@ -96,22 +108,29 @@ if defined ASSET_PACKS_DIR (
   for %%f in (%ASSET_PACKS_DIR%\*.zip) do call set "MODULE_FILES=%%MODULE_FILES%%,"%%~nxf""
 ) 
 
-:: Archive base dir
-cd /D %BASE_DIR%
-jar cfM "..\%BASE_FILE%" *
+if %DELPHI_VER% == 0 (
+  :: Archive base dir
+  echo Archiving base module..
+  cd /D %BASE_DIR%
+  jar cfM "..\%BASE_FILE%" *
+)
 
 cd /D %ASSET_PACKS_DIR%
 if exist "%BUNDLE_FILE%" del "%BUNDLE_FILE%"  
 :: Build the bundle...  removed:  --config=%TARGET_DIR%\buildconfig.json
+echo Building %BUNDLE_FILE%
 java.exe -jar "%BUNDLETOOL_JAR%" build-bundle --modules=%MODULE_FILES% --output="%BUNDLE_FILE%" 
 
 :: Sign it
+echo Signing %BUNDLE_FILE%
 jarsigner.exe -keystore "%KEYSTORE_FILE%" -keypass %KEY_PASS% -storepass %STORE_PASS% "%BUNDLE_FILE%" %ALIAS%
 
-:: Delete the base.zip (no longer required)
-del "%TARGET_DIR%\%BASE_FILE%"
+:: Delete the base zip file (no longer required)
+if %DELPHI_VER% == 0 del "%TARGET_DIR%\%BASE_FILE%"
 
 :finish
+
+echo Complete!
 
 :: Go back to original folder
 cd /D %CURRENT_DIR%
