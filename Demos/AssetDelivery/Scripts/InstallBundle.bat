@@ -21,7 +21,7 @@ set SERIAL=%~7
 set BUNDLE_FILE=%TARGET_DIR%\bin\%PROJECT%.aab
 set APKS_FILE=%TARGET_DIR%\bin\%PROJECT%.apks
 
-set BUNDLETOOL_JAR=%BDS%\bin\android\bundletool-all-1.2.0.jar
+set "BUNDLETOOL_JAR=%BDS%\bin\android\bundletool-all-1.2.0.jar"
 
 :: Delete any existing apks file
 if exist "%APKS_FILE%" del "%APKS_FILE%"
