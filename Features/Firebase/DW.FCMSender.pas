@@ -75,15 +75,18 @@ type
     FClickAction: string;
     FData: string;
     FImageURL: string;
+    FIsCritical: Boolean;
     FIsDataOnly: Boolean;
     FOptions: TFCMMessageOptions;
     FPriority: TFCMMessagePriority;
     FSoundName: string;
+    FSoundVolume: Single;
     FTitle: string;
     function GetAndroidJSONValue: TJSONValue;
     function GetAndroidNotificationJSONValue: TJSONValue;
     function GetAPNSJSONValue: TJSONValue;
     function GetDataJSONValue: TJSONValue;
+    procedure SetSoundVolume(const Value: Single);
   public
     constructor Create;
     function GetPayload(const ATo: string; const AIsTopic: Boolean): string;
@@ -97,10 +100,12 @@ type
     property ClickAction: string read FClickAction write FClickAction;
     property Data: string read FData write FData;
     property ImageURL: string read FImageURL write FImageURL;
+    property IsCritical: Boolean read FIsCritical write FIsCritical;
     property IsDataOnly: Boolean read FIsDataOnly write FIsDataOnly;
     property Options: TFCMMessageOptions read FOptions write FOptions;
     property Priority: TFCMMessagePriority read FPriority write FPriority;
     property SoundName: string read FSoundName write FSoundName;
+    property SoundVolume: Single read FSoundVolume write SetSoundVolume;
     property Title: string read FTitle write FTitle;
   end;
 
@@ -416,13 +421,20 @@ begin
   FImageURL := '';
   FOptions := [];
   FSoundName := '';
+  FIsCritical := False;
+  FSoundVolume := -1;
+end;
+
+procedure TFCMMessage.SetSoundVolume(const Value: Single);
+begin
+  FSoundVolume := Value;
 end;
 
 // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification?language=objc#2943363
 //   See Table 1
 function TFCMMessage.GetAPNSJSONValue: TJSONValue;
 var
-  LAPNS, LPayload, LAPS, LAlert, LDataValue: TJSONObject;
+  LAPNS, LPayload, LAPS, LAlert, LDataValue, LSoundValue: TJSONObject;
   LHasAPS: Boolean;
   I: Integer;
   LPair: TJSONPair;
@@ -435,8 +447,20 @@ begin
     LAPNS.AddPair('payload', LPayload);
     LAPS := TJSONObject.Create;
     LPayload.AddPair('aps', LAPS);
-    if not FSoundName.IsEmpty then
-      LAPS.AddPair('sound', FSoundName);
+    if not FSoundName.IsEmpty or FIsCritical then
+    begin
+      LSoundValue := TJSONObject.Create;
+      LSoundValue.AddPair('critical', Ord(FIsCritical));
+      if FSoundName.IsEmpty then
+        LSoundValue.AddPair('name', 'default')
+      else
+        LSoundValue.AddPair('name', FSoundName);
+      if FSoundVolume = -1 then
+        LSoundValue.AddPair('volume', 1)
+      else
+        LSoundValue.AddPair('volume', FSoundVolume);
+      LAPS.AddPair('sound', LSoundValue);
+    end;
     if FBadgeCount >= 0 then
       LAPS.AddPair('badge', TJSONNumber.Create(FBadgeCount));
     if TFCMMessageOption.ContentAvailable in FOptions then
