@@ -21,9 +21,9 @@ interface
 
 uses
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.Jni.GraphicsContentViewText, Androidapi.JNI,
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.Jni.GraphicsContentViewText, Androidapi.JNI, Androidapi.JNI.PlayServices.Tasks,
   // DW
-  DW.Androidapi.JNI.PlayCore;
+  DW.Androidapi.JNI.AssetDelivery;
 
 type
   TAssetDelivery = class;
@@ -32,13 +32,13 @@ type
   private
     FAssetDelivery: TAssetDelivery;
   public
-    { JStateUpdatedListener }
-    procedure onStateUpdate(state: JAssetPackState); cdecl;
+    { JAssetPackStateUpdateListener }
+    procedure onStateUpdate(state: JObject); cdecl;
   public
     constructor Create(const AAssetDelivery: TAssetDelivery);
   end;
 
-  TAssetPackStateCompleteListener = class(TJavaLocal, JOnCompleteListener)
+  TAssetPackStatesCompleteListener = class(TJavaLocal, JOnCompleteListener)
   private
     FAssetDelivery: TAssetDelivery;
   public
@@ -137,20 +137,20 @@ begin
   FAssetDelivery := AAssetDelivery;
 end;
 
-procedure TAssetPackStateUpdateListener.onStateUpdate(state: JAssetPackState);
+procedure TAssetPackStateUpdateListener.onStateUpdate(state: JObject);
 begin
-  FAssetDelivery.AssetPackStateUpdate(state);
+  FAssetDelivery.AssetPackStateUpdate(TJAssetPackState.Wrap(state));
 end;
 
-{ TAssetPackStateCompleteListener }
+{ TAssetPackStatesCompleteListener }
 
-constructor TAssetPackStateCompleteListener.Create(const AAssetDelivery: TAssetDelivery);
+constructor TAssetPackStatesCompleteListener.Create(const AAssetDelivery: TAssetDelivery);
 begin
   inherited Create;
   FAssetDelivery := AAssetDelivery;
 end;
 
-procedure TAssetPackStateCompleteListener.onComplete(task: JTask);
+procedure TAssetPackStatesCompleteListener.onComplete(task: JTask);
 begin
   FAssetDelivery.AssetPackStatesComplete(TJAssetPackStates.Wrap(task.getResult));
 end;
@@ -161,7 +161,7 @@ constructor TAssetDelivery.Create;
 begin
   inherited;
   FStateUpdateListener := TAssetPackStateUpdateListener.Create(Self);
-  FStatesCompleteListener := TAssetPackStateCompleteListener.Create(Self);
+  FStatesCompleteListener := TAssetPackStatesCompleteListener.Create(Self);
   FAssetPackManager := TJAssetPackManagerFactory.JavaClass.getInstance(TAndroidHelper.Context);
   FAssetPackManager.registerListener(FStateUpdateListener);
   FAssetManager := TAndroidHelper.Context.getAssets;
