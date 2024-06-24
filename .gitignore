@@ -77,7 +77,6 @@ info.plist.TemplateIOS.xml
 *.res
 .DS_Store
 Unused
-Research
 LaunchScreen.TemplateiOS
 Settings.bundle
 **/Android/Debug
@@ -96,12 +95,4 @@ ThirdParty/Firebase/iOS/Firebase.6.*
 **/Service/*.java
 **/Service/JavaClasses
 dbgout.log
-GoogleService-Info.plist
-google-services.json
-*.keystore
-Backup/
-htaccess*
-*.entitlements
-FMX.*
-thumbs.db
-*.class
+Thumbs.db
