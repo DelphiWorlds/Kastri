@@ -6,7 +6,7 @@ Demonstrates the use of the [Play Asset Delivery](https://developer.android.com/
 
 ## Supported Delphi versions
 
-Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
+Delphi 12.x, Delphi 11.x
 
 ## Asset Packs
 
@@ -60,13 +60,14 @@ After Codex has re-built the application, you can use the `Install` button to in
 
 ## Play Core Library
 
-You may note that a library has been added to the `Libraries` node of the `Android` target in the project, namely:
+In the demo, libraries have been added to the `Libraries` node of the `Android 32-bit` target in the project, namely:
 
 ```
-  play-core-1.10.0.jar
+  asset-delivery-2.2.2.jar
+  play-core-common-2.0.3.jar
 ```
 
-This provides Play Asset Delivery support to the application, and is used by the Kastri code to manage the asset packs
+These provide Play Asset Delivery support to the application, and is used by the Kastri code to manage the asset packs
 
 **Note**:
 
@@ -82,7 +83,7 @@ In order to support Play Asset Delivery, changes have been made to AndroidManife
 
 ## Permissions
 
-Play Asset Delivery requires the `Foreground Service` permission, so this option is checked in the `Uses Permissions` section of the project
+Play Asset Delivery requires the `Foreground Service` and `Foreground Service Data Sync` permissions, so these options are checked in the `Uses Permissions` section of the project
 
 ## Building the application
 
@@ -90,7 +91,7 @@ Delphi does not normally include asset packs, so there is a custom process for b
 
 ### Pre-requisites
 
-If you are using the manual build process (as opposed to [using Codex](#automating-building-of-asset-packs-using-codex)), ensure that the path to the JDK you are using is in the `PATH` environment variable, e.g. `C:\Program Files\Java\jdk1.8.0_191\bin`
+If you are using the manual build process (as opposed to [using Codex](#automating-building-of-asset-packs-using-codex)), ensure that the path to the JDK you are using is in the `PATH` environment variable, e.g. `C:\Program Files\Eclipse Adoptium\jdk-17.0.9.9-hotspot\bin`
 
 A useful tool for editing the `PATH` variable is [Rapid Environment Editor](https://www.rapidee.com) (which was written in Delphi)
 
