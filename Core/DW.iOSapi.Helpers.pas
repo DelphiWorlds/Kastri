@@ -19,7 +19,7 @@ uses
   // macOS
   Macapi.ObjectiveC,
   // iOS
-  iOSapi.Foundation,
+  iOSapi.Foundation, iOSapi.CocoaTypes,
   // DW
   DW.iOSapi.UIKit;
 
@@ -39,6 +39,7 @@ type
     class function NSDictionaryToString(const ADictionary: NSDictionary): string; static;
     class function SharedApplication: UIApplication; static;
     class function StandardUserDefaults: NSUserDefaults; static;
+    class function UIImageToJPEGData(const AImage: UIImage; const ACompressionQuality: CGFloat): NSData; static;
   end;
 
 implementation
@@ -166,12 +167,17 @@ end;
 
 class function TiOSHelperEx.SharedApplication: UIApplication;
 begin
-  Result := TUIApplication.Wrap(TUIApplication.OCClass.sharedApplication);
+  Result := TUIApplication.OCClass.sharedApplication;
 end;
 
 class function TiOSHelperEx.StandardUserDefaults: NSUserDefaults;
 begin
   Result := TNSUserDefaults.Wrap(TNSUserDefaults.OCClass.standardUserDefaults);
+end;
+
+class function TiOSHelperEx.UIImageToJPEGData(const AImage: UIImage; const ACompressionQuality: CGFloat): NSData;
+begin
+  Result := TNSData.Wrap(UIImageJPEGRepresentation(NSObjectToID(AImage), ACompressionQuality));
 end;
 
 end.
