@@ -17,9 +17,9 @@ uses
   // macOS
   Macapi.ObjectiveC,
   // iOS
-  iOSapi.UIKit, iOSapi.Foundation,
+  iOSapi.Foundation,
   // DW
-  DW.iOSapi.GoogleMobileAds, DW.AdMob, DW.AdMobAds;
+  DW.iOSapi.UIKit, DW.iOSapi.GoogleMobileAds, DW.AdMob, DW.AdMobAds;
 
 type
   TOpenCustomPlatformFullScreenAd = class(TCustomPlatformFullScreenAd);
@@ -122,6 +122,11 @@ type
     class function GetAdError(const AError: NSError): TADError; static;
     class function GetAdReward(const AReward: GADAdReward): TADReward; static;
   end;
+
+function SharedApplication: UIApplication;
+begin
+  Result := TUIApplication.Wrap(TUIApplication.OCClass.sharedApplication);
+end;
 
 { TGADHelper }
 
@@ -235,7 +240,7 @@ end;
 procedure TPlatformInterstitialAd.DoShow;
 begin
   if FAd <> nil then
-    FAd.presentFromRootViewController(TiOSHelper.SharedApplication.keyWindow.rootViewController);
+    FAd.presentFromRootViewController(SharedApplication.keyWindow.rootViewController);
 end;
 
 procedure TPlatformInterstitialAd.PaidEventHandler(value: GADAdValue);
@@ -287,7 +292,7 @@ end;
 procedure TPlatformRewardedAd.DoShow;
 begin
   if FAd <> nil then
-    FAd.presentFromRootViewController(TiOSHelper.SharedApplication.keyWindow.rootViewController, UserDidEarnRewardHandler);
+    FAd.presentFromRootViewController(SharedApplication.keyWindow.rootViewController, UserDidEarnRewardHandler);
 end;
 
 procedure TPlatformRewardedAd.PaidEventHandler(value: GADAdValue);
@@ -344,7 +349,7 @@ end;
 procedure TPlatformRewardedInterstitialAd.DoShow;
 begin
   if FAd <> nil then
-    FAd.presentFromRootViewController(TiOSHelper.SharedApplication.keyWindow.rootViewController, UserDidEarnRewardHandler);
+    FAd.presentFromRootViewController(SharedApplication.keyWindow.rootViewController, UserDidEarnRewardHandler);
 end;
 
 procedure TPlatformRewardedInterstitialAd.LoadAd;
@@ -427,7 +432,7 @@ end;
 procedure TPlatformAppOpenAd.ShowAdIfAvailable(const ACanShow: Boolean);
 begin
   if (FAd <> nil) and ACanShow then // and load time was less than 4 hours ago??
-    FAd.presentFromRootViewController(TiOSHelper.SharedApplication.keyWindow.rootViewController)
+    FAd.presentFromRootViewController(SharedApplication.keyWindow.rootViewController)
   else if FAd = nil then
     LoadAd;
 end;
