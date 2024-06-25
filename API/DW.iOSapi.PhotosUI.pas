@@ -17,9 +17,9 @@ uses
   // macOS
   Macapi.ObjectiveC,
   // iOS
-  iOSapi.Foundation, iOSapi.CocoaTypes, iOSapi.UIKit,
+  iOSapi.Foundation, iOSapi.CocoaTypes,
   // DW
-  DW.iOSapi.Foundation, DW.iOSapi.Photos;
+  DW.iOSapi.UIKit, DW.iOSapi.Foundation, DW.iOSapi.Photos;
 
 const
   PHLivePhotoBadgeOptionsOverContent = 1;
