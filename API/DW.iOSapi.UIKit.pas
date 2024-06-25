@@ -16342,52 +16342,52 @@ function UIPrintErrorDomain: NSErrorDomain;
 const
   libUIKit = '/System/Library/Frameworks/UIKit.framework/UIKit';
 
-function NSStringFromCGPoint(point: CGPoint): NSString; cdecl;
+function NSStringFromCGPoint(point: CGPoint): Pointer; cdecl;
   external libUIKit name _PU + 'NSStringFromCGPoint';
 
-function NSStringFromCGVector(vector: CGVector): NSString; cdecl;
+function NSStringFromCGVector(vector: CGVector): Pointer; cdecl;
   external libUIKit name _PU + 'NSStringFromCGVector';
 
-function NSStringFromCGSize(size: CGSize): NSString; cdecl;
+function NSStringFromCGSize(size: CGSize): Pointer; cdecl;
   external libUIKit name _PU + 'NSStringFromCGSize';
 
-function NSStringFromCGRect(rect: CGRect): NSString; cdecl;
+function NSStringFromCGRect(rect: CGRect): Pointer; cdecl;
   external libUIKit name _PU + 'NSStringFromCGRect';
 
-function NSStringFromCGAffineTransform(transform: CGAffineTransform): NSString; cdecl;
+function NSStringFromCGAffineTransform(transform: CGAffineTransform): Pointer; cdecl;
   external libUIKit name _PU + 'NSStringFromCGAffineTransform';
 
-function NSStringFromUIEdgeInsets(insets: UIEdgeInsets): NSString; cdecl;
+function NSStringFromUIEdgeInsets(insets: UIEdgeInsets): Pointer; cdecl;
   external libUIKit name _PU + 'NSStringFromUIEdgeInsets';
 
-function NSStringFromDirectionalEdgeInsets(insets: NSDirectionalEdgeInsets): NSString; cdecl;
+function NSStringFromDirectionalEdgeInsets(insets: NSDirectionalEdgeInsets): Pointer; cdecl;
   external libUIKit name _PU + 'NSStringFromDirectionalEdgeInsets';
 
-function NSStringFromUIOffset(offset: UIOffset): NSString; cdecl;
+function NSStringFromUIOffset(offset: UIOffset): Pointer; cdecl;
   external libUIKit name _PU + 'NSStringFromUIOffset';
 
-function CGPointFromString(&string: NSString): CGPoint; cdecl;
+function CGPointFromString(&string: Pointer): CGPoint; cdecl;
   external libUIKit name _PU + 'CGPointFromString';
 
-function CGVectorFromString(&string: NSString): CGVector; cdecl;
+function CGVectorFromString(&string: Pointer): CGVector; cdecl;
   external libUIKit name _PU + 'CGVectorFromString';
 
-function CGSizeFromString(&string: NSString): CGSize; cdecl;
+function CGSizeFromString(&string: Pointer): CGSize; cdecl;
   external libUIKit name _PU + 'CGSizeFromString';
 
-function CGRectFromString(&string: NSString): CGRect; cdecl;
+function CGRectFromString(&string: Pointer): CGRect; cdecl;
   external libUIKit name _PU + 'CGRectFromString';
 
-function CGAffineTransformFromString(&string: NSString): CGAffineTransform; cdecl;
+function CGAffineTransformFromString(&string: Pointer): CGAffineTransform; cdecl;
   external libUIKit name _PU + 'CGAffineTransformFromString';
 
-function UIEdgeInsetsFromString(&string: NSString): UIEdgeInsets; cdecl;
+function UIEdgeInsetsFromString(&string: Pointer): UIEdgeInsets; cdecl;
   external libUIKit name _PU + 'UIEdgeInsetsFromString';
 
-function NSDirectionalEdgeInsetsFromString(&string: NSString): NSDirectionalEdgeInsets; cdecl;
+function NSDirectionalEdgeInsetsFromString(&string: Pointer): NSDirectionalEdgeInsets; cdecl;
   external libUIKit name _PU + 'NSDirectionalEdgeInsetsFromString';
 
-function UIOffsetFromString(&string: NSString): UIOffset; cdecl;
+function UIOffsetFromString(&string: Pointer): UIOffset; cdecl;
   external libUIKit name _PU + 'UIOffsetFromString';
 
 function UIGraphicsGetCurrentContext: CGContextRef; cdecl;
@@ -16420,16 +16420,16 @@ procedure UIGraphicsBeginImageContext(size: CGSize); cdecl;
 procedure UIGraphicsBeginImageContextWithOptions(size: CGSize; opaque: Boolean; scale: CGFloat); cdecl;
   external libUIKit name _PU + 'UIGraphicsBeginImageContextWithOptions';
 
-function UIGraphicsGetImageFromCurrentImageContext: UIImage; cdecl;
+function UIGraphicsGetImageFromCurrentImageContext: Pointer; cdecl;
   external libUIKit name _PU + 'UIGraphicsGetImageFromCurrentImageContext';
 
 procedure UIGraphicsEndImageContext; cdecl;
   external libUIKit name _PU + 'UIGraphicsEndImageContext';
 
-function UIGraphicsBeginPDFContextToFile(path: NSString; bounds: CGRect; documentInfo: NSDictionary): Boolean; cdecl;
+function UIGraphicsBeginPDFContextToFile(path: Pointer; bounds: CGRect; documentInfo: Pointer): Boolean; cdecl;
   external libUIKit name _PU + 'UIGraphicsBeginPDFContextToFile';
 
-procedure UIGraphicsBeginPDFContextToData(data: NSMutableData; bounds: CGRect; documentInfo: NSDictionary); cdecl;
+procedure UIGraphicsBeginPDFContextToData(data: Pointer; bounds: CGRect; documentInfo: Pointer); cdecl;
   external libUIKit name _PU + 'UIGraphicsBeginPDFContextToData';
 
 procedure UIGraphicsEndPDFContext; cdecl;
@@ -16438,28 +16438,28 @@ procedure UIGraphicsEndPDFContext; cdecl;
 procedure UIGraphicsBeginPDFPage; cdecl;
   external libUIKit name _PU + 'UIGraphicsBeginPDFPage';
 
-procedure UIGraphicsBeginPDFPageWithInfo(bounds: CGRect; pageInfo: NSDictionary); cdecl;
+procedure UIGraphicsBeginPDFPageWithInfo(bounds: CGRect; pageInfo: Pointer); cdecl;
   external libUIKit name _PU + 'UIGraphicsBeginPDFPageWithInfo';
 
 function UIGraphicsGetPDFContextBounds: CGRect; cdecl;
   external libUIKit name _PU + 'UIGraphicsGetPDFContextBounds';
 
-procedure UIGraphicsSetPDFContextURLForRect(url: NSURL; rect: CGRect); cdecl;
+procedure UIGraphicsSetPDFContextURLForRect(url: Pointer; rect: CGRect); cdecl;
   external libUIKit name _PU + 'UIGraphicsSetPDFContextURLForRect';
 
-procedure UIGraphicsAddPDFContextDestinationAtPoint(name: NSString; point: CGPoint); cdecl;
+procedure UIGraphicsAddPDFContextDestinationAtPoint(name: Pointer; point: CGPoint); cdecl;
   external libUIKit name _PU + 'UIGraphicsAddPDFContextDestinationAtPoint';
 
-procedure UIGraphicsSetPDFContextDestinationForRect(name: NSString; rect: CGRect); cdecl;
+procedure UIGraphicsSetPDFContextDestinationForRect(name: Pointer; rect: CGRect); cdecl;
   external libUIKit name _PU + 'UIGraphicsSetPDFContextDestinationForRect';
 
-function UIImagePNGRepresentation(image: UIImage): NSData; cdecl;
+function UIImagePNGRepresentation(image: Pointer): Pointer; cdecl;
   external libUIKit name _PU + 'UIImagePNGRepresentation';
 
-function UIImageJPEGRepresentation(image: UIImage; compressionQuality: CGFloat): NSData; cdecl;
+function UIImageJPEGRepresentation(image: Pointer; compressionQuality: CGFloat): Pointer; cdecl;
   external libUIKit name _PU + 'UIImageJPEGRepresentation';
 
-function UIImageHEICRepresentation(image: UIImage): NSData; cdecl;
+function UIImageHEICRepresentation(image: Pointer): Pointer; cdecl;
   external libUIKit name _PU + 'UIImageHEICRepresentation';
 
 function UIFontWeightForImageSymbolWeight(symbolWeight: UIImageSymbolWeight): UIFontWeight; cdecl;
@@ -16477,25 +16477,25 @@ function NSTextAlignmentFromCTTextAlignment(ctTextAlignment: CTTextAlignment): N
 function UIEventButtonMaskForButtonNumber(buttonNumber: NSInteger): UIEventButtonMask; cdecl;
   external libUIKit name _PU + 'UIEventButtonMaskForButtonNumber';
 
-function _NSDictionaryOfVariableBindings(commaSeparatedKeysString: NSString; firstValue: Pointer): NSDictionary varargs; cdecl;
+function _NSDictionaryOfVariableBindings(commaSeparatedKeysString: Pointer; firstValue: Pointer): Pointer varargs; cdecl;
   external libUIKit name _PU + '_NSDictionaryOfVariableBindings';
 
-function UIContentSizeCategoryIsAccessibilityCategory(category: UIContentSizeCategory): Boolean; cdecl;
+function UIContentSizeCategoryIsAccessibilityCategory(category: Pointer): Boolean; cdecl;
   external libUIKit name _PU + 'UIContentSizeCategoryIsAccessibilityCategory';
 
-function UIContentSizeCategoryCompareToCategory(lhs: UIContentSizeCategory; rhs: UIContentSizeCategory): NSComparisonResult; cdecl;
+function UIContentSizeCategoryCompareToCategory(lhs: Pointer; rhs: Pointer): NSComparisonResult; cdecl;
   external libUIKit name _PU + 'UIContentSizeCategoryCompareToCategory';
 
-function UIApplicationMain(argc: Integer; argv: PPAnsiChar; principalClassName: NSString; delegateClassName: NSString): Integer; cdecl;
+function UIApplicationMain(argc: Integer; argv: PMarshaledAString; principalClassName: Pointer; delegateClassName: Pointer): Integer; cdecl;
   external libUIKit name _PU + 'UIApplicationMain';
 
-procedure UIAccessibilityZoomFocusChanged(&type: UIAccessibilityZoomType; frame: CGRect; view: UIView); cdecl;
+procedure UIAccessibilityZoomFocusChanged(&type: UIAccessibilityZoomType; frame: CGRect; view: Pointer); cdecl;
   external libUIKit name _PU + 'UIAccessibilityZoomFocusChanged';
 
 procedure UIAccessibilityRegisterGestureConflictWithZoom; cdecl;
   external libUIKit name _PU + 'UIAccessibilityRegisterGestureConflictWithZoom';
 
-function UIGuidedAccessRestrictionStateForIdentifier(restrictionIdentifier: NSString): UIGuidedAccessRestrictionState; cdecl;
+function UIGuidedAccessRestrictionStateForIdentifier(restrictionIdentifier: Pointer): UIGuidedAccessRestrictionState; cdecl;
   external libUIKit name _PU + 'UIGuidedAccessRestrictionStateForIdentifier';
 
 type
@@ -16505,13 +16505,13 @@ procedure UIGuidedAccessConfigureAccessibilityFeatures(features: UIGuidedAccessA
   completion: UIGuidedAccessConfigureAccessibilityFeatures_completion); cdecl;
   external libUIKit name _PU + 'UIGuidedAccessConfigureAccessibilityFeatures';
 
-function UIAccessibilityConvertFrameToScreenCoordinates(rect: CGRect; view: UIView): CGRect; cdecl;
+function UIAccessibilityConvertFrameToScreenCoordinates(rect: CGRect; view: Pointer): CGRect; cdecl;
   external libUIKit name _PU + 'UIAccessibilityConvertFrameToScreenCoordinates';
 
-function UIAccessibilityConvertPathToScreenCoordinates(path: UIBezierPath; view: UIView): UIBezierPath; cdecl;
+function UIAccessibilityConvertPathToScreenCoordinates(path: UIBezierPath; view: Pointer): Pointer; cdecl;
   external libUIKit name _PU + 'UIAccessibilityConvertPathToScreenCoordinates';
 
-function UIAccessibilityFocusedElement(assistiveTechnologyIdentifier: UIAccessibilityAssistiveTechnologyIdentifier): Pointer; cdecl;
+function UIAccessibilityFocusedElement(assistiveTechnologyIdentifier: Pointer): Pointer; cdecl;
   external libUIKit name _PU + 'UIAccessibilityFocusedElement';
 
 procedure UIAccessibilityPostNotification(notification: UIAccessibilityNotifications; argument: Pointer); cdecl;
@@ -16593,13 +16593,13 @@ function UICellAccessoryPositionBeforeAccessoryOfClass(accessoryClass: Pointer):
 function UICellAccessoryPositionAfterAccessoryOfClass(accessoryClass: Pointer): UICellAccessoryPosition; cdecl;
   external libUIKit name _PU + 'UICellAccessoryPositionAfterAccessoryOfClass';
 
-procedure UIImageWriteToSavedPhotosAlbum(image: UIImage; completionTarget: Pointer; completionSelector: SEL; contextInfo: Pointer); cdecl;
+procedure UIImageWriteToSavedPhotosAlbum(image: Pointer; completionTarget: Pointer; completionSelector: SEL; contextInfo: Pointer); cdecl;
   external libUIKit name _PU + 'UIImageWriteToSavedPhotosAlbum';
 
-function UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(videoPath: NSString): Boolean; cdecl;
+function UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(videoPath: Pointer): Boolean; cdecl;
   external libUIKit name _PU + 'UIVideoAtPathIsCompatibleWithSavedPhotosAlbum';
 
-procedure UISaveVideoAtPathToSavedPhotosAlbum(videoPath: NSString; completionTarget: Pointer; completionSelector: SEL; contextInfo: Pointer); cdecl;
+procedure UISaveVideoAtPathToSavedPhotosAlbum(videoPath: Pointer; completionTarget: Pointer; completionSelector: SEL; contextInfo: Pointer); cdecl;
   external libUIKit name _PU + 'UISaveVideoAtPathToSavedPhotosAlbum';
 
 function UIFloatRangeIsInfinite(range: UIFloatRange): Boolean; cdecl;
