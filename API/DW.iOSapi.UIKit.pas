@@ -4405,11 +4405,16 @@ type
     function verticalSizeClass: UIUserInterfaceSizeClass; cdecl;
   end;
 
-  UITraitEnvironment = interface(IObjectiveC)
-    ['{5E01251A-BADA-49C3-861F-7EC6A7865E4D}']
+  UITraitEnvironmentClass = interface(NSObjectClass)
+    ['{52E664EE-1A01-486A-9A9B-9647BCDCA370}']
+  end;
+
+  UITraitEnvironment = interface(NSObject)
+    ['{3E6DB638-EA4F-404E-8C1A-01542A327EF0}']
     function traitCollection: UITraitCollection; cdecl;
     procedure traitCollectionDidChange(previousTraitCollection: UITraitCollection); cdecl; // API_DEPRECATED("Use the trait change registration APIs declared in the UITraitChangeObservable protocol", ios(8.0, 17.0), visionos(1.0, 1.0))
   end;
+  TUITraitEnvironment = class(TOCGenericImport<UITraitEnvironmentClass, UITraitEnvironment>) end;
 
   UITraitChangeRegistration = interface(IObjectiveC)
     ['{69CB9066-D76F-4E9C-A1CE-B61B2C46A742}']
