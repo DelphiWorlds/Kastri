@@ -25,7 +25,7 @@ uses
   // FMX
   FMX.Presentation.Messages, FMX.Presentation.iOS, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model, FMX.Types,
   // DW
-  DW.iOSapi.GoogleMobileAds, DW.AdMob, DW.AdMobBannerAd;
+  DW.iOSapi.UIKit, DW.iOSapi.GoogleMobileAds, DW.AdMob, DW.AdMobBannerAd;
 
 type
   IGADBannerView = interface(UIView)
@@ -83,6 +83,11 @@ type
     property Model: TCustomAdMobBannerAdModel read GetModel;
   end;
 
+function SharedApplication: UIApplication;
+begin
+  Result := TUIApplication.Wrap(TUIApplication.OCClass.sharedApplication);
+end;
+
 { TGADBannerViewDelegate }
 
 constructor TGADBannerViewDelegate.Create(const ABannerAd: TiOSAdMobBannerAd);
@@ -138,8 +143,8 @@ begin
   FBannerView.setTranslatesAutoresizingMaskIntoConstraints(False);
   FDelegate := TGADBannerViewDelegate.Create(Self);
   FBannerView.setDelegate(FDelegate.GetObjectID);
-  FBannerView.setRootViewController(TiOSHelper.SharedApplication.keyWindow.rootViewController);
-  View.addSubview(FBannerView);
+  FBannerView.setRootViewController(SharedApplication.keyWindow.rootViewController);
+  View.addSubview(iOSapi.UIKit.TUIView.Wrap(NSObjectToID(FBannerView)));
   LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FBannerView),
     NSLayoutAttributeTop, NSLayoutRelationEqual, NSObjectToID(View), NSLayoutAttributeTop, 1, 0));
   LConstraint.setActive(True);
