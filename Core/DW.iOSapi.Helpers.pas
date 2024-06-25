@@ -19,15 +19,11 @@ uses
   // macOS
   Macapi.ObjectiveC,
   // iOS
-  iOSapi.Foundation, iOSapi.UIKit;
+  iOSapi.Foundation,
+  // DW
+  DW.iOSapi.UIKit;
 
 type
-  UIApplication = interface(iOSapi.UIKit.UIApplication)
-    ['{7228BEAE-1B3A-4EBC-A87C-03982C8EC742}']
-    function isRegisteredForRemoteNotifications: Boolean; cdecl;
-  end;
-  TUIApplication = class(TOCGenericImport<UIApplicationClass, UIApplication>) end;
-
   TiOSHelperEx = record
   public
     class procedure AddObserver(const AObserver: Pointer; const AMethod: MarshaledAString; const AName: NSString;
