@@ -114,10 +114,11 @@ uses
   System.IOUtils, System.SysUtils, System.Classes,
   // macOS
   Macapi.Helpers,
+  Macapi.ObjCRuntime,
   // iOS
   iOSapi.Helpers, iOSapi.CoreGraphics, iOSapi.CoreMedia,
   // DW
-  DW.Macapi.Helpers, DW.iOSapi.AVFoundation;
+  DW.Macapi.Helpers, DW.iOSapi.AVFoundation, DW.iOSapi.Helpers;
 
 type
   TItemProviderHandler = class(TInterfacedObject, IItemProviderHandler)
@@ -184,7 +185,7 @@ procedure TMemoryStreamHelper.LoadUIImageAsJPEG(const AImage: UIImage);
 var
   LData: NSData;
 begin
-  LData := TNSData.Wrap(UIImageJPEGRepresentation(NSObjectToID(AImage), 1));
+  LData := TiOSHelperEx.UIImageToJPEGData(AImage, 1);
   Clear;
   Write(LData.bytes^, LData.length);
 end;
@@ -299,7 +300,7 @@ begin
   FController := TPHPickerViewController.Wrap(FController.initWithConfiguration(LConfiguration));
   FController.setDelegate(GetObjectID);
   FController.setTitle(StrToNSStr(FSelector.Title));
-  TiOSHelper.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
+  TiOSHelperEx.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
 end;
 
 { TUIImagePickerControllerDelegate }
@@ -394,7 +395,7 @@ begin
   FController := TUIImagePickerController.Create;
   FController.setDelegate(GetObjectID);
   FController.setTitle(StrToNSStr(FSelector.Title));
-  TiOSHelper.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
+  TiOSHelperEx.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
 end;
 
 { TUIDocumentPickerDelegate }
@@ -424,7 +425,7 @@ begin
   FController.setAllowsMultipleSelection(True);
   FController.setDelegate(GetObjectID);
   FController.setTitle(StrToNSStr(FSelector.Title));
-  TiOSHelper.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
+  TiOSHelperEx.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
 end;
 
 procedure TUIDocumentPickerDelegate.documentPicker(controller: UIDocumentPickerViewController; didPickDocumentAtURL: NSURL);
@@ -542,7 +543,7 @@ begin
   try
     if LImage <> nil then
     begin
-      LData := TNSData.Wrap(UIImageJPEGRepresentation(NSObjectToID(LImage), 1));
+      LData := TiOSHelperEx.UIImageToJPEGData(LImage, 1);
       LStream.Write(LData.bytes^, LData.length);
     end;
     TThread.Synchronize(nil, procedure begin DoImageStream(LDocumentFileName, LStream); end);
@@ -570,7 +571,7 @@ begin
   else
     LImage := AImage;
   // Note: This operation makes the image lose its metadata - I think :-)
-  LData := TNSData.Wrap(UIImageJPEGRepresentation(NSObjectToID(LImage), 1));
+  LData := TiOSHelperEx.UIImageToJPEGData(LImage, 1);
   LStream := TMemoryStream.Create;
   try
     LStream.Write(LData.bytes^, LData.length);
