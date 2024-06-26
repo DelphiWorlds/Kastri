@@ -12,10 +12,10 @@ On Android, the "file names" returned are not actual file names, however they ar
 
 It is necessary to access the files using a [`ContentResolver`](https://developer.android.com/reference/android/content/ContentResolver), by calling the [`openInputStream`](https://developer.android.com/reference/android/content/ContentResolver#openInputStream(android.net.Uri)) method then dealing with the resulting [InputStream](https://developer.android.com/reference/java/io/InputStream). The `RawPath` member of `TSelectedFile` is a string respresentation of the URI.
 
-In [`DW.Android.Helpers`](https://github.com/DelphiWorlds/Kastri/blob/master/Core/DW.Android.Helpers.pas) there is a method of `TAndroidHelperEx` called `ImportFile` that you can use to copy the selected file somewhere, e.g. in the demo code you could do this:
+In [`DW.Android.Helpers`](https://github.com/DelphiWorlds/Kastri/blob/master/Core/DW.Android.Helpers.pas) there is a method of `TAndroidFileStream` called `CopyFile` that you can use to copy the selected file somewhere, e.g. in the demo code you could do this:
 
 ```
-  TAndroidHelperEx.ImportFile(FSelector.SelectedFiles[AIndex].RawPath, TPath.Combine(TPath.GetDocumentsPath, FSelector.SelectedFiles[AIndex].DisplayName))
+  TAndroidFileStream.CopyFile(FSelector.SelectedFiles[AIndex].RawPath, TPath.Combine(TPath.GetDocumentsPath, FSelector.SelectedFiles[AIndex].DisplayName))
 ```
 
 Where `AIndex` is the index of one of the files returned in `FSelector.SelectedFiles`
