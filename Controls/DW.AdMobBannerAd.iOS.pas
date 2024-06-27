@@ -28,7 +28,7 @@ uses
   DW.iOSapi.UIKit, DW.iOSapi.GoogleMobileAds, DW.AdMob, DW.AdMobBannerAd;
 
 type
-  IGADBannerView = interface(UIView)
+  IGADBannerView = interface(iOSapi.UIKit.UIView)
     ['{D46FDA3D-B11A-4B0D-861C-169655ADBEBE}']
   end;
 
@@ -85,7 +85,7 @@ type
 
 function SharedApplication: UIApplication;
 begin
-  Result := TUIApplication.Wrap(TUIApplication.OCClass.sharedApplication);
+  Result := TUIApplication.OCClass.sharedApplication;
 end;
 
 { TGADBannerViewDelegate }
