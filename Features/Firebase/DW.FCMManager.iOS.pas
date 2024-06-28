@@ -139,6 +139,7 @@ end;
 
 procedure TPlatformFCMManager.Start;
 begin
+  TFirebaseCommon.Configure;
   FMessaging := TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging);
   DoStart;
 end;

@@ -13,13 +13,29 @@ unit DW.Firebase.Common.iOS;
 
 interface
 
+type
+  TFirebaseCommon = record
+  private
+    class var IsConfigured: Boolean;
+  public
+    class procedure Configure; static;
+  end;
+
 implementation
 
 uses
   // DW
   DW.iOSapi.FirebaseCore;
 
-initialization
-  TFIRApp.OCClass.configure;
+{ TFirebaseCommon }
+
+class procedure TFirebaseCommon.Configure;
+begin
+  if not IsConfigured then
+  begin
+    TFIRApp.OCClass.configure;
+    IsConfigured := True;
+  end;
+end;
 
 end.
