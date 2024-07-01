@@ -579,9 +579,12 @@ begin
   try
     if Ord(FPriority) > 0 then
      LAndroid.AddPair('priority', cFCMMessagePriorityValues[FPriority]);
-    LNotification := GetAndroidNotificationJSONValue;
-    if LNotification <> nil then
-      LAndroid.AddPair('notification', LNotification);
+    if not IsDataOnly then
+    begin
+      LNotification := GetAndroidNotificationJSONValue;
+      if LNotification <> nil then
+        LAndroid.AddPair('notification', LNotification);
+    end;
     LHasProps := LAndroid.Count > 0;
   finally
     if LHasProps then
