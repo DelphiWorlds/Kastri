@@ -15,7 +15,9 @@ interface
 
 uses
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.App, Androidapi.JNI.Os;
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.App, Androidapi.JNI.Os,
+  // DW
+  DW.Androidapi.JNI.Concurrent;
 
 type
   JArrayDeque = interface;
