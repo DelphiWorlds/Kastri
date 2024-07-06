@@ -148,7 +148,10 @@ public class DWNotificationPresenter
     if (bigView != null)
       builder = builder.setCustomBigContentView(bigView);
     if (intent.hasExtra("isFullScreen"))
-      builder = builder.setFullScreenIntent(pendingIntent, true); 
-    notificationManager.notify(notifyId, builder.build());
+      builder = builder.setFullScreenIntent(pendingIntent, true);
+    Notification notification = builder.build();
+    if (intent.hasExtra("isInsistent"))
+      notification.flags |= Notification.FLAG_INSISTENT;
+    notificationManager.notify(notifyId, notification);
   }
 }
