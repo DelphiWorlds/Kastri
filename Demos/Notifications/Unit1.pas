@@ -5,7 +5,8 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Controls.Presentation, FMX.StdCtrls, FMX.ScrollBox, FMX.Memo, FMX.Memo.Types,
-  DW.Notifications, FMX.Edit;
+  FMX.Edit,
+  DW.Notifications;
 
 type
   TForm1 = class(TForm)
@@ -16,6 +17,7 @@ type
     ScheduleRepeatingButton: TButton;
     CancelImmediateButton: TButton;
     IncludeImageCheckBox: TCheckBox;
+    InsistentCheckBox: TCheckBox;
     procedure ImmediateButtonClick(Sender: TObject);
     procedure ScheduleButtonClick(Sender: TObject);
     procedure CancelScheduledClick(Sender: TObject);
@@ -93,6 +95,8 @@ begin
   LNotification.AlertBody := 'This is an immediate notification';
   if IncludeImageCheckBox.IsChecked then
     LNotification.Image := FImageFileName;
+  if InsistentCheckBox.IsChecked then
+    LNotification.IsInsistent := True;
   FNotifications.PresentNotification(LNotification);
 end;
 
@@ -124,6 +128,8 @@ begin
   LNotification.AlertBody := 'This notification was scheduled';
   if IncludeImageCheckBox.IsChecked then
     LNotification.Image := FImageFileName;
+  if InsistentCheckBox.IsChecked then
+    LNotification.IsInsistent := True;
   LNotification.FireDate := Now + EncodeTime(0, 0, ASeconds, 0);
   if ARepeating then
     LNotification.RepeatInterval := TRepeatInterval.Minute
