@@ -423,14 +423,18 @@ public class DWMultiBroadcastReceiver extends BroadcastReceiver {
         notificationIntent.putExtra("title", getNotificationTitle(notification));
         notificationIntent.putExtra("body", getNotificationText(notification));
         notificationIntent.putExtra("notifyId", intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0));
+        if (intent.hasExtra("isInsistent"))
+          notificationIntent.putExtra("isInsistent", intent.getStringExtra("isInsistent"));
         if (intent.hasExtra(EXTRA_NOTIFICATION_IMAGE)) {
           String imagePath = intent.getStringExtra(EXTRA_NOTIFICATION_IMAGE);
-          Log.d(TAG, "imagePath: " + imagePath);
-          File file = new File(imagePath);
-          try {
-            notificationIntent.putExtra("imageUrl", file.toURI().toURL().toString());
-          } catch (MalformedURLException e) {
-            Log.e(TAG, "Image path invalid: " + imagePath);
+          if (imagePath != null && !imagePath.isEmpty()) {
+            Log.d(TAG, "imagePath: " + imagePath);
+            File file = new File(imagePath);
+            try {
+              notificationIntent.putExtra("imageUrl", file.toURI().toURL().toString());
+            } catch (MalformedURLException e) {
+              Log.e(TAG, "Image path invalid: " + imagePath);
+            }
           }
         }
         DWNotificationPresenter.presentNotification(context, notificationIntent, notification.getChannelId(), notification.getSmallIcon().getResId());
