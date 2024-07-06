@@ -25,6 +25,7 @@ type
     FireDate: TDateTime;
     HasAction: Boolean;
     Image: string;
+    IsInsistent: Boolean;
     Name: string;
     Number: Integer;
     RepeatInterval: TRepeatInterval;
