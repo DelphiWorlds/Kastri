@@ -64,26 +64,27 @@ public class DWNotificationPresenter
     int layoutId = getResourceId(context, "layout/" + layout); // notification_custom
     RemoteViews remoteViews = null;
     if (layoutId > 0) {
-      remoteViews = new RemoteViews(context.getPackageName(), layoutId);
-      remoteViews.setTextViewText(getResourceId(context, "id/notification_custom_title"), title);
-      remoteViews.setTextViewText(getResourceId(context, "id/notification_custom_body"), body);
-      Bitmap bitmap = null;
-      if (imageUrl != null && !imageUrl.isEmpty()) {
+      if ((imageUrl != null && !imageUrl.isEmpty())) {
         Log.d(TAG, "imageUrl: " + imageUrl);
+        remoteViews = new RemoteViews(context.getPackageName(), layoutId);
+        remoteViews.setTextViewText(getResourceId(context, "id/notification_custom_title"), title);
+        remoteViews.setTextViewText(getResourceId(context, "id/notification_custom_body"), body);
+        Bitmap bitmap = null;
         try {
           bitmap = getBitmap(new URL(imageUrl));
         } catch (MalformedURLException e) {
-          Log.w("DWNotificationPresenter", "imageUrl invalid: " + imageUrl);
+          Log.w(TAG, "imageUrl invalid: " + imageUrl);
         } 
-      }
-      int imageId = getResourceId(context, "id/notification_custom_image");
-      if (bitmap != null) {
-        remoteViews.setImageViewBitmap(imageId, bitmap);
-      } else {
-        remoteViews.setViewVisibility(imageId, View.GONE);
-      } 
+        int imageId = getResourceId(context, "id/notification_custom_image");
+        if (bitmap != null) {
+          remoteViews.setImageViewBitmap(imageId, bitmap);
+        } else {
+          remoteViews.setViewVisibility(imageId, View.GONE);
+        } 
+      } else
+      Log.i(TAG, "No imageUrl specified");
     } else {
-      Log.w("DWNotificationPresenter", "Unable to locate resource notification_custom");
+      Log.i(TAG, "Unable to locate resource notification_custom");
     }  
     return remoteViews;
   }
