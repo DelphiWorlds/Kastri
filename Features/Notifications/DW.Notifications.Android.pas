@@ -419,6 +419,8 @@ begin
   LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_ID, AID);
   LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_IMAGE, StringToJString(ANotification.Image));
   LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION, TJParcelable.Wrap(TAndroidHelper.JObjectToID(LNotification)));
+  if ANotification.IsInsistent then
+    LIntent.putExtra(StringToJString('isInsistent'), StringToJString('1'));
   LFlags := TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT or TJPendingIntent.JavaClass.FLAG_IMMUTABLE;
   Result := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, AID, LIntent, LFlags);
 end;
@@ -463,6 +465,8 @@ begin
       .setCustomBigContentView(LContentBig);
   end;
   Result := LBuilder.Build;
+  if ANotification.IsInsistent then
+    Result.flags := Result.flags or TJNotification.JavaClass.FLAG_INSISTENT;
 end;
 
 procedure TPlatformNotifications.CancelAll;
