@@ -154,6 +154,7 @@ type
     property TestMode: Boolean read GetTestMode write SetTestMode;
     property OnAdFailedToLoad: TAdErrorEvent read FOnAdFailedToLoad write FOnAdFailedToLoad;
     property OnAdLoaded: TNotifyEvent read FOnAdLoaded write FOnAdLoaded;
+    property IsLoaded: Boolean read FIsLoaded;
   end;
 
   TFullScreenAd = class(TBaseAd)
