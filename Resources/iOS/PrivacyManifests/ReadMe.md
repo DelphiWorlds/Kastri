@@ -10,7 +10,11 @@ Files are named according to which third party SDKs are used, e.g.
 PrivacyInfo.BasePlusFCM.xcprivacy
 ```
 
-Provides data privacy information for a **basic** Delphi app that also uses Firebase Cloud Messaging. 
+Provides data privacy information for a **basic** Delphi app that also uses Firebase Cloud Messaging.
+
+## Deploying the Privacy Manifest
+
+In Deployment Manager in Delphi, click the Add Files button (second from the left in the Deployment Manager toolbar), select the relevant `.xcprivacy` file, and click Open. Leave the Remote Path value as `.\`, as this is the folder that the file needs to be deployed to.
 
 ## Future changes in Delphi
 
