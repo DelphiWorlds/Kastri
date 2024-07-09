@@ -463,8 +463,6 @@ begin
     end;
     if FBadgeCount >= 0 then
       LAPS.AddPair('badge', TJSONNumber.Create(FBadgeCount));
-    if TFCMMessageOption.ContentAvailable in FOptions then
-      LAPS.AddPair('content-available', TJSONNumber.Create(1));
     // "Data only" notifications need an APS alert member
     if FIsDataOnly then
     begin
@@ -473,6 +471,10 @@ begin
       LAlert.AddPair('body', TJSONString.Create(FBody));
       LAPS.AddPair('alert', LAlert);
     end;
+    if TFCMMessageOption.ContentAvailable in FOptions then
+      LAPS.AddPair('content-available', TJSONNumber.Create(1));
+    if not FClickAction.IsEmpty then
+      LAPS.AddPair('category', FClickAction);
     // Add any data JSON values to the APS member
     if not FData.IsEmpty then
     begin
