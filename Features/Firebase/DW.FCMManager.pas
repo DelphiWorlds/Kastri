@@ -23,6 +23,7 @@ type
   TTokenReceivedEvent = procedure(Sender: TObject; const Token: string) of object;
   TNotificationReceivedEvent = procedure(Sender: TObject; const Notification: TPushServiceNotification) of object;
   TMessageReceivedEvent = procedure(Sender: TObject; const JSON: TJSONObject) of object;
+  TNotificationCategoryEvent = procedure(Sender: TObject; const Category, Action: string) of object;
   TCheckPushEnabledMethod = reference to procedure(const Enabled: Boolean);
 
   TNotificationActionProc = reference to procedure;
@@ -54,7 +55,8 @@ type
   INotificationCategory = interface(IInterface)
     ['{B84E19A4-082A-4AAC-82C4-BEF7B0DD37E3}']
     function AddAction(const AID, ATitle: string; const AHandler: TNotificationActionProc;
-      const AOptions: TNotificationActionOptions = []): INotificationAction;
+      const AOptions: TNotificationActionOptions = []): INotificationAction; overload;
+    function AddAction(const AID, ATitle: string; const AOptions: TNotificationActionOptions = []): INotificationAction; overload;
     function FindAction(const AID: string; out AAction: INotificationAction): Boolean;
     function GetAction(const AIndex: Integer): INotificationAction;
     function GetActionCount: Integer;
@@ -86,6 +88,7 @@ type
     function GetAuthOptions: TAuthOptions;
     function GetNativeAuthOptions: LongInt;
     function GetOnMessageReceived: TMessageReceivedEvent;
+    function GetOnNotificationCategory: TNotificationCategoryEvent;
     function GetOnStatusChange: TNotifyEvent;
     function GetOnStarted: TNotifyEvent;
     function GetOnTokenReceived: TTokenReceivedEvent;
@@ -106,6 +109,7 @@ type
     procedure RemoveNotifications;
     procedure SetAuthOptions(const AValue: TAuthOptions);
     procedure SetOnMessageReceived(const AValue: TMessageReceivedEvent);
+    procedure SetOnNotificationCategory(const AValue: TNotificationCategoryEvent);
     procedure SetOnStarted(const AValue: TNotifyEvent);
     procedure SetOnStatusChange(const AValue: TNotifyEvent);
     procedure SetOnTokenReceived(const AValue: TTokenReceivedEvent);
@@ -143,6 +147,10 @@ type
     /// </summary>
     property OnMessageReceived: TMessageReceivedEvent read GetOnMessageReceived write SetOnMessageReceived;
     /// <summary>
+    ///   This event is fired when the push service receives a message
+    /// </summary>
+    property OnNotificationCategory: TNotificationCategoryEvent read GetOnNotificationCategory write SetOnNotificationCategory;
+    /// <summary>
     ///   This event is fired when the status of the push service changes
     /// </summary>
     property OnStatusChange: TNotifyEvent read GetOnStatusChange write SetOnStatusChange;
@@ -167,6 +175,7 @@ type
     FServiceConnection: TPushServiceConnection;
     FShowBannerIfForeground: Boolean;
     FOnMessageReceived: TMessageReceivedEvent;
+    FOnNotificationCategory: TNotificationCategoryEvent;
     FOnNotificationReceived: TNotificationReceivedEvent;
     FOnStarted: TNotifyEvent;
     FOnStatusChange: TNotifyEvent;
@@ -180,6 +189,7 @@ type
     procedure TokenReceived;
   protected
     procedure CreateChannel; virtual;
+    procedure DoNotificationCategory(const ACategory, AAction: string);
     procedure DoStart;
     function FindCategory(const AID: string; out ACategory: INotificationCategory): Boolean;
     procedure HandleNotification(const AServiceNotification: TPushServiceNotification);
@@ -197,6 +207,7 @@ type
     function GetAuthOptions: TAuthOptions;
     function GetNativeAuthOptions: LongInt; virtual;
     function GetOnMessageReceived: TMessageReceivedEvent;
+    function GetOnNotificationCategory: TNotificationCategoryEvent;
     function GetOnStarted: TNotifyEvent;
     function GetOnStatusChange: TNotifyEvent;
     function GetOnTokenReceived: TTokenReceivedEvent;
@@ -208,6 +219,7 @@ type
     procedure RemoveNotifications; virtual;
     procedure SetAuthOptions(const AValue: TAuthOptions);
     procedure SetOnMessageReceived(const AValue: TMessageReceivedEvent);
+    procedure SetOnNotificationCategory(const AValue: TNotificationCategoryEvent);
     procedure SetOnStarted(const AValue: TNotifyEvent);
     procedure SetOnStatusChange(const AValue: TNotifyEvent);
     procedure SetOnTokenReceived(const AValue: TTokenReceivedEvent);
@@ -272,7 +284,8 @@ type
   public
     { INotificationCategory }
     function AddAction(const AID, ATitle: string; const AHandler: TNotificationActionProc;
-      const AOptions: TNotificationActionOptions = []): INotificationAction;
+      const AOptions: TNotificationActionOptions = []): INotificationAction; overload;
+    function AddAction(const AID, ATitle: string; const AOptions: TNotificationActionOptions = []): INotificationAction; overload;
     function FindAction(const AID: string; out AAction: INotificationAction): Boolean;
     function GetAction(const AIndex: Integer): INotificationAction;
     function GetActionCount: Integer;
@@ -323,6 +336,11 @@ begin
   FID := AID;
   FHandler := AHandler;
   FOptions := AOptions;
+end;
+
+function TNotificationCategory.AddAction(const AID, ATitle: string; const AOptions: TNotificationActionOptions): INotificationAction;
+begin
+  Result := AddAction(AID, ATitle, nil, AOptions);
 end;
 
 function TNotificationCategory.AddAction(const AID, ATitle: string; const AHandler: TNotificationActionProc;
@@ -486,6 +504,11 @@ begin
   Result := FOnMessageReceived;
 end;
 
+function TCustomPlatformFCMManager.GetOnNotificationCategory: TNotificationCategoryEvent;
+begin
+  Result := FOnNotificationCategory;
+end;
+
 function TCustomPlatformFCMManager.GetOnStarted: TNotifyEvent;
 begin
   Result := FOnStarted;
@@ -509,6 +532,11 @@ end;
 procedure TCustomPlatformFCMManager.SetOnMessageReceived(const AValue: TMessageReceivedEvent);
 begin
   FOnMessageReceived := AValue;
+end;
+
+procedure TCustomPlatformFCMManager.SetOnNotificationCategory(const AValue: TNotificationCategoryEvent);
+begin
+  FOnNotificationCategory := AValue;
 end;
 
 procedure TCustomPlatformFCMManager.SetOnStarted(const AValue: TNotifyEvent);
@@ -664,6 +692,12 @@ begin
   TOSLog.d('TCustomPlatformFCMManager.StatusChange');
   if Assigned(FOnStatusChange) then
     FOnStatusChange(Self);
+end;
+
+procedure TCustomPlatformFCMManager.DoNotificationCategory(const ACategory, AAction: string);
+begin
+  if Assigned(FOnNotificationCategory) then
+    FOnNotificationCategory(Self, ACategory, AAction);
 end;
 
 procedure TCustomPlatformFCMManager.DoStart;

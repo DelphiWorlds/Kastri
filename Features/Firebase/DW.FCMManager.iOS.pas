@@ -241,19 +241,25 @@ var
   LResponse: UNNotificationResponse;
   LCategory: INotificationCategory;
   LAction: INotificationAction;
-
-  LID: string;
+  LCategoryID, LActionID: string;
 begin
   LResponse := TMessage<UNNotificationResponse>(AMsg).Value;
-  LID := NSStrToStr(LResponse.notification.request.content.categoryIdentifier);
-  if FindCategory(NSStrToStr(LResponse.notification.request.content.categoryIdentifier), LCategory) then
+  LCategoryID := NSStrToStr(LResponse.notification.request.content.categoryIdentifier);
+  if FindCategory(LCategoryID, LCategory) then
   begin
-    LID := NSStrToStr(LResponse.actionIdentifier);
-    if LCategory.FindAction(NSStrToStr(LResponse.actionIdentifier), LAction) and Assigned(LAction.Handler) then
-      LAction.Handler()
+    LActionID := NSStrToStr(LResponse.actionIdentifier);
+    if LCategory.FindAction(LActionID, LAction) then
+    begin
+      if Assigned(LAction.Handler) then
+        LAction.Handler()
+      else
+        DoNotificationCategory(LCategoryID, LActionID);
+    end
     else if Assigned(LCategory.Handler) then
-      LCategory.Handler();
-  end;
+      LCategory.Handler()
+    else
+      DoNotificationCategory(LCategoryID, '');
+ end;
 end;
 
 procedure TPlatformFCMManager.UnsubscribeFromTopic(const ATopic: string);
