@@ -28,6 +28,7 @@ type
     procedure Category2ConfirmHandler;
     procedure Category2DenyHandler;
     procedure FCMMessageReceivedHandler(Sender: TObject; const AJSON: TJSONObject);
+    procedure FCMNotificationCategoryHandler(Sender: TObject; const ACategory, AAction: string);
     procedure FCMTokenReceivedHandler(Sender: TObject; const AToken: string);
     procedure FCMStartedHandler(Sender: TObject);
   protected
@@ -61,6 +62,7 @@ begin
   FCM.OnMessageReceived := FCMMessageReceivedHandler;
   FCM.OnStarted := FCMStartedHandler;
   FCM.OnTokenReceived := FCMTokenReceivedHandler;
+  FCM.OnNotificationCategory := FCMNotificationCategoryHandler;
   FCM.Start;
 end;
 
@@ -80,14 +82,28 @@ begin
   MessagesMemo.Lines.Add('User responded to deny action of category2');
 end;
 
+procedure TfrmMain.FCMNotificationCategoryHandler(Sender: TObject; const ACategory, AAction: string);
+begin
+  if AAction.IsEmpty then
+    MessagesMemo.Lines.Add(Format('User responded to category: %s', [ACategory]))
+  else
+    MessagesMemo.Lines.Add(Format('User responded to action: %s of category: %s', [AAction, ACategory]));
+end;
+
 procedure TfrmMain.AddCategories;
 var
   LCategory: INotificationCategory;
 begin
+  // Using **specific** handlers:
   LCategory := FCM.AddCategory('category1', Category1Handler);
   LCategory := FCM.AddCategory('category2');
   LCategory.AddAction('action1', 'Confirm', Category2ConfirmHandler);
   LCategory.AddAction('action2', 'Deny', Category2DenyHandler);
+  // Using generic handler:
+  LCategory := FCM.AddCategory('category3');
+  LCategory := FCM.AddCategory('category4');
+  LCategory.AddAction('action3', 'Accept');
+  LCategory.AddAction('action4', 'Reject');
 end;
 
 procedure TfrmMain.ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
