@@ -22,7 +22,11 @@ type
     procedure RemoveNotificationsButtonClick(Sender: TObject);
   private
     FShown: Boolean;
+    procedure AddCategories;
     procedure ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
+    procedure Category1Handler;
+    procedure Category2ConfirmHandler;
+    procedure Category2DenyHandler;
     procedure FCMMessageReceivedHandler(Sender: TObject; const AJSON: TJSONObject);
     procedure FCMTokenReceivedHandler(Sender: TObject; const AToken: string);
     procedure FCMStartedHandler(Sender: TObject);
@@ -51,6 +55,8 @@ constructor TfrmMain.Create(AOwner: TComponent);
 begin
   inherited;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
+  // Please ensure that you add categories *before* calling Start
+  AddCategories;
   FCM.ShowBannerIfForeground := True;
   FCM.OnMessageReceived := FCMMessageReceivedHandler;
   FCM.OnStarted := FCMStartedHandler;
@@ -64,6 +70,26 @@ begin
   inherited;
 end;
 
+procedure TfrmMain.Category2ConfirmHandler;
+begin
+  MessagesMemo.Lines.Add('User responded to confirm action of category2');
+end;
+
+procedure TfrmMain.Category2DenyHandler;
+begin
+  MessagesMemo.Lines.Add('User responded to deny action of category2');
+end;
+
+procedure TfrmMain.AddCategories;
+var
+  LCategory: INotificationCategory;
+begin
+  LCategory := FCM.AddCategory('category1', Category1Handler);
+  LCategory := FCM.AddCategory('category2');
+  LCategory.AddAction('action1', 'Confirm', Category2ConfirmHandler);
+  LCategory.AddAction('action2', 'Deny', Category2DenyHandler);
+end;
+
 procedure TfrmMain.ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
 begin
   case TApplicationEventMessage(AMsg).Value.Event of
@@ -71,16 +97,23 @@ begin
     begin
       if not FShown then
       begin
+        {$IF Defined(RELAYDEMO)}
         PermissionsService.RequestPermissions([cPermissionSendSMS],
           procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
           begin
             // No action needed with permissions result. If granted, the relay service will be able to send SMS messages
           end
         );
+        {$ENDIF}
       end;
       FShown := True;
     end;
   end;
+end;
+
+procedure TfrmMain.Category1Handler;
+begin
+  MessagesMemo.Lines.Add('User responded to a notification of category1');
 end;
 
 procedure TfrmMain.ClearMessagesButtonClick(Sender: TObject);
