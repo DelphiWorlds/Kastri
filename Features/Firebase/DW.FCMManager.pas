@@ -25,11 +25,59 @@ type
   TMessageReceivedEvent = procedure(Sender: TObject; const JSON: TJSONObject) of object;
   TCheckPushEnabledMethod = reference to procedure(const Enabled: Boolean);
 
+  TNotificationActionProc = reference to procedure;
+
+  TNotificationActionOption = (AuthenticationRequired, Destructive, Foreground);
+
+  TNotificationActionOptions = set of TNotificationActionOption;
+
+  INotificationAction = interface(IInterface)
+    ['{22C26F7D-7E56-4534-837E-C271CE169309}']
+    function GetHandler: TNotificationActionProc;
+    function GetID: string;
+    function GetOptions: TNotificationActionOptions;
+    function GetTitle: string;
+    property Handler: TNotificationActionProc read GetHandler;
+    property ID: string read GetID;
+    property Options: TNotificationActionOptions read GetOptions;
+    property Title: string read GetTitle;
+  end;
+
+  TNotificationActions = TArray<INotificationAction>;
+
+  TNotificationCategoryOption = (CustomDismissAction, AllowInCarPlay, HiddenPreviewsShowTitle, HiddenPreviewsShowSubtitle, AllowAnnouncement);
+
+  TNotificationCategoryOptions = set of TNotificationCategoryOption;
+
+  TNotificationCategoryProc = reference to procedure;
+
+  INotificationCategory = interface(IInterface)
+    ['{B84E19A4-082A-4AAC-82C4-BEF7B0DD37E3}']
+    function AddAction(const AID, ATitle: string; const AHandler: TNotificationActionProc;
+      const AOptions: TNotificationActionOptions = []): INotificationAction;
+    function FindAction(const AID: string; out AAction: INotificationAction): Boolean;
+    function GetAction(const AIndex: Integer): INotificationAction;
+    function GetActionCount: Integer;
+    function GetHandler: TNotificationCategoryProc;
+    function GetID: string;
+    function GetOptions: TNotificationCategoryOptions;
+    property ActionCount: Integer read GetActionCount;
+    property Actions[const AIndex: Integer]: INotificationAction read GetAction;
+    property Handler: TNotificationCategoryProc read GetHandler;
+    property ID: string read GetID;
+    property Options: TNotificationCategoryOptions read GetOptions;
+  end;
+
+  TNotificationCategories = TArray<INotificationCategory>;
+
   TAuthOption = (Badge, Sound, Alert, CarPlay, CriticalAlert, ProvidesAppNotificationSettings, Provisional);
   TAuthOptions = set of TAuthOption;
 
   IFCMManager = interface(IInterface)
     ['{961FE28D-76AA-466D-AA0D-3086FBE4D678}']
+    function AddCategory(const AID: string; const AHandler: TNotificationCategoryProc;
+      const AOptions: TNotificationCategoryOptions = []): INotificationCategory; overload;
+    function AddCategory(const AID: string; const AOptions: TNotificationCategoryOptions = []): INotificationCategory; overload;
     /// <summary>
     ///   Checks if Push Notifications are enabled for the application
     /// </summary>
@@ -111,6 +159,7 @@ type
   TCustomPlatformFCMManager = class(TInterfacedObject)
   private
     FAuthOptions: TAuthOptions;
+    FCategories: TNotificationCategories;
     FDeviceID: string;
     FDeviceToken: string;
     FIsForeground: Boolean;
@@ -132,12 +181,17 @@ type
   protected
     procedure CreateChannel; virtual;
     procedure DoStart;
+    function FindCategory(const AID: string; out ACategory: INotificationCategory): Boolean;
     procedure HandleNotification(const AServiceNotification: TPushServiceNotification);
     procedure Started;
+    property Categories: TNotificationCategories read FCategories;
     property IsForeground: Boolean read FIsForeground;
     property ShowBannerIfForeground: Boolean read FShowBannerIfForeground;
     property AuthOptions: TAuthOptions read FAuthOptions;
   public
+    function AddCategory(const AID: string; const AHandler: TNotificationCategoryProc;
+      const AOptions: TNotificationCategoryOptions = []): INotificationCategory; overload;
+    function AddCategory(const AID: string; const AOptions: TNotificationCategoryOptions = []): INotificationCategory; overload;
     procedure CheckPushEnabled(const AHandler: TCheckPushEnabledMethod); virtual;
     function GetAPNSToken: string; virtual;
     function GetAuthOptions: TAuthOptions;
@@ -192,6 +246,138 @@ type
   TPlatformFCMManager = class(TCustomPlatformFCMManager, IFCMManager);
 {$ENDIF}
 
+type
+  TNotificationAction = class(TInterfacedObject, INotificationAction)
+  private
+    FHandler: TNotificationActionProc;
+    FID: string;
+    FOptions: TNotificationActionOptions;
+    FTitle: string;
+  public
+    { INotificationAction }
+    function GetHandler: TNotificationActionProc;
+    function GetID: string;
+    function GetOptions: TNotificationActionOptions;
+    function GetTitle: string;
+  public
+    constructor Create(const AID, ATitle: string; const AHandler: TNotificationActionProc; const AOptions: TNotificationActionOptions);
+  end;
+
+  TNotificationCategory = class(TInterfacedObject, INotificationCategory)
+  private
+    FActions: TNotificationActions;
+    FHandler: TNotificationCategoryProc;
+    FID: string;
+    FOptions: TNotificationCategoryOptions;
+  public
+    { INotificationCategory }
+    function AddAction(const AID, ATitle: string; const AHandler: TNotificationActionProc;
+      const AOptions: TNotificationActionOptions = []): INotificationAction;
+    function FindAction(const AID: string; out AAction: INotificationAction): Boolean;
+    function GetAction(const AIndex: Integer): INotificationAction;
+    function GetActionCount: Integer;
+    function GetHandler: TNotificationCategoryProc;
+    function GetID: string;
+    function GetOptions: TNotificationCategoryOptions;
+  public
+    constructor Create(const AID: string; const AHandler: TNotificationCategoryProc; const AOptions: TNotificationCategoryOptions);
+  end;
+
+{ TNotificationAction }
+
+constructor TNotificationAction.Create(const AID, ATitle: string; const AHandler: TNotificationActionProc;
+  const AOptions: TNotificationActionOptions);
+begin
+  inherited Create;
+  FID := AID;
+  FTitle := ATitle;
+  FHandler := AHandler;
+  FOptions := AOptions;
+end;
+
+function TNotificationAction.GetHandler: TNotificationActionProc;
+begin
+  Result := FHandler;
+end;
+
+function TNotificationAction.GetID: string;
+begin
+  Result := FID;
+end;
+
+function TNotificationAction.GetOptions: TNotificationActionOptions;
+begin
+  Result := FOptions;
+end;
+
+function TNotificationAction.GetTitle: string;
+begin
+  Result := FTitle;
+end;
+
+{ TNotificationCategory }
+
+constructor TNotificationCategory.Create(const AID: string; const AHandler: TNotificationCategoryProc; const AOptions: TNotificationCategoryOptions);
+begin
+  inherited Create;
+  FID := AID;
+  FHandler := AHandler;
+  FOptions := AOptions;
+end;
+
+function TNotificationCategory.AddAction(const AID, ATitle: string; const AHandler: TNotificationActionProc;
+  const AOptions: TNotificationActionOptions): INotificationAction;
+begin
+  if not FindAction(AID, Result) then
+  begin
+    Result := TNotificationAction.Create(AID, ATitle, AHandler, AOptions);
+    FActions := FActions + [Result];
+  end;
+end;
+
+function TNotificationCategory.FindAction(const AID: string; out AAction: INotificationAction): Boolean;
+var
+  LAction: INotificationAction;
+begin
+  Result := False;
+  for LAction in FActions do
+  begin
+    if LAction.ID.Equals(AID) then
+    begin
+      AAction := LAction;
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+function TNotificationCategory.GetAction(const AIndex: Integer): INotificationAction;
+begin
+  Result := nil;
+  if (AIndex >= 0) and (AIndex < GetActionCount) then
+    Result := FActions[AIndex];
+end;
+
+function TNotificationCategory.GetActionCount: Integer;
+begin
+  Result := Length(FActions);
+end;
+
+function TNotificationCategory.GetHandler: TNotificationCategoryProc;
+begin
+  Result := FHandler;
+end;
+
+function TNotificationCategory.GetID: string;
+begin
+  Result := FID;
+end;
+
+function TNotificationCategory.GetOptions: TNotificationCategoryOptions;
+begin
+  Result := FOptions;
+end;
+
 { TCustomPlatformFCMManager }
 
 constructor TCustomPlatformFCMManager.Create;
@@ -242,6 +428,37 @@ begin
   end
   else
     TOSLog.d('> No PushService??');
+end;
+
+function TCustomPlatformFCMManager.AddCategory(const AID: string; const AOptions: TNotificationCategoryOptions): INotificationCategory;
+begin
+  Result := AddCategory(AID, nil, AOptions);
+end;
+
+function TCustomPlatformFCMManager.AddCategory(const AID: string; const AHandler: TNotificationCategoryProc;
+  const AOptions: TNotificationCategoryOptions): INotificationCategory;
+begin
+  if not FindCategory(AID, Result) then
+  begin
+    Result := TNotificationCategory.Create(AID, AHandler, AOptions);
+    FCategories := FCategories + [Result];
+  end;
+end;
+
+function TCustomPlatformFCMManager.FindCategory(const AID: string; out ACategory: INotificationCategory): Boolean;
+var
+  LCategory: INotificationCategory;
+begin
+  Result := False;
+  for LCategory in FCategories do
+  begin
+    if LCategory.ID.Equals(AID) then
+    begin
+      ACategory := LCategory;
+      Result := True;
+      Break;
+    end;
+  end;
 end;
 
 procedure TCustomPlatformFCMManager.CheckPushEnabled(const AHandler: TCheckPushEnabledMethod);
