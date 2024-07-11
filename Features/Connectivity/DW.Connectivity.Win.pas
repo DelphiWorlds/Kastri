@@ -23,6 +23,7 @@ type
     FConnectivity: TConnectivity;
     FNetwork: TObject;
   public
+    class function GetLocalAddresses: TIPAddresses;
     class function IsConnectedToInternet: Boolean;
     class function IsWifiInternetConnection: Boolean;
   public
@@ -36,7 +37,7 @@ uses
   // RTL
   System.SysUtils, System.Classes,
   // Windows
-  Winapi.ActiveX, Winapi.Windows, Winapi.IpTypes, Winapi.IpHlpApi,
+  Winapi.ActiveX, Winapi.Windows, Winapi.IpTypes, Winapi.IpHlpApi, Winapi.WinSock, Winapi.WinSock2,
   // DW
   DW.Winapi.NetworkList_TLB;
 
@@ -68,8 +69,24 @@ type
 
   TOpenConnectivity = class(TConnectivity);
 
+  IN6_ADDR = record
+    case Integer of
+      0: (Byte: array [0..15] of UCHAR);
+      1: (Word: array [0..7] of USHORT);
+  end;
+
+  SOCKADDR_IN6 = record
+    sin6_family: short;
+    sin6_port: u_short;
+    sin6_flowinfo: u_long;
+    sin6_addr: IN6_ADDR;
+    sin6_scope_id: u_long;
+  end;
+  PSOCKADDR_IN6 = ^SOCKADDR_IN6;
+
 const
   IID_IConnectionPointContainer: TGUID = (D1:$B196B284;D2:$BAB4;D3:$101A;D4:($B6,$9C,$00,$AA,$00,$34,$1D,$07));
+  IF_TYPE_SOFTWARE_LOOPBACK = 24;
   IF_TYPE_IEEE80211 = 71;
 
 var
@@ -91,6 +108,62 @@ begin
   TNetwork(FNetwork).Stop;
   FNetwork := nil;
   inherited;
+end;
+
+class function TPlatformConnectivity.GetLocalAddresses: TIPAddresses;
+var
+  LRes: DWORD;
+  LBufLen: ULONG;
+  LAdapters, LAdapter: PIP_ADAPTER_ADDRESSES;
+  LUnicastAddress: PIP_ADAPTER_UNICAST_ADDRESS;
+  LIPAddress: TIPAddress;
+  LAddress: array[0..45] of AnsiChar;
+  LBuffer: TBytes;
+begin
+  Result := [];
+  LBufLen := 0;
+  LRes := GetAdaptersAddresses(PF_UNSPEC, GAA_FLAG_SKIP_ANYCAST or GAA_FLAG_SKIP_MULTICAST or GAA_FLAG_SKIP_DNS_SERVER, nil, nil, @LBufLen);
+  if LRes = ERROR_BUFFER_OVERFLOW then
+  begin
+    SetLength(LBuffer, LBufLen);
+    LAdapters := PIP_ADAPTER_ADDRESSES(@LBuffer[0]);
+    LRes := GetAdaptersAddresses(PF_UNSPEC, GAA_FLAG_SKIP_ANYCAST or GAA_FLAG_SKIP_MULTICAST or GAA_FLAG_SKIP_DNS_SERVER, nil, LAdapters, @LBufLen);
+    if LRes = ERROR_SUCCESS then
+    begin
+      LAdapter := LAdapters;
+      while LAdapter <> nil do
+      begin
+        if (LAdapter.IfType <> IF_TYPE_SOFTWARE_LOOPBACK) and ((LAdapter.Flags and IP_ADAPTER_RECEIVE_ONLY) = 0) then
+        begin
+          LUnicastAddress := LAdapter.FirstUnicastAddress;
+          while LUnicastAddress <> nil do
+          begin
+            if LUnicastAddress.DadState = IpDadStatePreferred then
+            begin
+              case LUnicastAddress.Address.lpSockaddr.sin_family of
+                AF_INET:
+                begin
+                  LIPAddress.Version := TIPVersion.IPv4;
+                  inet_ntop(AF_INET, @PSOCKADDR_IN(LUnicastAddress.Address.lpSockaddr).sin_addr, LAddress, SizeOf(LAddress));
+                  LIPAddress.IP := string(AnsiString(LAddress));
+                  Result := Result + [LIPAddress];
+                end;
+                AF_INET6:
+                begin
+                  LIPAddress.Version := TIPVersion.IPv6;
+                  inet_ntop(AF_INET6, @PSOCKADDR_IN6(LUnicastAddress.Address.lpSockaddr).sin6_addr, LAddress, SizeOf(LAddress));
+                  LIPAddress.IP := string(AnsiString(LAddress));
+                  Result := Result + [LIPAddress];
+                end;
+              end;
+            end;
+            LUnicastAddress := LUnicastAddress.Next;
+          end;
+        end;
+        LAdapter := LAdapter^.Next;
+      end;
+    end;
+  end;
 end;
 
 class function TPlatformConnectivity.IsConnectedToInternet: Boolean;

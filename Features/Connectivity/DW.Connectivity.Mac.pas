@@ -31,6 +31,7 @@ type
   private
     FConnectivity: TConnectivity;
   public
+    class function GetLocalAddresses: TIPAddresses;
     class function IsConnectedToInternet: Boolean;
     class function IsWifiEnabled: Boolean;
     class function IsWifiInternetConnection: Boolean;
@@ -85,11 +86,58 @@ const
 function getifaddrs(var ifap: pifaddrs): Integer; cdecl; external libc name _PU + 'getifaddrs'; {do not localize}
 procedure freeifaddrs(ifap: pifaddrs); cdecl; external libc name _PU + 'freeifaddrs'; {do not localize}
 
+function IsEthernet(const AFlags: Cardinal): Boolean;
+begin
+  {$WARN SYMBOL_PLATFORM OFF}
+  Result := ((AFlags and IFF_UP) = IFF_UP) and ((AFlags and IFF_LOOPBACK) = 0) and (AFlags and IFF_BROADCAST <> 0) and
+    (AFlags and IFF_MULTICAST <> 0);
+  {$WARN SYMBOL_PLATFORM ON}
+end;
+
+{ TPlatformConnectivity }
+
 constructor TPlatformConnectivity.Create(const AConnectivity: TConnectivity);
 begin
   inherited Create;
   FConnectivity := AConnectivity;
   TReachability.Current.Connectivity := FConnectivity;
+end;
+
+class function TPlatformConnectivity.GetLocalAddresses: TIPAddresses;
+var
+  LAddrList, LAddrInfo: pifaddrs;
+  LIPAddress: TIPAddress;
+  LAddress: array[0..45] of AnsiChar;
+begin
+  Result := [];
+  if getifaddrs(LAddrList) = 0 then
+  try
+    LAddrInfo := LAddrList;
+    repeat
+      LIPAddress := Default(TIPAddress);
+      if IsEthernet(LAddrInfo.ifa_flags) then
+      begin
+        case LAddrInfo.ifa_addr.sa_family of
+          AF_INET:
+          begin
+            LIPAddress.Version := TIPVersion.IPv4;
+            LIPAddress.IP := string(AnsiString(inet_ntoa(Psockaddr_in(LAddrInfo.ifa_addr).sin_addr)));
+            Result := Result + [LIPAddress];
+          end;
+          AF_INET6:
+          begin
+            LIPAddress.Version := TIPVersion.IPv6;
+            inet_ntop(AF_INET6, @Psockaddr_in6(LAddrInfo.ifa_addr).sin6_addr, LAddress, SizeOf(LAddress));
+            LIPAddress.IP := string(LAddress);
+            Result := Result + [LIPAddress];
+          end;
+        end;
+      end;
+      LAddrInfo := LAddrInfo^.ifa_next;
+    until LAddrInfo = nil;
+  finally
+    freeifaddrs(LAddrList);
+  end;
 end;
 
 class function TPlatformConnectivity.IsConnectedToInternet: Boolean;
@@ -144,7 +192,7 @@ var
   LFlags: SCNetworkReachabilityFlags;
 begin
   inherited;
-  LEndPoint := TNetEndpoint.Create(TIPAddress.Any, 0);
+  LEndPoint := TNetEndpoint.Create(System.Net.Socket.TIPAddress.Any, 0);
   LRawAddress := LEndPoint;
   FReachabilityRef := SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, @LRawAddress);
   SCNetworkReachabilityGetFlags(FReachabilityRef, @LFlags);

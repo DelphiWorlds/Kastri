@@ -71,6 +71,7 @@ type
     procedure ConnectivityChange(const AIsConnected: Boolean);
     function SkipValidation: Boolean;
   public
+    class function GetLocalAddresses: TIPAddresses;
     class function IsConnectedToInternet: Boolean; static;
     class function IsWifiInternetConnection: Boolean; static;
   public
@@ -85,7 +86,7 @@ uses
   // RTL
   System.SysUtils, System.Classes,
   // Android
-  Androidapi.JNI.JavaTypes, Androidapi.Helpers, Androidapi.JNI.Os, Androidapi.JNI;
+  Androidapi.JNI.JavaTypes, Androidapi.Helpers, Androidapi.JNI.Os, Androidapi.JNI, Androidapi.JNI.Java.Net;
 
 type
   TOpenConnectivity = class(TConnectivity);
@@ -272,6 +273,36 @@ begin
   // FCallbackDelegate.Free;
   FReceiver.Free;
   inherited;
+end;
+
+class function TPlatformConnectivity.GetLocalAddresses: TIPAddresses;
+var
+  LInterfaces, LAddresses: JEnumeration;
+  LAddress: JInetAddress;
+  LIPAddress: TIPAddress;
+  LClassName: string;
+begin
+  LInterfaces := TJNetworkInterface.JavaClass.getNetworkInterfaces;
+  while LInterfaces.hasMoreElements do
+  begin
+    LAddresses := TJNetworkInterface.Wrap(LInterfaces.nextElement).getInetAddresses;
+    while LAddresses.hasMoreElements do
+    begin
+      LAddress := TJInetAddress.Wrap(LAddresses.nextElement);
+      if not LAddress.isLoopbackAddress then
+      begin
+        LClassName := JStringToString(LAddress.getClass.getName);
+        if LClassName.Contains('Inet4Address') then
+          LIPAddress.Version := TIPVersion.IPv4
+        else if LClassName.Contains('Inet6Address') then
+          LIPAddress.Version := TIPVersion.IPv6;
+        LIPAddress.IP := JStringToString(LAddress.getHostAddress);
+        if LIPAddress.IP.IndexOf('%') > -1 then
+          LIPAddress.IP := LIPAddress.IP.Substring(0, LIPAddress.IP.IndexOf('%'));
+        Result := Result + [LIPAddress];
+      end;
+    end;
+  end;
 end;
 
 class function TPlatformConnectivity.IsConnectedToInternet: Boolean;

@@ -13,7 +13,18 @@ unit DW.Connectivity;
 
 interface
 
+{$SCOPEDENUMS ON}
+
 type
+  TIPVersion = (IPv4, IPv6);
+
+  TIPAddress = record
+    IP: string;
+    Version: TIPVersion;
+  end;
+
+  TIPAddresses = TArray<TIPAddress>;
+
   TConnectivityChangeEvent = procedure(Sender: TObject; const IsConnected: Boolean) of object;
 
   TConnectivity = class(TObject)
@@ -24,6 +35,7 @@ type
   protected
     procedure DoConnectivityChange(const IsConnected: Boolean);
   public
+    class function GetLocalAddresses: TIPAddresses;
     class function IsConnectedToInternet: Boolean;
     class function IsWifiInternetConnection: Boolean;
   public
@@ -73,6 +85,11 @@ procedure TConnectivity.DoConnectivityChange(const IsConnected: Boolean);
 begin
   if Assigned(FOnConnectivityChange) then
     FOnConnectivityChange(Self, IsConnected);
+end;
+
+class function TConnectivity.GetLocalAddresses: TIPAddresses;
+begin
+  Result := TPlatformConnectivity.GetLocalAddresses;
 end;
 
 class function TConnectivity.IsConnectedToInternet: Boolean;
