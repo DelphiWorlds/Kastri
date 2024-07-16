@@ -102,8 +102,21 @@ begin
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_NDEF_DISCOVERED);
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_TECH_DISCOVERED);
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_TAG_DISCOVERED);
-  LIntent := TJIntent.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Activity.getClass).addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP);
-  FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent, TJPendingIntent.JavaClass.FLAG_MUTABLE);
+  {$IF CompilerVersion >= 36.0}
+  if TJBuild_VERSION.JavaClass.SDK_INT >= 31 then
+  begin
+    LIntent := TJIntent.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Activity.getClass).addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP);
+    FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent, TJPendingIntent.JavaClass.FLAG_MUTABLE);
+  end
+  else
+  begin
+    LIntent := TJIntent.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Activity.getClass);
+    FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent.addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP), 0);
+  end;
+  {$ELSE}
+  LIntent := TJIntent.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Activity.getClass);
+  FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent.addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP), 0);
+  {$ENDIF}
 end;
 
 destructor TPlatformNFCReader.Destroy;
