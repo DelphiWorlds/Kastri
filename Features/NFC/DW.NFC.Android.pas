@@ -93,8 +93,11 @@ end;
 { TPlatformNFCReader }
 
 constructor TPlatformNFCReader.Create(const ANFCReader: TNFCReader);
+const
+  FLAG_MUTABLE = $2000000; // https://developer.android.com/reference/android/app/PendingIntent#FLAG_MUTABLE
 var
   LIntent: JIntent;
+  LFlags: Integer;
 begin
   inherited;
   TMessageManager.DefaultManager.SubscribeToMessage(TMessageReceivedNotification, MessageReceivedNotificationHandler);
@@ -103,7 +106,11 @@ begin
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_TECH_DISCOVERED);
   MainActivity.registerIntentAction(TJNfcAdapter.JavaClass.ACTION_TAG_DISCOVERED);
   LIntent := TJIntent.JavaClass.init(TAndroidHelper.Context, TAndroidHelper.Activity.getClass).addFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP);
-  FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent, TJPendingIntent.JavaClass.FLAG_MUTABLE);
+  if TJBuild_VERSION.JavaClass.SDK_INT >= 31 then
+    LFlags := FLAG_MUTABLE
+  else
+    LFlags := 0;
+  FPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, 0, LIntent, LFlags);
 end;
 
 destructor TPlatformNFCReader.Destroy;
