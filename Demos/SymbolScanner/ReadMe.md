@@ -14,7 +14,7 @@ The demo should compile and work for at least versions 10.3.3, 10.4.x and 11.x. 
 
 ### Symbol support
 
-There are 2 entries required in the Android manifest, and these are reflected in AndroidManifest.template.xml supplied with the demo:
+There are 3 entries required in the Android manifest, and these are reflected in AndroidManifest.template.xml supplied with the demo:
 
 This entry should be inserted just below the `<%uses-permission%>` entry in the manifest template:
 
@@ -23,6 +23,10 @@ This entry should be inserted just below the `<%uses-permission%>` entry in the 
 This entry should be inserted just below the `<%uses-libraries%>` entry:
 
 `<uses-library android:name="com.symbol.emdk" android:required="false"/>`
+
+This entry should be inserted just inside the `<queries>` tag:
+
+`<package android:name="com.symbol.emdk.emdkservice" />`
 
 ### Honeywell support
 
