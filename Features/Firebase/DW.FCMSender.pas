@@ -435,12 +435,12 @@ end;
 function TFCMMessage.GetAPNSJSONValue: TJSONValue;
 var
   LAPNS, LPayload, LAPS, LAlert, LDataValue, LSoundValue: TJSONObject;
-  LHasAPS: Boolean;
+  LNeedsAPNS: Boolean;
   I: Integer;
   LPair: TJSONPair;
 begin
   Result := nil;
-  LHasAPS := False;
+  LNeedsAPNS := False;
   LAPNS := TJSONObject.Create;
   try
     LPayload := TJSONObject.Create;
@@ -493,9 +493,12 @@ begin
     // Add this LAST
     if LAPS.Count > 0 then
       LAPS.AddPair('mutable-content', TJSONNumber.Create(1));
-    LHasAPS := LAPS.Count > 0;
+    // imageUrl is used in FCM handling code in Kastri
+    if not FImageURL.IsEmpty then
+      LPayload.AddPair('imageUrl', FImageURL);
+    LNeedsAPNS := (LPayload.Count > 0) or (LAPS.Count > 0);
   finally
-    if LHasAPS then
+    if LNeedsAPNS then
       Result := LAPNS
     else
       LAPNS.Free;
