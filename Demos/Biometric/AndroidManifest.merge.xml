@@ -3,6 +3,6 @@
   <!-- suppress DeprecatedClassUsageInspection -->
   <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
   <application>
-    <activity merge:update="add" android:name="com.delphiworlds.kastri.DWBiometricFragmentActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:excludeFromRecents="true" android:exported="false"/>
+    <activity merge:update="add" android:name="com.delphiworlds.kastri.DWBiometricFragmentActivity" android:theme="@style/Theme.AppCompat.Light" android:excludeFromRecents="true" android:exported="false"/>
   </application>
 </manifest>
