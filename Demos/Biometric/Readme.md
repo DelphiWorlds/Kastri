@@ -24,7 +24,7 @@ These instructions apply to when you wish to use Biometric support in your own p
 
 ### Dependent jars (Android only)
 
-For Delphi 11.x, you will need to add the dependent jar libraries and disable the corresponding older versions, found in the `Libraries` node under the Android 32-Bit platform target in the Delphi Project Manager.
+For Delphi 11.x **ONLY**, you will need to add the dependent jar libraries and disable the corresponding older versions, found in the `Libraries` node under the Android 32-Bit platform target in the Delphi Project Manager.
 
 The jars to be disabled, are:
 
@@ -50,6 +50,8 @@ The jars to be added from the `ThirdParty\Android` folder are:
 * lifecycle-viewmodel-2.2.0.jar
 * lifecycle-viewmodel-savedstate-2.3.1.jar
 
+For Delphi 11.x **AND** Delphi 12.x
+
 The jars to be added from the `Lib` folder are:
 
 * dw-biometric-2.0.0.jar
@@ -57,11 +59,43 @@ The jars to be added from the `Lib` folder are:
 
 To add these, right click the `Libraries` node and click `Add..`, then select the relevant jar file(s)
 
-** NOTE: If you use the `Revert System Files to Default` option (for whatever reason), you will need to re-disable the jars that need to be disabled. **
+#### Building the R jar file
 
-For Delphi 10.4.x, you will only need to add:
+Remember: this requirement is for when integrating `TBiometric` into your **OWN** app. *It has already been done in the demo.*
 
-* dw-biometric.jar
+Biometric requires `R` classes associated with the dependent jar files in order to work. When using Android Studio, these are generated automatically; with Delphi, they need to be generated separately. 
+
+This process could be done manually via the command line or in a batch file, however an easier way is through the use of [Codex](https://github.com/DelphiWorlds/Codex). Once you install Codex, you can follow these steps:
+
+1. Build and deploy your project at least once. This step is important for merging the resources Delphi creates, with resources in the Biometric library
+2. From the Codex menu in Delphi, in the Android Tools section, use the Download Package function:
+
+   <img src="./Screenshots/CodexPackageDownload.png" alt="Codex Package Download" height="200">
+   
+   ..to download/extract biometric-1.1.0, using this value in the Packages edit:
+
+   ```
+   androidx.biometric:biometric:1.1.0
+   ```
+
+   <img src="./Screenshots/PackageDownloadBiometric.png" alt="Package Download Biometric" height="400">
+   
+   ..and click `Extract`
+
+3. Right-click the project in Project Manager, and click `Add Android Package`:
+   
+   <img src="./Screenshots/CodexAddAndroidPackageMenu.png" alt="Codex Add Android Package Menu" height="200">
+
+   ..and add the folder that the package was extracted to in step 2:
+   
+   <img src="./Screenshots/CodexAddAndroidPackage.png" alt="Codex Add Android Package" height="200">
+
+   ..and click `Execute` to build the R classes for `biometric-1.1.0` and add the resulting R jar to the project
+
+   This adds a library with the same name as the project, with an extension of `.R.jar`, to the Libraries node of the Android 32-bit target in Project Manager.
+   
+4. Rebuild/deploy your project 
+
 
 ### Build Event/Android Manifest
 
@@ -75,7 +109,7 @@ Due to changes in the Android build process:
 
   ```
     <activity android:name="com.delphiworlds.kastri.DWBiometricFragmentActivity" 
-      android:theme="@android:style/Theme.Translucent.NoTitleBar" 
+      android:theme="@style/Theme.AppCompat.Light" 
       android:excludeFromRecents="true" 
       android:exported="false"/>
   ```
