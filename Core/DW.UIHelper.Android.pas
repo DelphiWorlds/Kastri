@@ -58,7 +58,7 @@ uses
   // FMX
   FMX.Platform, FMX.Platform.UI.Android, FMX.Platform.Android,
   // DW
-  DW.Androidapi.JNI.DWUtility;
+  DW.Androidapi.JNI.DWUtility, DW.Android.Helpers;
 
 { TPlatformUIHelper }
 
@@ -76,7 +76,7 @@ end;
 
 class function TPlatformUIHelper.GetNavigationBarOffset: Single;
 begin
-  if IsFullScreen then
+  if TAndroidHelperEx.CheckBuildAndTarget(35) or IsFullScreen then
     Result := GetResourceHeight('navigation_bar_height')
   else
     Result := 0;
