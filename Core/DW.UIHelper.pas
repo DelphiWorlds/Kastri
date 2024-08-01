@@ -152,7 +152,7 @@ end;
 
 class function TUIHelper.GetUserInterfaceStyle: TUserInterfaceStyle;
 begin
-  {$IF Defined(IOS) or Defined(Android)}
+  {$IF Defined(MACOS) or Defined(Android)}
   Result := TPlatformUIHelper.GetUserInterfaceStyle;
   {$ELSE}
   Result := TUserInterfaceStyle.Light;
