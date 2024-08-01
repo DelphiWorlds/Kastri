@@ -115,42 +115,23 @@ end;
 class function TPlatformUIHelper.GetBrightness: Single;
 begin
   Result := 1;
-  // Result := TiOSHelper.MainScreen.brightness;
 end;
 
 class function TPlatformUIHelper.GetOffsetRect(const AHandle: TWindowHandle): TRectF;
-//var
-//  LInsets: UIEdgeInsets;
 begin
   Result := TRectF.Empty;
-{
-  if TOSVersion.Check(11) and (AHandle <> nil) then
-  begin
-    LInsets := TUIView.Wrap(NSObjectToID(WindowHandleToPlatform(AHandle).View)).safeAreaInsets;
-    Result := RectF(LInsets.left, LInsets.top, LInsets.right, LInsets.bottom);
-  end;
-}
 end;
 
 class function TPlatformUIHelper.GetUserInterfaceStyle: TUserInterfaceStyle;
-{
 var
-  LTraitCollection: UITraitCollection;
-  LTraitEnvironment: UITraitEnvironment;
-}
+  LStyle: string;
+  LDefaults: NSUserDefaults;
 begin
+  LDefaults := TNSUserDefaults.Wrap(TNSUserDefaults.OCClass.standardUserDefaults);
+  LStyle := NSStrToStr(LDefaults.stringForKey(StrToNSStr('AppleInterfaceStyle')));
   Result := TUserInterfaceStyle.Light;
-{
-  if TOSVersion.Check(13) then
-  begin
-    LTraitEnvironment := TUITraitEnvironment.Wrap(NSObjectToId(TiOSHelper.MainScreen));
-    LTraitCollection := LTraitEnvironment.traitCollection;
-    case LTraitCollection.userInterfaceStyle of
-      UIUserInterfaceStyleDark:
-        Result := TUserInterfaceStyle.Dark;
-    end;
-  end;
-}
+  if LStyle.Equals('Dark') then
+    Result := TUserInterfaceStyle.Dark;
 end;
 
 class procedure TPlatformUIHelper.SetBrightness(const AValue: Single);
