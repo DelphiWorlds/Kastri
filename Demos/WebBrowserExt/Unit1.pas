@@ -93,7 +93,7 @@ end;
 
 procedure TForm1.DownloadButtonClick(Sender: TObject);
 begin
-  URLEdit.Text := 'http://delphiworlds.com/files/Example.html';
+  URLEdit.Text := 'https://delphiworlds.com/files/Example.html';
   FIsPageLoaded := False;
   WebBrowser.Navigate(URLEdit.Text);
 end;
