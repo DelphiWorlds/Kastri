@@ -18,19 +18,61 @@ uses
   System.Classes,
   // macOS
   Macapi.WebKit, Macapi.Foundation, Macapi.ObjectiveC,
+  // FMX
+  FMX.WebBrowser.Delegate.Mac,
   // DW
   DW.WebBrowserExt, DW.JavaScript;
 
 type
+  TPlatformWebBrowserExt = class;
+
+  TWebBrowserExtNavigationDelegate = class(TOCLocal, WKNavigationDelegate)
+  private
+    FPlatformWebBrowserExt: TPlatformWebBrowserExt;
+    FWebViewNavigationDelegate: WKNavigationDelegate;
+  public
+    { WKNavigationDelegate }
+    [MethodName('webView:decidePolicyForNavigationAction:decisionHandler:')]
+    procedure webViewDecidePolicyForNavigationActionDecisionHandler(webView: WKWebView;
+      decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer); cdecl;
+    [MethodName('webView:decidePolicyForNavigationResponse:decisionHandler:')]
+    procedure webViewDecidePolicyForNavigationResponseDecisionHandler(webView: WKWebView;
+      decidePolicyForNavigationResponse: WKNavigationResponse; decisionHandler: Pointer); cdecl;
+    [MethodName('webView:didStartProvisionalNavigation:')]
+    procedure webViewDidStartProvisionalNavigation(webView: WKWebView;
+      didStartProvisionalNavigation: WKNavigation); cdecl;
+    [MethodName('webView:didReceiveServerRedirectForProvisionalNavigation:')]
+    procedure webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView;
+      didReceiveServerRedirectForProvisionalNavigation: WKNavigation); cdecl;
+    [MethodName('webView:didFailProvisionalNavigation:withError:')]
+    procedure webViewDidFailProvisionalNavigationWithError(webView: WKWebView;
+      didFailProvisionalNavigation: WKNavigation; withError: NSError); cdecl;
+    [MethodName('webView:didCommitNavigation:')]
+    procedure webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation); cdecl;
+    [MethodName('webView:didFinishNavigation:')]
+    procedure webViewDidFinishNavigation(webView: WKWebView; didFinishNavigation: WKNavigation); cdecl;
+    [MethodName('webView:didFailNavigation:withError:')]
+    procedure webViewDidFailNavigationWithError(webView: WKWebView; didFailNavigation: WKNavigation;
+      withError: NSError); cdecl;
+    [MethodName('webView:didReceiveAuthenticationChallenge:completionHandler:')]
+    procedure webViewDidReceiveAuthenticationChallengeCompletionHandler(webView: WKWebView;
+      didReceiveAuthenticationChallenge: NSURLAuthenticationChallenge;
+      completionHandler: Pointer); cdecl;
+  public
+    constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+  end;
+
   TPlatformWebBrowserExt = class(TCustomPlatformWebBrowserExt)
   private
     FJavaScriptResultHandler: TJavaScriptResultProc;
+    FNavigationDelegate: TWebBrowserExtNavigationDelegate;
     FWebView: WKWebView;
     procedure JavaScriptCompletionHandler(obj: Pointer; error: NSError);
   protected
     procedure ClearCache(const ADataKinds: TCacheDataKinds); override;
     procedure ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc); override;
     procedure Navigate(const AURL: string); override;
+    property WebView: WKWebView read FWebView;
   public
     constructor Create(const AWebBrowserExt: TWebBrowserExt); override;
     destructor Destroy; override;
@@ -42,7 +84,7 @@ uses
   // RTL
   System.SysUtils,
   // macOS
-  Macapi.Helpers, Macapi.CocoaTypes;
+  Macapi.Helpers, Macapi.CocoaTypes, Macapi.ObjCRuntime;
 
 // Declarations missing from Macapi.WebKit
 
@@ -122,12 +164,92 @@ begin
   Result := CocoaNSStringConst(libWebKit, 'WKWebsiteDataTypeIndexedDBDatabases');
 end;
 
+{ TWebBrowserExtNavigationDelegate }
+
+constructor TWebBrowserExtNavigationDelegate.Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+begin
+  inherited Create;
+  FPlatformWebBrowserExt := APlatformWebBrowserExt;
+  // The following line converts the delegate object id into the desired interface
+  WrapInterface(FPlatformWebBrowserExt.WebView.navigationDelegate, TypeInfo(WKNavigationDelegate), FWebViewNavigationDelegate);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDecidePolicyForNavigationActionDecisionHandler(webView: WKWebView;
+  decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer);
+var
+  LBlockImp: procedure(policy: WKNavigationActionPolicy); cdecl;
+  LURL: string;
+  LPreventDefault: Boolean;
+begin
+  // Just highjacking this method
+  LURL := NSStrToStr(decidePolicyForNavigationAction.request.URL.absoluteString);
+  LPreventDefault := False;
+  if decidePolicyForNavigationAction.navigationType = WKNavigationTypeLinkActivated then
+    FPlatformWebBrowserExt.DoElementClick(THitTestKind.SrcAnchor, LURL, LPreventDefault);
+  // If preventing the default, tell the OS to cancel, otherwise use the default delegate's method
+  if LPreventDefault then
+  begin
+    @LBlockImp := imp_implementationWithBlock(decisionHandler);
+    LBlockImp(WKNavigationActionPolicyCancel);
+    imp_removeBlock(@LBlockImp);
+  end
+  else
+    FWebViewNavigationDelegate.webViewDecidePolicyForNavigationActionDecisionHandler(webView, decidePolicyForNavigationAction, decisionHandler);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDecidePolicyForNavigationResponseDecisionHandler(webView: WKWebView;
+  decidePolicyForNavigationResponse: WKNavigationResponse; decisionHandler: Pointer);
+begin
+  FWebViewNavigationDelegate.webViewDecidePolicyForNavigationResponseDecisionHandler(webView, decidePolicyForNavigationResponse, decisionHandler);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation);
+begin
+  FWebViewNavigationDelegate.webViewDidCommitNavigation(webView, didCommitNavigation);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidFailNavigationWithError(webView: WKWebView; didFailNavigation: WKNavigation; withError: NSError);
+begin
+  FWebViewNavigationDelegate.webViewDidFailNavigationWithError(webView, didFailNavigation, withError);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidFailProvisionalNavigationWithError(webView: WKWebView;
+  didFailProvisionalNavigation: WKNavigation; withError: NSError);
+begin
+  FWebViewNavigationDelegate.webViewDidFailProvisionalNavigationWithError(webView, didFailProvisionalNavigation, withError);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidFinishNavigation(webView: WKWebView; didFinishNavigation: WKNavigation);
+begin
+  FWebViewNavigationDelegate.webViewDidFinishNavigation(webView, didFinishNavigation);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidReceiveAuthenticationChallengeCompletionHandler(webView: WKWebView;
+  didReceiveAuthenticationChallenge: NSURLAuthenticationChallenge; completionHandler: Pointer);
+begin
+  FWebViewNavigationDelegate.webViewDidReceiveAuthenticationChallengeCompletionHandler(webView, didReceiveAuthenticationChallenge, completionHandler);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView;
+  didReceiveServerRedirectForProvisionalNavigation: WKNavigation);
+begin
+  FWebViewNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView, didReceiveServerRedirectForProvisionalNavigation);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidStartProvisionalNavigation(webView: WKWebView; didStartProvisionalNavigation: WKNavigation);
+begin
+  FWebViewNavigationDelegate.webViewDidStartProvisionalNavigation(webView, didStartProvisionalNavigation);
+end;
+
 { TPlatformWebBrowserExt }
 
 constructor TPlatformWebBrowserExt.Create(const AWebBrowserExt: TWebBrowserExt);
 begin
   inherited;
   Supports(Browser, WKWebView, FWebView);
+  // Hijack the original navigation delegate
+  FNavigationDelegate := TWebBrowserExtNavigationDelegate.Create(Self);
+  FWebView.setNavigationDelegate(FNavigationDelegate.GetObjectID);
 end;
 
 destructor TPlatformWebBrowserExt.Destroy;
