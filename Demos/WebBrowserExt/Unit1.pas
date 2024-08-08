@@ -50,7 +50,7 @@ uses
   System.IOUtils, System.Net.HttpClient, System.Net.URLClient,
   DW.OSLog,
   DW.Consts.Android, DW.Permissions.Helpers,
-  DW.IOUtils.Helpers, DW.JavaScript;
+  DW.IOUtils.Helpers, DW.JavaScript, DW.Printing;
 
 type
   TURIHelper = record helper for TURI
@@ -174,10 +174,10 @@ end;
 
 procedure TForm1.PrintActionExecute(Sender: TObject);
 begin
-  // COMING SOON...
-  // Perhaps change WebPage to something more meaningful, related to the URL
-  // Printing.Print(FWebBrowserExt.GetPrintAdapter('WebPage'));
-  ShowMessage('This feature is coming soon..');
+  // Perhaps change 'WebPage' to something more meaningful, related to the URL
+  Printing.Print(FWebBrowserExt.GetPrintAdapter('WebPage'));
+  // Printing can also be used to print a file, e.g
+  //   Printing.Print('SomeFileName.txt');
 end;
 
 procedure TForm1.PrintActionUpdate(Sender: TObject);
