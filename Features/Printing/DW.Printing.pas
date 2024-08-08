@@ -42,7 +42,7 @@ type
     { IPrinting }
     function GetPrintStatus(const AIndex: Integer): TPrintJobStatus;
     function Print(const AAdapter: IInterface): Integer; overload;
-    function Print(const AFileName): Integer; overload;
+    function Print(const AFileName: string): Integer; overload;
   end;
 
 function TPlatformPrinting.GetPrintStatus(const AIndex: Integer): TPrintJobStatus;
@@ -55,7 +55,7 @@ begin
   Result := -1;
 end;
 
-function TPlatformPrinting.Print(const AFileName): Integer;
+function TPlatformPrinting.Print(const AFileName: string): Integer;
 begin
   Result := -1;
 end;
