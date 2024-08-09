@@ -21,12 +21,24 @@ uses
   DW.Printing, DW.Androidapi.JNI.Print;
 
 type
+  JDWPDFPrintDocumentAdapter = interface;
   JDWWebViewClient = interface;
   JDWWebViewClientDelegate = interface;
 
+  JDWPDFPrintDocumentAdapterClass = interface(JObjectClass)
+    ['{4794FD6C-34B2-43DA-B0FB-332A138136D9}']
+    function init(context: JContext; pdfFile: JFile): JDWPDFPrintDocumentAdapter; cdecl;
+  end;
+
+  [JavaSignature('com/delphiworlds/kastri/DWPDFPrintDocumentAdapter')]
+  JDWPDFPrintDocumentAdapter = interface(JObject)
+    ['{51451993-22CA-4D9F-85D0-B22AD1B70A17}']
+  end;
+  TJDWPDFPrintDocumentAdapter = class(TJavaGenericImport<JDWPDFPrintDocumentAdapterClass, JDWPDFPrintDocumentAdapter>) end;
+
   JDWWebViewClientClass = interface(JWebViewClientClass)
-   ['{8CA4282E-E8AA-4CDD-83F8-5826485AB88D}']
-   function init(delegate: JDWWebViewClientDelegate): JDWWebViewClient; cdecl;
+    ['{8CA4282E-E8AA-4CDD-83F8-5826485AB88D}']
+    function init(delegate: JDWWebViewClientDelegate): JDWWebViewClient; cdecl;
   end;
 
   [JavaSignature('com/delphiworlds/kastri/DWWebViewClient')]
@@ -67,7 +79,6 @@ type
     FWebViewClient: JWebViewClient;
     FWebViewClientDelegate: JDWWebViewClientDelegate;
     procedure CreatePrintManager;
-    procedure PrintPDF(const AFileName: string);
     procedure WebViewPageFinished(const AURL: JString);
   public
     constructor Create;
@@ -236,12 +247,7 @@ begin
     FWebView.loadUrl(FURL);
   end
   else
-    PrintPDF(AFileName);
-end;
-
-procedure TPlatformPrinting.PrintPDF(const AFileName: string);
-begin
-  //
+    Print(TJDWPDFPrintDocumentAdapter.JavaClass.init(TAndroidHelper.Context, TJFile.JavaClass.init(StringToJString(AFileName))));
 end;
 
 procedure TPlatformPrinting.WebViewPageFinished(const AURL: JString);
