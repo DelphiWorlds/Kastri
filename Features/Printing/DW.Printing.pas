@@ -19,7 +19,21 @@ type
   IPrinting = interface(IInterface)
     ['{C771CC67-4A94-462D-A834-5BACA49174A2}']
     function GetPrintStatus(const AIndex: Integer): TPrintJobStatus;
+    /// <summary>
+    ///   Prints a file via a supported adapter
+    /// </summary>
+    /// <remarks>
+    ///   On Android, AAdapter must be a descendant of PrintDocumentAdapter
+    ///   On iOS, AAdapter must be a descendant of UIPrintFormatter
+    /// </remarks>
     function Print(const AAdapter: IInterface): Integer; overload;
+    /// <summary>
+    ///   Prints a file if the file type is supported
+    /// </summary>
+    /// <remarks>
+    ///   On Android: Files with a .pdf extension are printed using a simple PDF renderer. All other files are printed via an internal WebView
+    ///   On iOS: Printing of images that are compatible with the ImageIO framework, and PDF files is supported
+    /// </remarks>
     function Print(const AFileName: string): Integer; overload;
   end;
 
