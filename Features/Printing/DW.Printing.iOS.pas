@@ -66,7 +66,7 @@ type
 
   TPlatformPrinting = class(TInterfacedObject, IPrinting)
   private
-    // FController: UIPrintInteractionController;
+    function GetController(const AJobNumber: Integer): UIPrintInteractionController;
     procedure PrintCompletionHandler(controller: UIPrintInteractionController; completed: Boolean; error: NSError);
   public
     function GetPrintStatus(const AIndex: Integer): TPrintJobStatus;
@@ -87,30 +87,40 @@ uses
 
 { TPlatformPrinting }
 
+function TPlatformPrinting.GetController(const AJobNumber: Integer): UIPrintInteractionController;
+var
+  LInfo: UIPrintInfo;
+begin
+  LInfo := TUIPrintInfo.Wrap(TUIPrintInfo.OCClass.printInfo);
+  LInfo.setJobName(StrToNSStr(Format('%s Print Job %d', [TOSDevice.GetDeviceName, AJobNumber])));
+  LInfo.setOutputType(UIPrintInfoOutputGeneral);
+  Result := TUIPrintInteractionController.OCClass.sharedPrintController;
+  Result.setPrintInfo(LInfo);
+end;
+
 function TPlatformPrinting.GetPrintStatus(const AIndex: Integer): TPrintJobStatus;
 begin
   Result := TPrintJobStatus.None;
 end;
 
 function TPlatformPrinting.Print(const AFileName: string): Integer;
+var
+  LController: UIPrintInteractionController;
 begin
-  Result := 0;
-  // TODO
+  Result := 1;
+  LController := GetController(Result);
+  LController.setPrintingItem(TNSData.OCClass.dataWithContentsOfFile(StrToNSStr(AFileName)));
+  LController.presentAnimated(True, PrintCompletionHandler);
 end;
 
 function TPlatformPrinting.Print(const AAdapter: IInterface): Integer;
 var
-  LInfo: UIPrintInfo;
   LController: UIPrintInteractionController;
 begin
   if AAdapter <> nil then
   begin
     Result := 1;
-    LInfo := TUIPrintInfo.Wrap(TUIPrintInfo.OCClass.printInfo);
-    LInfo.setJobName(StrToNSStr(Format('%s Print Job %d', [TOSDevice.GetDeviceName, Result])));
-    LInfo.setOutputType(UIPrintInfoOutputGeneral);
-    LController := TUIPrintInteractionController.OCClass.sharedPrintController;
-    LController.setPrintInfo(LInfo);
+    LController := GetController(Result);
     LController.setPrintFormatter(UIPrintFormatter(AAdapter));
     LController.presentAnimated(True, PrintCompletionHandler);
   end
@@ -120,7 +130,7 @@ end;
 
 procedure TPlatformPrinting.PrintCompletionHandler(controller: UIPrintInteractionController; completed: Boolean; error: NSError);
 begin
-  TOSLog.d('TPlatformWebBrowserExt.PrintCompletionHandler');
+  TOSLog.d('TPlatformPrinting.PrintCompletionHandler');
 end;
 
 end.
