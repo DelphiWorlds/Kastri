@@ -14,7 +14,11 @@ unit DW.Androidapi.JNI.Guava;
 interface
 
 uses
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.Java.Security, Androidapi.JNI.Java.Net;
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.Java.Security, Androidapi.JNI.Java.Net
+  {$IF CompilerVersion < 36}
+  , DW.Androidapi.JNI.Util
+  {$ENDIF}
+  ;
 
 type
   JAbstractMultimap = interface;
