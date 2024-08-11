@@ -54,6 +54,9 @@ type
   JLoadEventInfo = interface;
   JLoadingInfo = interface;
   JLoadingInfo_Builder = interface;
+  {$IF CompilerVersion < 36}
+  JLogSessionId = interface;
+  {$ENDIF}
   JMediaChunkIterator = interface;
   JMediaClock = interface;
   JMediaLoadData = interface;
@@ -730,6 +733,22 @@ type
     property tunneling: Boolean read _Gettunneling;
   end;
   TJAudioSink_AudioTrackConfig = class(TJavaGenericImport<JAudioSink_AudioTrackConfigClass, JAudioSink_AudioTrackConfig>) end;
+
+  JLogSessionIdClass = interface(JObjectClass)
+    ['{D8C1D067-1565-4FFA-8AE8-E98DC75D0564}']
+    {class} function _GetLOG_SESSION_ID_NONE: JLogSessionId; cdecl;
+    {class} property LOG_SESSION_ID_NONE: JLogSessionId read _GetLOG_SESSION_ID_NONE;
+  end;
+
+  [JavaSignature('android/media/metrics/LogSessionId')]
+  JLogSessionId = interface(JObject)
+    ['{F33CC65A-A4BE-4AFC-8A0A-720B72959395}']
+    function equals(o: JObject): Boolean; cdecl;
+    function getStringId: JString; cdecl;
+    function hashCode: Integer; cdecl;
+    function toString: JString; cdecl;
+  end;
+  TJLogSessionId = class(TJavaGenericImport<JLogSessionIdClass, JLogSessionId>) end;
 
   JPlayerIdClass = interface(JObjectClass)
     ['{C59D0179-3A88-4C29-A34D-579A468C2624}']
