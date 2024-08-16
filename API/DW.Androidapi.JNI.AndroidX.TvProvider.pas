@@ -32,6 +32,7 @@ type
   JTvContractCompat = interface;
   JTvContractCompat_Channels = interface;
   JTvContractCompat_PreviewPrograms = interface;
+  JTvContractCompat_PreviewProgramColumns = interface;
   JTvContractCompat_Programs = interface;
   JTvContractCompat_WatchNextPrograms = interface;
 
@@ -627,6 +628,136 @@ type
     ['{319AEBE5-7A72-4DD5-8B59-33D0A7CD7899}']
   end;
   TJTvContractCompat_PreviewPrograms = class(TJavaGenericImport<JTvContractCompat_PreviewProgramsClass, JTvContractCompat_PreviewPrograms>) end;
+
+  JTvContractCompat_PreviewProgramColumnsClass = interface(IJavaClass)
+    ['{E1D0758E-8C24-4D27-AE3F-2428DA765571}']
+    {class} function _GetASPECT_RATIO_16_9: Integer; cdecl;
+    {class} function _GetASPECT_RATIO_1_1: Integer; cdecl;
+    {class} function _GetASPECT_RATIO_2_3: Integer; cdecl;
+    {class} function _GetASPECT_RATIO_3_2: Integer; cdecl;
+    {class} function _GetASPECT_RATIO_4_3: Integer; cdecl;
+    {class} function _GetASPECT_RATIO_MOVIE_POSTER: Integer; cdecl;
+    {class} function _GetAVAILABILITY_AVAILABLE: Integer; cdecl;
+    {class} function _GetAVAILABILITY_FREE: Integer; cdecl;
+    {class} function _GetAVAILABILITY_FREE_WITH_SUBSCRIPTION: Integer; cdecl;
+    {class} function _GetAVAILABILITY_PAID_CONTENT: Integer; cdecl;
+    {class} function _GetAVAILABILITY_PURCHASED: Integer; cdecl;
+    {class} function _GetCOLUMN_AUTHOR: JString; cdecl;
+    {class} function _GetCOLUMN_AVAILABILITY: JString; cdecl;
+    {class} function _GetCOLUMN_BROWSABLE: JString; cdecl;
+    {class} function _GetCOLUMN_CONTENT_ID: JString; cdecl;
+    {class} function _GetCOLUMN_DURATION_MILLIS: JString; cdecl;
+    {class} function _GetCOLUMN_END_TIME_UTC_MILLIS: JString; cdecl;
+    {class} function _GetCOLUMN_GENRE: JString; cdecl;
+    {class} function _GetCOLUMN_INTENT_URI: JString; cdecl;
+    {class} function _GetCOLUMN_INTERACTION_COUNT: JString; cdecl;
+    {class} function _GetCOLUMN_INTERACTION_TYPE: JString; cdecl;
+    {class} function _GetCOLUMN_INTERNAL_PROVIDER_ID: JString; cdecl;
+    {class} function _GetCOLUMN_ITEM_COUNT: JString; cdecl;
+    {class} function _GetCOLUMN_LAST_PLAYBACK_POSITION_MILLIS: JString; cdecl;
+    {class} function _GetCOLUMN_LIVE: JString; cdecl;
+    {class} function _GetCOLUMN_LOGO_CONTENT_DESCRIPTION: JString; cdecl;
+    {class} function _GetCOLUMN_LOGO_URI: JString; cdecl;
+    {class} function _GetCOLUMN_OFFER_PRICE: JString; cdecl;
+    {class} function _GetCOLUMN_POSTER_ART_ASPECT_RATIO: JString; cdecl;
+    {class} function _GetCOLUMN_PREVIEW_AUDIO_URI: JString; cdecl;
+    {class} function _GetCOLUMN_PREVIEW_VIDEO_URI: JString; cdecl;
+    {class} function _GetCOLUMN_RELEASE_DATE: JString; cdecl;
+    {class} function _GetCOLUMN_STARTING_PRICE: JString; cdecl;
+    {class} function _GetCOLUMN_START_TIME_UTC_MILLIS: JString; cdecl;
+    {class} function _GetCOLUMN_THUMBNAIL_ASPECT_RATIO: JString; cdecl;
+    {class} function _GetCOLUMN_TRANSIENT: JString; cdecl;
+    {class} function _GetCOLUMN_TV_SERIES_ITEM_TYPE: JString; cdecl;
+    {class} function _GetCOLUMN_TYPE: JString; cdecl;
+    {class} function _GetINTERACTION_TYPE_FANS: Integer; cdecl;
+    {class} function _GetINTERACTION_TYPE_FOLLOWERS: Integer; cdecl;
+    {class} function _GetINTERACTION_TYPE_LIKES: Integer; cdecl;
+    {class} function _GetINTERACTION_TYPE_LISTENS: Integer; cdecl;
+    {class} function _GetINTERACTION_TYPE_THUMBS: Integer; cdecl;
+    {class} function _GetINTERACTION_TYPE_VIEWERS: Integer; cdecl;
+    {class} function _GetINTERACTION_TYPE_VIEWS: Integer; cdecl;
+    {class} function _GetTV_SERIES_ITEM_TYPE_CHAPTER: Integer; cdecl;
+    {class} function _GetTV_SERIES_ITEM_TYPE_EPISODE: Integer; cdecl;
+    {class} function _GetTYPE_ALBUM: Integer; cdecl;
+    {class} function _GetTYPE_ARTIST: Integer; cdecl;
+    {class} function _GetTYPE_CHANNEL: Integer; cdecl;
+    {class} function _GetTYPE_CLIP: Integer; cdecl;
+    {class} function _GetTYPE_EVENT: Integer; cdecl;
+    {class} function _GetTYPE_GAME: Integer; cdecl;
+    {class} function _GetTYPE_MOVIE: Integer; cdecl;
+    {class} function _GetTYPE_PLAYLIST: Integer; cdecl;
+    {class} function _GetTYPE_STATION: Integer; cdecl;
+    {class} function _GetTYPE_TRACK: Integer; cdecl;
+    {class} function _GetTYPE_TV_EPISODE: Integer; cdecl;
+    {class} function _GetTYPE_TV_SEASON: Integer; cdecl;
+    {class} function _GetTYPE_TV_SERIES: Integer; cdecl;
+    {class} property ASPECT_RATIO_16_9: Integer read _GetASPECT_RATIO_16_9;
+    {class} property ASPECT_RATIO_1_1: Integer read _GetASPECT_RATIO_1_1;
+    {class} property ASPECT_RATIO_2_3: Integer read _GetASPECT_RATIO_2_3;
+    {class} property ASPECT_RATIO_3_2: Integer read _GetASPECT_RATIO_3_2;
+    {class} property ASPECT_RATIO_4_3: Integer read _GetASPECT_RATIO_4_3;
+    {class} property ASPECT_RATIO_MOVIE_POSTER: Integer read _GetASPECT_RATIO_MOVIE_POSTER;
+    {class} property AVAILABILITY_AVAILABLE: Integer read _GetAVAILABILITY_AVAILABLE;
+    {class} property AVAILABILITY_FREE: Integer read _GetAVAILABILITY_FREE;
+    {class} property AVAILABILITY_FREE_WITH_SUBSCRIPTION: Integer read _GetAVAILABILITY_FREE_WITH_SUBSCRIPTION;
+    {class} property AVAILABILITY_PAID_CONTENT: Integer read _GetAVAILABILITY_PAID_CONTENT;
+    {class} property AVAILABILITY_PURCHASED: Integer read _GetAVAILABILITY_PURCHASED;
+    {class} property COLUMN_AUTHOR: JString read _GetCOLUMN_AUTHOR;
+    {class} property COLUMN_AVAILABILITY: JString read _GetCOLUMN_AVAILABILITY;
+    {class} property COLUMN_BROWSABLE: JString read _GetCOLUMN_BROWSABLE;
+    {class} property COLUMN_CONTENT_ID: JString read _GetCOLUMN_CONTENT_ID;
+    {class} property COLUMN_DURATION_MILLIS: JString read _GetCOLUMN_DURATION_MILLIS;
+    {class} property COLUMN_END_TIME_UTC_MILLIS: JString read _GetCOLUMN_END_TIME_UTC_MILLIS;
+    {class} property COLUMN_GENRE: JString read _GetCOLUMN_GENRE;
+    {class} property COLUMN_INTENT_URI: JString read _GetCOLUMN_INTENT_URI;
+    {class} property COLUMN_INTERACTION_COUNT: JString read _GetCOLUMN_INTERACTION_COUNT;
+    {class} property COLUMN_INTERACTION_TYPE: JString read _GetCOLUMN_INTERACTION_TYPE;
+    {class} property COLUMN_INTERNAL_PROVIDER_ID: JString read _GetCOLUMN_INTERNAL_PROVIDER_ID;
+    {class} property COLUMN_ITEM_COUNT: JString read _GetCOLUMN_ITEM_COUNT;
+    {class} property COLUMN_LAST_PLAYBACK_POSITION_MILLIS: JString read _GetCOLUMN_LAST_PLAYBACK_POSITION_MILLIS;
+    {class} property COLUMN_LIVE: JString read _GetCOLUMN_LIVE;
+    {class} property COLUMN_LOGO_CONTENT_DESCRIPTION: JString read _GetCOLUMN_LOGO_CONTENT_DESCRIPTION;
+    {class} property COLUMN_LOGO_URI: JString read _GetCOLUMN_LOGO_URI;
+    {class} property COLUMN_OFFER_PRICE: JString read _GetCOLUMN_OFFER_PRICE;
+    {class} property COLUMN_POSTER_ART_ASPECT_RATIO: JString read _GetCOLUMN_POSTER_ART_ASPECT_RATIO;
+    {class} property COLUMN_PREVIEW_AUDIO_URI: JString read _GetCOLUMN_PREVIEW_AUDIO_URI;
+    {class} property COLUMN_PREVIEW_VIDEO_URI: JString read _GetCOLUMN_PREVIEW_VIDEO_URI;
+    {class} property COLUMN_RELEASE_DATE: JString read _GetCOLUMN_RELEASE_DATE;
+    {class} property COLUMN_STARTING_PRICE: JString read _GetCOLUMN_STARTING_PRICE;
+    {class} property COLUMN_START_TIME_UTC_MILLIS: JString read _GetCOLUMN_START_TIME_UTC_MILLIS;
+    {class} property COLUMN_THUMBNAIL_ASPECT_RATIO: JString read _GetCOLUMN_THUMBNAIL_ASPECT_RATIO;
+    {class} property COLUMN_TRANSIENT: JString read _GetCOLUMN_TRANSIENT;
+    {class} property COLUMN_TV_SERIES_ITEM_TYPE: JString read _GetCOLUMN_TV_SERIES_ITEM_TYPE;
+    {class} property COLUMN_TYPE: JString read _GetCOLUMN_TYPE;
+    {class} property INTERACTION_TYPE_FANS: Integer read _GetINTERACTION_TYPE_FANS;
+    {class} property INTERACTION_TYPE_FOLLOWERS: Integer read _GetINTERACTION_TYPE_FOLLOWERS;
+    {class} property INTERACTION_TYPE_LIKES: Integer read _GetINTERACTION_TYPE_LIKES;
+    {class} property INTERACTION_TYPE_LISTENS: Integer read _GetINTERACTION_TYPE_LISTENS;
+    {class} property INTERACTION_TYPE_THUMBS: Integer read _GetINTERACTION_TYPE_THUMBS;
+    {class} property INTERACTION_TYPE_VIEWERS: Integer read _GetINTERACTION_TYPE_VIEWERS;
+    {class} property INTERACTION_TYPE_VIEWS: Integer read _GetINTERACTION_TYPE_VIEWS;
+    {class} property TV_SERIES_ITEM_TYPE_CHAPTER: Integer read _GetTV_SERIES_ITEM_TYPE_CHAPTER;
+    {class} property TV_SERIES_ITEM_TYPE_EPISODE: Integer read _GetTV_SERIES_ITEM_TYPE_EPISODE;
+    {class} property TYPE_ALBUM: Integer read _GetTYPE_ALBUM;
+    {class} property TYPE_ARTIST: Integer read _GetTYPE_ARTIST;
+    {class} property TYPE_CHANNEL: Integer read _GetTYPE_CHANNEL;
+    {class} property TYPE_CLIP: Integer read _GetTYPE_CLIP;
+    {class} property TYPE_EVENT: Integer read _GetTYPE_EVENT;
+    {class} property TYPE_GAME: Integer read _GetTYPE_GAME;
+    {class} property TYPE_MOVIE: Integer read _GetTYPE_MOVIE;
+    {class} property TYPE_PLAYLIST: Integer read _GetTYPE_PLAYLIST;
+    {class} property TYPE_STATION: Integer read _GetTYPE_STATION;
+    {class} property TYPE_TRACK: Integer read _GetTYPE_TRACK;
+    {class} property TYPE_TV_EPISODE: Integer read _GetTYPE_TV_EPISODE;
+    {class} property TYPE_TV_SEASON: Integer read _GetTYPE_TV_SEASON;
+    {class} property TYPE_TV_SERIES: Integer read _GetTYPE_TV_SERIES;
+  end;
+
+  [JavaSignature('androidx/tvprovider/media/tv/TvContractCompat$PreviewProgramColumns')]
+  JTvContractCompat_PreviewProgramColumns = interface(IJavaInstance)
+    ['{0FDC54B0-7174-4F07-A426-2620F33C18A5}']
+  end;
+  TJTvContractCompat_PreviewProgramColumns = class(TJavaGenericImport<JTvContractCompat_PreviewProgramColumnsClass, JTvContractCompat_PreviewProgramColumns>) end;
 
   JTvContractCompat_ProgramsClass = interface(JObjectClass)
     ['{BA553894-5E50-477C-B2E1-FEA45C4F0BB4}']
