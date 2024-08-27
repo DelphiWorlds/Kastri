@@ -19,8 +19,12 @@ uses
   Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Util;
 
 type
+  JDownloadManager = interface;
+  JDownloadManager_Query = interface;
+  JDownloadManager_Request = interface;
   JKeyguardManager = interface;
   JKeyguardManager_KeyguardLock = interface;
+  JKeyguardManager_KeyguardDismissCallback = interface;
   JKeyguardManager_OnKeyguardExitResult = interface;
   {$IF CompilerVersion < 33}
   JLocalTime = interface;
@@ -61,8 +65,21 @@ type
     function isKeyguardLocked: Boolean; cdecl;
     function isKeyguardSecure: Boolean; cdecl;
     function newKeyguardLock(tag: JString): JKeyguardManager_KeyguardLock; cdecl;
+    procedure requestDismissKeyguard(activity: JActivity; callback: JKeyguardManager_KeyguardDismissCallback); cdecl;
   end;
   TJKeyguardManager = class(TJavaGenericImport<JKeyguardManagerClass, JKeyguardManager>) end;
+
+  JKeyguardManager_KeyguardDismissCallbackClass = interface(JObjectClass)
+    ['{05ED1989-6EBC-4F43-9333-D1D14101475C}']
+  end;
+
+  [JavaSignature('android/app/KeyguardManager$KeyguardDismissCallback')]
+  JKeyguardManager_KeyguardDismissCallback = interface(JObject)
+    ['{5B237B1E-7B6A-4B0E-B2F3-74078B6298D9}']
+    procedure onDismissCancelled; cdecl;
+    procedure onDismissError; cdecl;
+    procedure onDismissSucceeded; cdecl;
+  end;
 
   JKeyguardManager_KeyguardLockClass = interface(JObjectClass)
     ['{98306533-81FC-4498-91E6-19F58EA32BD7}']
@@ -390,6 +407,154 @@ type
   TJWallpaperManager_OnColorsChangedListener = class(TJavaGenericImport<JWallpaperManager_OnColorsChangedListenerClass,
     JWallpaperManager_OnColorsChangedListener>)
   end;
+
+  JDownloadManager_RequestClass = interface(JObjectClass)
+    ['{BBBEFE89-63E2-44A1-A266-FADC4AD023B0}']
+    {class} function _GetNETWORK_MOBILE: Integer; cdecl;
+    {class} function _GetNETWORK_WIFI: Integer; cdecl;
+    {class} function _GetVISIBILITY_HIDDEN: Integer; cdecl;
+    {class} function _GetVISIBILITY_VISIBLE: Integer; cdecl;
+    {class} function _GetVISIBILITY_VISIBLE_NOTIFY_COMPLETED: Integer; cdecl;
+    {class} function _GetVISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION: Integer; cdecl;
+    {class} function init(uri: Jnet_Uri): JDownloadManager_Request; cdecl;
+    {class} property NETWORK_MOBILE: Integer read _GetNETWORK_MOBILE;
+    {class} property NETWORK_WIFI: Integer read _GetNETWORK_WIFI;
+    {class} property VISIBILITY_HIDDEN: Integer read _GetVISIBILITY_HIDDEN;
+    {class} property VISIBILITY_VISIBLE: Integer read _GetVISIBILITY_VISIBLE;
+    {class} property VISIBILITY_VISIBLE_NOTIFY_COMPLETED: Integer read _GetVISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+    {class} property VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION: Integer read _GetVISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION;
+  end;
+
+  [JavaSignature('android/app/DownloadManager$Request')]
+  JDownloadManager_Request = interface(JObject)
+    ['{18F28F88-F356-4C44-AC95-B83B1BF82E32}']
+    function addRequestHeader(string_1: JString; string_2: JString): JDownloadManager_Request; cdecl;
+    procedure allowScanningByMediaScanner; cdecl;
+    function setAllowedNetworkTypes(int: Integer): JDownloadManager_Request; cdecl;
+    function setAllowedOverMetered(boolean: Boolean): JDownloadManager_Request; cdecl;
+    function setAllowedOverRoaming(boolean: Boolean): JDownloadManager_Request; cdecl;
+    function setDescription(charsequence: JCharSequence): JDownloadManager_Request; cdecl;
+    function setDestinationInExternalFilesDir(context: JContext; string_1: JString; string_2: JString): JDownloadManager_Request; cdecl;
+    function setDestinationInExternalPublicDir(string_1: JString; string_2: JString): JDownloadManager_Request; cdecl;
+    function setDestinationUri(uri: Jnet_Uri): JDownloadManager_Request; cdecl;
+    function setMimeType(string_1: JString): JDownloadManager_Request; cdecl;
+    function setNotificationVisibility(int: Integer): JDownloadManager_Request; cdecl;
+    function setRequiresCharging(boolean: Boolean): JDownloadManager_Request; cdecl;
+    function setRequiresDeviceIdle(boolean: Boolean): JDownloadManager_Request; cdecl;
+    function setShowRunningNotification(boolean: Boolean): JDownloadManager_Request; cdecl;
+    function setTitle(charsequence: JCharSequence): JDownloadManager_Request; cdecl;
+    function setVisibleInDownloadsUi(boolean: Boolean): JDownloadManager_Request; cdecl;
+  end;
+  TJDownloadManager_Request = class(TJavaGenericImport<JDownloadManager_RequestClass, JDownloadManager_Request>) end;
+
+  JDownloadManagerClass = interface(JObjectClass)
+    ['{3EC21155-52FF-473A-85C0-420C95EB374C}']
+    {class} function _GetACTION_DOWNLOAD_COMPLETE: JString; cdecl;
+    {class} function _GetACTION_NOTIFICATION_CLICKED: JString; cdecl;
+    {class} function _GetACTION_VIEW_DOWNLOADS: JString; cdecl;
+    {class} function _GetCOLUMN_BYTES_DOWNLOADED_SO_FAR: JString; cdecl;
+    {class} function _GetCOLUMN_DESCRIPTION: JString; cdecl;
+    {class} function _GetCOLUMN_ID: JString; cdecl;
+    {class} function _GetCOLUMN_LAST_MODIFIED_TIMESTAMP: JString; cdecl;
+    {class} function _GetCOLUMN_LOCAL_FILENAME: JString; cdecl;
+    {class} function _GetCOLUMN_LOCAL_URI: JString; cdecl;
+    {class} function _GetCOLUMN_MEDIAPROVIDER_URI: JString; cdecl;
+    {class} function _GetCOLUMN_MEDIA_TYPE: JString; cdecl;
+    {class} function _GetCOLUMN_REASON: JString; cdecl;
+    {class} function _GetCOLUMN_STATUS: JString; cdecl;
+    {class} function _GetCOLUMN_TITLE: JString; cdecl;
+    {class} function _GetCOLUMN_TOTAL_SIZE_BYTES: JString; cdecl;
+    {class} function _GetCOLUMN_URI: JString; cdecl;
+    {class} function _GetERROR_CANNOT_RESUME: Integer; cdecl;
+    {class} function _GetERROR_DEVICE_NOT_FOUND: Integer; cdecl;
+    {class} function _GetERROR_FILE_ALREADY_EXISTS: Integer; cdecl;
+    {class} function _GetERROR_FILE_ERROR: Integer; cdecl;
+    {class} function _GetERROR_HTTP_DATA_ERROR: Integer; cdecl;
+    {class} function _GetERROR_INSUFFICIENT_SPACE: Integer; cdecl;
+    {class} function _GetERROR_TOO_MANY_REDIRECTS: Integer; cdecl;
+    {class} function _GetERROR_UNHANDLED_HTTP_CODE: Integer; cdecl;
+    {class} function _GetERROR_UNKNOWN: Integer; cdecl;
+    {class} function _GetEXTRA_DOWNLOAD_ID: JString; cdecl;
+    {class} function _GetEXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS: JString; cdecl;
+    {class} function _GetINTENT_EXTRAS_SORT_BY_SIZE: JString; cdecl;
+    {class} function _GetPAUSED_QUEUED_FOR_WIFI: Integer; cdecl;
+    {class} function _GetPAUSED_UNKNOWN: Integer; cdecl;
+    {class} function _GetPAUSED_WAITING_FOR_NETWORK: Integer; cdecl;
+    {class} function _GetPAUSED_WAITING_TO_RETRY: Integer; cdecl;
+    {class} function _GetSTATUS_FAILED: Integer; cdecl;
+    {class} function _GetSTATUS_PAUSED: Integer; cdecl;
+    {class} function _GetSTATUS_PENDING: Integer; cdecl;
+    {class} function _GetSTATUS_RUNNING: Integer; cdecl;
+    {class} function _GetSTATUS_SUCCESSFUL: Integer; cdecl;
+    {class} function getMaxBytesOverMobile(context: JContext): JLong; cdecl;
+    {class} function getRecommendedMaxBytesOverMobile(context: JContext): JLong; cdecl;
+    {class} property ACTION_DOWNLOAD_COMPLETE: JString read _GetACTION_DOWNLOAD_COMPLETE;
+    {class} property ACTION_NOTIFICATION_CLICKED: JString read _GetACTION_NOTIFICATION_CLICKED;
+    {class} property ACTION_VIEW_DOWNLOADS: JString read _GetACTION_VIEW_DOWNLOADS;
+    {class} property COLUMN_BYTES_DOWNLOADED_SO_FAR: JString read _GetCOLUMN_BYTES_DOWNLOADED_SO_FAR;
+    {class} property COLUMN_DESCRIPTION: JString read _GetCOLUMN_DESCRIPTION;
+    {class} property COLUMN_ID: JString read _GetCOLUMN_ID;
+    {class} property COLUMN_LAST_MODIFIED_TIMESTAMP: JString read _GetCOLUMN_LAST_MODIFIED_TIMESTAMP;
+    {class} property COLUMN_LOCAL_FILENAME: JString read _GetCOLUMN_LOCAL_FILENAME;
+    {class} property COLUMN_LOCAL_URI: JString read _GetCOLUMN_LOCAL_URI;
+    {class} property COLUMN_MEDIAPROVIDER_URI: JString read _GetCOLUMN_MEDIAPROVIDER_URI;
+    {class} property COLUMN_MEDIA_TYPE: JString read _GetCOLUMN_MEDIA_TYPE;
+    {class} property COLUMN_REASON: JString read _GetCOLUMN_REASON;
+    {class} property COLUMN_STATUS: JString read _GetCOLUMN_STATUS;
+    {class} property COLUMN_TITLE: JString read _GetCOLUMN_TITLE;
+    {class} property COLUMN_TOTAL_SIZE_BYTES: JString read _GetCOLUMN_TOTAL_SIZE_BYTES;
+    {class} property COLUMN_URI: JString read _GetCOLUMN_URI;
+    {class} property ERROR_CANNOT_RESUME: Integer read _GetERROR_CANNOT_RESUME;
+    {class} property ERROR_DEVICE_NOT_FOUND: Integer read _GetERROR_DEVICE_NOT_FOUND;
+    {class} property ERROR_FILE_ALREADY_EXISTS: Integer read _GetERROR_FILE_ALREADY_EXISTS;
+    {class} property ERROR_FILE_ERROR: Integer read _GetERROR_FILE_ERROR;
+    {class} property ERROR_HTTP_DATA_ERROR: Integer read _GetERROR_HTTP_DATA_ERROR;
+    {class} property ERROR_INSUFFICIENT_SPACE: Integer read _GetERROR_INSUFFICIENT_SPACE;
+    {class} property ERROR_TOO_MANY_REDIRECTS: Integer read _GetERROR_TOO_MANY_REDIRECTS;
+    {class} property ERROR_UNHANDLED_HTTP_CODE: Integer read _GetERROR_UNHANDLED_HTTP_CODE;
+    {class} property ERROR_UNKNOWN: Integer read _GetERROR_UNKNOWN;
+    {class} property EXTRA_DOWNLOAD_ID: JString read _GetEXTRA_DOWNLOAD_ID;
+    {class} property EXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS: JString read _GetEXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS;
+    {class} property INTENT_EXTRAS_SORT_BY_SIZE: JString read _GetINTENT_EXTRAS_SORT_BY_SIZE;
+    {class} property PAUSED_QUEUED_FOR_WIFI: Integer read _GetPAUSED_QUEUED_FOR_WIFI;
+    {class} property PAUSED_UNKNOWN: Integer read _GetPAUSED_UNKNOWN;
+    {class} property PAUSED_WAITING_FOR_NETWORK: Integer read _GetPAUSED_WAITING_FOR_NETWORK;
+    {class} property PAUSED_WAITING_TO_RETRY: Integer read _GetPAUSED_WAITING_TO_RETRY;
+    {class} property STATUS_FAILED: Integer read _GetSTATUS_FAILED;
+    {class} property STATUS_PAUSED: Integer read _GetSTATUS_PAUSED;
+    {class} property STATUS_PENDING: Integer read _GetSTATUS_PENDING;
+    {class} property STATUS_RUNNING: Integer read _GetSTATUS_RUNNING;
+    {class} property STATUS_SUCCESSFUL: Integer read _GetSTATUS_SUCCESSFUL;
+  end;
+
+  [JavaSignature('android/app/DownloadManager')]
+  JDownloadManager = interface(JObject)
+    ['{74D647AC-CA0B-49DE-80E5-45BD9C324ABD}']
+    function addCompletedDownload(string_1: JString; string_2: JString; boolean: Boolean; string_3: JString; string_4: JString; long: Int64;
+      boolean_1: Boolean): Int64; cdecl; overload;
+    function addCompletedDownload(string_1: JString; string_2: JString; boolean: Boolean; string_3: JString; string_4: JString; long: Int64;
+      boolean_1: Boolean; uri: Jnet_Uri; uri_1: Jnet_Uri): Int64; cdecl; overload;
+    function enqueue(request: JDownloadManager_Request): Int64; cdecl;
+    function getMimeTypeForDownloadedFile(long: Int64): JString; cdecl;
+    function getUriForDownloadedFile(long: Int64): Jnet_Uri; cdecl;
+    function openDownloadedFile(long: Int64): JParcelFileDescriptor; cdecl;
+    function query(query: JDownloadManager_Query): JCursor; cdecl;
+    function remove(long: Int64): Integer; cdecl;
+  end;
+  TJDownloadManager = class(TJavaGenericImport<JDownloadManagerClass, JDownloadManager>) end;
+
+  JDownloadManager_QueryClass = interface(JObjectClass)
+    ['{FA8E1375-4BAB-4A3D-B20C-47657182189D}']
+    {class} function init: JDownloadManager_Query; cdecl;
+  end;
+
+  [JavaSignature('android/app/DownloadManager$Query')]
+  JDownloadManager_Query = interface(JObject)
+    ['{BD4605FD-02DC-4DCC-8E40-E9150F0EC349}']
+    function setFilterById(ids: TJavaArray<Int64>): JDownloadManager_Query; cdecl;
+    function setFilterByStatus(int: Integer): JDownloadManager_Query; cdecl;
+  end;
+  TJDownloadManager_Query = class(TJavaGenericImport<JDownloadManager_QueryClass, JDownloadManager_Query>) end;
 
 implementation
 
