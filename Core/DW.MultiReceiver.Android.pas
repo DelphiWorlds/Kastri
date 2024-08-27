@@ -64,11 +64,11 @@ type
   private
     FIntentFilter: JIntentFilter;
     FLocal: Boolean;
-    function HasNonSystemActions: Boolean;
     procedure RegisterReceiver;
   protected
     procedure ConfigureActions; virtual; abstract;
     function GetResultCode: Integer;
+    function IsExported: Boolean; virtual;
     property IntentFilter: JIntentFilter read FIntentFilter;
   public
     constructor Create(const ALocal: Boolean = False);
@@ -136,22 +136,9 @@ begin
   Result := FReceiver.getResultCode;
 end;
 
-function TMultiReceiver.HasNonSystemActions: Boolean;
-var
-  I: Integer;
-  LAction: string;
+function TMultiReceiver.IsExported: Boolean;
 begin
-  Result := False;
-  for I := 0 to FIntentFilter.countActions - 1 do
-  begin
-    LAction := JStringToString(FIntentFilter.getAction(I));
-    // Crude way of determining whether or not this is a system broadcast
-    if not (LAction.StartsWith('android.') or LAction.StartsWith('com.android.')) then
-    begin
-      Result := True;
-      Break;
-    end;
-  end;
+  Result := True;
 end;
 
 procedure TMultiReceiver.RegisterReceiver;
@@ -164,7 +151,7 @@ begin
     LFlags := 0;
     if TAndroidHelperEx.CheckBuildAndTarget(TAndroidHelperEx.UPSIDE_DOWN_CAKE) then
     begin
-      if HasNonSystemActions then
+      if IsExported then
       begin
         {$IF CompilerVersion > 35}
         LFlags := TJContext.JavaClass.RECEIVER_EXPORTED;
@@ -180,8 +167,10 @@ begin
         LFlags := 4;
         {$ENDIF}
       end;
-    end;
-    TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter, LFlags);
+      TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter, LFlags);
+    end
+    else
+      TAndroidHelper.Context.registerReceiver(FReceiver, FIntentFilter);
   end
   else
     TJLocalBroadcastManager.JavaClass.getInstance(TAndroidHelper.Context).registerReceiver(FReceiver, FIntentFilter);
