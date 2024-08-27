@@ -23,15 +23,41 @@ uses
   Androidapi.JNIBridge, Androidapi.JNI, Androidapi.JNI.Support,
   // FMX
   FMX.Presentation.Messages, FMX.Presentation.Android, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model,
-  FMX.Graphics,
+  FMX.Graphics, FMX.Types,
   // DW
+  DW.OSLog,
   DW.NativeShape, DW.NativeControl.Android;
 
 type
+  JDWRectangleDrawable = interface;
+
+  JDWRectangleDrawableClass = interface(JDrawableClass)
+    ['{E2C91459-7CF6-4B29-AFF1-14F67A7D1C87}']
+    {class} function _GetSIDE_BOTTOM: Integer; cdecl;
+    {class} function _GetSIDE_LEFT: Integer; cdecl;
+    {class} function _GetSIDE_NONE: Integer; cdecl;
+    {class} function _GetSIDE_RIGHT: Integer; cdecl;
+    {class} function _GetSIDE_TOP: Integer; cdecl;
+    {class} function init: JDWRectangleDrawable; cdecl;
+    {class} property SIDE_BOTTOM: Integer read _GetSIDE_BOTTOM;
+    {class} property SIDE_LEFT: Integer read _GetSIDE_LEFT;
+    {class} property SIDE_NONE: Integer read _GetSIDE_NONE;
+    {class} property SIDE_RIGHT: Integer read _GetSIDE_RIGHT;
+    {class} property SIDE_TOP: Integer read _GetSIDE_TOP;
+  end;
+
+  [JavaSignature('com/delphiworlds/kastri/DWRectangleDrawable')]
+  JDWRectangleDrawable = interface(JShapeDrawable)
+    ['{6D84FA16-F0CB-4B8F-8B72-8B2D7E65B4AD}']
+    procedure setSides(sides: Integer); cdecl;
+    procedure setStroke(strokeWidth: Integer; strokeColor: Integer); cdecl;
+  end;
+  TJDWRectangleDrawable = class(TJavaGenericImport<JDWRectangleDrawableClass, JDWRectangleDrawable>)
+  end;
+
   TAndroidNativeShape = class(TNativeControl)
   private
-    FBackground: JGradientDrawable;
-    FView: JImageView;
+    FView: JViewGroup;
     function GetShapeControl: TCustomNativeShape;
     function GetModel: TCustomNativeShapeModel; overload;
     procedure MMFillChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_FILL_CHANGED;
@@ -39,22 +65,30 @@ type
     procedure MMStrokeChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_STROKE_CHANGED;
   protected
     function CreateView: JView; override;
-    procedure FillChanged; virtual;
-    procedure StrokeChanged; virtual;
     function DefineModelClass: TDataModelClass; override;
+    procedure FillChanged; virtual;
+    function GetFillNativeColor: Integer;
+    function GetStrokeNativeColor: Integer;
+    function GetStrokeNativeThickness: Integer;
+    procedure StrokeChanged; virtual;
+    procedure ViewCreated; virtual;
     property ShapeControl: TCustomNativeShape read GetShapeControl;
   public
     constructor Create; override;
     destructor Destroy; override;
     property Model: TCustomNativeShapeModel read GetModel;
-    property View: JImageView read FView;
+    property View: JViewGroup read FView;
   end;
 
   TAndroidNativeEllipse = class(TAndroidNativeShape)
   private
+    FEllipse: JGradientDrawable;
     function GetModel: TCustomNativeEllipseModel; overload;
   protected
     function DefineModelClass: TDataModelClass; override;
+    procedure FillChanged; override;
+    procedure StrokeChanged; override;
+    procedure ViewCreated; override;
   public
     constructor Create; override;
     property Model: TCustomNativeEllipseModel read GetModel;
@@ -62,6 +96,7 @@ type
 
   TAndroidNativeRectangle = class(TAndroidNativeShape)
   private
+    FRectangle: JDWRectangleDrawable;
     function GetModel: TCustomNativeRectangleModel; overload;
     procedure MMCornersChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_CORNERS_CHANGED;
     procedure MMCornerTypeChanged(var AMessage: TDispatchMessage); message MM_NATIVESHAPE_CORNERTYPE_CHANGED;
@@ -73,6 +108,8 @@ type
     function DefineModelClass: TDataModelClass; override;
     procedure RadiusChanged; virtual;
     procedure SidesChanged; virtual;
+    procedure StrokeChanged; override;
+    procedure ViewCreated; override;
   public
     constructor Create; override;
     property Model: TCustomNativeRectangleModel read GetModel;
@@ -93,12 +130,14 @@ begin
 end;
 
 function TAndroidNativeShape.CreateView: JView;
+var
+  LLayout: JLinearLayout;
 begin
-  FBackground := TJGradientDrawable.JavaClass.init;
-  FView := TJImageView.JavaClass.init(TAndroidHelper.Context);
-  // FView.setScaleType(TJImageView_ScaleType.JavaClass.CENTER_CROP); //??
-  FView.setBackground(FBackground);
+  LLayout := TJLinearLayout.JavaClass.init(TAndroidHelper.Context);
+  LLayout.setOrientation(TJLinearLayout.JavaClass.HORIZONTAL);
+  FView := LLayout;
   Result := FView;
+  ViewCreated;
 end;
 
 function TAndroidNativeShape.DefineModelClass: TDataModelClass;
@@ -109,6 +148,25 @@ end;
 function TAndroidNativeShape.GetShapeControl: TCustomNativeShape;
 begin
   Result := TCustomNativeShape(Control)
+end;
+
+function TAndroidNativeShape.GetStrokeNativeColor: Integer;
+var
+  LColor: TAlphaColorRec;
+begin
+  if (Model.Stroke.Color = TAlphaColors.Null) or (Model.Stroke.Kind = TBrushKind.None) or (Model.Opacity = 0) then
+    Result := TJColor.JavaClass.TRANSPARENT
+  else
+  begin
+    LColor := TAlphaColorRec(Model.Stroke.Color);
+    LColor.A := Round(Model.Opacity * 255);
+    Result := TAndroidHelper.AlphaColorToJColor(LColor.Color);
+  end;
+end;
+
+function TAndroidNativeShape.GetStrokeNativeThickness: Integer;
+begin
+  Result := Round(Model.Stroke.Thickness * ScreenScale);
 end;
 
 procedure TAndroidNativeShape.MMFillChanged(var AMessage: TDispatchMessage);
@@ -128,35 +186,32 @@ begin
 end;
 
 procedure TAndroidNativeShape.FillChanged;
+begin
+  //
+end;
+
+procedure TAndroidNativeShape.StrokeChanged;
+begin
+  //
+end;
+
+procedure TAndroidNativeShape.ViewCreated;
+begin
+  //
+end;
+
+function TAndroidNativeShape.GetFillNativeColor: Integer;
 var
-  LNativeColor: Integer;
   LColor: TAlphaColorRec;
 begin
   if (Model.Fill.Color = TAlphaColors.Null) or (Model.Fill.Kind = TBrushKind.None) or (Model.Opacity = 0) then
-    LNativeColor := TJColor.JavaClass.TRANSPARENT
+    Result := TJColor.JavaClass.TRANSPARENT
   else
   begin
     LColor := TAlphaColorRec(Model.Fill.Color);
     LColor.A := Round(Model.Opacity * 255);
-    LNativeColor := TAndroidHelper.AlphaColorToJColor(LColor.Color);
+    Result := TAndroidHelper.AlphaColorToJColor(LColor.Color);
   end;
-  FBackground.setColor(LNativeColor);
-end;
-
-procedure TAndroidNativeShape.StrokeChanged;
-var
-  LNativeColor: Integer;
-  LColor: TAlphaColorRec;
-begin
-  if (Model.Stroke.Color = TAlphaColors.Null) or (Model.Stroke.Kind = TBrushKind.None) or (Model.Opacity = 0) then
-    LNativeColor := TJColor.JavaClass.TRANSPARENT
-  else
-  begin
-    LColor := TAlphaColorRec(Model.Stroke.Color);
-    LColor.A := Round(Model.Opacity * 255);
-    LNativeColor := TAndroidHelper.AlphaColorToJColor(LColor.Color);
-  end;
-  FBackground.setStroke(Round(Model.Stroke.Thickness * ScreenScale), LNativeColor);
 end;
 
 function TAndroidNativeShape.GetModel: TCustomNativeShapeModel;
@@ -169,7 +224,7 @@ end;
 constructor TAndroidNativeEllipse.Create;
 begin
   inherited;
-  FBackground.setShape(TJGradientDrawable.JavaClass.OVAL);
+  //
 end;
 
 function TAndroidNativeEllipse.DefineModelClass: TDataModelClass;
@@ -177,9 +232,26 @@ begin
   Result := TCustomNativeEllipseModel;
 end;
 
+procedure TAndroidNativeEllipse.ViewCreated;
+begin
+  FEllipse := TJGradientDrawable.JavaClass.init;
+  FEllipse.setShape(TJGradientDrawable.JavaClass.OVAL);
+  View.setBackground(FEllipse);
+end;
+
 function TAndroidNativeEllipse.GetModel: TCustomNativeEllipseModel;
 begin
   Result := inherited GetModel<TCustomNativeEllipseModel>;
+end;
+
+procedure TAndroidNativeEllipse.FillChanged;
+begin
+  FEllipse.setColor(GetFillNativeColor);
+end;
+
+procedure TAndroidNativeEllipse.StrokeChanged;
+begin
+  FEllipse.setStroke(GetStrokeNativeThickness, GetStrokeNativeColor);
 end;
 
 { TAndroidNativeRectangle }
@@ -187,7 +259,7 @@ end;
 constructor TAndroidNativeRectangle.Create;
 begin
   inherited;
-  FBackground.setShape(TJGradientDrawable.JavaClass.RECTANGLE);
+  //
 end;
 
 function TAndroidNativeRectangle.DefineModelClass: TDataModelClass;
@@ -222,35 +294,57 @@ end;
 
 procedure TAndroidNativeRectangle.CornersChanged;
 begin
-
+  //
 end;
 
 procedure TAndroidNativeRectangle.CornerTypeChanged;
 begin
-
+  //
 end;
 
 procedure TAndroidNativeRectangle.RadiusChanged;
-var
-  LRadii: TJavaArray<Single>;
-  I: Integer;
+//var
+//  LRadii: TJavaArray<Single>;
+//  I: Integer;
 begin
-  LRadii := TJavaArray<Single>.Create(8);
-  try
-    for I := 0 to LRadii.Length - 1 do
-    begin
-      LRadii.Items[I] := Model.XRadius;
-      LRadii.Items[I + 1] := Model.YRadius;
-    end;
-    FBackground.setCornerRadii(LRadii);
-  finally
-    LRadii.Free;
-  end;
+//  LRadii := TJavaArray<Single>.Create(8);
+//  try
+//    for I := 0 to LRadii.Length - 1 do
+//    begin
+//      LRadii.Items[I] := Model.XRadius;
+//      LRadii.Items[I + 1] := Model.YRadius;
+//    end;
+//    FBackground.setCornerRadii(LRadii);
+//  finally
+//    LRadii.Free;
+//  end;
 end;
 
 procedure TAndroidNativeRectangle.SidesChanged;
+var
+  LSides: Integer;
 begin
-  // Not supported yet
+  LSides := TJDWRectangleDrawable.JavaClass.SIDE_NONE;
+  if TSide.Bottom in Model.Sides then
+    LSides := LSides or TJDWRectangleDrawable.JavaClass.SIDE_BOTTOM;
+  if TSide.Left in Model.Sides then
+    LSides := LSides or TJDWRectangleDrawable.JavaClass.SIDE_LEFT;
+  if TSide.Right in Model.Sides then
+    LSides := LSides or TJDWRectangleDrawable.JavaClass.SIDE_RIGHT;
+  if TSide.Top in Model.Sides then
+    LSides := LSides or TJDWRectangleDrawable.JavaClass.SIDE_TOP;
+  FRectangle.setSides(LSides);
+end;
+
+procedure TAndroidNativeRectangle.StrokeChanged;
+begin
+  FRectangle.setStroke(GetStrokeNativeThickness, GetStrokeNativeColor);
+end;
+
+procedure TAndroidNativeRectangle.ViewCreated;
+begin
+  FRectangle := TJDWRectangleDrawable.JavaClass.init;
+  View.setBackground(FRectangle);
 end;
 
 initialization
