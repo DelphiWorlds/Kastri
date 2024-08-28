@@ -31,6 +31,8 @@ type
     FWebBrowserExt: TWebBrowserExt;
     FIsLoggingIn: Boolean;
     FIsPageLoaded: Boolean;
+    procedure WebBrowserExtDownloadStartHandler(Sender: TObject; const AUri, AFileExt: string; var AFileName: string);
+    procedure WebBrowserExtDownloadStateChangeHandler(Sender: TObject; const AFileName: string; const AState: TDownloadState);
     procedure WebBrowserExtElementClickHandler(Sender: TObject; const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean);
     procedure WebBrowserShouldStartLoadWithRequestHandler(Sender: TObject; const AURL: string);
   public
@@ -83,6 +85,8 @@ begin
   WebBrowser.OnShouldStartLoadWithRequest := WebBrowserShouldStartLoadWithRequestHandler;
   FWebBrowserExt := TWebBrowserExt.Create(WebBrowser);
   FWebBrowserExt.OnElementClick := WebBrowserExtElementClickHandler;
+  FWebBrowserExt.OnDownloadStart := WebBrowserExtDownloadStartHandler;
+  FWebBrowserExt.OnDownloadStateChange := WebBrowserExtDownloadStateChangeHandler;
 end;
 
 destructor TForm1.Destroy;
@@ -114,6 +118,32 @@ begin
     FIsLoggingIn := False;
     Memo.Lines.Add('Responded from login attempt');
   end;
+end;
+
+procedure TForm1.WebBrowserExtDownloadStartHandler(Sender: TObject; const AUri, AFileExt: string; var AFileName: string);
+begin
+  // Leaving AFileName blank will prevent download
+  // Including a folder name in the file name should result in the file being downloaded to that path
+  // If just the filename is provided, and DefaultDownloadsFolder is not empty, that folder will be used
+  // If just the filename is provided, and DefaultDownloadsFolder IS empty, the default folder for the system will be used
+  // On mobile, DefaultDownloadsFolder defaults to: <DocumentsPath>\Downloads
+
+  // The developer can decide:
+  //   Which part(s) of the Uri should be used for the filename
+  //   What to do if AFileExt ends up being blank (not a valid mime type, or whatever other reason)
+  //   How to construct AFileName as a whole.
+  Memo.Lines.Add(Format('> WebBrowserExtDownloadStartHandler - AUri: %s, AFileExt: %s', [AUri, AFileExt]));
+  // This variation provides just the filename
+  AFileName := TPath.GetFileNameWithoutExtension(AUri) + AFileExt;
+  // This variation includes a folder in the filename
+  // AFileName := TPath.Combine(TPath.GetDocumentsPath, TPath.GetFileNameWithoutExtension(AUri) + AFileExt);
+end;
+
+procedure TForm1.WebBrowserExtDownloadStateChangeHandler(Sender: TObject; const AFileName: string; const AState: TDownloadState);
+begin
+  // Possible values for AState:
+  // TDownloadState = (Completed, Failed, Paused, Pending, Running, Unknown);
+  Memo.Lines.Add(Format('> WebBrowserExtDownloadStateChangeHandler: %s', [AFileName]));
 end;
 
 procedure TForm1.WebBrowserExtElementClickHandler(Sender: TObject; const AHitTestKind: THitTestKind; const AExtra: string;
