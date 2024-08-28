@@ -15,14 +15,14 @@ interface
 
 uses
   // RTL
-  System.Classes,
+  System.Classes, System.Generics.Collections,
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.WebKit, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Embarcadero,
   Androidapi.JNI.Os, Androidapi.JNI.Net,
   // FMX
   FMX.Graphics,
   // DW
-  DW.WebBrowserExt, DW.JavaScript;
+  DW.WebBrowserExt, DW.JavaScript, DW.Androidapi.JNI.App, DW.MultiReceiver.Android;
 
 type
   TPlatformWebBrowserExt = class;
@@ -48,10 +48,36 @@ type
     constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
   end;
 
+  TDownloadListener = class(TJavaLocal, JDownloadListener)
+  private
+    FPlatformWebBrowserExt: TPlatformWebBrowserExt;
+  public
+    { JDownloadListener }
+    procedure onDownloadStart(url: JString; userAgent: JString; contentDisposition: JString; mimetype: JString; contentLength: Int64); cdecl;
+  public
+    constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+  end;
+
+  TDownloadCompleteReceiver = class(TMultiReceiver)
+  private
+    FPlatformWebBrowserExt: TPlatformWebBrowserExt;
+  protected
+    procedure ConfigureActions; override;
+    procedure Receive(context: JContext; intent: JIntent); override;
+  public
+    constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+  end;
+
+  TDownloads = TDictionary<Int64, String>;
+
   TPlatformWebBrowserExt = class(TCustomPlatformWebBrowserExt)
   private
     class function GetHitTestKind(const AType: Integer): THitTestKind;
   private
+    FDownloadCompleteReceiver: TDownloadCompleteReceiver;
+    FDownloadListener: JDownloadListener;
+    FDownloadManager: JDownloadManager;
+    FDownloads: TDownloads;
     FTouchListener: JView_OnTouchListener;
     FValueCallbacks: TArray<JValueCallback>;
     FWebView: JWebView;
@@ -60,6 +86,8 @@ type
   protected
     procedure ClearCache(const ADataKinds: TCacheDataKinds); override;
     procedure DoCaptureBitmap; override;
+    procedure DownloadStateChange(const AContext: JContext; const AIntent: JIntent);
+    procedure DownloadStart(const AUrl, AUserAgent, AContentDisposition, AMimetype: JString; const AContentLength: Int64);
     procedure ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc); override;
     procedure FlushCookies(const ARemove: Boolean); override;
     function GetPrintAdapter(const ADocumentName: string): IInterface; override;
@@ -77,10 +105,11 @@ implementation
 
 uses
   // RTL
-  System.SysUtils,
+  System.SysUtils, System.IOUtils,
   // Android
   Androidapi.Helpers, Androidapi.JNI.Print,
   // DW
+  DW.OSLog, System.TypInfo,
   DW.Graphics.Helpers.Android;
 
 { TValueCallback }
@@ -112,6 +141,37 @@ begin
   Result := FPlatformWebBrowserExt.WebViewTouch(v, event);
 end;
 
+{ TDownloadListener }
+
+constructor TDownloadListener.Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+begin
+  inherited Create;
+  FPlatformWebBrowserExt := APlatformWebBrowserExt;
+end;
+
+procedure TDownloadListener.onDownloadStart(url, userAgent, contentDisposition, mimetype: JString; contentLength: Int64);
+begin
+  FPlatformWebBrowserExt.DownloadStart(url, userAgent, contentDisposition, mimetype, contentLength);
+end;
+
+{ TDownloadCompleteReceiver }
+
+constructor TDownloadCompleteReceiver.Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+begin
+  inherited Create;
+  FPlatformWebBrowserExt := APlatformWebBrowserExt;
+end;
+
+procedure TDownloadCompleteReceiver.ConfigureActions;
+begin
+  IntentFilter.addAction(TJDownloadManager.JavaClass.ACTION_DOWNLOAD_COMPLETE);
+end;
+
+procedure TDownloadCompleteReceiver.Receive(context: JContext; intent: JIntent);
+begin
+  FPlatformWebBrowserExt.DownloadStateChange(context, intent);
+end;
+
 { TPlatformWebBrowserExt }
 
 constructor TPlatformWebBrowserExt.Create(const AWebBrowserExt: TWebBrowserExt);
@@ -122,12 +182,18 @@ begin
   begin
     FTouchListener := TTouchListener.Create(Self);
     FWebView.setOnTouchListener(FTouchListener);
+    FDownloadManager := TJDownloadManager.Wrap(TAndroidHelper.Context.getSystemService(TJContext.JavaClass.DOWNLOAD_SERVICE));
+    FDownloads := TDownloads.Create;
+    FDownloadCompleteReceiver := TDownloadCompleteReceiver.Create(Self);
+    FDownloadListener := TDownloadListener.Create(Self);
+    FWebView.setDownloadListener(FDownloadListener);
   end;
 end;
 
 destructor TPlatformWebBrowserExt.Destroy;
 begin
-  //
+  FDownloadCompleteReceiver.Free;
+  FDownloads.Free;
   inherited;
 end;
 
@@ -204,6 +270,96 @@ begin
   end
   else
     inherited;
+end;
+
+procedure TPlatformWebBrowserExt.DownloadStart(const AUrl, AUserAgent, AContentDisposition, AMimetype: JString; const AContentLength: Int64);
+var
+  LDownloadRequest: JDownloadManager_Request;
+  LFile, LDir: JFile;
+  LFileName: string;
+begin
+  LFileName := '';
+  DoDownloadStart(JStringToString(AUrl), JStringToString(AMimeType), LFileName);
+  if not LFileName.IsEmpty then
+  begin
+    LDownloadRequest := TJDownloadManager_Request.JavaClass.init(TJnet_uri.JavaClass.parse(AUrl));
+    // Might not want this visible? Use a property in TWebBrowserExt?
+    LDownloadRequest.setNotificationVisibility(TJDownloadManager_Request.JavaClass.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+    if TOSVersion.Check(10) then
+      LDir := TAndroidHelper.Context.getExternalFilesDir(TJEnvironment.JavaClass.DIRECTORY_DOWNLOADS)
+    else
+      LDir := TJEnvironment.JavaClass.getExternalStoragePublicDirectory(TJEnvironment.JavaClass.DIRECTORY_DOWNLOADS);
+    LFile := TJFile.JavaClass.init(LDir, StringToJString(TPath.GetFileName(LFileName)));
+    LDownloadRequest.setDestinationUri(TJnet_Uri.JavaClass.fromFile(LFile));
+    FDownloads.Add(FDownloadManager.enqueue(LDownloadRequest), LFileName);
+  end;
+end;
+
+procedure TPlatformWebBrowserExt.DownloadStateChange(const AContext: JContext; const AIntent: JIntent);
+var
+  LDownloadID: Int64;
+  LFileName, LLocalFileName: string;
+  LState: TDownloadState;
+  LCursor: JCursor;
+  LQuery: JDownloadManager_Query;
+  LStatus: Integer;
+  LUriString: JString;
+  LIds: TJavaArray<Int64>;
+begin
+  LDownloadID := AIntent.getLongExtra(TJDownloadManager.JavaClass.EXTRA_DOWNLOAD_ID, -1);
+  if FDownloads.TryGetValue(LDownloadID, LFileName) then
+  begin
+    LState := TDownloadState.Unknown;
+    LQuery := TJDownloadManager_Query.JavaClass.init;
+    LIds := TJavaArray<Int64>.Create(1);
+    try
+      LIds.Items[0] := LDownloadID;
+      LQuery := LQuery.setFilterById(LIds);
+    finally
+      LIds.Free;
+    end;
+    LCursor := FDownloadManager.query(LQuery);
+    try
+      if LCursor.moveToFirst then
+      begin
+        LStatus := LCursor.getInt(LCursor.getColumnIndex(TJDownloadManager.JavaClass.COLUMN_STATUS));
+        if LStatus = TJDownloadManager.JavaClass.STATUS_SUCCESSFUL then
+          LState := TDownloadState.Completed
+        else if LStatus = TJDownloadManager.JavaClass.STATUS_PAUSED then
+          LState := TDownloadState.Paused
+        else if LStatus = TJDownloadManager.JavaClass.STATUS_FAILED then
+          LState := TDownloadState.Failed
+        else if LStatus = TJDownloadManager.JavaClass.STATUS_PENDING then
+          LState := TDownloadState.Pending
+        else if LStatus = TJDownloadManager.JavaClass.STATUS_RUNNING then
+          LState := TDownloadState.Running;
+        LUriString := LCursor.getString(LCursor.getColumnIndex(TJDownloadManager.JavaClass.COLUMN_LOCAL_URI));
+      end;
+    finally
+      LCursor.close;
+    end;
+    if LState = TDownloadState.Completed then
+    begin
+      LLocalFileName := JStringToString(TJnet_Uri.JavaClass.parse(LUriString).getPath);
+      if TPath.GetDirectoryName(LFileName).IsEmpty and not DefaultDownloadsFolder.IsEmpty and ForceDirectories(DefaultDownloadsFolder) then
+        LFileName := TPath.Combine(DefaultDownloadsFolder, LFileName);
+      if not TPath.GetDirectoryName(LFileName).IsEmpty then
+      begin
+        try
+          TFile.Copy(LLocalFileName, LFileName, True);
+          if TFile.Exists(LFileName) then
+            TFile.Delete(LLocalFileName);
+        except
+          // If the "move" fails, the path will be what the download uri is
+        end;
+        if not TFile.Exists(LFileName) then
+          LFileName := LLocalFileName;
+      end;
+      FDownloads.Remove(LDownloadID);
+    end;
+    DoDownloadStateChange(LFileName, LState);
+  end;
+  // else no matching download id???
 end;
 
 procedure TPlatformWebBrowserExt.SetAllowZoom(const AValue: Boolean);

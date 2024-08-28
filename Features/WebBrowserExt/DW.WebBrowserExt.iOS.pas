@@ -21,7 +21,7 @@ uses
   //
   FMX.WebBrowser.Delegate.iOS,
   // DW
-  DW.WebBrowserExt, DW.JavaScript;
+  DW.WebBrowserExt, DW.WebBrowserExt.Cocoa, DW.JavaScript;
 
 type
   TPlatformWebBrowserExt = class;
@@ -65,7 +65,7 @@ type
     constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
   end;
 
-  TPlatformWebBrowserExt = class(TCustomPlatformWebBrowserExt)
+  TPlatformWebBrowserExt = class(TPlatformCocoaWebBrowserExt)
   private
     FJavaScriptResultHandler: TJavaScriptResultProc;
     FNavigationDelegate: TWebBrowserExtNavigationDelegate;
@@ -93,7 +93,7 @@ implementation
 
 uses
   // RTL
-  System.SysUtils,
+  System.SysUtils, System.Classes, System.IOUtils, System.StrUtils,
   // macOS
   Macapi.Helpers, Macapi.ObjCRuntime,
   // iOS
@@ -118,7 +118,7 @@ begin
   inherited Create;
   FPlatformWebBrowserExt := APlatformWebBrowserExt;
   // The following line converts the delegate object id into the desired interface
-  WrapInterFace(FPlatformWebBrowserExt.WebView.navigationDelegate, TypeInfo(WKNavigationDelegateSlim), FWebViewNavigationDelegate);
+  WrapInterface(FPlatformWebBrowserExt.WebView.navigationDelegate, TypeInfo(WKNavigationDelegateSlim), FWebViewNavigationDelegate);
 end;
 
 procedure TWebBrowserExtNavigationDelegate.webViewDecidePolicyForNavigationAction(webView: WKWebView; navigationAction: WKNavigationAction;
@@ -128,7 +128,6 @@ var
   LURL: string;
   LPreventDefault: Boolean;
 begin
-  // Just highjacking this method
   LURL := NSStrToStr(navigationAction.request.URL.absoluteString);
   LPreventDefault := False;
   if navigationAction.navigationType = WKNavigationTypeLinkActivated then
@@ -146,8 +145,17 @@ end;
 
 procedure TWebBrowserExtNavigationDelegate.webViewDecidePolicyForNavigationResponse(webView: WKWebView; navigationResponse: WKNavigationResponse;
   decisionHandler: Pointer);
+var
+  LBlockImp: procedure(policy: WKNavigationActionPolicy); cdecl;
 begin
-  FWebViewNavigationDelegate.webViewDecidePolicyForNavigationResponse(webView, navigationResponse, decisionHandler);
+  if FPlatformWebBrowserExt.WillDownload(navigationResponse.response) then
+  begin
+    @LBlockImp := imp_implementationWithBlock(decisionHandler);
+    LBlockImp(WKNavigationActionPolicyCancel);
+    imp_removeBlock(@LBlockImp);
+  end
+  else
+    FWebViewNavigationDelegate.webViewDecidePolicyForNavigationResponse(webView, navigationResponse, decisionHandler);
 end;
 
 procedure TWebBrowserExtNavigationDelegate.webViewDidFailNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError);
@@ -175,7 +183,6 @@ procedure TWebBrowserExtNavigationDelegate.webViewDidStartProvisionalNavigation(
 begin
   FWebViewNavigationDelegate.webViewDidStartProvisionalNavigation(webView, navigation);
 end;
-
 
 { TScriptMessageHandler }
 

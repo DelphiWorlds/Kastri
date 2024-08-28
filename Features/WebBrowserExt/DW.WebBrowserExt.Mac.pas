@@ -21,7 +21,7 @@ uses
   // FMX
   FMX.WebBrowser.Delegate.Mac,
   // DW
-  DW.WebBrowserExt, DW.JavaScript;
+  DW.WebBrowserExt, DW.WebBrowserExt.Cocoa, DW.JavaScript;
 
 type
   TPlatformWebBrowserExt = class;
@@ -62,7 +62,7 @@ type
     constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
   end;
 
-  TPlatformWebBrowserExt = class(TCustomPlatformWebBrowserExt)
+  TPlatformWebBrowserExt = class(TPlatformCocoaWebBrowserExt)
   private
     FJavaScriptResultHandler: TJavaScriptResultProc;
     FNavigationDelegate: TWebBrowserExtNavigationDelegate;
@@ -199,8 +199,17 @@ end;
 
 procedure TWebBrowserExtNavigationDelegate.webViewDecidePolicyForNavigationResponseDecisionHandler(webView: WKWebView;
   decidePolicyForNavigationResponse: WKNavigationResponse; decisionHandler: Pointer);
+var
+  LBlockImp: procedure(policy: WKNavigationActionPolicy); cdecl;
 begin
-  FWebViewNavigationDelegate.webViewDecidePolicyForNavigationResponseDecisionHandler(webView, decidePolicyForNavigationResponse, decisionHandler);
+  if FPlatformWebBrowserExt.WillDownload(decidePolicyForNavigationResponse.response) then
+  begin
+    @LBlockImp := imp_implementationWithBlock(decisionHandler);
+    LBlockImp(WKNavigationActionPolicyCancel);
+    imp_removeBlock(@LBlockImp);
+  end
+  else
+    FWebViewNavigationDelegate.webViewDecidePolicyForNavigationResponseDecisionHandler(webView, decidePolicyForNavigationResponse, decisionHandler);
 end;
 
 procedure TWebBrowserExtNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation);

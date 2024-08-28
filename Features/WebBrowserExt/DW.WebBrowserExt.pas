@@ -36,16 +36,21 @@ type
 
   TWebBrowserExt = class;
 
+  TDownloadState = (Completed, Failed, Paused, Pending, Running, Unknown);
+
   TCustomPlatformWebBrowserExt = class(TObject)
   private
     FCaptureBitmapHandler: TCaptureBitmapProc;
     FWebBrowserExt: TWebBrowserExt;
     function GetBrowser: TWebBrowser;
+    function GetDefaultDownloadsFolder: string;
   protected
     procedure BitmapCaptured(const ABitmap: TBitmap);
     procedure CaptureBitmap(const AHandler: TCaptureBitmapProc);
     procedure ClearCache(const ADataKinds: TCacheDataKinds); virtual;
     procedure DoCaptureBitmap; virtual;
+    procedure DoDownloadStateChange(const AFileName: string; const AState: TDownloadState);
+    procedure DoDownloadStart(const AUri, AMimeType: string; var AFileName: string);
     procedure DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean); virtual;
     procedure ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc); virtual;
     procedure FlushCookies(const ARemove: Boolean); virtual;
@@ -55,19 +60,27 @@ type
     procedure ResetZoom; virtual;
     procedure SetAllowZoom(const AValue: Boolean); virtual;
     procedure SetInitialScale(const AValue: Integer); virtual;
+    property DefaultDownloadsFolder: string read GetDefaultDownloadsFolder;
   public
     constructor Create(const AWebBrowserExt: TWebBrowserExt); virtual;
     property Browser: TWebBrowser read GetBrowser;
   end;
 
   TElementClickEvent = procedure(Sender: TObject; const HitTestKind: THitTestKind; const Extra: string; var PreventDefault: Boolean) of object;
+  TDownloadStartEvent = procedure(Sender: TObject; const Uri, FileExt: string; var FileName: string) of object;
+  TDownloadStateChangeEvent = procedure(Sender: TObject; const FileName: string; const State: TDownloadState) of object;
 
   TWebBrowserExt = class(TComponent)
   private
     FBrowser: TWebBrowser;
+    FDefaultDownloadsFolder: string;
     FPlatformWebBrowserExt: TCustomPlatformWebBrowserExt;
+    FOnDownloadStateChange: TDownloadStateChangeEvent;
+    FOnDownloadStart: TDownloadStartEvent;
     FOnElementClick: TElementClickEvent;
   protected
+    procedure DoDownloadStateChange(const AFileName: string; const AState: TDownloadState);
+    procedure DoDownloadStart(const AUri, AFileExt: string; var AFileName: string);
     procedure DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean);
     property Browser: TWebBrowser read FBrowser;
   public
@@ -82,13 +95,20 @@ type
     procedure ResetZoom;
     procedure SetAllowZoom(const AValue: Boolean);
     procedure SetInitialScale(const AValue: Integer);
+    property DefaultDownloadsFolder: string read FDefaultDownloadsFolder write FDefaultDownloadsFolder;
+    property OnDownloadStart: TDownloadStartEvent read FOnDownloadStart write FOnDownloadStart;
+    property OnDownloadStateChange: TDownloadStateChangeEvent read FOnDownloadStateChange write FOnDownloadStateChange;
     property OnElementClick: TElementClickEvent read FOnElementClick write FOnElementClick;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
+  System.SysUtils, System.Net.Mime, System.IOUtils,
+
+  DW.OSLog,
+
+  DW.IOUtils.Helpers,
 {$IF Defined(ANDROID)}
   DW.WebBrowserExt.Android;
 {$ENDIF}
@@ -135,6 +155,21 @@ begin
   BitmapCaptured(nil);
 end;
 
+procedure TCustomPlatformWebBrowserExt.DoDownloadStateChange(const AFileName: string; const AState: TDownloadState);
+begin
+  FWebBrowserExt.DoDownloadStateChange(AFileName, AState);
+end;
+
+procedure TCustomPlatformWebBrowserExt.DoDownloadStart(const AUri, AMimeType: string; var AFileName: string);
+var
+  LKind: TMimeTypes.TKind;
+  LFileExt: string;
+begin
+  if TMimeTypes.Default.GetTypeInfo(AMimeType, LFileExt, LKind) then
+    LFileExt := '.' + LFileExt;
+  FWebBrowserExt.DoDownloadStart(AUri, LFileExt, AFileName);
+end;
+
 procedure TCustomPlatformWebBrowserExt.DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean);
 begin
   FWebBrowserExt.DoElementClick(AHitTestKind, AExtra, APreventDefault);
@@ -153,6 +188,11 @@ end;
 function TCustomPlatformWebBrowserExt.GetBrowser: TWebBrowser;
 begin
   Result := FWebBrowserExt.Browser;
+end;
+
+function TCustomPlatformWebBrowserExt.GetDefaultDownloadsFolder: string;
+begin
+  Result := FWebBrowserExt.DefaultDownloadsFolder;
 end;
 
 procedure TCustomPlatformWebBrowserExt.GetElementValueByName(const AName: string; const AHandler: TJavaScriptResultProc);
@@ -189,6 +229,19 @@ end;
 
 { TWebBrowserExt }
 
+constructor TWebBrowserExt.Create(AOwner: TComponent);
+begin
+  inherited;
+  if AOwner is TWebBrowser then
+    FBrowser := TWebBrowser(AOwner);
+  FPlatformWebBrowserExt := TPlatformWebBrowserExt.Create(Self);
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  FDefaultDownloadsFolder := TPath.Combine(TPath.GetDocumentsPath, 'Downloads');
+  {$ELSE}
+  FDefaultDownloadsFolder := TPath.Combine(TPath.Combine(TPath.GetSharedDocumentsPath, TPathHelper.GetAppName), 'Downloads');
+  {$ENDIF}
+end;
+
 procedure TWebBrowserExt.CaptureBitmap(const AHandler: TCaptureBitmapProc);
 begin
   FPlatformWebBrowserExt.CaptureBitmap(AHandler);
@@ -199,12 +252,16 @@ begin
   FPlatformWebBrowserExt.ClearCache(ADataKinds);
 end;
 
-constructor TWebBrowserExt.Create(AOwner: TComponent);
+procedure TWebBrowserExt.DoDownloadStateChange(const AFileName: string; const AState: TDownloadState);
 begin
-  inherited;
-  if AOwner is TWebBrowser then
-    FBrowser := TWebBrowser(AOwner);
-  FPlatformWebBrowserExt := TPlatformWebBrowserExt.Create(Self);
+  if Assigned(FOnDownloadStateChange) then
+    FOnDownloadStateChange(Self, AFileName, AState);
+end;
+
+procedure TWebBrowserExt.DoDownloadStart(const AUri, AFileExt: string; var AFileName: string);
+begin
+  if Assigned(FOnDownloadStart) then
+    FOnDownloadStart(Self, AUri, AFileExt, AFileName);
 end;
 
 procedure TWebBrowserExt.DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean);
