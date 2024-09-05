@@ -15,17 +15,18 @@ interface
 
 uses
   // Android
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App;
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.App, Androidapi.JNI.Media;
 
 type
   JDWUtility = interface;
 
   JDWUtilityClass = interface(JObjectClass)
     ['{CD282406-0D42-4EEE-B42E-24E79D058B30}']
-    {class} function isPackageInstalled(context: JContext; packageName: JString): Boolean; cdecl;
     {class} procedure crashTest; cdecl;
     {class} function createObjectMap: JMap; cdecl;
     {class} function getScreenBrightness(activity: JActivity): Single; cdecl;
+    {class} function imageToBitmap(image: JImage): JBitmap; cdecl;
+    {class} function isPackageInstalled(context: JContext; packageName: JString): Boolean; cdecl;
     {class} procedure setScreenBrightness(activity: JActivity; brightness: Single); cdecl;
   end;
 
