@@ -75,6 +75,7 @@ const
   AVQueuedSampleBufferRenderingStatusUnknown = 0;
   AVQueuedSampleBufferRenderingStatusRendering = 1;
   AVQueuedSampleBufferRenderingStatusFailed = 2;
+  AVCaptureDevicePositionUnspecified = 0;
 
 type
   AVAssetExportSession = interface;
@@ -99,6 +100,7 @@ type
   AVAudioEnvironmentDistanceAttenuationParameters = interface;
   AVAudioUnitEQFilterParameters = interface;
   AVAudioEnvironmentReverbParameters = interface;
+  AVCaptureDeviceDiscoverySession = interface;
   AVMetadataItemFilter = interface;
   AVSampleBufferVideoRenderer = interface;
   AVSampleBufferDisplayLayer = interface;
@@ -805,8 +807,30 @@ type
   end;
   TAVSampleBufferDisplayLayer = class(TOCGenericImport<AVSampleBufferDisplayLayerClass, AVSampleBufferDisplayLayer>) end;
 
+  AVCaptureDeviceDiscoverySessionClass = interface(NSObjectClass)
+    ['{D8610740-BB03-477C-9D37-E4046A55CA63}']
+    {class} function discoverySessionWithDeviceTypes(deviceTypes: NSArray; mediaType: AVMediaType;
+      position: AVCaptureDevicePosition): AVCaptureDeviceDiscoverySession; cdecl;
+  end;
+
+  AVCaptureDeviceDiscoverySession = interface(NSObject)
+    ['{E9EA1B3A-D0E8-47C7-90E1-4392D6984971}']
+    function devices: NSArray; cdecl;
+    function supportedMultiCamDeviceSets: NSArray; cdecl;
+  end;
+  TAVCaptureDeviceDiscoverySession = class(TOCGenericImport<AVCaptureDeviceDiscoverySessionClass, AVCaptureDeviceDiscoverySession>) end;
+
 function AVAudioSessionCategoryRecord: NSString;
 function AVAudioSessionModeMeasurement: NSString;
+function AVCaptureDeviceTypeBuiltInWideAngleCamera: AVCaptureDeviceType;
+function AVCaptureDeviceTypeBuiltInTelephotoCamera: AVCaptureDeviceType;
+function AVCaptureDeviceTypeBuiltInUltraWideCamera: AVCaptureDeviceType;
+function AVCaptureDeviceTypeBuiltInDualCamera: AVCaptureDeviceType;
+function AVCaptureDeviceTypeBuiltInDualWideCamera: AVCaptureDeviceType;
+function AVCaptureDeviceTypeBuiltInTripleCamera: AVCaptureDeviceType;
+function AVCaptureDeviceTypeBuiltInTrueDepthCamera: AVCaptureDeviceType;
+function AVCaptureDeviceTypeBuiltInLiDARDepthCamera: AVCaptureDeviceType;
+function AVCaptureDeviceTypeContinuityCamera: AVCaptureDeviceType;
 
 implementation
 
@@ -819,6 +843,52 @@ function AVAudioSessionModeMeasurement: NSString;
 begin
   Result := CocoaNSStringConst(libAVFoundation, 'AVAudioSessionModeMeasurement');
 end;
+
+function AVCaptureDeviceTypeBuiltInWideAngleCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeBuiltInWideAngleCamera');
+end;
+
+function AVCaptureDeviceTypeBuiltInTelephotoCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeBuiltInTelephotoCamera');
+end;
+
+function AVCaptureDeviceTypeBuiltInUltraWideCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeBuiltInUltraWideCamera');
+end;
+
+function AVCaptureDeviceTypeBuiltInDualCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeBuiltInDualCamera');
+end;
+
+function AVCaptureDeviceTypeBuiltInDualWideCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeBuiltInDualWideCamera');
+end;
+
+function AVCaptureDeviceTypeBuiltInTripleCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeBuiltInTripleCamera');
+end;
+
+function AVCaptureDeviceTypeBuiltInTrueDepthCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeBuiltInTrueDepthCamera');
+end;
+
+function AVCaptureDeviceTypeBuiltInLiDARDepthCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeBuiltInLiDARDepthCamera');
+end;
+
+function AVCaptureDeviceTypeContinuityCamera: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureDeviceTypeContinuityCamera');
+end;
+
 
 end.
 
