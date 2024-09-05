@@ -71,6 +71,7 @@ type
   TNSArrayHelper = record
   public
     class function FromNSObjects(const AArray: array of NSObject): NSArray; static;
+    class function FromNSStrings(const AArray: array of NSString): NSArray; static;
   end;
 
   TNSDataHelper = record
@@ -317,6 +318,17 @@ end;
 { TNSArrayHelper }
 
 class function TNSArrayHelper.FromNSObjects(const AArray: array of NSObject): NSArray;
+var
+  I: Integer;
+  LArray: NSMutableArray;
+begin
+  LArray := TNSMutableArray.Create;
+  for I := 0 to Length(AArray) - 1 do
+    LArray.addObject(NSObjectToID(AArray[I]));
+  Result := LArray;
+end;
+
+class function TNSArrayHelper.FromNSStrings(const AArray: array of NSString): NSArray;
 var
   I: Integer;
   LArray: NSMutableArray;
