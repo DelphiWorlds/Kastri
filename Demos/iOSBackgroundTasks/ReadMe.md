@@ -6,6 +6,10 @@ This project demonstrates the use of an implementation of background tasks on iO
 
 **NOTE: This code will work ONLY on iOS 13 and above**
 
+Note also that background tasks on iOS are **short lived**. App Refresh tasks typically run < 30 seconds, and Processing tasks for up to a few minutes.
+
+They **do NOT run continuously**, like services can (to some extent) on Android.
+
 ## TCustomBackgroundTask
 
 This class is provided for developers who wish to have finer grained control over the background task. Create a descendant of this class and override at least the abstract methods:
