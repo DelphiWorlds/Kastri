@@ -1,0 +1,20 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 824
+  ClientWidth = 580
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Image1: TImage
+    MultiResBitmap = <
+      item
+      end>
+    Align = Center
+    Size.Width = 414.000000000000000000
+    Size.Height = 244.000000000000000000
+    Size.PlatformDefault = False
+  end
+end
