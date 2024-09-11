@@ -77,6 +77,7 @@ type
     FImageURL: string;
     FIsCritical: Boolean;
     FIsDataOnly: Boolean;
+    FIsSilent: Boolean;
     FOptions: TFCMMessageOptions;
     FPriority: TFCMMessagePriority;
     FSoundName: string;
@@ -98,10 +99,31 @@ type
     property Body: string read FBody write FBody;
     property ChannelID: string read FChannelID write FChannelID;
     property ClickAction: string read FClickAction write FClickAction;
+    /// <summary>
+    ///   Additional information to include in the data member of the payload. Needs to be valid JSON, with string properties *only*
+    /// </summary>
     property Data: string read FData write FData;
+    /// <summary>
+    ///   Used by the Kastri client-side implementation of FCM to display an optional image with the notification
+    /// </summary>
     property ImageURL: string read FImageURL write FImageURL;
+    /// <summary>
+    ///   Indicates that the message is critical - currently applies to iOS only
+    /// </summary>
     property IsCritical: Boolean read FIsCritical write FIsCritical;
+    /// <summary>
+    ///   Indicates whether or not a notification member should be included in the Android part of the payload
+    /// </summary>
+    /// <remarks>
+    ///   This should be set to True if the Kastri client-side implementation of FCM for Android is being used, so that messages can be handled
+    ///   in both the *background* and foreground. Please see this link for further explanation:
+    ///     https://firebase.google.com/docs/cloud-messaging/android/receive
+    /// </remarks>
     property IsDataOnly: Boolean read FIsDataOnly write FIsDataOnly;
+    /// <summary>
+    ///   Used by the Kastri client-side implementation of FCM to indicate that a notification should not be shown
+    /// </summary>
+    property IsSilent: Boolean read FIsSilent write FIsSilent;
     property Options: TFCMMessageOptions read FOptions write FOptions;
     property Priority: TFCMMessagePriority read FPriority write FPriority;
     property SoundName: string read FSoundName write FSoundName;
@@ -524,6 +546,8 @@ begin
       LData.AddPair('big_text', '1');
     if not FImageURL.IsEmpty and (TFCMMessageOption.BigImage in FOptions) then
       LData.AddPair('big_image', '1');
+    if IsSilent then
+      LData.AddPair('isSilent', '1');
     if FIsDataOnly then
     begin
       LData.AddPair('title', TJSONString.Create(FTitle));
