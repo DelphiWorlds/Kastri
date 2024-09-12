@@ -33,6 +33,7 @@ type
   public
     class procedure CopyImageToClipboard(const AImage: TStream); static;
     class function GetBrightness: Single; static;
+    class function GetLuminance(const AColor: TAlphaColor): Single; static;
     class function GetNavigationBarOffset: Single; static;
     /// <summary>
     ///   Special function for handling of "notch" based devices
@@ -106,6 +107,14 @@ begin
   {$ENDIF}
 end;
 
+class function TUIHelper.GetLuminance(const AColor: TAlphaColor): Single;
+var
+  LRec: TAlphaColorRec;
+begin
+  LRec := TAlphaColorRec(AColor);
+  Result := (LRec.R * 0.299) + (LRec.G * 0.587) + (LRec.B * 0.114);
+end;
+
 class function TUIHelper.GetNavigationBarOffset: Single;
 begin
   {$IF Defined(Android)}
@@ -140,11 +149,8 @@ begin
 end;
 
 class function TUIHelper.GetTextColor(const ABackgroundColor: TAlphaColor; const AFactor: Single = 1): TAlphaColor;
-var
-  LRec: TAlphaColorRec;
 begin
-  LRec := TAlphaColorRec(ABackgroundColor);
-  if ((LRec.R * 0.299) + (LRec.G * 0.587) + (LRec.B * 0.114)) * AFactor > 127 then
+  if GetLuminance(ABackgroundColor) * AFactor > 127 then
     Result := TAlphaColorRec.Black
   else
     Result := TAlphaColorRec.White;
