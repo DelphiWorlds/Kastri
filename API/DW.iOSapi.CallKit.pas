@@ -21,11 +21,15 @@ uses
 
 const
   CXErrorCodeUnknownError = 0;
+  CXErrorCodeUnentitled = 1;
+  CXErrorCodeInvalidArgument = 2;
+  CXErrorCodeMissingVoIPBackgroundMode = 3;
   CXErrorCodeIncomingCallErrorUnknown = 0;
   CXErrorCodeIncomingCallErrorUnentitled = 1;
   CXErrorCodeIncomingCallErrorCallUUIDAlreadyExists = 2;
   CXErrorCodeIncomingCallErrorFilteredByDoNotDisturb = 3;
   CXErrorCodeIncomingCallErrorFilteredByBlockList = 4;
+  CXErrorCodeIncomingCallErrorFilteredDuringRestrictedSharingMode = 5;
   CXErrorCodeRequestTransactionErrorUnknown = 0;
   CXErrorCodeRequestTransactionErrorUnentitled = 1;
   CXErrorCodeRequestTransactionErrorUnknownCallProvider = 2;
@@ -43,6 +47,9 @@ const
   CXErrorCodeCallDirectoryManagerErrorExtensionDisabled = 6;
   CXErrorCodeCallDirectoryManagerErrorCurrentlyLoading = 7;
   CXErrorCodeCallDirectoryManagerErrorUnexpectedIncrementalRemoval = 8;
+  CXErrorCodeNotificationServiceExtensionErrorUnknown = 0;
+  CXErrorCodeNotificationServiceExtensionErrorInvalidClientProcess = 1;
+  CXErrorCodeNotificationServiceExtensionErrorMissingNotificationFilteringEntitlement = 2;
   CXHandleTypeGeneric = 1;
   CXHandleTypePhoneNumber = 2;
   CXHandleTypeEmailAddress = 3;
@@ -87,25 +94,28 @@ type
   CXErrorCodeIncomingCallError = NSInteger;
   CXErrorCodeRequestTransactionError = NSInteger;
   CXErrorCodeCallDirectoryManagerError = NSInteger;
+  CXErrorCodeNotificationServiceExtensionError = NSInteger;
   CXHandleType = NSInteger;
   CXPlayDTMFCallActionType = NSInteger;
   CXCallEndedReason = NSInteger;
   CXCallDirectoryPhoneNumber = Int64;
   CXCallDirectoryEnabledStatus = NSInteger;
+
   NSErrorDomain = NSString;
 
   TCXProviderBlockMethod1 = procedure(error: NSError) of object;
+  TCXProviderBlockMethod2 = procedure(param1: NSError) of object;
   TCXCallControllerBlockMethod1 = procedure(error: NSError) of object;
   TCXCallDirectoryManagerBlockMethod1 = procedure(error: NSError) of object;
   TCXCallDirectoryManagerBlockMethod2 = procedure(enabledStatus: CXCallDirectoryEnabledStatus; error: NSError) of object;
   TCXCallDirectoryExtensionContextBlockMethod1 = procedure(expired: Boolean) of object;
 
   CXActionClass = interface(NSObjectClass)
-    ['{0BC6FA95-53FA-47E0-96ED-5CCD98E5810D}']
+    ['{808DEE02-E462-4F11-A9B2-F558DDBC32F4}']
   end;
 
   CXAction = interface(NSObject)
-    ['{601E4B2B-F9C9-49D9-9289-6E475E80C745}']
+    ['{D238957E-AF0B-4182-B600-27E802547A07}']
     procedure fail; cdecl;
     procedure fulfill; cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
@@ -116,11 +126,11 @@ type
   TCXAction = class(TOCGenericImport<CXActionClass, CXAction>) end;
 
   CXTransactionClass = interface(NSObjectClass)
-    ['{B2000E61-3A4D-486A-96FC-9759033BD35A}']
+    ['{E828AC79-F61B-4249-A7C5-F344028FF21C}']
   end;
 
   CXTransaction = interface(NSObject)
-    ['{1F562EF3-F025-4D65-85C4-4007A8D78D0F}']
+    ['{370F88D9-7420-49C7-BE29-670E82B9D8CB}']
     function actions: NSArray; cdecl;
     procedure addAction(action: CXAction); cdecl;
     function initWithAction(action: CXAction): Pointer; cdecl;
@@ -131,11 +141,11 @@ type
   TCXTransaction = class(TOCGenericImport<CXTransactionClass, CXTransaction>) end;
 
   CXCallUpdateClass = interface(NSObjectClass)
-    ['{C188915D-7DED-4A2A-9FDF-DF100369AA3E}']
+    ['{F64ED29F-D47F-4EDE-88DA-FF39B6647CBC}']
   end;
 
   CXCallUpdate = interface(NSObject)
-    ['{9C231A14-0495-4CA3-9717-014F6F8ECE9B}']
+    ['{4A27650B-0273-48AF-A1F9-B8E7D2018947}']
     function hasVideo: Boolean; cdecl;
     function localizedCallerName: NSString; cdecl;
     function remoteHandle: CXHandle; cdecl;
@@ -154,13 +164,12 @@ type
   TCXCallUpdate = class(TOCGenericImport<CXCallUpdateClass, CXCallUpdate>) end;
 
   CXHandleClass = interface(NSObjectClass)
-    ['{6537340C-1650-4CE8-8B8B-4696EE6A2483}']
+    ['{C0733FFA-870A-4A3E-B9AF-84E247F5E741}']
   end;
 
   CXHandle = interface(NSObject)
-    ['{AA749A4D-0911-40D7-A0BF-81EAD0B1688C}']
+    ['{7560D908-DEEF-4EBA-8DB4-F818FF31DA98}']
     function &type: CXHandleType; cdecl;
-    [MethodName('initWithType:value:')]
     function initWithType(&type: CXHandleType; value: NSString): Pointer; cdecl;
     function isEqualToHandle(handle: CXHandle): Boolean; cdecl;
     function value: NSString; cdecl;
@@ -168,11 +177,11 @@ type
   TCXHandle = class(TOCGenericImport<CXHandleClass, CXHandle>) end;
 
   CXCallActionClass = interface(CXActionClass)
-    ['{5CD966CA-FF28-4C3E-B789-0562F69276AA}']
+    ['{F0968238-54A1-48AC-988A-8170104088C5}']
   end;
 
   CXCallAction = interface(CXAction)
-    ['{0640511A-C60E-43CF-8FA3-84BC932275BE}']
+    ['{18CF20F2-D864-4BA3-93A9-2BB4E22E5D9F}']
     function callUUID: NSUUID; cdecl;
     function initWithCallUUID(callUUID: NSUUID): Pointer; cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
@@ -180,15 +189,14 @@ type
   TCXCallAction = class(TOCGenericImport<CXCallActionClass, CXCallAction>) end;
 
   CXStartCallActionClass = interface(CXCallActionClass)
-    ['{2A5E2FA0-6313-40BD-9734-E2FF192B003D}']
+    ['{5D20D385-241C-44E6-85AA-86E3FEED4D4A}']
   end;
 
   CXStartCallAction = interface(CXCallAction)
-    ['{DEC52AFA-91D6-42D3-AFA4-3618778B1EA2}']
+    ['{FE14BDDC-50CD-4004-BC75-4854BAF7ED32}']
     function contactIdentifier: NSString; cdecl;
     procedure fulfillWithDateStarted(dateStarted: NSDate); cdecl;
     function handle: CXHandle; cdecl;
-    [MethodName('initWithCallUUID:handle:')]
     function initWithCallUUID(callUUID: NSUUID; handle: CXHandle): Pointer; overload; cdecl;
     function initWithCallUUID(callUUID: NSUUID): Pointer; overload; cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
@@ -200,33 +208,32 @@ type
   TCXStartCallAction = class(TOCGenericImport<CXStartCallActionClass, CXStartCallAction>) end;
 
   CXAnswerCallActionClass = interface(CXCallActionClass)
-    ['{ABE5ED2B-E7EB-4009-8C36-F06E26AE4084}']
+    ['{369D17A5-D9E4-4DC9-9418-97116834696C}']
   end;
 
   CXAnswerCallAction = interface(CXCallAction)
-    ['{B20D92F4-3BBA-41EB-B7BB-ED1D9FBB9A50}']
+    ['{3875B204-2ECA-49D8-B1C8-6C737DFF52B2}']
     procedure fulfillWithDateConnected(dateConnected: NSDate); cdecl;
   end;
   TCXAnswerCallAction = class(TOCGenericImport<CXAnswerCallActionClass, CXAnswerCallAction>) end;
 
   CXEndCallActionClass = interface(CXCallActionClass)
-    ['{D820A11D-29B9-49C4-A0AB-DDAA9F911A3A}']
+    ['{591F27CE-64A5-4053-9308-54CC1EADCDBF}']
   end;
 
   CXEndCallAction = interface(CXCallAction)
-    ['{E202410F-B756-4DF7-891D-0616B987B78C}']
+    ['{EA6D2B72-BB60-4415-B4D0-DFD4783B9244}']
     procedure fulfillWithDateEnded(dateEnded: NSDate); cdecl;
   end;
   TCXEndCallAction = class(TOCGenericImport<CXEndCallActionClass, CXEndCallAction>) end;
 
   CXSetHeldCallActionClass = interface(CXCallActionClass)
-    ['{92428B28-E7DB-431A-B8D1-BA799B914585}']
+    ['{00821443-B143-4CF3-9286-9A0F2554553F}']
   end;
 
   CXSetHeldCallAction = interface(CXCallAction)
-    ['{69C091F8-D01C-4791-ACC0-DEC0E1D445FD}']
+    ['{EA254ADC-11DA-4510-9739-9D3688AA6CAB}']
     function initWithCallUUID(callUUID: NSUUID): Pointer; overload; cdecl;
-    [MethodName('initWithCallUUID:onHold:')]
     function initWithCallUUID(callUUID: NSUUID; onHold: Boolean): Pointer; overload; cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
     function isOnHold: Boolean; cdecl;
@@ -235,13 +242,12 @@ type
   TCXSetHeldCallAction = class(TOCGenericImport<CXSetHeldCallActionClass, CXSetHeldCallAction>) end;
 
   CXSetMutedCallActionClass = interface(CXCallActionClass)
-    ['{BEC9BC45-BE5B-4CAC-A390-3B7DE1DBB77B}']
+    ['{529B3161-447E-4376-B4D1-F879D69BB1B0}']
   end;
 
   CXSetMutedCallAction = interface(CXCallAction)
-    ['{02A82FC4-9B64-4393-8BAA-7051A3A0DF77}']
+    ['{2A7680CF-EEC4-40A5-9F77-5F6A4CAE9E2A}']
     function initWithCallUUID(callUUID: NSUUID): Pointer; overload; cdecl;
-    [MethodName('initWithCallUUID:muted:')]
     function initWithCallUUID(callUUID: NSUUID; muted: Boolean): Pointer; overload; cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
     function isMuted: Boolean; cdecl;
@@ -250,14 +256,13 @@ type
   TCXSetMutedCallAction = class(TOCGenericImport<CXSetMutedCallActionClass, CXSetMutedCallAction>) end;
 
   CXSetGroupCallActionClass = interface(CXCallActionClass)
-    ['{7BEA7EBD-0E88-42DA-8F49-37F7BA7C5282}']
+    ['{EE21C9E1-5F99-4A14-B519-5C04DEDF65A1}']
   end;
 
   CXSetGroupCallAction = interface(CXCallAction)
-    ['{950121EB-281C-4C68-BEA6-8B650D285ECD}']
+    ['{3973E64A-1822-45B0-BEB4-5194BF30C153}']
     function callUUIDToGroupWith: NSUUID; cdecl;
     function initWithCallUUID(callUUID: NSUUID): Pointer; overload; cdecl;
-    [MethodName('initWithCallUUID:callUUIDToGroupWith:')]
     function initWithCallUUID(callUUID: NSUUID; callUUIDToGroupWith: NSUUID): Pointer; overload; cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
     procedure setCallUUIDToGroupWith(callUUIDToGroupWith: NSUUID); cdecl;
@@ -265,15 +270,14 @@ type
   TCXSetGroupCallAction = class(TOCGenericImport<CXSetGroupCallActionClass, CXSetGroupCallAction>) end;
 
   CXPlayDTMFCallActionClass = interface(CXCallActionClass)
-    ['{F1CFE59F-8145-4AF7-9D90-D99DD123444A}']
+    ['{2217AA45-B4D7-4DAF-AD06-C8BD58233A0A}']
   end;
 
   CXPlayDTMFCallAction = interface(CXCallAction)
-    ['{8B144D1E-BE04-4BC8-A549-ED2F42210850}']
+    ['{119742BF-0AC2-4877-B75E-D36574B4E4E9}']
     function &type: CXPlayDTMFCallActionType; cdecl;
     function digits: NSString; cdecl;
     function initWithCallUUID(callUUID: NSUUID): Pointer; overload; cdecl;
-    [MethodName('initWithCallUUID:digits:type:')]
     function initWithCallUUID(callUUID: NSUUID; digits: NSString; &type: CXPlayDTMFCallActionType): Pointer; overload; cdecl;
     function initWithCoder(aDecoder: NSCoder): Pointer; cdecl;
     procedure setDigits(digits: NSString); cdecl;
@@ -282,71 +286,57 @@ type
   TCXPlayDTMFCallAction = class(TOCGenericImport<CXPlayDTMFCallActionClass, CXPlayDTMFCallAction>) end;
 
   CXProviderDelegate = interface(IObjectiveC)
-    ['{6807D9E8-1E00-4A14-AF94-159CBB4D1ED1}']
-    [MethodName('provider:didActivateAudioSession:')]
-    procedure providerDidActivateAudioSession(provider: CXProvider; audioSession: AVAudioSession); cdecl;
+    ['{A804F9B5-DC0A-4A5E-8F55-D31A29380FBE}']
+    procedure provider(provider: CXProvider; didActivateAudioSession: AVAudioSession); overload; cdecl;
+    function provider(provider: CXProvider; executeTransaction: CXTransaction): Boolean; overload; cdecl;
+    procedure provider(provider: CXProvider; performAnswerCallAction: CXAnswerCallAction); overload; cdecl;
+    procedure provider(provider: CXProvider; performEndCallAction: CXEndCallAction); overload; cdecl;
+    procedure provider(provider: CXProvider; performPlayDTMFCallAction: CXPlayDTMFCallAction); overload; cdecl;
+    procedure provider(provider: CXProvider; performSetGroupCallAction: CXSetGroupCallAction); overload; cdecl;
+    procedure provider(provider: CXProvider; performSetHeldCallAction: CXSetHeldCallAction); overload; cdecl;
+    procedure provider(provider: CXProvider; performSetMutedCallAction: CXSetMutedCallAction); overload; cdecl;
+    procedure provider(provider: CXProvider; performStartCallAction: CXStartCallAction); overload; cdecl;
+    procedure provider(provider: CXProvider; timedOutPerformingAction: CXAction); overload; cdecl;
     procedure providerDidBegin(provider: CXProvider); cdecl;
     [MethodName('provider:didDeactivateAudioSession:')]
-    procedure providerDidDeactivateAudioSession(provider: CXProvider; audioSession: AVAudioSession); cdecl;
+    procedure providerDidDeactivateAudioSession(provider: CXProvider; didDeactivateAudioSession: AVAudioSession); cdecl;
     procedure providerDidReset(provider: CXProvider); cdecl;
-    [MethodName('provider:executeTransaction:')]
-    function providerExecuteTransaction(provider: CXProvider; transaction: CXTransaction): Boolean; cdecl;
-    [MethodName('provider:performAnswerCallAction:')]
-    procedure providerPerformAnswerCallAction(provider: CXProvider; action: CXAnswerCallAction); cdecl;
-    [MethodName('provider:performEndCallAction:')]
-    procedure providerPerformEndCallAction(provider: CXProvider; action: CXEndCallAction); cdecl;
-    [MethodName('provider:performPlayDTMFCallAction:')]
-    procedure providerPerformPlayDTMFCallAction(provider: CXProvider; action: CXPlayDTMFCallAction); cdecl;
-    [MethodName('provider:performSetGroupCallAction:')]
-    procedure providerPerformSetGroupCallAction(provider: CXProvider; action: CXSetGroupCallAction); cdecl;
-    [MethodName('provider:performSetHeldCallAction:')]
-    procedure providerPerformSetHeldCallAction(provider: CXProvider; action: CXSetHeldCallAction); cdecl;
-    [MethodName('provider:performSetMutedCallAction:')]
-    procedure providerPerformSetMutedCallAction(provider: CXProvider; action: CXSetMutedCallAction); cdecl;
-    [MethodName('provider:performStartCallAction:')]
-    procedure providerPerformStartCallAction(provider: CXProvider; action: CXStartCallAction); cdecl;
-    [MethodName('provider:timedOutPerformingAction:')]
-    procedure providerTimedOutPerformingAction(provider: CXProvider; action: CXAction); cdecl;
   end;
 
   CXProviderClass = interface(NSObjectClass)
-    ['{7BF8DF68-25EF-4A4F-8CDE-913FE27D41D4}']
+    ['{8F618640-09C3-41CD-B53F-020F97867BC3}']
+    {class} function new: Pointer; cdecl;
+    {class} procedure reportNewIncomingVoIPPushPayload(dictionaryPayload: NSDictionary; completion: TCXProviderBlockMethod2); cdecl;
   end;
 
   CXProvider = interface(NSObject)
-    ['{484DE01D-A986-4541-8E65-F7BA440A0FBB}']
+    ['{C84B5415-7C52-44DB-8B1A-2E4EEBC2FA2C}']
     function configuration: CXProviderConfiguration; cdecl;
     function initWithConfiguration(configuration: CXProviderConfiguration): Pointer; cdecl;
     procedure invalidate; cdecl;
-    [MethodName('pendingCallActionsOfClass:withCallUUID:')]
-    function pendingCallActionsOfClass(callActionClass: Pointer; callUUID: NSUUID): NSArray; cdecl;
+    function pendingCallActionsOfClass(callActionClass: Pointer; withCallUUID: NSUUID): NSArray; cdecl;
     function pendingTransactions: NSArray; cdecl;
-    [MethodName('reportCallWithUUID:endedAtDate:reason:')]
-    procedure reportCallWithUUID(UUID: NSUUID; dateEnded: NSDate; endedReason: CXCallEndedReason); overload; cdecl;
-    [MethodName('reportCallWithUUID:updated:')]
-    procedure reportCallWithUUID(UUID: NSUUID; update: CXCallUpdate); overload; cdecl;
-    [MethodName('reportNewIncomingCallWithUUID:update:completion:')]
+    procedure reportCallWithUUID(UUID: NSUUID; updated: CXCallUpdate); overload; cdecl;
+    procedure reportCallWithUUID(UUID: NSUUID; endedAtDate: NSDate; reason: CXCallEndedReason); overload; cdecl;
     procedure reportNewIncomingCallWithUUID(UUID: NSUUID; update: CXCallUpdate; completion: TCXProviderBlockMethod1); cdecl;
+    procedure reportOutgoingCallWithUUID(UUID: NSUUID; startedConnectingAtDate: NSDate); cdecl;
     [MethodName('reportOutgoingCallWithUUID:connectedAtDate:')]
-    procedure reportOutgoingCallWithUUIDConnectedAtDate(UUID: NSUUID; dateConnected: NSDate); cdecl;
-    [MethodName('reportOutgoingCallWithUUID:startedConnectingAtDate:')]
-    procedure reportOutgoingCallWithUUIDStartedConnectingAtDate(UUID: NSUUID; dateStartedConnecting: NSDate); cdecl;
+    procedure reportOutgoingCallWithUUIDConnectedAtDate(UUID: NSUUID; connectedAtDate: NSDate); cdecl;
     procedure setConfiguration(configuration: CXProviderConfiguration); cdecl;
-    [MethodName('setDelegate:queue:')]
     procedure setDelegate(delegate: Pointer; queue: dispatch_queue_t); cdecl;
   end;
   TCXProvider = class(TOCGenericImport<CXProviderClass, CXProvider>) end;
 
   CXProviderConfigurationClass = interface(NSObjectClass)
-    ['{99BB3897-A3E2-4D31-BD59-096400D5D6F4}']
+    ['{DD0145B3-FBEB-4965-9AF4-EC082B078FDC}']
   end;
 
   CXProviderConfiguration = interface(NSObject)
-    ['{39D4B0DE-5B53-4CF2-9C57-240516DD6391}']
+    ['{FBF8824E-EB76-4F7E-B7DA-FE40601FE2B0}']
     function iconTemplateImageData: NSData; cdecl;
     function includesCallsInRecents: Boolean; cdecl;
-    function initWithLocalizedName(localizedName: NSString): Pointer; cdecl;
-    function localizedName: NSString; cdecl;
+    function initWithLocalizedName(localizedName: NSString): Pointer; cdecl; // API_DEPRECATED_WITH_REPLACEMENT("init", ios(10.0, 14.0), macCatalyst(13.0, 14.0), macos(11.0, 11.0))
+    function localizedName: NSString; cdecl; // API_DEPRECATED("No longer supported", ios(10.0, 14.0), macCatalyst(13.0, 14.0), macos(11.0, 11.0))
     function maximumCallGroups: NSUInteger; cdecl;
     function maximumCallsPerCallGroup: NSUInteger; cdecl;
     function ringtoneSound: NSString; cdecl;
@@ -363,11 +353,11 @@ type
   TCXProviderConfiguration = class(TOCGenericImport<CXProviderConfigurationClass, CXProviderConfiguration>) end;
 
   CXCallClass = interface(NSObjectClass)
-    ['{35901EB7-6436-4F0E-8DAF-C5DE81140DE1}']
+    ['{EF896431-D53D-4897-A4CE-319A2B9B06BC}']
   end;
 
   CXCall = interface(NSObject)
-    ['{5D8DD558-129F-48FA-BDD1-BFB8289DD875}']
+    ['{2CC6A1DE-88AF-4B62-8392-54FCCBE73654}']
     function hasConnected: Boolean; cdecl;
     function hasEnded: Boolean; cdecl;
     function isEqualToCall(call: CXCall): Boolean; cdecl;
@@ -378,80 +368,71 @@ type
   TCXCall = class(TOCGenericImport<CXCallClass, CXCall>) end;
 
   CXCallObserverDelegate = interface(IObjectiveC)
-    ['{26587E79-C708-4EA0-8232-23C1152D3D0D}']
-    [MethodName('callObserver:callChanged:')]
-    procedure callObserverCallChanged(callObserver: CXCallObserver; call: CXCall); cdecl;
+    ['{EB2FC593-6A13-4A45-A834-4ECF70C04EC4}']
+    procedure callObserver(callObserver: CXCallObserver; callChanged: CXCall); cdecl;
   end;
 
   CXCallObserverClass = interface(NSObjectClass)
-    ['{4D7F0CC6-1872-4641-81B8-409AFCEF2306}']
+    ['{BD06FEAB-4567-46A6-A3E5-8F3CA12BC304}']
   end;
 
   CXCallObserver = interface(NSObject)
-    ['{00FC5D81-86A1-452D-B9ED-AFA4C59D9316}']
+    ['{CB0CED99-2D74-429F-A5DC-838F1FCF5404}']
     function calls: NSArray; cdecl;
-    [MethodName('setDelegate:queue:')]
     procedure setDelegate(delegate: Pointer; queue: dispatch_queue_t); cdecl;
   end;
   TCXCallObserver = class(TOCGenericImport<CXCallObserverClass, CXCallObserver>) end;
 
   CXCallControllerClass = interface(NSObjectClass)
-    ['{AA8C91AF-348F-4EAD-B34D-B8E73490CBD7}']
+    ['{59918814-A06D-4FDC-86A3-4AFBE91480C8}']
   end;
 
   CXCallController = interface(NSObject)
-    ['{6CDB9032-EAD6-48F4-9D27-53B484AAB8C0}']
+    ['{20DCC1BD-ECB1-4444-989A-E62BB5830635}']
     function callObserver: CXCallObserver; cdecl;
     function initWithQueue(queue: dispatch_queue_t): Pointer; cdecl;
-    [MethodName('requestTransaction:completion:')]
     procedure requestTransaction(transaction: CXTransaction; completion: TCXCallControllerBlockMethod1); cdecl;
-    [MethodName('requestTransactionWithAction:completion:')]
     procedure requestTransactionWithAction(action: CXAction; completion: TCXCallControllerBlockMethod1); cdecl;
-    [MethodName('requestTransactionWithActions:completion:')]
     procedure requestTransactionWithActions(actions: NSArray; completion: TCXCallControllerBlockMethod1); cdecl;
   end;
   TCXCallController = class(TOCGenericImport<CXCallControllerClass, CXCallController>) end;
 
   CXCallDirectoryManagerClass = interface(NSObjectClass)
-    ['{8D8B3FB0-6AB8-4FE3-883B-DB12A4ECA4CF}']
+    ['{374AB20F-9019-4E94-872A-5CA76E75BD67}']
     {class} function sharedInstance: CXCallDirectoryManager; cdecl;
   end;
 
   CXCallDirectoryManager = interface(NSObject)
-    ['{8D15F50E-B44C-460A-BD5C-1786750E14FB}']
-    [MethodName('getEnabledStatusForExtensionWithIdentifier:completionHandler:')]
-    procedure getEnabledStatusForExtensionWithIdentifier(identifier: NSString; completion: TCXCallDirectoryManagerBlockMethod2); cdecl;
-    [MethodName('reloadExtensionWithIdentifier:completionHandler:')]
-    procedure reloadExtensionWithIdentifier(identifier: NSString; completion: TCXCallDirectoryManagerBlockMethod1); cdecl;
+    ['{25F48B83-5457-4A30-A4DC-53BF9BF5E7A6}']
+    procedure getEnabledStatusForExtensionWithIdentifier(identifier: NSString; completionHandler: TCXCallDirectoryManagerBlockMethod2); cdecl;
+    procedure openSettingsWithCompletionHandler(completion: TCXCallDirectoryManagerBlockMethod1); cdecl;
+    procedure reloadExtensionWithIdentifier(identifier: NSString; completionHandler: TCXCallDirectoryManagerBlockMethod1); cdecl;
   end;
   TCXCallDirectoryManager = class(TOCGenericImport<CXCallDirectoryManagerClass, CXCallDirectoryManager>) end;
 
   CXCallDirectoryProviderClass = interface(NSObjectClass)
-    ['{A830B6EB-E16E-44D5-A29E-44BCF5F30A4A}']
+    ['{6D54A2CD-212E-47F8-80A4-3F5C82CB82E2}']
   end;
 
   CXCallDirectoryProvider = interface(NSObject)
-    ['{14144AEF-DAC0-4D3A-99D8-1DB419BB8A26}']
+    ['{25089246-270B-411E-84BB-BD1B935AF9C9}']
     procedure beginRequestWithExtensionContext(context: CXCallDirectoryExtensionContext); cdecl;
   end;
   TCXCallDirectoryProvider = class(TOCGenericImport<CXCallDirectoryProviderClass, CXCallDirectoryProvider>) end;
 
   CXCallDirectoryExtensionContextDelegate = interface(IObjectiveC)
-    ['{3C0C1015-A050-45ED-8041-32ADD79B13E8}']
-    [MethodName('requestFailedForExtensionContext:withError:')]
-    procedure requestFailedForExtensionContext(extensionContext: CXCallDirectoryExtensionContext; error: NSError); cdecl;
+    ['{5E3A5987-A934-4B18-8D9F-E6B70C3D07E3}']
+    procedure requestFailedForExtensionContext(extensionContext: CXCallDirectoryExtensionContext; withError: NSError); cdecl;
   end;
 
   CXCallDirectoryExtensionContextClass = interface(NSExtensionContextClass)
-    ['{B8A10D37-089D-46CF-AA45-834100DCED51}']
+    ['{7267D205-2CAD-4E17-B4F6-485832F38F47}']
   end;
 
   CXCallDirectoryExtensionContext = interface(NSExtensionContext)
-    ['{3D06F744-421D-4C3F-B045-EC142E7C9559}']
+    ['{4F1BD324-E537-4EB9-97A2-F2C474B225BB}']
     procedure addBlockingEntryWithNextSequentialPhoneNumber(phoneNumber: CXCallDirectoryPhoneNumber); cdecl;
-    [MethodName('addIdentificationEntryWithNextSequentialPhoneNumber:label:')]
     procedure addIdentificationEntryWithNextSequentialPhoneNumber(phoneNumber: CXCallDirectoryPhoneNumber; &label: NSString); cdecl;
-    [MethodName('completeRequestReturningItems:completionHandler:')]
     procedure completeRequestReturningItems(items: NSArray; completionHandler: TCXCallDirectoryExtensionContextBlockMethod1); cdecl;
     procedure completeRequestWithCompletionHandler(completion: TCXCallDirectoryExtensionContextBlockMethod1); cdecl;
     function delegate: Pointer; cdecl;
@@ -468,19 +449,18 @@ function CXErrorDomain: NSErrorDomain;
 function CXErrorDomainIncomingCall: NSErrorDomain;
 function CXErrorDomainRequestTransaction: NSErrorDomain;
 function CXErrorDomainCallDirectoryManager: NSErrorDomain;
+function CXErrorDomainNotificationServiceExtension: NSErrorDomain;
 
 const
   libCallKit = '/System/Library/Frameworks/CallKit.framework/CallKit';
 
 implementation
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 uses
   Posix.Dlfcn;
 
 var
   CallKitModule: THandle;
-{$ENDIF}
 
 function CXErrorDomain: NSErrorDomain;
 begin
@@ -502,14 +482,15 @@ begin
   Result := CocoaNSStringConst(libCallKit, 'CXErrorDomainCallDirectoryManager');
 end;
 
-procedure CallKitLoader; cdecl; external libCallKit;
+function CXErrorDomainNotificationServiceExtension: NSErrorDomain;
+begin
+  Result := CocoaNSStringConst(libCallKit, 'CXErrorDomainNotificationServiceExtension');
+end;
 
-{$IF Defined(IOS) and not Defined(CPUARM)}
 initialization
   CallKitModule := dlopen(MarshaledAString(libCallKit), RTLD_LAZY);
 
 finalization
-  dlclose(CallKitModule)
-{$ENDIF}
+  dlclose(CallKitModule);
 
 end.
