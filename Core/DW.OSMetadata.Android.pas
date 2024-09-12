@@ -25,6 +25,7 @@ type
   public
     class function ContainsKey(const AKey: string): Boolean; static;
     class function GetValue(const AKey: string; var AValue: string): Boolean; overload; static;
+    class function GetValue(const AKey: string; var AValue: Integer): Boolean; overload; static;
     class function GetValue(const AKey: string; var AValue: Int64): Boolean; overload; static;
   end;
 
@@ -46,6 +47,13 @@ begin
     FMetadata := TAndroidHelper.Context.getPackageManager.getApplicationInfo(TAndroidHelper.Context.getPackageName, LFlags).metaData;
   end;
   Result := FMetadata;
+end;
+
+class function TPlatformOSMetadata.GetValue(const AKey: string; var AValue: Integer): Boolean;
+begin
+  Result := ContainsKey(AKey);
+  if Result then
+    AValue := GetMetadata.getInt(StringToJString(AKey));
 end;
 
 class function TPlatformOSMetadata.ContainsKey(const AKey: string): Boolean;
