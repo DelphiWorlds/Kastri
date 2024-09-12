@@ -97,8 +97,8 @@ public class DWFirebaseMessagingService extends FirebaseMessagingService {
       }
     }
     int appState = this.getApplicationState();
-    // If app is not running, or no callback is assigned, or app is foreground and needs the notification, present it
-    if ((appState == APP_STATE_NOT_RUNNING) || (mCallback == null) || (mCallback.getShowNotificationWhenForeground() && (appState == APP_STATE_FOREGROUND)))
+    // If app is not foreground, or no callback is assigned, or app is foreground and needs the notification, present it
+    if ((appState != APP_STATE_FOREGROUND) || (mCallback == null) || (mCallback.getShowNotificationWhenForeground() && (appState == APP_STATE_FOREGROUND)))
       DWNotificationPresenter.presentNotification(this, intent, channelId, icon);
     if (mCallback != null) {
       Log.d(TAG, "> mCallback.onNotificationReceived");
