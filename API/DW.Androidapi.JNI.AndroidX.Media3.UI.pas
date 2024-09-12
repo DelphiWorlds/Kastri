@@ -1,4 +1,4 @@
-unit DW.Androidapi.JNI.AndroidX.Media3.Ui;
+unit DW.Androidapi.JNI.AndroidX.Media3.UI;
 
 {*******************************************************}
 {                                                       }
@@ -22,7 +22,9 @@ uses
 type
   JAspectRatioFrameLayout_AspectRatioListener = interface;
   JCaptionStyleCompat = interface;
+  JPlayerControlView = interface;
   JPlayerControlView_OnFullScreenModeChangedListener = interface;
+  JPlayerControlView_ProgressUpdateListener = interface;
   JPlayerControlView_VisibilityListener = interface;
   JPlayerView = interface;
   JPlayerView_ControllerVisibilityListener = interface;
@@ -163,6 +165,64 @@ type
   end;
   TJPlayerView_ControllerVisibilityListener = class(TJavaGenericImport<JPlayerView_ControllerVisibilityListenerClass, JPlayerView_ControllerVisibilityListener>) end;
 
+  JPlayerControlViewClass = interface(JFrameLayoutClass)
+    ['{34A5F6D1-3F29-485B-ACCE-4E50ACF63197}']
+    {class} function _GetDEFAULT_REPEAT_TOGGLE_MODES: Integer; cdecl;
+    {class} function _GetDEFAULT_SHOW_TIMEOUT_MS: Integer; cdecl;
+    {class} function _GetDEFAULT_TIME_BAR_MIN_UPDATE_INTERVAL_MS: Integer; cdecl;
+    {class} function _GetMAX_WINDOWS_FOR_MULTI_WINDOW_TIME_BAR: Integer; cdecl;
+    {class} function init(context: JContext; attributeset: JAttributeSet): JPlayerControlView; overload; cdecl;
+    {class} function init(context: JContext; attributeset: JAttributeSet; int: Integer): JPlayerControlView; overload; cdecl;
+    {class} function init(context: JContext; attributeset: JAttributeSet; int: Integer; attributeset_1: JAttributeSet): JPlayerControlView; overload; cdecl;
+    {class} function init(context: JContext): JPlayerControlView; overload; cdecl;
+    {class} property DEFAULT_REPEAT_TOGGLE_MODES: Integer read _GetDEFAULT_REPEAT_TOGGLE_MODES;
+    {class} property DEFAULT_SHOW_TIMEOUT_MS: Integer read _GetDEFAULT_SHOW_TIMEOUT_MS;
+    {class} property DEFAULT_TIME_BAR_MIN_UPDATE_INTERVAL_MS: Integer read _GetDEFAULT_TIME_BAR_MIN_UPDATE_INTERVAL_MS;
+    {class} property MAX_WINDOWS_FOR_MULTI_WINDOW_TIME_BAR: Integer read _GetMAX_WINDOWS_FOR_MULTI_WINDOW_TIME_BAR;
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerControlView')]
+  JPlayerControlView = interface(JFrameLayout)
+    ['{7D21C814-FB6A-4C44-8128-008D488A7DA7}']
+    procedure addVisibilityListener(visibilitylistener: JPlayerControlView_VisibilityListener); cdecl;
+    function dispatchKeyEvent(keyevent: JKeyEvent): Boolean; cdecl;
+    function dispatchMediaKeyEvent(keyevent: JKeyEvent): Boolean; cdecl;
+    function getPlayer: JPlayer; cdecl;
+    function getRepeatToggleModes: Integer; cdecl;
+    function getShowShuffleButton: Boolean; cdecl;
+    function getShowSubtitleButton: Boolean; cdecl;
+    function getShowTimeoutMs: Integer; cdecl;
+    function getShowVrButton: Boolean; cdecl;
+    procedure hide; cdecl;
+    procedure hideImmediately; cdecl;
+    function isAnimationEnabled: Boolean; cdecl;
+    function isFullyVisible: Boolean; cdecl;
+    function isVisible: Boolean; cdecl;
+    procedure onAttachedToWindow; cdecl;
+    procedure onDetachedFromWindow; cdecl;
+    procedure removeVisibilityListener(visibilitylistener: JPlayerControlView_VisibilityListener); cdecl;
+    procedure setAnimationEnabled(boolean: Boolean); cdecl;
+    procedure setExtraAdGroupMarkers(longs: TJavaArray<Int64>; booleans: TJavaArray<Boolean>); cdecl;
+    procedure setOnFullScreenModeChangedListener(onfullscreenmodechangedlistener: JPlayerControlView_OnFullScreenModeChangedListener); cdecl;
+    procedure setPlayer(player: JPlayer); cdecl;
+    procedure setProgressUpdateListener(progressupdatelistener: JPlayerControlView_ProgressUpdateListener); cdecl;
+    procedure setRepeatToggleModes(int: Integer); cdecl;
+    procedure setShowFastForwardButton(boolean: Boolean); cdecl;
+    procedure setShowMultiWindowTimeBar(boolean: Boolean); cdecl;
+    procedure setShowNextButton(boolean: Boolean); cdecl;
+    procedure setShowPlayButtonIfPlaybackIsSuppressed(boolean: Boolean); cdecl;
+    procedure setShowPreviousButton(boolean: Boolean); cdecl;
+    procedure setShowRewindButton(boolean: Boolean); cdecl;
+    procedure setShowShuffleButton(boolean: Boolean); cdecl;
+    procedure setShowSubtitleButton(boolean: Boolean); cdecl;
+    procedure setShowTimeoutMs(int: Integer); cdecl;
+    procedure setShowVrButton(boolean: Boolean); cdecl;
+    procedure setTimeBarMinUpdateInterval(int: Integer); cdecl;
+    procedure setVrButtonListener(onclicklistener: JView_OnClickListener); cdecl;
+    procedure show; cdecl;
+  end;
+  TJPlayerControlView = class(TJavaGenericImport<JPlayerControlViewClass, JPlayerControlView>) end;
+
   JPlayerControlView_VisibilityListenerClass = interface(IJavaClass)
     ['{16F03EBB-8CFC-4032-836E-C8BC96A25225}']
   end;
@@ -184,6 +244,17 @@ type
     procedure onFullScreenModeChanged(boolean: Boolean); cdecl;
   end;
   TJPlayerControlView_OnFullScreenModeChangedListener = class(TJavaGenericImport<JPlayerControlView_OnFullScreenModeChangedListenerClass, JPlayerControlView_OnFullScreenModeChangedListener>) end;
+
+  JPlayerControlView_ProgressUpdateListenerClass = interface(IJavaClass)
+    ['{1FEF8744-3ABF-4D6C-A738-FACB5EB509E9}']
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerControlView$ProgressUpdateListener')]
+  JPlayerControlView_ProgressUpdateListener = interface(IJavaInstance)
+    ['{E1739926-3039-45A7-BA5F-504C10920B89}']
+    procedure onProgressUpdate(long: Int64; long_1: Int64); cdecl;
+  end;
+  TJPlayerControlView_ProgressUpdateListener = class(TJavaGenericImport<JPlayerControlView_ProgressUpdateListenerClass, JPlayerControlView_ProgressUpdateListener>) end;
 
   JCaptionStyleCompatClass = interface(JObjectClass)
     ['{FA96F5FE-32B9-4E10-9B24-5FA540DA6BDE}']
