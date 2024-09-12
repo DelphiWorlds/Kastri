@@ -734,6 +734,7 @@ type
   end;
   TJAudioSink_AudioTrackConfig = class(TJavaGenericImport<JAudioSink_AudioTrackConfigClass, JAudioSink_AudioTrackConfig>) end;
 
+  {$IF CompilerVersion < 36}
   JLogSessionIdClass = interface(JObjectClass)
     ['{D8C1D067-1565-4FFA-8AE8-E98DC75D0564}']
     {class} function _GetLOG_SESSION_ID_NONE: JLogSessionId; cdecl;
@@ -749,6 +750,7 @@ type
     function toString: JString; cdecl;
   end;
   TJLogSessionId = class(TJavaGenericImport<JLogSessionIdClass, JLogSessionId>) end;
+  {$ENDIF}
 
   JPlayerIdClass = interface(JObjectClass)
     ['{C59D0179-3A88-4C29-A34D-579A468C2624}']
