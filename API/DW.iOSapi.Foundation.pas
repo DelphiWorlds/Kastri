@@ -72,6 +72,7 @@ type
   NSAttributedStringFormattingContextKey = NSString;
   NSAttributedStringEnumerationOptions = NSInteger;
   NSQualityOfService = NSInteger;
+  NSFileProtectionType = NSString;
 
   NSItemProviderCompletionHandler = procedure(item: Pointer; error: NSError) of object;
   NSItemProviderLoadHandler = procedure(completionHandler: NSItemProviderCompletionHandler; expectedValueClass: Pointer; options: NSDictionary) of object;
