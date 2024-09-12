@@ -180,14 +180,14 @@ end;
 
 procedure TPlatformFCMManager.MessageReceivedNotificationHandler(const Sender: TObject; const AMsg: TMessage);
 var
-  LIcon: string;
+  LIcon: Integer;
   LIntent: JIntent;
 begin
   if ShowBannerIfForeground and IsForeground then
   begin
     LIntent := TMessageReceivedNotification(AMsg).Value;
     TOSMetadata.GetValue(cMetadataFCMDefaultNotificationIcon, LIcon);
-    TJDWNotificationPresenter.JavaClass.presentNotification(TAndroidHelper.Context, LIntent, StringToJString(FChannelId), StrToIntDef(LIcon, 0));
+    TJDWNotificationPresenter.JavaClass.presentNotification(TAndroidHelper.Context, LIntent, StringToJString(FChannelId), LIcon);
   end;
 end;
 
