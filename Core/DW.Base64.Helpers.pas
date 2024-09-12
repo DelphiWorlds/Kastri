@@ -51,7 +51,11 @@ type
     /// <summary>
     ///   Decodes a Base64 string and saves it to a file
     /// </summary>
-    class procedure DecodeToFile(const ASource, AFileName: string); static;
+    class procedure DecodeToFile(const ASource, AFileName: string); overload; static;
+    /// <summary>
+    ///   Decodes a Base64 stream and saves it to a file
+    /// </summary>
+    class procedure DecodeToFile(const ASource: TStream; const AFileName: string); overload; static;
     /// <summary>
     ///   Encodes a stream to a Base64 string
     /// </summary>
@@ -161,6 +165,19 @@ begin
   LStream := TMemoryStream.Create;
   try
     DecodeDecompress(ASource, LStream);
+    LStream.SaveToFile(AFileName);
+  finally
+    LStream.Free;
+  end;
+end;
+
+class procedure TBase64Helper.DecodeToFile(const ASource: TStream; const AFileName: string);
+var
+  LStream: TMemoryStream;
+begin
+  LStream := TMemoryStream.Create;
+  try
+    TNetEncoding.Base64.Decode(ASource, LStream);
     LStream.SaveToFile(AFileName);
   finally
     LStream.Free;
