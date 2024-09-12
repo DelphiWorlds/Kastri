@@ -26,6 +26,7 @@ type
   JAudioAttributes = interface;
   JAudioAttributes_AudioAttributesV21 = interface;
   JAuxEffectInfo = interface;
+  JBitmapLoader = interface;
   JBundleable_Creator = interface;
   JClock = interface;
   JColorInfo = interface;
@@ -81,6 +82,20 @@ type
   JTrackSelectionParameters_Builder = interface;
   JTracks = interface;
   JVideoSize = interface;
+
+  JBitmapLoaderClass = interface(IJavaClass)
+    ['{86BDB629-C94C-4845-B853-58D37AA024FE}']
+  end;
+
+  [JavaSignature('androidx/media3/common/util/BitmapLoader')]
+  JBitmapLoader = interface(IJavaInstance)
+    ['{516D03C5-E92B-48C0-A8CE-34D675B5E59E}']
+    function decodeBitmap(bytes: TJavaArray<Byte>): JListenableFuture; cdecl;
+    function loadBitmap(uri: Jnet_Uri): JListenableFuture; cdecl;
+    function loadBitmapFromMetadata(mediametadata: JMediaMetadata): JListenableFuture; cdecl;
+    function supportsMimeType(string_1: JString): Boolean; cdecl;
+  end;
+  TJBitmapLoader = class(TJavaGenericImport<JBitmapLoaderClass, JBitmapLoader>) end;
 
   JBasePlayerClass = interface(JObjectClass)
     ['{08D14E5F-172C-4189-8A90-2441B0C2E7B2}']
