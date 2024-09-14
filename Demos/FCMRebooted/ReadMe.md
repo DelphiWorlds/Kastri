@@ -4,9 +4,9 @@
 
 This incarnation of FCM support is a substantial reworking of the original FCM support in Kastri, however some elements remain.
 
-**NOTE: The demo has been updated (on Nov 8th, 2023) to align it with the Firebase iOS SDK v10.8.0**. See the [iOS](#ios) section below.
+In this implementation, support has been added for a customised notification on Android, using RemoteViews, similar to the [CustomNotification demo in the Playground repo](https://github.com/DelphiWorlds/Playground/tree/main/Demos/CustomNotification). This allows multiple lines of text in the notification banner, and an optional image, placed to the right of the text.
 
-In this implementation, support has been added for a customised notification **on Android**, using RemoteViews, similar to the [CustomNotification demo in the Playground repo](https://github.com/DelphiWorlds/Playground/tree/main/Demos/CustomNotification). This allows multiple lines of text in the notification banner, and an optional image, placed to the right of the text.
+For support of **images in notifications on iOS**, please refer to [this separate documentation](NotificationImagesOnIOS.md).
 
 The unit `DW.FCMManager` handles management of FCM, which is exposed as a reference to an interface: `IFCMManager`. Now you do not need to create any classes; just assign event handlers, and call the `Start` method on the `FCM` reference. 
 
@@ -21,7 +21,7 @@ There are 2 demos:
 
 ## Supported Delphi versions
 
-Delphi 12.x, Delphi 11.x. _There is no support for 10.4.x or earlier_
+Delphi 12.x, Delphi 11.3. _There is no support for 10.4.x or earlier_
 
 ## Project Configuration
 
@@ -54,7 +54,7 @@ cd <Kastri>\Features\Firebase
 FCMPatch.cmd
 ```
   
-where `<Kastri>` is the root of your copy of Kastri. This should work for Delphi 11.3 and Delphi 12.0
+where `<Kastri>` is the root of your copy of Kastri. This should work for Delphi 11.3 and Delphi 12.x
 
 If you need to patch `FMX.PushNotification.FCM.iOS` manually, please see [these instructions](../../Features/Firebase/FCMManualPatch.md).
 
@@ -78,6 +78,8 @@ For the `Options passed to the LD linker` option in the Project Options for iOS 
 ```
 -ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib  -weak_library /usr/lib/swift/libswiftFileProvider.dylib
 ``` 
+
+The `-weak_library` entries ensure compatibility with iOS 15 or lower.
 
 ### Android
 
