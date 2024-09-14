@@ -38,7 +38,7 @@ These will be used when building the Notification Extension project as indicated
   <img src="./Screenshots/XcodeNotificationExtension.png" alt="logo" height="375">
 
 * Select the `NotificationService` target in the `Targets` list
-* Enter your applications **notification extension** Bundle Identifier in the `Bundle Identifier` field, as per the instructions in the [FCM/Apple Configuration](#fcmapple-configuration) section
+* Enter your applications **notification extension** Bundle Identifier in the `Bundle Identifier` field, as per the instructions in the [Configuration for the Notification Extension](#configuration-for-the-notification-extension) section
 * Select the applications **notification extension** Provisioning Profile (again as per the instructions above) for the target build type
 * Select the `Any iOS Device (arm64)` device in the target combo box at the top
   
