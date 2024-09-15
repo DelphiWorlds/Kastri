@@ -62,17 +62,24 @@ If you need to patch `FMX.PushNotification.FCM.iOS` manually, please see [these 
 
 #### Firebase SDK
 
-Firebase support in Kastri has now been aligned with Firebase SDK for iOS version 10.8.0. Firebase SDK versions 9.x and older have now been **deprecated**, and are not guaranteed to work, so support for them has been removed entirely from Kastri.
+Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now successfully be linked with Delphi code. Please download the Firebase iOS SDK depending on your version of Delphi:
 
-Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
+* Delphi 12.2 - [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
+* Delphi 12.1 and earlier - [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
+
+..and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
 
 In order to compile successfully for iOS, it's also necessary to add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
+
+If you choose Firebase iOS SDK 11.2.0, you will also need to add the `DeveloperToolsSupport` framework to the iOS SDK in Delphi's SDK Manager. [See here](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks#readme) for a guide to adding SDK frameworks.
 
 #### Deployment of GoogleServices-info.plist
 
 Download the `GoogleServices-info.plist` file from your project configured in [Firebase Console](https://console.firebase.google.com/), and save it to the Resources folder in the demo. Add `GoogleServices-info.plist` to the deployment, as per the demo, as described above.
 
 #### Linker Options
+
+For `Minimum iOS version supported`, ensure the value is set to `13.0`
 
 For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit, ensure you have a value of: 
 ```
