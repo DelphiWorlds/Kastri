@@ -24,9 +24,11 @@ A very basic demo is in the [`Demos\NativeControls`](../Demos/NativeControls) fo
 
 TNativeSlider is implemented as [SeekBar](https://developer.android.com/reference/android/widget/SeekBar) on Android (with the added bonus of being able to use it vertically as well as horizontal), and as a [UISlider](https://developer.apple.com/documentation/uikit/uislider) on iOS
 
-**NOTE:** It was necessary to create a descendant of the Java class (in order to implement a vertical SeekBar), so you will need to add [dw-kastri-base.jar](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-kastri-base.jar) to the Libraries node under the Android platform in Project Manager in your project
+**NOTE:** It was necessary to create a descendant of the Java class (in order to implement a vertical SeekBar), so you will need to add the Kastri base jar to the Libraries node under the Android 32-bit platform (it will compile for both 32-bit and 64-bit) in Project Manager in your project. Which `.jar` file to add will depend on the version of Delphi you have:
 
-<br>
+* Delphi 11.x: `dw-kastri-base-2.0.0.jar`
+* Delphi 12.x: `dw-kastri-base-3.0.0.jar`
+
 
 ### TNativeButton
 
@@ -34,7 +36,6 @@ TNativeButton is implemented as [Button](https://developer.android.com/reference
 
 At present, TNativeButton provides only very basic support, e.g. the various states, titles and image support for UIButton are yet to be supported.
 
-<br>
 
 ### TNativeEllipse
 
@@ -44,15 +45,11 @@ Both TNativeRectangle and TNativeEllipse use [ImageView](https://developer.andro
 
 The Stroke property has very basic support - only Color, Kind (`Solid` or `None`) and Thickness are currently supported
 
-<br>
-
 ### TNativeImage
 
 TNativeImage is implemented as [ImageView](https://developer.android.com/reference/android/widget/ImageView) on Android and [UIImageView](https://developer.apple.com/documentation/uikit/uiimageview?language=objc) on iOS.
 
 It has a Text property that can serve as a caption that overlays the image.
-
-<br/>
 
 ### TNativeRectangle
 
