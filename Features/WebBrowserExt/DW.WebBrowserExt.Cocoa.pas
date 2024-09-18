@@ -198,6 +198,7 @@ var
 begin
   if FDownloadTasks.TryGetValue(NSObjectToID(ATask), LFileName) then
   begin
+    FDownloadTasks.Remove(NSObjectToID(ATask));
     if AError <> nil then
     begin
       TOSLog.e('> Error: %d - %s', [AError.code, NSStrToStr(AError.localizedDescription)]);
