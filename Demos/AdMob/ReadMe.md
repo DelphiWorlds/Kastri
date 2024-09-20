@@ -130,9 +130,14 @@ This adds a library with the same name as the project, with an extension of `.R.
 
 The UMP support has now been modified to include App Tracking Transparency (ATT), so you will need to [modify the iOS SDK to add the `AppTrackingTransparency` framework](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks).
 
-**UPDATE: Nov 8th, 2023**
+#### Firebase SDK
 
-AdMob support in Kastri has now been aligned with the latest compatible version of the Firebase SDK for iOS, which is version 10.8.0. Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo.
+Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now successfully be linked with Delphi code. Please download the Firebase iOS SDK depending on your version of Delphi:
+
+* Delphi 12.2 - [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
+* Delphi 12.1 and earlier - [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
+
+..and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
 
 In order to compile successfully for iOS, it's also necessary to:
 
@@ -140,11 +145,13 @@ In order to compile successfully for iOS, it's also necessary to:
 2. Add the following frameworks to the iOS SDK in Delphi's SDK Manager (if they are not already added):
 
 * Accessibility
+* AdServices
 * AppTrackingTransparency
 * Combine
-* AdServices
 * CoreMotion
 * DataDetection
+* MarketplaceKit (if using Firebase 11.2.0)
+* Network (if using Firebase 11.2.0)
 * UniformTypeIdentifiers
 
 [This link](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks) describes how to add the frameworks.
