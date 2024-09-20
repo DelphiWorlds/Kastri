@@ -42,5 +42,6 @@ procedure libswiftOSLogLoader; cdecl; external '/usr/lib/swift/libswiftOSLog.dyl
 procedure libswiftQuartzCoreLoader; cdecl; external '/usr/lib/swift/libswiftQuartzCore.dylib';
 procedure libswiftUIKitLoader; cdecl; external '/usr/lib/swift/libswiftUIKit.dylib';
 procedure libswiftUniformTypeIdentifiersLoader; cdecl; external '/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib';
+procedure libswiftXPCLoader; cdecl; external '/usr/lib/swift/libswiftXPC.dylib';
 
 end.
