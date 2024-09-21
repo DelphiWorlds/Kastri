@@ -111,6 +111,7 @@ uses
 
 const
   libSystemConfiguration = '/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration';
+  libSwiftUI = '/System/Library/Frameworks/SwiftUI.framework/SwiftUI';
 
 procedure CLangRTLoader; cdecl;
   {$IF not Defined(IOSSIMULATOR)}
@@ -129,5 +130,6 @@ procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
 procedure nanoPBLoader; cdecl; external framework 'nanoPB';
 procedure SystemConfigurationLoader; cdecl; external libSystemConfiguration;
 procedure StoreKitLoader; cdecl; external libStoreKit;
+procedure SwiftUILoader; cdecl; external libSwiftUI;
 
 end.
