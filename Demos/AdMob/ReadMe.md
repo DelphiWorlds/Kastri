@@ -2,19 +2,15 @@
 
 ## Description
 
-Advertising implementation, specifically for AdMob (at present)
+Advertising implementation, specifically for AdMob (Google Mobile Ads)
 
-**UPDATE** -
-
-Nov 25th, 2023: Support for User Messsaging Platform (UMP) has been added (Android support for **Delphi 12 only**, iOS support for Delphi 11.x and Delphi 12), which is required by Google in some geographic locations. This is **enabled by default**, and will require configuration in your [AdMob settings](https://apps.admob.com).
+Support for User Messsaging Platform (UMP) has been added (Android support for **Delphi 12 only**, iOS support for Delphi 11.x and Delphi 12), which is required by Google in some geographic locations. This is **enabled by default**, and will require configuration in your [AdMob settings](https://apps.admob.com).
 
 See [below](#user-messaging-platform-ump-support) for further information about the UMP support.
 
-Nov 8th, 2023: Changed to align with the Firebase iOS SDK v10.8.0. See the [Libraries > iOS](#ios) section below.
-
 ## Supported Delphi versions
 
-Delphi 12, Delphi 11.x.
+Delphi 12.x, Delphi 11.3 (limited support)
 
 **NOTE: The project for Delphi 12 is `AdTestD12.dproj` and the project for Delphi 11.x is `AdTest.dproj`**
 
@@ -26,9 +22,9 @@ The "full screen" ad types:
 * TRewardedInterstitialAd
 * TRewardedAd
 
-Have an option of performing the load of an ad, and showing an ad, all in one call by calling `Load` with no parameters, **OR** the load can be performed separately by calling `Load(False)`, and once the ad is loaded (which happens in the background), the `OnAdLoaded` event is called, and at that point the `Show` method can be called to show the ad.  
+..have an option of performing the load of an ad, and showing an ad, all in one call by calling `Load` with no parameters, **OR** the load can be performed separately by calling `Load(False)`, and once the ad is loaded (which happens in the background), the `OnAdLoaded` event is called, and at that point the `Show` method can be called to show the ad.  
 
-The latter method means that ads can be "preloaded" so that when it comes time to show an ad, it shows **immediately**. The demo has been changed from the originally published version to use this method.
+The latter method means that ads can be "preloaded" so that when it comes time to show an ad, it shows **immediately**.
 
 The former method may result in a poor user experience, given that it takes a little while for the ad to load first, then be shown.
 
@@ -80,13 +76,21 @@ See the `TForm1.Create` method in the demo for examples.
 If creating your own project, you will need to add the supporting library:
 
 * For Delphi 11.x: [`dw-admob.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob.jar) 
-* For Delphi 12: [`dw-admob-3.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob-3.0.0.jar)
+* For Delphi 12.x: [`dw-admob-3.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob-3.0.0.jar)
 
 to the Libraries node under the Android 32-bit platform in Project Manager
 
 **Note**:
 
 Due to a bug in **Delphi 11.3 ONLY**, if you need to compile for Android 64-bit, you will need to either apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the required jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+
+#### Android Entitlements
+
+Ensure your project has the `AdMob Service` enabled. This adds Google Play services metadata and the Ads activity to the manifest.
+
+#### Android Permission
+
+Ensure your project has the `Access Network State` permission in Project Options
 
 #### Generating a jar that contains R classes
 
@@ -126,18 +130,18 @@ This adds a library with the same name as the project, with an extension of `.R.
 
 ### iOS
 
-**UPDATE: Dec 21st, 2023**
-
-The UMP support has now been modified to include App Tracking Transparency (ATT), so you will need to [modify the iOS SDK to add the `AppTrackingTransparency` framework](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks).
-
 #### Firebase SDK
 
-Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now successfully be linked with Delphi code. Please download the Firebase iOS SDK depending on your version of Delphi:
+Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now successfully be linked with Delphi code. Download the Firebase iOS SDK from one of these links:
 
 * Delphi 12.2 - [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
 * Delphi 12.1 and earlier - [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
 
-..and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
+..and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. 
+
+Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
+
+**NOTE:** Using GoogleMobileAds from Firebase iOS SDK 11.2.0 requires that the **minimum version of iOS be set to 12.0** (see [Linker Options](#linker-options))
 
 In order to compile successfully for iOS, it's also necessary to:
 
@@ -149,10 +153,15 @@ In order to compile successfully for iOS, it's also necessary to:
 * AppTrackingTransparency
 * Combine
 * CoreMotion
+* CoreTransferable
 * DataDetection
-* MarketplaceKit (if using Firebase 11.2.0)
-* Network (if using Firebase 11.2.0)
+* MarketplaceKit (if using Firebase iOS SDK v11.2.0)
+* Network (if using Firebase iOS SDK v11.2.0)
+* SwiftCore
+* SwiftUI
 * UniformTypeIdentifiers
+
+Remember that using Firebase iOS SDK v11.2.0 requires **Delphi 12.2 or later**
 
 [This link](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks) describes how to add the frameworks.
 
@@ -163,28 +172,37 @@ If creating your own project:
 #### Framework search path
 
 In Project Options, set the Framework Search Path value for iOS Device 64-bit target to:
+
+When using Firebase iOS SDK 10.8.0:
+
 ```
 $(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64_armv7
 ```
 
+When using Firebase iOS SDK 11.2.0 - **Delphi 12.2 or later**:
+
+```
+$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64
+```
+
 #### Linker Options
+
+For `Minimum iOS version supported`, when using **Firebase iOS SDK 11.2.0 - Delphi 12.2 or later**, ensure the value is set to: `12.0`
 
 For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit, ensure you have a value of: 
 ```
 -ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib  -weak_library /usr/lib/swift/libswiftFileProvider.dylib
 ``` 
 
+The `-weak_library` entries ensure compatibility with iOS 15 or lower.
+
 #### NSUserTrackingUsageDescription
 
-For iOS, when you specify in App Store Connect that your app collects data from users, you will need to add a `NSUserTrackingUsageDescription` key and value to the Version Info section of the project options
+Add a `NSUserTrackingUsageDescription` key and value to the Version Info section of the project options. The value should be indicative of why your app requires user tracking. Since this is for AdMob, an example of this could be:
 
-#### Android Entitlements
-
-Ensure your project has the `AdMob Service` enabled. This adds Google Play services metadata and the Ads activity to the manifest.
-
-#### Android Permission
-
-Ensure your project has the `Access Network State` permission in Project Options
+```
+This app uses tracking data to help deliver ads that are relevant to you
+```
 
 ### Using non-test Ad UnitIds
 
