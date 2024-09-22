@@ -1,11 +1,16 @@
 #import <CoreMedia/CoreMedia.h>
 #import <UIKit/UIKit.h>
 
+
+
+#import "MLKCompatibleImage.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /** An image or image buffer used for vision detection. */
 NS_SWIFT_NAME(VisionImage)
-@interface MLKVisionImage : NSObject
+
+@interface MLKVisionImage : NSObject <MLKCompatibleImage>
 
 /** The display orientation of the image. The default is `.up`. */
 @property(nonatomic) UIImageOrientation orientation;
