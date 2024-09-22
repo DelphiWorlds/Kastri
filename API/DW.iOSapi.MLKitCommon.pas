@@ -103,15 +103,16 @@ implementation
 
 procedure AccelerateLoader; cdecl; external framework 'Accelerate';
 procedure CLangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
-procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
 procedure GoogleDataTransportLoader; cdecl; external framework 'GoogleDataTransport';
 procedure GoogleToolboxForMacLoader; cdecl; external 'libGoogleToolboxForMac.a';
 procedure GoogleUtilitiesComponentsLoader; cdecl; external 'libGoogleUtilitiesComponents.a';
 // NOTE: When combining Firebase Cloud Messaging with ML Kit, Firebase iOS SDK v10.8.0 MUST be used (as at 22-SEP-2024)
 {$IF not Defined(FIREBASE)}
+procedure FBLPromisesLoader; cdecl; external 'libPromisesObjC.a';
 procedure GoogleUtilitiesLoader; cdecl; external 'libGoogleUtilities.a';
 procedure GTMSessionFetcherLoader; cdecl; external framework 'GTMSessionFetcher';
 {$ELSE}
+procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
 procedure GTMSessionFetcherLoader; cdecl; external 'libGTMSessionFetcher.a';
 {$ENDIF}
 procedure MLImageLoader; cdecl; external framework 'MLImage';
