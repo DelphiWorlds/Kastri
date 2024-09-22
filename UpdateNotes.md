@@ -12,6 +12,11 @@ This documents updates to Kastri which may adversely impact users, and describes
 
   For AdMob, see [here](https://github.com/DelphiWorlds/Kastri/blob/master/Demos/AdMob/ReadMe.md#firebase-sdk)
 
+## Sep 23rd, 2024
+
+* Updated `API\DW.iOSapi.MLKitCommon.pas` to add support for Firebase iOS SDK v11.2.0 and retain compatibility with v10.8.0, which is required when combining Firebase Cloud Messaging support
+  
+  Please read the [readme in the demo](https://github.com/DelphiWorlds/Kastri/tree/master/Demos/BarcodeReader) to ensure that your project configuration is correct
 
  
 
