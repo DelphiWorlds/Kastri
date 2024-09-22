@@ -99,28 +99,23 @@ type
   end;
   TMLKModelDownloadConditions = class(TOCGenericImport<MLKModelDownloadConditionsClass, MLKModelDownloadConditions>) end;
 
-const
-  libMLKitCommon = 'MLKitCommon';
-
 implementation
 
 procedure AccelerateLoader; cdecl; external framework 'Accelerate';
-procedure MLKitCommonLoader; cdecl; external framework libMLKitCommon;
 procedure CLangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
-{$IF Defined(FIREBASE)}
+procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
 procedure GoogleDataTransportLoader; cdecl; external framework 'GoogleDataTransport';
-procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
-procedure nanoPBLoader; cdecl; external framework 'nanoPB';
-procedure PromisesObjCLoader; cdecl; external framework 'PromisesObjC';
-{$ELSE}
-procedure GoogleDataTransportLoader; cdecl; external 'libGoogleDataTransport.a';
-procedure GoogleUtilitiesLoader; cdecl; external 'libGoogleUtilities.a';
-procedure nanopbLoader; cdecl; external 'libnanopb.a';
-procedure PromisesObjCLoader; cdecl; external 'libPromisesObjC.a';
-{$ENDIF}
-procedure GoogleUtilitiesComponentsLoader; cdecl; external 'libGoogleUtilitiesComponents.a';
 procedure GoogleToolboxForMacLoader; cdecl; external 'libGoogleToolboxForMac.a';
+procedure GoogleUtilitiesComponentsLoader; cdecl; external 'libGoogleUtilitiesComponents.a';
+// NOTE: When combining Firebase Cloud Messaging with ML Kit, Firebase iOS SDK v10.8.0 MUST be used (as at 22-SEP-2024)
+{$IF not Defined(FIREBASE)}
+procedure GoogleUtilitiesLoader; cdecl; external 'libGoogleUtilities.a';
+procedure GTMSessionFetcherLoader; cdecl; external framework 'GTMSessionFetcher';
+{$ELSE}
 procedure GTMSessionFetcherLoader; cdecl; external 'libGTMSessionFetcher.a';
-procedure ProtobufLoader; cdecl; external 'libProtobuf.a';
+{$ENDIF}
+procedure MLImageLoader; cdecl; external framework 'MLImage';
+procedure MLKitCommonLoader; cdecl; external framework 'MLKitCommon';
+procedure nanoPBLoader; cdecl; external framework 'nanoPB';
 
 end.
