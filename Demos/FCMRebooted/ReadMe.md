@@ -89,6 +89,12 @@ When using Firebase iOS SDK 11.2.0 - **Delphi 12.2 or later**:
 $(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanoPB.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
 ```
 
+**For iOS Simulator**:
+
+```
+$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\nanoPB.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64_x86_64-simulator
+```
+
 #### Additional Frameworks
 
 In order to compile successfully for iOS, it's also necessary to add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
@@ -96,8 +102,8 @@ In order to compile successfully for iOS, it's also necessary to add [Swift Supp
 You will need to add the following frameworks to the iOS SDK in Delphi's SDK Manager:
 
 * CoreTransferable
-* SwiftCore
 * SwiftUI
+* SwiftUICore
 
 If you choose Firebase iOS SDK 11.2.0, will need to add:
 
