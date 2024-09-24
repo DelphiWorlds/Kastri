@@ -117,9 +117,9 @@ Download the `GoogleServices-info.plist` file from your project configured in [F
 
 #### Linker Options
 
-For `Minimum iOS version supported`, when using **Firebase iOS SDK 11.2.0 - Delphi 12.2 or later**, ensure the value is set to: `13.0`
+For `Minimum iOS version supported`, when using **Firebase iOS SDK 11.2.0 - Delphi 12.2 or later**, ensure the value is set to: `13.0`. For iOS Simulator the value should be `14.0`
 
-For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit, ensure you have a value of: 
+For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit (or iOS Simulator if you are building for that), ensure you have a value of: 
 ```
 -ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib  -weak_library /usr/lib/swift/libswiftFileProvider.dylib
 ``` 
