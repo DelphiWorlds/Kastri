@@ -237,12 +237,9 @@ With PushIt, you can see what the resulting payload looks like by selecting the 
 
 If you receive compiler errors during the linking phase, it is likely that the framework paths have not been configured correctly, or you may be using an unsupported Firebase SDK. Please check the [Project Configuration](#project-configuration) section above.
 
-#### FCM messages not being received
-
-If your app is receiving a Firebase token, but does not appear to be receiving messages, it is likely to be either:
-
-* The App ID being used for the Provisioning Profile does not have Push Notifications enabled
-* The payload being used for the message being sent is incorrect
+#### No token being received
+ 
+This can happen if the App ID being used for the Provisioning Profile does not have Push Notifications enabled.
 
 You can check that the App ID/Provisioning Profile is correct by examining the `AppName.entitlements` file that Delphi creates when deploying the app (where `AppName` is the name of your app) in the `iOSDevice64\Config` folder (where `Config` is the active config e.g. `Debug` or `Release`). It should contain the following:
 
@@ -252,6 +249,14 @@ You can check that the App ID/Provisioning Profile is correct by examining the `
 ```
 
 Where `development` will be replaced by `production` when using an App Store Provisioning Profile. For info regarding provisioning profile configuration, please refer to the [instructions in the original FCM demo](https://github.com/DelphiWorlds/Kastri/blob/master/Demos/FirebaseCloudMessaging/Readme.md)
+
+#### FCM messages not being received
+
+If your app is receiving a Firebase token, but does not appear to be receiving messages, it may be that:
+
+* There is no APNS key configured for iOS in [Firebase Console](https://console.firebase.google.com/)
+* The payload being used for the message being sent is incorrect
+
 
 
 
