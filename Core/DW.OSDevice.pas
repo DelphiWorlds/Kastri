@@ -33,6 +33,8 @@ type
 
   TUIMode = (Appliance, Car, Desk, Normal, Television, VRHeadset, Undefined, Watch);
 
+  TOpenURLCompletionMethod = procedure(success: Boolean) of object;
+
   /// <summary>
   ///   Operating System specific functions that operate below FMX
   /// </summary>
@@ -134,8 +136,8 @@ type
     /// <summary>
     ///   Opens the default browser with the URL
     /// </summary>
-    class procedure OpenURL(const AURL: string); static;
-    class procedure OpenAppSettings; static;
+    class procedure OpenURL(const AURL: string; const ACompletion: TOpenURLCompletionMethod = nil); static;
+    class procedure OpenAppSettings(const ACompletion: TOpenURLCompletionMethod = nil); static;
     class function OpenWriteSettingsPermissions: Boolean; static;
     /// <summary>
     ///   Prevent the screen from locking (Android and iOS)
@@ -348,16 +350,20 @@ begin
   {$ENDIF}
 end;
 
-class procedure TOSDevice.OpenAppSettings;
+class procedure TOSDevice.OpenAppSettings(const ACompletion: TOpenURLCompletionMethod = nil);
 begin
-  {$IF Defined(IOS) or Defined(ANDROID)}
+  {$IF Defined(IOS)}
+  TPlatformOSDevice.OpenAppSettings(ACompletion);
+  {$ELSEIF Defined(ANDROID)}
   TPlatformOSDevice.OpenAppSettings;
   {$ENDIF}
 end;
 
-class procedure TOSDevice.OpenURL(const AURL: string);
+class procedure TOSDevice.OpenURL(const AURL: string; const ACompletion: TOpenURLCompletionMethod = nil);
 begin
-  {$IF Defined(MACOS) or Defined(ANDROID) or Defined(MSWINDOWS)}
+  {$IF Defined(IOS)}
+  TPlatformOSDevice.OpenURL(AURL, ACompletion);
+  {$ELSEIF Defined(MACOS) or Defined(ANDROID) or Defined(MSWINDOWS)}
   TPlatformOSDevice.OpenURL(AURL);
   {$ENDIF}
 end;

@@ -22,7 +22,7 @@ uses
 type
   TPlatformOSDevice = record
   private
-    class procedure OpenNSURL(const AURL: NSURL); static;
+    class procedure OpenNSURL(const AURL: NSURL; const ACompletion: TOpenURLCompletionMethod); static;
   public
     class function EnableTorch(const AEnable: Boolean): Boolean; static;
     class function GetCurrentLocaleInfo: TLocaleInfo; static;
@@ -37,8 +37,8 @@ type
     class function IsScreenLocked: Boolean; static;
     class function IsTablet: Boolean; static;
     class function IsTouchDevice: Boolean; static;
-    class procedure OpenURL(const AURL: string); static;
-    class procedure OpenAppSettings; static;
+    class procedure OpenAppSettings(const ACompletion: TOpenURLCompletionMethod); static;
+    class procedure OpenURL(const AURL: string; const ACompletion: TOpenURLCompletionMethod); static;
     class procedure SetPreventScreenLock(const AValue: Boolean); static;
   end;
 
@@ -55,6 +55,11 @@ uses
   Posix.SysUtsname,
   // DW
   DW.Macapi.Helpers, DW.iOSapi.Foundation, DW.iOSapi.UIKit;
+
+function SharedApplication: UIApplication;
+begin
+  Result := TUIApplication.OCClass.sharedApplication;
+end;
 
 { TPlatformOSDevice }
 
@@ -129,19 +134,19 @@ begin
   Result := True;
 end;
 
-class procedure TPlatformOSDevice.OpenNSURL(const AURL: NSURL);
+class procedure TPlatformOSDevice.OpenNSURL(const AURL: NSURL; const ACompletion: TOpenURLCompletionMethod);
 begin
-  TiOSHelper.SharedApplication.openURL(AURL);
+  SharedApplication.openURL(AURL, nil, ACompletion)
 end;
 
-class procedure TPlatformOSDevice.OpenAppSettings;
+class procedure TPlatformOSDevice.OpenAppSettings(const ACompletion: TOpenURLCompletionMethod);
 begin
-  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(UIApplicationOpenSettingsURLString)));
+  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(UIApplicationOpenSettingsURLString)), ACompletion);
 end;
 
-class procedure TPlatformOSDevice.OpenURL(const AURL: string);
+class procedure TPlatformOSDevice.OpenURL(const AURL: string; const ACompletion: TOpenURLCompletionMethod);
 begin
-  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(StrToNSStr(AURL))));
+  OpenNSURL(TNSURL.Wrap(TNSURL.OCClass.URLWithString(StrToNSStr(AURL))), ACompletion);
 end;
 
 class procedure TPlatformOSDevice.SetPreventScreenLock(const AValue: Boolean);
