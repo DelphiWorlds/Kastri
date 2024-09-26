@@ -2,9 +2,9 @@
 
 <img src="kastri-logo.png" alt="logo" height="250">
 
-From [Delphi Worlds](http://www.delphiworlds.com)
+From [Delphi Worlds](https://x.com/delphiworlds)
 
-[![Twitter](https://img.shields.io/badge/-Twitter-1DA1F2?style=plastic&logo=Twitter)](https://twitter.com/DelphiWorlds)  [![Facebook](https://img.shields.io/badge/-Facebook-green?style=plastic&logo=Facebook)](https://www.facebook.com/DelphiWorlds)  [![Instagram](https://img.shields.io/badge/-Instagram-833AB4?style=plastic&logo=Instagram)](https://www.instagram.com/delphiworlds)
+[![Twitter](https://img.shields.io/badge/-Twitter-1DA1F2?style=plastic&logo=Twitter)](https://x.com/DelphiWorlds)  [![Facebook](https://img.shields.io/badge/-Facebook-green?style=plastic&logo=Facebook)](https://www.facebook.com/DelphiWorlds) 
 
 Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two major releases** (e.g. at present that includes Delphi 12.x and Delphi 11.x) are "officially" supported. 
 
@@ -58,6 +58,10 @@ Pull requests are welcome, however before making any, please read the [Coding St
 In regards to coding standards, in particular observe things like naming, ensuring fields/methods are kept in alphabetical order (which makes them easier to find as the number of methods grow), and that structured statements follow the standard.
 
 ## Support
+
+### News/Features
+
+Regular posts will appear on [X (Twitter)](https://x.com/delphiworlds), about updates to Kastri and other repos, and news about what I'm working on, so please follow!
 
 ### Issues page
 
