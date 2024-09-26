@@ -62,8 +62,8 @@ type
   private
     function GetBackgroundColor: TAlphaColor;
     function GetImage: TBitmap;
-    function GetOnLongPress: TNotifyEvent;
     function GetModel: TCustomNativeImageModel; overload;
+    function GetOnLongPress: TNotifyEvent;
     function GetStyledSettings: TStyledSettings;
     function GetText: string;
     function GetTextSettings: TTextSettings;
