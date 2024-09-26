@@ -114,7 +114,7 @@ uses
   // FMX
   FMX.Controls, FMX.Presentation.iOS, FMX.Presentation.Factory,
   // DW
-  DW.VideoPlayer.View;
+  DW.VideoPlayer.View, DW.iOSapi.Helpers;
 
 type
   TiOSVideoPlayerView = class(TiOSNativeView);
@@ -223,10 +223,10 @@ var
   LURL: NSURL;
 begin
   DestroyAVPlayer;
-  if AURL.StartsWith('http://', True) or AURL.StartsWith('https://', True) then
+  if AURL.StartsWith('http://', True) or AURL.StartsWith('https://', True) or AURL.StartsWith('rtsp://', True) then
     LURL := TNSURL.Wrap(TNSURL.OCClass.URLWithString(StrToNSStr(AURL)))
   else
-    LURL := TNSURL.Wrap(TNSURL.OCClass.FileURLWithPath(StrToNSStr(AURL)));
+    LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(AURL)));
   FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
   FPlayerItemNotifications.AddObservers(NSObjectToID(FPlayerItem));
   FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem));
@@ -259,7 +259,7 @@ begin
     if Value then
     begin
       FController.setPlayer(FPlayer);
-      TiOSHelper.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
+      TiOSHelperEx.SharedApplication.keyWindow.rootViewController.presentViewController(FController, True, nil);
     end
     else
       FController.setPlayer(nil);
