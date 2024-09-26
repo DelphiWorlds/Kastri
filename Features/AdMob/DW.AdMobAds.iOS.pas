@@ -125,7 +125,7 @@ type
 
 function SharedApplication: UIApplication;
 begin
-  Result := TUIApplication.Wrap(TUIApplication.OCClass.sharedApplication);
+  Result := TUIApplication.OCClass.sharedApplication;
 end;
 
 { TGADHelper }
