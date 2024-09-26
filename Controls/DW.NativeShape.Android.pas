@@ -47,8 +47,9 @@ type
   end;
 
   [JavaSignature('com/delphiworlds/kastri/DWRectangleDrawable')]
-  JDWRectangleDrawable = interface(JShapeDrawable)
+  JDWRectangleDrawable = interface(JDrawable)
     ['{6D84FA16-F0CB-4B8F-8B72-8B2D7E65B4AD}']
+    function getFill: JPaint; cdecl;
     procedure setSides(sides: Integer); cdecl;
     procedure setStroke(strokeWidth: Integer; strokeColor: Integer); cdecl;
   end;
@@ -106,6 +107,7 @@ type
     procedure CornersChanged; virtual;
     procedure CornerTypeChanged; virtual;
     function DefineModelClass: TDataModelClass; override;
+    procedure FillChanged; override;
     procedure RadiusChanged; virtual;
     procedure SidesChanged; virtual;
     procedure StrokeChanged; override;
@@ -318,6 +320,12 @@ begin
 //  finally
 //    LRadii.Free;
 //  end;
+end;
+
+procedure TAndroidNativeRectangle.FillChanged;
+begin
+  FRectangle.getFill.setColor(TAndroidHelper.AlphaColorToJColor(Model.Fill.Color));
+  FRectangle.invalidateSelf;
 end;
 
 procedure TAndroidNativeRectangle.SidesChanged;
