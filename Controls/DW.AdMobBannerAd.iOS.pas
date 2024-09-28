@@ -138,8 +138,7 @@ var
   LConstraint: NSLayoutConstraint;
 begin
   inherited;
-  FBannerView := TGADBannerView.Create;
-  FBannerView.initWithAdSize(GADAdSizeFromCGSize(CGSizeMake(0, 0)));
+  FBannerView := TGADBannerView.Wrap(TGADBannerView.Alloc.initWithAdSize(GADAdSizeFromCGSize(CGSizeMake(0, 0))));
   FBannerView.setTranslatesAutoresizingMaskIntoConstraints(False);
   FDelegate := TGADBannerViewDelegate.Create(Self);
   FBannerView.setDelegate(FDelegate.GetObjectID);
