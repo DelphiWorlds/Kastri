@@ -233,6 +233,8 @@ With PushIt, you can see what the resulting payload looks like by selecting the 
 
 ### iOS
 
+NOTE: **Firebase Cloud Messaging support here requires iOS SDK 17.4 or higher**. This implementation has been tested with Xcode 16 and iOS 18.0 SDK.
+
 #### Compiler Errors
 
 If you receive compiler errors during the linking phase, it is likely that the framework paths have not been configured correctly, or you may be using an unsupported Firebase SDK. Please check the [Project Configuration](#project-configuration) section above.
