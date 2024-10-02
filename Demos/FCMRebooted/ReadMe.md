@@ -102,12 +102,9 @@ In order to compile successfully for iOS, it's also necessary to add [Swift Supp
 You will need to add the following frameworks to the iOS SDK in Delphi's SDK Manager:
 
 * CoreTransferable
+* DeveloperToolsSupport
 * SwiftUI
 * SwiftUICore
-
-If you choose Firebase iOS SDK 11.2.0, will need to add:
-
-* DeveloperToolsSupport
 
 [This link](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks) describes how to add the frameworks.
 
