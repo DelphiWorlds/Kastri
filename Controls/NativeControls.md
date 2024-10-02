@@ -51,6 +51,8 @@ TNativeImage is implemented as [ImageView](https://developer.android.com/referen
 
 It has a Text property that can serve as a caption that overlays the image.
 
+Note: On **Android**, in order to use the `LoadFromFile` method, you will need to enable **Secure File Sharing** in the Entitlements section of Project Options
+
 ### TNativeRectangle
 
 TNativeRectangle is like TRectangle in FMX. At present, on iOS rounded corners are not supported (however this is planned to be supported in the future).

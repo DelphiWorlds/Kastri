@@ -20,6 +20,10 @@ As TNativeSlider is based on [SeekBar](https://developer.android.com/reference/a
 
 ..to the Libraries node under the Android platform in Project Manager in your project. (This is already added in the demos)
 
+## Note about TNativeImage on Android
+
+In order to use the `LoadFromFile` method, you will need to enable **Secure File Sharing** in the Entitlements section of Project Options
+
 ## Appearance
 
 Here's how the controls look:
