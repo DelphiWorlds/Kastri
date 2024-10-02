@@ -25,7 +25,7 @@ uses
   FMX.Presentation.Messages, FMX.Presentation.Android, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model,
   FMX.Graphics, FMX.Types,
   // DW
-  DW.NativeImage, DW.UIHelper.Android;
+  DW.NativeImage, DW.UIHelper.Android, DW.Graphics.Helpers.Android;
 
 type
   TAndroidNativeImage = class(TAndroidNativeView)
@@ -36,6 +36,7 @@ type
     function GetImageControl: TCustomNativeImage;
     function GetModel: TCustomNativeImageModel;
     procedure MMBackgroundColorChanged(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_BACKGROUNDCOLORCHANGED;
+    procedure MMImageChanged(var AMessage: TDispatchMessage); message MM_NATIVEIMAGE_IMAGECHANGED;
     procedure MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_LOADFROMFILE;
     procedure MMLoadFromStream(var AMessage: TDispatchMessageWithValue<TStream>); message MM_NATIVEIMAGE_LOADFROMSTREAM;
     procedure MMTextChanged(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_TEXTCHANGED;
@@ -103,6 +104,11 @@ end;
 procedure TAndroidNativeImage.MMBackgroundColorChanged(var AMessage: TDispatchMessageWithValue<string>);
 begin
   View.setBackgroundColor(TAndroidHelper.AlphaColorToJColor(Model.BackgroundColor));
+end;
+
+procedure TAndroidNativeImage.MMImageChanged(var AMessage: TDispatchMessage);
+begin
+  FImageView.setImageBitmap(Model.Image.ToJBitmap);
 end;
 
 procedure TAndroidNativeImage.MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>);

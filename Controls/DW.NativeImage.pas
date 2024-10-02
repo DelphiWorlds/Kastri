@@ -29,6 +29,7 @@ const
   MM_NATIVEIMAGE_TEXTCHANGED = MM_USER + 5;
   MM_NATIVEIMAGE_TEXTSETTINGSCHANGED = MM_USER + 6;
   MM_NATIVEIMAGE_BACKGROUNDCOLORCHANGED = MM_USER + 7;
+  MM_NATIVEIMAGE_IMAGECHANGED = MM_USER + 8;
 
 type
   TCustomNativeImageModel = class(TNativeControlModel)
@@ -38,6 +39,7 @@ type
     FText: string;
     FTextSettingsInfo: TTextSettingsInfo;
     FOnTextSettingsChanged: TNotifyEvent;
+    procedure BitmapChangedHandler(Sender: TObject);
     procedure SetBackgroundColor(const Value: TAlphaColor);
     procedure SetImage(const Value: TBitmap);
     procedure SetText(const Value: string);
@@ -48,12 +50,12 @@ type
     procedure LoadFromResource(const AResourceName: string);
     procedure LoadFromStream(const AStream: TStream);
     procedure TextSettingsChanged;
-    property Image: TBitmap read FImage write SetImage;
     property OnTextSettingsChanged: TNotifyEvent read FOnTextSettingsChanged write FOnTextSettingsChanged;
   public
     constructor Create(const AOwner: TComponent); override;
     destructor Destroy; override;
     property BackgroundColor: TAlphaColor read FBackgroundColor write SetBackgroundColor;
+    property Image: TBitmap read FImage write SetImage;
     property Text: string read FText write SetText;
     property TextSettingsInfo: TTextSettingsInfo read FTextSettingsInfo;
   end;
@@ -203,6 +205,7 @@ constructor TCustomNativeImageModel.Create(const AOwner: TComponent);
 begin
   inherited;
   FImage := TBitmap.Create;
+  FImage.OnChange := BitmapChangedHandler;
   FTextSettingsInfo := TNativeImageSettingsInfo.Create(Self, TNativeImageTextSettings);
 end;
 
@@ -211,6 +214,11 @@ begin
   FImage.Free;
   FTextSettingsInfo.Free;
   inherited;
+end;
+
+procedure TCustomNativeImageModel.BitmapChangedHandler(Sender: TObject);
+begin
+  SendMessage(MM_NATIVEIMAGE_IMAGECHANGED);
 end;
 
 procedure TCustomNativeImageModel.Loaded;

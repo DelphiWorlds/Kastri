@@ -44,6 +44,7 @@ type
     function GetImageControl: TCustomNativeImage;
     function GetModel: TCustomNativeImageModel;
     function GetView: UIImageView;
+    procedure MMImageChanged(var AMessage: TDispatchMessage); message MM_NATIVEIMAGE_IMAGECHANGED;
     procedure MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_LOADFROMFILE;
     procedure MMLoadFromStream(var AMessage: TDispatchMessageWithValue<TStream>); message MM_NATIVEIMAGE_LOADFROMSTREAM;
     procedure MMTextChanged(var AMessage: TDispatchMessageWithValue<string>); message MM_NATIVEIMAGE_TEXTCHANGED;
@@ -116,6 +117,11 @@ begin
     FLabel.setNumberOfLines(0);
     Result.addSubview(FLabel);
   end;
+end;
+
+procedure TiOSNativeImage.MMImageChanged(var AMessage: TDispatchMessage);
+begin
+  View.setImage(BitmapToUIImage(Model.Image));
 end;
 
 procedure TiOSNativeImage.MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>);
