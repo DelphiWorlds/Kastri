@@ -96,6 +96,10 @@ type
     function GetShowBannerIfForeground: Boolean;
     function GetStatus: TPushService.TStatus;
     /// <summary>
+    ///   Returns the Device ID
+    /// </summary>
+    function GetDeviceID: string;
+    /// <summary>
     ///   Returns the FCM token
     /// </summary>
     function GetToken: string;
@@ -214,6 +218,7 @@ type
     function GetPushService: TPushService;
     function GetShowBannerIfForeground: Boolean;
     function GetStatus: TPushService.TStatus;
+    function GetDeviceID: string;
     function GetToken: string;
     function IsStarted: Boolean;
     procedure RemoveNotifications; virtual;
@@ -492,6 +497,11 @@ end;
 function TCustomPlatformFCMManager.GetAuthOptions: TAuthOptions;
 begin
   Result := FAuthOptions;
+end;
+
+function TCustomPlatformFCMManager.GetDeviceID: string;
+begin
+  Result := FDeviceID;
 end;
 
 function TCustomPlatformFCMManager.GetNativeAuthOptions: LongInt;
