@@ -86,6 +86,7 @@ type
     procedure CheckPushEnabled(const AHandler: TCheckPushEnabledMethod);
     function GetAPNSToken: string;
     function GetAuthOptions: TAuthOptions;
+    function GetDeviceID: string;
     function GetNativeAuthOptions: LongInt;
     function GetOnMessageReceived: TMessageReceivedEvent;
     function GetOnNotificationCategory: TNotificationCategoryEvent;
@@ -205,6 +206,7 @@ type
     procedure CheckPushEnabled(const AHandler: TCheckPushEnabledMethod); virtual;
     function GetAPNSToken: string; virtual;
     function GetAuthOptions: TAuthOptions;
+    function GetDeviceID: string;
     function GetNativeAuthOptions: LongInt; virtual;
     function GetOnMessageReceived: TMessageReceivedEvent;
     function GetOnNotificationCategory: TNotificationCategoryEvent;
@@ -492,6 +494,11 @@ end;
 function TCustomPlatformFCMManager.GetAuthOptions: TAuthOptions;
 begin
   Result := FAuthOptions;
+end;
+
+function TCustomPlatformFCMManager.GetDeviceID: string;
+begin
+  Result := FDeviceID;
 end;
 
 function TCustomPlatformFCMManager.GetNativeAuthOptions: LongInt;
