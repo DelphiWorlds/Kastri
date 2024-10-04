@@ -17,6 +17,18 @@ const
   cJSEventScheme = 'jsevent';
   cJSEventProtocol = cJSEventScheme + ':blank?';
 
+  cJavaScriptClickAtXY = '(function() { '#13#10 +
+    'var windowX = %d, windowY = %d'#13#10 +
+    'let x = windowX - (window.scrollX || window.pageXOffset)'#13#10 +
+    'let y = windowY - (window.scrollY || window.pageYOffset);'#13#10 +
+    'var element = document.elementFromPoint(x, y);'#13#10 +
+    'if (element) {'#13#10 +  
+    '  var clickEvent = document.createEvent("MouseEvents");'#13#10 +
+    '  clickEvent.initMouseEvent("click", true, true, window, 0, 0, 0, x, y, false, false, false, false, 0, null);'#13#10 +
+    '  element.dispatchEvent(clickEvent);'#13#10 +
+    '} else'#13#10 +
+    '  console.log("No element found at coordinates:", x, y);'#13#10 +
+    '})()';
   cJavaScriptGetInputValueByName = '(function() { return document.getElementsByName("%s")[0].value; })()';
   cJavaScriptGetPageContents = '(function() { return document.getElementsByTagName("html")[0].innerHTML; })()';
   cJavaScriptNullResult = 'null';
