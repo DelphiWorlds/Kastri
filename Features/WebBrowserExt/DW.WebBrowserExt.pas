@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Classes,
+  System.Classes, System.Types,
   // FMX
   FMX.WebBrowser, FMX.Graphics,
   // DW
@@ -60,6 +60,7 @@ type
     procedure ResetZoom; virtual;
     procedure SetAllowZoom(const AValue: Boolean); virtual;
     procedure SetInitialScale(const AValue: Integer); virtual;
+    procedure SimulateClick(const APoint: TPointF); virtual;
     property DefaultDownloadsFolder: string read GetDefaultDownloadsFolder;
   public
     constructor Create(const AWebBrowserExt: TWebBrowserExt); virtual;
@@ -95,6 +96,7 @@ type
     procedure ResetZoom;
     procedure SetAllowZoom(const AValue: Boolean);
     procedure SetInitialScale(const AValue: Integer);
+    procedure SimulateClick(const APoint: TPointF);
     property DefaultDownloadsFolder: string read FDefaultDownloadsFolder write FDefaultDownloadsFolder;
     property OnDownloadStart: TDownloadStartEvent read FOnDownloadStart write FOnDownloadStart;
     property OnDownloadStateChange: TDownloadStateChangeEvent read FOnDownloadStateChange write FOnDownloadStateChange;
@@ -227,6 +229,14 @@ begin
   //
 end;
 
+procedure TCustomPlatformWebBrowserExt.SimulateClick(const APoint: TPointF);
+var
+  LNativePoint: TPoint;
+begin
+  LNativePoint := APoint.Round;
+  ExecuteJavaScript(Format(cJavaScriptClickAtXY, [LNativePoint.X, LNativePoint.Y]), nil);
+end;
+
 { TWebBrowserExt }
 
 constructor TWebBrowserExt.Create(AOwner: TComponent);
@@ -308,6 +318,11 @@ end;
 procedure TWebBrowserExt.SetInitialScale(const AValue: Integer);
 begin
   FPlatformWebBrowserExt.SetInitialScale(AValue);
+end;
+
+procedure TWebBrowserExt.SimulateClick(const APoint: TPointF);
+begin
+  FPlatformWebBrowserExt.SimulateClick(APoint);
 end;
 
 end.
