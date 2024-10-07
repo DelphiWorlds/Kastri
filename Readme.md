@@ -16,7 +16,13 @@ Alternatively, you might like to make a donation via Stripe*:
     <img src="https://kinsta.com/wp-content/uploads/2018/05/stripe-donate-button-1-1-360x180.png" height="50">
 </a>
 
-(*Donations were previously being made via another service which I no longer use, as they were unable to keep my funds secure. My apologies for any inconvenience)
+or Paypal:
+
+[![paypal](https://www.paypalobjects.com/en_AU/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=CGHWQ28MKBGAA)
+
+or via Lightning Wallet:
+
+<img src="https://www.delphiworlds.com/files/images/WalletOfSatoshi.png" height="175">
 
 Please star this repo by clicking the Star box in the top right corner if you find it useful!
 
