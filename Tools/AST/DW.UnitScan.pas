@@ -52,7 +52,8 @@ type
     Items: TUnitMaps;
     procedure AddItem(const AItem: TUnitMap);
     function Count: Integer;
-    function FindSymbol(const ASignature: string; out ASymbol: string): Boolean;
+    function FindSymbol(const ASignature: string): Boolean; overload;
+    function FindSymbol(const ASignature: string; out ASymbol: string): Boolean; overload;
     function FindUnits(const ASymbolName: string): TArray<string>;
   end;
 
@@ -139,6 +140,13 @@ begin
       Break;
     end;
   end;
+end;
+
+function TSymbolUnitMaps.FindSymbol(const ASignature: string): Boolean;
+var
+  LSymbol: string;
+begin
+  Result := FindSymbol(ASignature, LSymbol);
 end;
 
 function TSymbolUnitMaps.FindUnits(const ASymbolName: string): TArray<string>;
