@@ -118,7 +118,7 @@ For `Minimum iOS version supported`, when using **Firebase iOS SDK 11.2.0 - Delp
 
 For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit (or iOS Simulator if you are building for that), ensure you have a value of: 
 ```
--ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib -weak_library /usr/lib/swift/libswiftFileProvider.dylib -weak_library /usr/lib/swift/libswiftXPC.dylib
+-ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib -weak_library /usr/lib/swift/libswiftFileProvider.dylib -weak_library /usr/lib/swift/libswiftOSLog.dylib -weak_library /usr/lib/swift/libswiftXPC.dylib
 ``` 
 
 The `-weak_library` entries ensure compatibility with iOS 15 or lower.
