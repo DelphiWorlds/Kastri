@@ -157,9 +157,8 @@ begin
   inherited;
   {$IF Defined(ANDROID)}
   RequestPermissions;
-  {$ELSE}
-  StartLocation;
   {$ENDIF}
+  StartLocation;
 end;
 
 procedure TMainView.Resize;
