@@ -54,6 +54,10 @@ Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now succe
 
 Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. Alternatively, you will need to modify the [Framework search path](#framework-search-path) value to use the folder where the SDK is unzipped to.
 
+#### Swift Compatibility libraries
+
+If you use Firebase iOS SDK 11.2.0, it's also necessary to add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
+
 #### ML Kit Libraries
 
 The Barcode Scanner feature is dependent on prebuilt libraries in the [`ThirdParty\iOS`](https://github.com/DelphiWorlds/Kastri/tree/master/ThirdParty/iOS) folder
