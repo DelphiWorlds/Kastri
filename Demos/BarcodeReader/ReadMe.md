@@ -43,7 +43,7 @@ You will also need to modify `AndroidManifest.template.xml` - under `<%applicati
 
 Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now successfully be linked with Delphi code. Please download the Firebase iOS SDK depending on your version of Delphi. 
 
-**NOTE**: If you are combining **Firebase Cloud Messaging** support with your project, unfortunately due to library conflicts, **you MUST use Firebase iOS SDK 10.8.0** (see also [Conditional Defines](#conditional-defines))
+**NOTE**: If you are combining the [**Firebase Cloud Messaging** support from Kastri](https://github.com/DelphiWorlds/Kastri/tree/master/Demos/FCMRebooted) (i.e. **not** the built-in FCM support that comes with Delphi) with your project, unfortunately due to library conflicts, **you MUST use Firebase iOS SDK 10.8.0** (see also [Conditional Defines](#conditional-defines))
 
 * Delphi 12.2 - [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
 * Delphi 12.1 and earlier - [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
