@@ -135,12 +135,15 @@ begin
   if error = nil then
   begin
     LError := '';
-    for I := 0 to barcodes.count - 1 do
+    if barcodes.count > 0 then
     begin
-      LMLKBarcode := TMLKBarcode.Wrap(barcodes.objectAtIndex(I));
-      LBarcode.Value := NSStrToStr(LMLKBarcode.displayValue);
-      LBarcode.Format := GetBarcodeFormat(LMLKBarcode.format);
-      LBarcodes := LBarcodes + [LBarcode];
+      for I := 0 to barcodes.count - 1 do
+      begin
+        LMLKBarcode := TMLKBarcode.Wrap(barcodes.objectAtIndex(I));
+        LBarcode.Value := NSStrToStr(LMLKBarcode.displayValue);
+        LBarcode.Format := GetBarcodeFormat(LMLKBarcode.format);
+        LBarcodes := LBarcodes + [LBarcode];
+      end;
     end;
   end
   else
