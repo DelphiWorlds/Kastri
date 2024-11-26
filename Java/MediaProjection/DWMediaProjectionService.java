@@ -30,7 +30,7 @@ public class DWMediaProjectionService extends Service {
       channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
       NotificationManager manager = getSystemService(NotificationManager.class);
       if (manager != null)
-          manager.createNotificationChannel(channel);
+        manager.createNotificationChannel(channel);
     }
   }
 
@@ -53,6 +53,6 @@ public class DWMediaProjectionService extends Service {
 
   @Override
   public IBinder onBind(Intent intent) {
-      return null;
+    return null;
   }
 }
