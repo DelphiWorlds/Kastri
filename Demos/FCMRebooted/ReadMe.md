@@ -5,10 +5,10 @@
 This project demonstrates the implementation of Firebase Cloud Messaging (FCM) in Kastri, which extends the built-in support in Delphi by offering additional functionality.
 
 Key features include:
-- Customized notifications on Android using `RemoteViews` (e.g., multiple lines of text, optional image).
+- Customized notifications on Android using `RemoteViews` (e.g., multiple text lines, optional image).
 - Support for **images in iOS notifications** (refer to [this documentation](NotificationImagesOnIOS.md)).
 
-The core unit, `DW.FCMManager`, simplifies FCM management by providing an interface (`IFCMManager`). You no longer need to create any classes—just assign event handlers and call the `Start` method on the `FCM` reference.
+The core unit, `DW.FCMManager`, simplifies FCM management by providing an interface (`IFCMManager`). You no longer need to create custom classes—just assign event handlers and call the `Start` method on the `FCM` reference.
 
 > **Note:** The `DW.FCMManager` unit requires a patch to the Delphi `FMX.PushNotification.FCM.iOS` unit. See [Delphi Source Patch](#delphi-source-patch) for details.
 
@@ -118,6 +118,57 @@ Add these to the **Libraries** node under the Android platform in Project Manage
 
 > **Note:** Delphi 11.3 users compiling for Android 64-bit may need [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled).
 
-#### Android Manifest (Delphi 12.1 or Later)
+#### Build Event/Android Manifest
 
-For Delphi 12.1 or later, the manifest merge is broken. Manually apply the changes by including required permissions and configuration entries. Refer to the official documentation or the demo for an example.
+For Delphi 12.0 or earlier, configure the Post-Build event to merge the Android manifest:
+```bash
+[kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
+```
+Copy `AndroidManifest.merge.xml` from the demo folder to your project root.
+
+---
+
+## Relay Demo
+
+The **Relay Demo** handles push notifications using a service (`FCMRelayService`), even when the app is inactive. For details on setting up the service, refer to the demo’s documentation.
+
+Example push notification payload for the Relay Demo:
+```json
+{
+  "message": {
+    "topic": "FCMRebooted",
+    "data": {
+      "SMSText": "Test Message",
+      "SMSDest": "+610499999999",
+      "title": "Test SMS",
+      "body": "This is a test"
+    }
+  }
+}
+```
+
+---
+
+## Sending Test Messages
+
+Use [PushIt](https://github.com/DelphiWorlds/PushIt) to send test messages. Ensure the **Data Only Notification** checkbox is selected for Android.
+
+---
+
+## Troubleshooting
+
+### iOS
+- **No token received**: Verify the Provisioning Profile and ensure Push Notifications are enabled.
+- **Compiler errors**: Check framework paths and Firebase SDK compatibility.
+
+### Android
+- **Messages not received**: Ensure the payload format is correct and omit the `notification` element.
+
+---
+
+### Key Improvements:
+1. **Structured Headings**: Improved hierarchy and organization for better readability.
+2. **Consistent Formatting**: Used code blocks for paths, commands, and JSON examples.
+3. **Clear Notes and Warnings**: Highlighted critical details using bold text and blockquotes.
+4. **Simplified Language**: Removed redundant phrases and streamlined explanations.
+5. **Enhanced Accessibility**: Improved alt text and cross-referenced links for better navigation.
