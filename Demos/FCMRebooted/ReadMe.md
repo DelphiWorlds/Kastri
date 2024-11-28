@@ -5,10 +5,10 @@
 This project demonstrates the implementation of Firebase Cloud Messaging (FCM) in Kastri, which extends the built-in support in Delphi by offering additional functionality.
 
 Key features include:
-- Customized notifications on Android using `RemoteViews` (e.g., multiple text lines, optional image).
+- Customized notifications on Android using `RemoteViews` (e.g., multiple lines of text, optional image).
 - Support for **images in iOS notifications** (refer to [this documentation](NotificationImagesOnIOS.md)).
 
-The core unit, `DW.FCMManager`, simplifies FCM management by providing an interface (`IFCMManager`). You no longer need to create custom classes—just assign event handlers and call the `Start` method on the `FCM` reference.
+The core unit, `DW.FCMManager`, simplifies FCM management by providing an interface (`IFCMManager`). You no longer need to create any classes—just assign event handlers and call the `Start` method on the `FCM` reference.
 
 > **Note:** The `DW.FCMManager` unit requires a patch to the Delphi `FMX.PushNotification.FCM.iOS` unit. See [Delphi Source Patch](#delphi-source-patch) for details.
 
@@ -118,13 +118,9 @@ Add these to the **Libraries** node under the Android platform in Project Manage
 
 > **Note:** Delphi 11.3 users compiling for Android 64-bit may need [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled).
 
-#### Build Event/Android Manifest
+#### Android Manifest (Delphi 12.1 or Later)
 
-For Delphi 12.0 or earlier, configure the Post-Build event to merge the Android manifest:
-```bash
-[kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
-```
-Copy `AndroidManifest.merge.xml` from the demo folder to your project root.
+For Delphi 12.1 or later, the manifest merge is broken. Manually apply the changes by including required permissions and configuration entries. Refer to the official documentation or the demo for an example.
 
 ---
 
