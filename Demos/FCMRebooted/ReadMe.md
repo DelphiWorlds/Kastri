@@ -159,12 +159,3 @@ Use [PushIt](https://github.com/DelphiWorlds/PushIt) to send test messages. Ensu
 
 ### Android
 - **Messages not received**: Ensure the payload format is correct and omit the `notification` element.
-
----
-
-### Key Improvements:
-1. **Structured Headings**: Improved hierarchy and organization for better readability.
-2. **Consistent Formatting**: Used code blocks for paths, commands, and JSON examples.
-3. **Clear Notes and Warnings**: Highlighted critical details using bold text and blockquotes.
-4. **Simplified Language**: Removed redundant phrases and streamlined explanations.
-5. **Enhanced Accessibility**: Improved alt text and cross-referenced links for better navigation.
