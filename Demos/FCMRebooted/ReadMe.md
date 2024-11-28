@@ -2,270 +2,160 @@
 
 ## Description
 
-Demonstrates the implementation of Firebase Cloud Messaging (FCM) in Kastri, which provides functionality over and above that of the "out of the box" support in Delphi.
+This project demonstrates the implementation of Firebase Cloud Messaging (FCM) in Kastri, which extends the built-in support in Delphi by offering additional functionality.
 
-In this implementation, support has been added for a customised notification on Android, using RemoteViews, similar to the [CustomNotification demo in the Playground repo](https://github.com/DelphiWorlds/Playground/tree/main/Demos/CustomNotification). This allows multiple lines of text in the notification banner, and an optional image, placed to the right of the text.
+Key features include:
+- Customized notifications on Android using `RemoteViews` (e.g., multiple lines of text, optional image).
+- Support for **images in iOS notifications** (refer to [this documentation](NotificationImagesOnIOS.md)).
 
-For support of **images in notifications on iOS**, please refer to [this separate documentation](NotificationImagesOnIOS.md).
+The core unit, `DW.FCMManager`, simplifies FCM management by providing an interface (`IFCMManager`). You no longer need to create any classes—just assign event handlers and call the `Start` method on the `FCM` reference.
 
-The unit `DW.FCMManager` handles management of FCM, which is exposed as a reference to an interface: `IFCMManager`. Now you do not need to create any classes; just assign event handlers, and call the `Start` method on the `FCM` reference. 
+> **Note:** The `DW.FCMManager` unit requires a patch to the Delphi `FMX.PushNotification.FCM.iOS` unit. See [Delphi Source Patch](#delphi-source-patch) for details.
 
-**NOTE: The `DW.FCMManager` unit requires the `FMX.PushNotification.FCM.iOS` unit from the Delphi source to be patched**. See [below for details](#delphi-source-patch).
+Two demos are included:
+- **FCMBaseDemo:** A standard FCM implementation.
+- **FCMRelayDemo:** Uses a service to handle messages, even when the app is not running.
 
-There are 2 demos: 
+**Important:** Android FCM messages must omit the `notification` element and include the `title`, `body`, and `imageUrl` (if needed) properties in the `data` element. Refer to the [Sending Test Messages](#sending-test-messages) section for details.
 
-* A regular FCM demo (FCMBaseDemo), and
-* A demo of using a service to handle the message regardless of whether or not the app is running (FCMRelayDemo)
+---
 
-**In order for messages to be received properly on Android, FCM message payloads will need to omit `notification` elements, and include `title`, `body` and `imageUrl` (if needed) properties in the `data` element.** Please refer to the [Sending test messages](#sending-test-messages) section.
+## Supported Delphi Versions
 
-## Supported Delphi versions
+- **Delphi 12.x**
+- **Delphi 11.3** (limited support)
 
-Delphi 12.x, Delphi 11.3 (limited support)
+---
 
 ## Project Configuration
 
-In order to use FCM in Delphi, you will need to:
-
-### [Apple Developer portal](http://developer.apple.com/account) (iOS)
-
-* Create an APNs key for use with Firebase Cloud Messaging in your Firebase project
-* Create an App ID and enable Push Notifications for it
-* Create a Provisioning Profile that has the App ID attached to it
-* Download the Provisioning Profile on to the Mac
-
-### [Firebase Console](https://console.firebase.google.com) (both platforms)
-
-* Create a Firebase project that you can use for FCM
-* Add iOS support to the project
-* Add the APNs key to the Cloud Messaging iOS support
-* Add Android support to the project
-
 ### iOS
 
-#### Delphi source patch
+#### Apple Developer Portal
 
-Due to changes in how the newer Firebase SDK works, it is necessary to patch the Delphi source file `FMX.PushNotification.FCM.iOS` located in the `source\fmx` folder of Delphi. 
-
-If you have [Git](https://git-scm.com/) installed on your system, you can use the following to create a patched version of the unit. In a command-line window, execute these commands:
-
-```
-cd <Kastri>\Features\Firebase
-FCMPatch.cmd
-```
-  
-where `<Kastri>` is the root of your copy of Kastri. This should work for Delphi 11.3 and Delphi 12.x
-
-If you need to patch `FMX.PushNotification.FCM.iOS` manually, please see [these instructions](../../Features/Firebase/FCMManualPatch.md).
-
-**NOTE**: The patched file needs to be in the *project folder*, **OR** in the *search path*. **Do not patch it "in place" in the Delphi source**, because those folders are not normally in the search path.
+1. Create an APNs key for use with Firebase Cloud Messaging in your Firebase project.
+2. Create an App ID and enable Push Notifications for it.
+3. Create a Provisioning Profile linked to the App ID.
+4. Download the Provisioning Profile to your Mac.
 
 #### Firebase SDK
 
-**NOTE:** Using FirebaseCloudMessaging from Firebase iOS SDK 11.2.0 requires that the **minimum version of iOS be set to 13.0** (see [Linker Options](#linker-options))
+To use FCM, download the appropriate Firebase iOS SDK based on your Delphi version:
 
-Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now successfully be linked with Delphi code. Please download the Firebase iOS SDK depending on your version of Delphi:
+- **Delphi 12.2:** [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
+- **Delphi 12.1 and earlier:** [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
 
-* Delphi 12.2 - [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
-* Delphi 12.1 and earlier - [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
+Unzip the SDK to a shared folder and create an [Environment Variable Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) named `Firebase` pointing to the folder. Alternatively, update the [Framework Search Path](#framework-search-path).
 
-..and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. 
+> **Note:** For Firebase iOS SDK 11.2.0, the minimum iOS version must be set to **13.0**.
 
-Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo.
+#### Delphi Source Patch
 
-#### Framework search path
+Due to updates in the Firebase SDK, patching the Delphi `FMX.PushNotification.FCM.iOS` unit is necessary. To apply the patch:
 
-In Project Options, set the Framework Search Path value for iOS Device 64-bit target to:
+1. Navigate to `<Kastri>\Features\Firebase`.
+2. Run the command:
+   ```bash
+   FCMPatch.cmd
+   ```
 
-When using Firebase iOS SDK 10.8.0:
+For manual patching instructions, refer to [FCMManualPatch.md](../../Features/Firebase/FCMManualPatch.md).
 
+> **Note:** Place the patched file in the project folder or a location in the search path. Avoid modifying the Delphi source folder directly.
+
+#### Framework Search Path
+
+Configure the framework paths based on the Firebase SDK version:
+
+**For Firebase iOS SDK 10.8.0**:
+```text
+$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64_armv7;...
 ```
-$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanoPB.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
+
+**For Firebase iOS SDK 11.2.0 (Delphi 12.2 or later)**:
+```text
+$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64;...
 ```
 
-When using Firebase iOS SDK 11.2.0 - **Delphi 12.2 or later**:
-
-```
-$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanoPB.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
-```
-
-**For iOS Simulator**:
-
-```
-$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseAnalytics\nanoPB.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64_x86_64-simulator;$(Firebase)\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64_x86_64-simulator
-```
+For **iOS Simulator** paths, use `ios-arm64_x86_64-simulator` instead of `ios-arm64`.
 
 #### Additional Frameworks
 
-In order to compile successfully for iOS, it's also necessary to add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
+Add the following frameworks in Delphi's SDK Manager:
+- CoreTransferable
+- DeveloperToolsSupport
+- SwiftUI
+- SwiftUICore
 
-You will need to add the following frameworks to the iOS SDK in Delphi's SDK Manager:
+Refer to [this guide](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks) for instructions.
 
-* CoreTransferable
-* DeveloperToolsSupport
-* SwiftUI
-* SwiftUICore
+#### Deployment of `GoogleServices-info.plist`
 
-[This link](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks) describes how to add the frameworks.
-
-#### Deployment of GoogleServices-info.plist
-
-Download the `GoogleServices-info.plist` file from your project configured in [Firebase Console](https://console.firebase.google.com/), and save it to the Resources folder in the demo. Add `GoogleServices-info.plist` to the deployment, as per the demo, as described above.
+1. Download the `GoogleServices-info.plist` file from Firebase Console.
+2. Add it to the project’s Resources folder.
+3. Include it in the deployment settings.
 
 #### Linker Options
 
-For `Minimum iOS version supported`, when using **Firebase iOS SDK 11.2.0 - Delphi 12.2 or later**, ensure the value is set to: `13.0`. For iOS Simulator the value should be `14.0`
+For Firebase iOS SDK 11.2.0:
+- Set the **Minimum iOS version supported** to `13.0` (or `14.0` for iOS Simulator).
+- Add the following linker options:
+  ```text
+  -ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib ...
+  ```
 
-For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit (or iOS Simulator if you are building for that), ensure you have a value of: 
-```
--ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib -weak_library /usr/lib/swift/libswiftFileProvider.dylib -weak_library /usr/lib/swift/libswiftOSLog.dylib -weak_library /usr/lib/swift/libswiftXPC.dylib
-``` 
-
-The `-weak_library` entries ensure compatibility with iOS 15 or lower.
+---
 
 ### Android
 
-See [Build Event](#build-eventandroid-manifest) section **even if you are using the demo with Delphi 12.1**
+#### Java Libraries
 
-If you are creating your own project:
+Include the appropriate Kastri JAR files in the project:
+- Delphi 12.x: `dw-kastri-base-3.0.0.jar`, `dw-fcm-3.0.0.jar`
+- Delphi 11.x: `dw-kastri-base-2.0.0.jar`, `dw-fcm-2.0.0.jar`
 
-#### Kastri java libraries
+Add these to the **Libraries** node under the Android platform in Project Manager.
 
-FCM Rebooted relies on:
+> **Note:** Delphi 11.3 users compiling for Android 64-bit may need [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled).
 
-* Delphi 12.x: `dw-kastri-base-3.0.0.jar` and `dw-fcm-3.0.0.jar`
-* Delphi 11.x: `dw-kastri-base-2.0.0.jar` and `dw-fcm-2.0.0.jar` 
- 
-from the `Lib` folder, so add them to the `Libraries` node under the Android platform in Project Manager.
+#### Android Manifest (Delphi 12.1 or Later)
 
-**Note**:
+For Delphi 12.1 or later, the manifest merge is broken. Manually apply the changes by including required permissions and configuration entries. Refer to the official documentation or the demo for an example.
 
-Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will need to either apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+---
 
-#### Build Event/Android Manifest
+## Relay Demo
 
-**Delphi 12.1 ONLY**
+The **Relay Demo** handles push notifications using a service (`FCMRelayService`), even when the app is inactive. For details on setting up the service, refer to the demo’s documentation.
 
-Please see [this link](../../Delphi12.1.AndroidManifestIssue.md).
-
-**Delphi 12.0 or earlier:**
-
-Configure Build Events in Project Options to add a Post-Build event with the command:  
-
-```
-  [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
-```  
-Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
-
-`AndroidManifest.merge.xml` can be found in the root folder of the respective demo (i.e. FCMBaseDemo and FCMRelayDemo), and should be copied to the root folder of your project
-
-### Relay Demo
-
-The "Relay" demo uses metadata that is merged into the Android manifest (using `AndroidManifest.merge.xml` in that demo), to specify the service to relay the notification to - in this case: `com.embarcadero.services.FCMRelayService`, i.e. the fully qualified name of the service.
-Use the `AndroidIntentServiceHandleIntent` event in the service to handle the notification.
-
-Please ensure that the `Receive push notifications` checkbox is checked in the Entitlements Section of the Project Options.
-
-In the `Build Events` section of Project Options, please ensure that you configure the `Post Build` event to execute the `manifestmerge` tool (as per the demo), which ensures that the correct overridden `FirebaseMessageingService` is configured in the manifest when the project is built.
-
-For your own project, **or** the demo:
-
-In the `Services` section of the Project Options, import the google-services.json file that you download from your project configured in [Firebase Console](https://console.firebase.google.com/).
-
-The FCMRelayDemo was updated on Nov 28th, 2023 to illustrate how it could be used. In this case, if a push notification is sent to the device in a certain format, it will send an SMS to the specified destinations. This is an example message payload that could be sent in a push:
-
+Example push notification payload for the Relay Demo:
 ```json
 {
-  "message":{
-    "topic":"FCMRebooted",
-    "data":{
-      "SMSText":"Test Message",
-      "SMSDest":"+610499999999",
-      "title":"Test SMS",
-      "body":"This is a test"
+  "message": {
+    "topic": "FCMRebooted",
+    "data": {
+      "SMSText": "Test Message",
+      "SMSDest": "+610499999999",
+      "title": "Test SMS",
+      "body": "This is a test"
     }
   }
 }
 ```
 
-Note that this is a **data-only** message (i.e. no `notification` member). See the [section below](#sending-test-messages) regarding sending push messages. The message arrives at the FCMRelayDemo app like this:
+---
 
-```json
-{
-   "google.delivered_priority":"normal",
-   "google.sent_time":"1701112119113",
-   "google.ttl":"2419200",
-   "google.original_priority":"normal",
-   "SMSDest":"+610499999999",
-   "SMSText":"Test Message",
-   "body":"Test SMS",
-   "from":"\/topics\/FCMRebooted",
-   "title":"This is a test",
-   "google.message_id":"0:1701112119712079%e6375accf9fd7ecd",
-   "google.c.sender.id":"952580923416"
-}
-```
+## Sending Test Messages
 
-The service checks if the `SMSText` and `SMSDest` members are present, and if so, uses the [SMS feature](https://github.com/DelphiWorlds/Kastri/tree/master/Demos/SMS) in Kastri to send an SMS. 
+Use [PushIt](https://github.com/DelphiWorlds/PushIt) to send test messages. Ensure the **Data Only Notification** checkbox is selected for Android.
 
-**NOTE: Using the SMS API (as opposed to via intents) requires special permission from Google if you plan to deploy such an app to the Play Store.** Unfortunately, sending an SMS via intents requires user interaction, so doing so via a service is not feasible.
-
-The FCMRelayDemo app needs to be run **at least once**, so that the user can respond to the SMS permission request. After this, the app does not need to be running in order for the service to respond to the push notification and send the SMS.
-
-As stated above, sending an SMS is _just one example_ of how a "relay" service might be used.
-
-## Sending test messages
-
-Test messages can be sent using the [PushIt](https://github.com/DelphiWorlds/PushIt) tool. Please take note of the section on how to obtain the service account file from the [Cloud Console](https://console.cloud.google.com/iam-admin/serviceaccounts).
-
-**On Android, for this implementation of FCM to work, you will need to check the "Data Only Notification" checkbox.** If you do not check this checkbox, the title and body of the notification will be blank.
-
-This is due to a limitation in FCM where messages that contain a "notification" property (regardless of whether it contains a "data" property) do not cause the customized FCM service to be invoked when the app is not running or is in the background. 
-
-Added bonus: for Android, images can be included in the customised notification (they will appear on the left). Use the Image URL edit box to include a URL to an image, e.g: https://sd.keepcalms.com/i/keep-calm-and-love-delphi-26.png
-
-With PushIt, you can see what the resulting payload looks like by selecting the `JSON` tab, which can help guide you in constructing message payloads in your server.
+---
 
 ## Troubleshooting
 
 ### iOS
+- **No token received**: Verify the Provisioning Profile and ensure Push Notifications are enabled.
+- **Compiler errors**: Check framework paths and Firebase SDK compatibility.
 
-NOTE: **Firebase Cloud Messaging support here requires iOS SDK 17.4 or higher**. This implementation has been tested with Xcode 16 and iOS 18.0 SDK.
-
-#### Compiler Errors
-
-If you receive compiler errors during the linking phase, it is likely that the framework paths have not been configured correctly, or you may be using an unsupported Firebase SDK. Please check the [Project Configuration](#project-configuration) section above.
-
-#### No token being received
- 
-This can happen if the App ID being used for the Provisioning Profile does not have Push Notifications enabled.
-
-You can check that the App ID/Provisioning Profile is correct by examining the `AppName.entitlements` file that Delphi creates when deploying the app (where `AppName` is the name of your app) in the `iOSDevice64\Config` folder (where `Config` is the active config e.g. `Debug` or `Release`). It should contain the following:
-
-```
-<key>aps-environment</key>
-<string>development</string>
-```
-
-Where `development` will be replaced by `production` when using an App Store Provisioning Profile. For info regarding provisioning profile configuration, please refer to the [instructions in the original FCM demo](https://github.com/DelphiWorlds/Kastri/blob/master/Demos/FirebaseCloudMessaging/Readme.md)
-
-#### FCM messages not being received
-
-If your app is receiving a Firebase token, but does not appear to be receiving messages, it may be that:
-
-* There is no APNS key configured for iOS in [Firebase Console](https://console.firebase.google.com/)
-* The payload being used for the message being sent is incorrect
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### Android
+- **Messages not received**: Ensure the payload format is correct and omit the `notification` element.
