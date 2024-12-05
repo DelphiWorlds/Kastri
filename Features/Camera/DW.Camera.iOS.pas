@@ -572,16 +572,19 @@ var
 begin
   FDevice := nil;
   LDevices := TAVCaptureDevice.OCClass.devicesWithMediaType(AVMediaTypeVideo);
-  for I := 0 to LDevices.count - 1 do
+  if LDevices.count > 0 then
   begin
-    LDevice := TAVCaptureDevice.Wrap(LDevices.objectAtIndex(I));
-    case CameraPosition of
-      TDevicePosition.Back:
-        if LDevice.position = AVCaptureDevicePositionBack then
-          FDevice := LDevice;
-      TDevicePosition.Front:
-        if LDevice.position = AVCaptureDevicePositionFront then
-          FDevice := LDevice;
+    for I := 0 to LDevices.count - 1 do
+    begin
+      LDevice := TAVCaptureDevice.Wrap(LDevices.objectAtIndex(I));
+      case CameraPosition of
+        TDevicePosition.Back:
+          if LDevice.position = AVCaptureDevicePositionBack then
+            FDevice := LDevice;
+        TDevicePosition.Front:
+          if LDevice.position = AVCaptureDevicePositionFront then
+            FDevice := LDevice;
+      end;
     end;
   end;
   if FDevice <> nil then
