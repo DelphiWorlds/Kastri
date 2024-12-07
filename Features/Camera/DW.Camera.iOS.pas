@@ -492,12 +492,15 @@ var
   LISO: Single;
 begin
   LDevice := TAVCaptureDeviceEx.Wrap(NSObjectToID(FDevice));
-  LFormat := TAVCaptureDeviceFormatEx.Wrap(NSObjectToID(FDevice.activeFormat));
-  if Exposure > -1 then
-    LISO := LFormat.minISO + (Exposure * (LFormat.maxISO - LFormat.minISO))
-  else
-    LISO := FISODefault;
-  LDevice.setExposureModeCustomWithDuration(LDevice.exposureDuration, LISO, nil);
+  if LDevice.activeFormat <> nil then
+  begin
+    LFormat := TAVCaptureDeviceFormatEx.Wrap(NSObjectToID(LDevice.activeFormat));
+    if Exposure > -1 then
+      LISO := LFormat.minISO + (Exposure * (LFormat.maxISO - LFormat.minISO))
+    else
+      LISO := FISODefault;
+    LDevice.setExposureModeCustomWithDuration(LDevice.exposureDuration, LISO, nil);
+  end;
 end;
 
 procedure TPlatformCamera.UpdateExposureValue;
@@ -506,10 +509,13 @@ var
   LFormat: AVCaptureDeviceFormatEx;
 begin
   LDevice := TAVCaptureDeviceEx.Wrap(NSObjectToID(FDevice));
-  LFormat := TAVCaptureDeviceFormatEx.Wrap(NSObjectToID(FDevice.activeFormat));
-  if FISODefault = -1 then
-    FISODefault := LDevice.ISO;
-  InternalSetExposure((FISODefault - LFormat.minISO) / (LFormat.maxISO - LFormat.minISO));
+  if LDevice.activeFormat <> nil then
+  begin
+    LFormat := TAVCaptureDeviceFormatEx.Wrap(NSObjectToID(LDevice.activeFormat));
+    if FISODefault = -1 then
+      FISODefault := LDevice.ISO;
+    InternalSetExposure((FISODefault - LFormat.minISO) / (LFormat.maxISO - LFormat.minISO));
+  end;
 end;
 
 procedure TPlatformCamera.UpdateFlashMode;
