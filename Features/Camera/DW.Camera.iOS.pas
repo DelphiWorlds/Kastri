@@ -183,6 +183,11 @@ begin
   Result := CocoaNSStringConst(libAVFoundation, 'AVVideoCodecJPEG');
 end;
 
+function AVCaptureISOCurrent: CGFloat;
+begin
+  Result := CocoaDoubleConst(libAVFoundation, 'AVCaptureISOCurrent');
+end;
+
 type
   NSObjectEx = interface(NSObject)
     ['{07DD60D7-65A5-4BA6-AF2B-F91C1360D8B8}']
@@ -499,7 +504,8 @@ begin
       LISO := LFormat.minISO + (Exposure * (LFormat.maxISO - LFormat.minISO))
     else
       LISO := FISODefault;
-    LDevice.setExposureModeCustomWithDuration(LDevice.exposureDuration, LISO, nil);
+    if (LISO >= LFormat.minISO) and (LISO <= LFormat.maxISO) then
+      LDevice.setExposureModeCustomWithDuration(LDevice.exposureDuration, LISO, nil);
   end;
 end;
 
