@@ -33,6 +33,7 @@ type
     FRestoreViewport: Boolean;
     FStoredHeight: Single;
     FStoredIsElastic: Boolean;
+    FVerticalOffset: Single;
     FViewportOffset: Single;
     FVKRect: TRect;
     function IsFocusedObject: Boolean;
@@ -66,6 +67,10 @@ type
     ///   You will likely never need to set this to True
     /// </remarks>
     property RestoreViewport: Boolean read FRestoreViewport write FRestoreViewport;
+    /// <summary>
+    ///   The amount of extra vertical space allowed for the control to be clear of the virtual keyboard
+    /// </summary>
+    property VerticalOffset: Single read FVerticalOffset write FVerticalOffset;
   end;
 
 implementation
@@ -82,11 +87,15 @@ uses
   // DW
   DW.VirtualKeyboard.Helpers, DW.ElasticLayout;
 
+const
+  cVerticalOffsetDefault = 2;
+
 { TVertScrollBox }
 
 constructor TVertScrollBox.Create(AOwner: TComponent);
 begin
   inherited;
+  FVerticalOffset := cVerticalOffsetDefault;
   FNeedsIsElasticUpdate := True;
   FVKRect := TRect.Empty;
   TMessageManager.DefaultManager.SubscribeToMessage(TOrientationChangedMessage, OrientationChangedMessageHandler);
@@ -216,8 +225,8 @@ begin
     LMemo := TCustomMemo(FFocusedControl);
     LControlBottom := LControlPosition.Y + (LMemo.Caret.Pos.Y - LMemo.ViewportPosition.Y) + (LMemo.Caret.size.Height * 2) + 6;
   end;
-  // + 2 = to give a tiny bit of clearance between the control "bottom" and the VK
-  LOffset := (LControlBottom + 2 + LStatusBarHeight - FVKRect.Top) / Scale.Y;
+  // FVerticalOffset gives a bit more clearance between the control "bottom" and the VK
+  LOffset := (LControlBottom + FVerticalOffset + LStatusBarHeight - FVKRect.Top) / Scale.Y;
   if Trunc(LOffset) > 0 then
     FViewportOffset := LOffset
   else
