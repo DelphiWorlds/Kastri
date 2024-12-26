@@ -960,28 +960,28 @@
                 <DeployFile LocalName="Resources\Overrides\res\values\styles-v21.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-v21</RemoteDir>
-                        <RemoteName>styles-v21.xml</RemoteName>
+                        <RemoteName>styles.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Resources\Overrides\res\values\styles-v21.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>res\values-v21</RemoteDir>
-                        <RemoteName>styles-v21.xml</RemoteName>
+                        <RemoteName>styles.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Resources\Overrides\res\values\styles-v21.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-v21</RemoteDir>
-                        <RemoteName>styles-v21.xml</RemoteName>
+                        <RemoteName>styles.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Resources\Overrides\res\values\styles-v21.xml" Configuration="Release" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>res\values-v21</RemoteDir>
-                        <RemoteName>styles-v21.xml</RemoteName>
+                        <RemoteName>styles.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
