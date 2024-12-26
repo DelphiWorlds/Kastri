@@ -25,15 +25,12 @@ This feature is dependent on the Play Core library, which does not ship with Del
 
 Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
 
-### Build Event/Android Manifest
+### Android Manifest/Deployment
 
-**Delphi 12.1, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md):**
+Steps:
 
-Due to changes in the Android build process:
-
-* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
-* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
-* Modify `AndroidManifest.template.xml` to add *before* the terminating application tag, i.e. `</application>`
+1. Deploy the project *at least once* - this will create the required manifest template and styles files
+2. Modify `AndroidManifest.template.xml` to add *before* `<%activity%>`
 
   ```
     <activity android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
@@ -42,21 +39,23 @@ Due to changes in the Android build process:
         android:stateNotNeeded="true"
         android:theme="@style/Theme.PlayCore.Transparent" />
   ```
-
-**Delphi 12.0 or earlier:**
-
-Please refer to the Build Events section of the Project Options. There are two commands in a Post-Build event:
-
-* Merge `AndroidManifest.template.xml` using the `manifestmerge` tool in the Tools folder of Kastri
-* If Delphi generates a `styles.xml` file (as it does when you enable the splash screen), the file `Resources\styles.merge.xml` is merged (using `resmerge` in the Tools folder) with the Delphi generated file into the `Resources\Overrides\res\values` folder. This file is included in the Deployment (see Deployment section below)
-
-**You may need to modify these commands to suit your environment**.
-
-### Deployment
-
-As per the Build Events section above, the merged `styles.xml` is added to the deployment. As this file is an "override", the Delphi generated styles.xml deployment **needs to be disabled** (if one exists): 
-
-<img src="Screenshots/Deployment.png" alt="logo" height="200">
+3. Copy `styles.xml` and `styles-v21.xml` from the project output folder to the `Resources\Overrides\res\values` folder
+4. Modify **each** of these files to add this style inside the `<resources>` tag:
+   ```
+    <style name="Theme.PlayCore.Transparent" parent="android:Theme">
+      <item name="android:windowIsTranslucent">true</item>
+      <item name="android:windowBackground">@android:color/transparent</item>
+      <item name="android:windowContentOverlay">@null</item>
+      <item name="android:windowNoTitle">true</item>
+      <item name="android:windowIsFloating">true</item>
+      <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    ```
+5. If you are creating your own project, these files will need to be added to the deployment (they are already added in the demo), for the target platforms (i.e. Android 32-bit and Android 64-bit) and configurations (e.g. Debug and Release). See the next step for an illustration of the required entries
+6. As these files are an "override", the **Delphi generated styles** deployment files **need to be disabled**, e.g. for Android 64-bit (All configurations):
+   
+   <img src="Screenshots/Deployment.png" alt="logo" height="200">
+7. Redeploy the app
 
 ## Thanks
 
