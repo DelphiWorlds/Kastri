@@ -17,7 +17,7 @@ implementation
 
 uses
   // RTL
-  System.SysUtils, System.Notification, System.PushNotification, System.Messaging, System.Permissions,
+  System.SysUtils, System.Notification, System.PushNotification, System.Messaging, System.Permissions, System.StrUtils,
   // Android
   Androidapi.JNI.Os, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.Helpers, Androidapi.JNI.Firebase,
   Androidapi.JNI.App, Androidapi.JNIBridge, Androidapi.JNI,
@@ -89,9 +89,11 @@ type
   private
     FChannelId: string;
     FFirebaseMessagingServiceCallback: TDWFirebaseMessagingServiceCallback;
+    FMessageIDs: TArray<string>;
     function IsAndroidPushEnabled: Boolean;
     procedure MessageReceivedNotificationHandler(const Sender: TObject; const AMsg: TMessage);
   protected
+    function CanHandleNotification(const AServiceNotification: TPushServiceNotification): Boolean; override;
     procedure CreateChannel; override;
   public
     constructor Create;
@@ -183,9 +185,9 @@ var
   LIcon: Integer;
   LIntent: JIntent;
 begin
-  if ShowBannerIfForeground and IsForeground then
+  LIntent := TMessageReceivedNotification(AMsg).Value;
+  if ShowBannerIfForeground and IsForeground and LIntent.hasExtra(StringToJString('S.google.message_id')) then
   begin
-    LIntent := TMessageReceivedNotification(AMsg).Value;
     TOSMetadata.GetValue(cMetadataFCMDefaultNotificationIcon, LIcon);
     TJDWNotificationPresenter.JavaClass.presentNotification(TAndroidHelper.Context, LIntent, StringToJString(FChannelId), LIcon);
   end;
@@ -215,6 +217,23 @@ begin
       end;
     end;
   end;
+end;
+
+function TPlatformFCMManager.CanHandleNotification(const AServiceNotification: TPushServiceNotification): Boolean;
+var
+  LMessageID: string;
+begin
+  if AServiceNotification.Json <> nil then
+  begin
+    Result := False;
+    if AServiceNotification.Json.TryGetValue('["google.message_id"]', LMessageID) then
+    begin
+      Result := not MatchText(LMessageID, FMessageIDs);
+      FMessageIDs := FMessageIDs + [LMessageID];
+    end;
+  end
+  else
+    Result := inherited;
 end;
 
 procedure TPlatformFCMManager.CheckPushEnabled(const AHandler: TCheckPushEnabledMethod);

@@ -189,6 +189,7 @@ type
     procedure StatusChange;
     procedure TokenReceived;
   protected
+    function CanHandleNotification(const AServiceNotification: TPushServiceNotification): Boolean; virtual;
     procedure CreateChannel; virtual;
     procedure DoNotificationCategory(const ACategory, AAction: string);
     procedure DoStart;
@@ -481,6 +482,11 @@ begin
   end;
 end;
 
+function TCustomPlatformFCMManager.CanHandleNotification(const AServiceNotification: TPushServiceNotification): Boolean;
+begin
+  Result := True;
+end;
+
 procedure TCustomPlatformFCMManager.CheckPushEnabled(const AHandler: TCheckPushEnabledMethod);
 begin
   //
@@ -622,7 +628,7 @@ begin
     FOnNotificationReceived(Self, AServiceNotification);
   if AServiceNotification.Json <> nil then
   begin
-    if Assigned(FOnMessageReceived) then
+    if Assigned(FOnMessageReceived) and CanHandleNotification(AServiceNotification) then
       FOnMessageReceived(Self, AServiceNotification.Json);
   end;
 end;
