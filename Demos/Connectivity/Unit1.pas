@@ -13,7 +13,7 @@ type
   private
     FConnectivity: TConnectivity;
     procedure ConnectivityChangeHandler(Sender: TObject; const AIsConnected: Boolean);
-    procedure DumpLocalIPv4Addresses;
+    procedure DumpIPAddresses;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -39,7 +39,7 @@ begin
   end
   else
     Memo1.Lines.Add('Device is NOT connected to the internet');
-  DumpLocalIPv4Addresses;
+  DumpIPAddresses;
   FConnectivity := TConnectivity.Create;
   FConnectivity.OnConnectivityChange := ConnectivityChangeHandler;
 end;
@@ -50,13 +50,18 @@ begin
   inherited;
 end;
 
-procedure TForm1.DumpLocalIPv4Addresses;
+procedure TForm1.DumpIPAddresses;
 var
   LAddress: TIPAddress;
 begin
   for LAddress in TConnectivity.GetLocalAddresses do
   begin
     if LAddress.Version = TIPVersion.IPv4 then
+      Memo1.Lines.Add(LAddress.IP);
+  end;
+  for LAddress in TConnectivity.GetLocalAddresses do
+  begin
+    if LAddress.Version = TIPVersion.IPv6 then
       Memo1.Lines.Add(LAddress.IP);
   end;
 end;
