@@ -6,7 +6,7 @@ unit DW.SpeechRecognition;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2024 Dave Nottage under MIT license   }
+{  Copyright 2020-2025 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -71,6 +71,12 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    /// <summary>
+    ///   Requests permission to use the microphone, which is required for speech recognition
+    /// </summary>
+    /// <remarks>
+    ///   Applies to iOS, macOS and Android
+    /// </remarks>
     procedure RequestPermission;
     /// <summary>
     ///   Starts recording
