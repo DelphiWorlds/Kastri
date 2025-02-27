@@ -154,6 +154,7 @@ Use [PushIt](https://github.com/DelphiWorlds/PushIt) to send test messages. Ensu
 ## Troubleshooting
 
 ### iOS
+- **Compile error** - `[DCC Error] E2597 ld: file not found: PromisesObjC`: The source has not been patched as per [these instructions](#delphi-source-patch). 
 - **No token received**: Verify the Provisioning Profile and ensure Push Notifications are enabled.
 - **Compiler errors**: Check framework paths and Firebase SDK compatibility.
 
