@@ -96,7 +96,7 @@ Ensure your project has the `Access Network State` permission in Project Options
 
 This process is required only if you are **not disabling UMP support** ([see above](#user-messaging-platform-ump-support))
 
-User Messaging Platform (UMP) requires `R` classes associated with the play-services-base-18.1.0.jar file that is part of the "default" libraries used by Delphi 12. When using Android Studio, these are generated automatically; with Delphi, they need to be generated separately. 
+User Messaging Platform (UMP) requires `R` classes associated with the play-services-ads-22.2.0.jar file that is part of the "default" libraries used by Delphi 12.x. When using Android Studio, these are generated automatically; with Delphi, they need to be generated separately. 
 
 This process could be done manually via the command line or in a batch file, however an easier way is through the use of [Codex](https://github.com/DelphiWorlds/Codex). Once you install Codex, you can follow these steps:
 
@@ -108,8 +108,9 @@ This process could be done manually via the command line or in a batch file, how
    ..to download/extract play-services-basement, using this value in the Packages edit:
 
    ```
-   com.google.android.gms:play-services-base:18.1.0
+   com.google.android.gms:play-services-ads:22.2.0
    ```
+
    <img src="./Screenshots/PackageDownloadPlayServicesBase.png" alt="Package Download Play Services Base" height="400">
    
    ..and click `Extract`
