@@ -126,6 +126,8 @@ For Delphi 12.1 or later, the manifest merge is broken. Manually apply the chang
 
 ## Relay Demo
 
+**NOTE: If you are using Delphi 12.3** please see [this report in the Quality Portal](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3108) for a workaround to the compiler error you will receive.
+
 The **Relay Demo** handles push notifications using a service (`FCMRelayService`), even when the app is inactive. For details on setting up the service, refer to the demo’s documentation.
 
 Example push notification payload for the Relay Demo:
@@ -155,8 +157,8 @@ Use [PushIt](https://github.com/DelphiWorlds/PushIt) to send test messages. Ensu
 
 ### iOS
 - **Compile error** - `[DCC Error] E2597 ld: file not found: PromisesObjC`: The source has not been patched as per [these instructions](#delphi-source-patch). 
+- **Other Compiler errors**: Check framework paths and Firebase SDK compatibility.
 - **No token received**: Verify the Provisioning Profile and ensure Push Notifications are enabled.
-- **Compiler errors**: Check framework paths and Firebase SDK compatibility.
 
 ### Android
 - **Messages not received**: Ensure the payload format is correct and omit the `notification` element.
