@@ -81,13 +81,16 @@ For **iOS Simulator** paths, use `ios-arm64_x86_64-simulator` instead of `ios-ar
 
 #### Additional Frameworks
 
-Add the following frameworks in Delphi's SDK Manager:
-- CoreTransferable
-- DeveloperToolsSupport
-- SwiftUI
-- SwiftUICore
+In order to compile successfully for iOS, it's also necessary to:
 
-Refer to [this guide](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks) for instructions.
+1. Add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
+2. Add the following frameworks in Delphi's SDK Manager:
+   - CoreTransferable
+   - DeveloperToolsSupport
+   - SwiftUI
+   - SwiftUICore
+  
+   Refer to [this guide](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks) for instructions.
 
 #### Deployment of `GoogleServices-info.plist`
 
