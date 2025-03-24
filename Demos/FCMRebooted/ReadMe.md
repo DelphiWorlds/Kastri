@@ -14,9 +14,9 @@ The core unit, `DW.FCMManager`, simplifies FCM management by providing an interf
 
 Two demos are included:
 - **FCMBaseDemo:** A standard FCM implementation.
-- **FCMRelayDemo:** Uses a service to handle messages, even when the app is not running.
+- **FCMRelayDemo:** Uses a service to handle messages so that you can do **custom processing** of messages when the app is not running. 
 
-**Important:** Android FCM messages must omit the `notification` element and include the `title`, `body`, and `imageUrl` (if needed) properties in the `data` element. Refer to the [Sending Test Messages](#sending-test-messages) section for details.
+**Important:** With this implementation, Android FCM messages must omit the `notification` element and include the `title`, `body`, and `imageUrl` (if needed) properties in the `data` element. Refer to the [Sending Test Messages](#sending-test-messages) section for details.
 
 ---
 
