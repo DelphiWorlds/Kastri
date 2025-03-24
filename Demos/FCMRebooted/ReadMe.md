@@ -121,9 +121,46 @@ Add these to the **Libraries** node under the Android platform in Project Manage
 
 > **Note:** Delphi 11.3 users compiling for Android 64-bit may need [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled).
 
-#### Android Manifest (Delphi 12.1 or Later)
+#### Entitlement List
 
-For Delphi 12.1 or later, the manifest merge is broken. Manually apply the changes by including required permissions and configuration entries. Refer to the official documentation or the demo for an example.
+In the Entitlement List section of the Project Options, ensure that `Receive push notifications` is checked.
+
+#### Android Manifest
+
+In AndroidManifest.template.xml, make the following changes:
+
+**Replace** the `<%services%>` tag with:
+
+```xml
+  <service android:exported="false" android:name="com.delphiworlds.kastri.DWFirebaseMessagingService">
+      <intent-filter>
+          <action android:name="com.google.firebase.MESSAGING_EVENT" />
+      </intent-filter>
+  </service>
+  <service
+      android:name="com.google.firebase.messaging.FirebaseMessagingService"
+      android:directBootAware="true"
+      android:exported="false" >
+      <intent-filter android:priority="-500" >
+          <action android:name="com.google.firebase.MESSAGING_EVENT" />
+      </intent-filter>
+  </service>
+  <service
+      android:name="com.google.firebase.components.ComponentDiscoveryService"
+      android:exported="false" >
+      <meta-data
+          android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+          android:value="com.google.firebase.components.ComponentRegistrar" />
+      <meta-data
+          android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar"
+          android:value="com.google.firebase.components.ComponentRegistrar" />
+      <meta-data
+          android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+          android:value="com.google.firebase.components.ComponentRegistrar" />
+  </service>
+```
+
+The reason for making this change is so that the Embarcadero Firebase Messaging proxy service (`com.embarcadero.firebase.messaging.ProxyFirebaseMessagingService`) is "overridden", since it does not implement some of the functionality that the one from Kastri does.
 
 ---
 
