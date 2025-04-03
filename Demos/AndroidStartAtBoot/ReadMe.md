@@ -28,13 +28,8 @@ Add the Kastri base jar:
  
 ..to the Libraries node, under the Android target in Project Manager.
 
-### Build Event/Android Manifest
+### Android Manifest
 
-**Delphi 12.1 ONLY, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md):**
-
-Due to changes in the Android build process in Delphi:
-
-* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
 * Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
 * Modify `AndroidManifest.template.xml` to add *after* `<%application-meta-data%>`
 
@@ -56,10 +51,6 @@ Due to changes in the Android build process in Delphi:
       </intent-filter>
     </receiver>
   ``` 
-
-**Delphi 12.0 or earlier:**
-
-Please refer to the Build Events section of the Project Options of the demo. The command merges `AndroidManifest.template.xml` using the `manifestmerge` tool in the Tools folder of Kastri. You may need to modify the command in the Project Options of your own project to suit your file locations.
 
 ### Startup notification resource
 
