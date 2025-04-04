@@ -42,6 +42,7 @@ type
     FDelay: Integer;
     FIsPlayRequested: Boolean;
     FMediaPlayer: JMediaPlayer;
+    FOnCompletionListener: JMediaPlayer_OnCompletionListener;
     FOnPreparedListener: JMediaPlayer_OnPreparedListener;
     FPlayStartTime: TDateTime;
     FWatcher: TAudioPlayerWatcher;
@@ -170,6 +171,7 @@ begin
   inherited;
   LService := TAndroidHelper.Activity.getSystemService(TJContext.JavaClass.AUDIO_SERVICE);
   FAudioManager := TJAudioManager.Wrap(TAndroidHelper.JObjectToID(LService));
+  FOnCompletionListener := TOnCompletionListener.Create(Self);
   FOnPreparedListener := TOnPreparedListener.Create(Self);
   FWatcher := TAudioPlayerWatcher.Create(Self);
 end;
@@ -195,6 +197,7 @@ begin
   FMediaPlayer := nil;
   FMediaPlayer := TJMediaPlayer.JavaClass.init;
   FMediaPlayer.setDataSource(StringToJString(AFileName));
+  FMediaPlayer.setOnCompletionListener(FOnCompletionListener);
   FMediaPlayer.setOnPreparedListener(FOnPreparedListener);
   FMediaPlayer.prepareAsync;
 end;
