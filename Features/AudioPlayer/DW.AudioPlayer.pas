@@ -125,14 +125,14 @@ end;
 
 procedure TCustomPlatformAudioPlayer.DoAudioStateChange(const AState: TAudioState);
 var
-  LIsPlaying: Boolean;
+  LWasPlaying: Boolean;
 begin
-  LIsPlaying := AState = TAudioState.Playing;
+  LWasPlaying := FAudioState = TAudioState.Playing;
   if FAudioState <> AState then
   begin
     FAudioState := AState;
     FAudioPlayer.DoAudioStateChange;
-    if LIsPlaying and (FAudioState = TAudioState.Stopped) and FIsLooped then
+    if LWasPlaying and (FAudioState = TAudioState.Stopped) and FIsLooped then
       DoPlay;
   end;
 end;
@@ -173,7 +173,8 @@ begin
   if AValue <> FIsReady then
   begin
     FIsReady := AValue;
-    DoAudioStateChange(TAudioState.Ready);
+    if FIsReady then
+      DoAudioStateChange(TAudioState.Ready);
   end;
 end;
 

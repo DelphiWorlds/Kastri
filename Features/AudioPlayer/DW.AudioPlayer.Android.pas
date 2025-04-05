@@ -41,6 +41,7 @@ type
     FAudioManager: JAudioManager;
     FDelay: Integer;
     FIsPlayRequested: Boolean;
+    FIsPrepared: Boolean;
     FMediaPlayer: JMediaPlayer;
     FOnCompletionListener: JMediaPlayer_OnCompletionListener;
     FOnPreparedListener: JMediaPlayer_OnPreparedListener;
@@ -159,7 +160,7 @@ end;
 
 procedure TOnCompletionListener.onCompletion(mp: JMediaPlayer);
 begin
-  FPlayer.DoAudioStateChange(TAudioState.Stopped);
+  FPlayer.Stop;
 end;
 
 { TPlatformAudioPlayer }
@@ -204,6 +205,7 @@ end;
 
 procedure TPlatformAudioPlayer.MediaPlayerItemPrepared;
 begin
+  FIsPrepared := True;
   SetIsReady(True);
   if FIsPlayRequested then
     Play;
@@ -236,6 +238,8 @@ begin
     end
     else
       FIsPlayRequested := True;
+    if not FIsPrepared then
+      FMediaPlayer.prepareAsync;
   end;
 end;
 
@@ -254,6 +258,8 @@ end;
 procedure TPlatformAudioPlayer.Stop;
 begin
   FMediaPlayer.stop;
+  SetIsReady(False);
+  FIsPrepared := False;
   DoAudioStateChange(TAudioState.Stopped);
 end;
 
