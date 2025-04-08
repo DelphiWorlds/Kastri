@@ -139,7 +139,7 @@ end;
 
 procedure TCustomPlatformAudioPlayer.DoPlay;
 begin
-  if AudioState <> TAudioState.Paused then
+  if AudioState = TAudioState.None then
     DoAudioStateChange(TAudioState.PlayStart);
   Play;
 end;

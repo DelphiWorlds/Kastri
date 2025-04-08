@@ -240,8 +240,6 @@ begin
     end
     else
       FIsPlayRequested := True;
-    if AudioState = TAudioState.Stopped then
-      FMediaPlayer.prepareAsync;
   end;
 end;
 
@@ -261,7 +259,6 @@ procedure TPlatformAudioPlayer.Stop;
 begin
   if (FMediaPlayer <> nil) and FMediaPlayer.isPlaying then
     FMediaPlayer.stop;
-  SetIsReady(False);
   if AudioState <> TAudioState.None then
     DoAudioStateChange(TAudioState.Stopped);
 end;
