@@ -194,7 +194,7 @@ end;
 
 procedure TPlatformAudioPlayer.LoadFromFile(const AFileName: string);
 begin
-  SetIsReady(False);
+  Stop;
   DoAudioStateChange(TAudioState.None);
   FMediaPlayer := nil;
   FMediaPlayer := TJMediaPlayer.JavaClass.init;
@@ -259,9 +259,11 @@ end;
 
 procedure TPlatformAudioPlayer.Stop;
 begin
-  FMediaPlayer.stop;
+  if (FMediaPlayer <> nil) and FMediaPlayer.isPlaying then
+    FMediaPlayer.stop;
   SetIsReady(False);
-  DoAudioStateChange(TAudioState.Stopped);
+  if AudioState <> TAudioState.None then
+    DoAudioStateChange(TAudioState.Stopped);
 end;
 
 end.
