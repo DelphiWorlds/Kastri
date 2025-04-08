@@ -41,7 +41,6 @@ type
     FAudioManager: JAudioManager;
     FDelay: Integer;
     FIsPlayRequested: Boolean;
-    FIsPrepared: Boolean;
     FMediaPlayer: JMediaPlayer;
     FOnCompletionListener: JMediaPlayer_OnCompletionListener;
     FOnPreparedListener: JMediaPlayer_OnPreparedListener;
@@ -195,6 +194,8 @@ end;
 
 procedure TPlatformAudioPlayer.LoadFromFile(const AFileName: string);
 begin
+  SetIsReady(False);
+  DoAudioStateChange(TAudioState.None);
   FMediaPlayer := nil;
   FMediaPlayer := TJMediaPlayer.JavaClass.init;
   FMediaPlayer.setDataSource(StringToJString(AFileName));
@@ -205,7 +206,6 @@ end;
 
 procedure TPlatformAudioPlayer.MediaPlayerItemPrepared;
 begin
-  FIsPrepared := True;
   SetIsReady(True);
   if FIsPlayRequested then
     Play;
@@ -233,12 +233,14 @@ begin
         FMediaPlayer.seekTo(0);
         FPlayStartTime := Now;
         DoAudioStateChange(TAudioState.PlayStart);
-      end;
+      end
+      else
+        DoAudioStateChange(TAudioState.Playing);
       FMediaPlayer.start;
     end
     else
       FIsPlayRequested := True;
-    if not FIsPrepared then
+    if AudioState = TAudioState.Stopped then
       FMediaPlayer.prepareAsync;
   end;
 end;
@@ -259,7 +261,6 @@ procedure TPlatformAudioPlayer.Stop;
 begin
   FMediaPlayer.stop;
   SetIsReady(False);
-  FIsPrepared := False;
   DoAudioStateChange(TAudioState.Stopped);
 end;
 
