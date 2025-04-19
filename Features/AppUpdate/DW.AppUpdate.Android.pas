@@ -14,9 +14,10 @@ unit DW.AppUpdate.Android;
 interface
 
 uses
-  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes,
-  DW.Androidapi.JNI.PlayCore,
-  DW.AppUpdate;
+  // Android
+  Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, AndroidApi.JNI.PlayServices.Tasks,
+  // DW
+  DW.Androidapi.JNI.PlayServices.AppUpdate, DW.AppUpdate;
 
 type
   TTaskSuccessProc = reference to procedure(const Obj: JObject);
@@ -66,7 +67,9 @@ type
 implementation
 
 uses
+  // RTL
   System.SysUtils,
+  // Android
   Androidapi.Helpers, Androidapi.JNI, Androidapi.JNI.App;
 
 { TTaskSuccessListener }
