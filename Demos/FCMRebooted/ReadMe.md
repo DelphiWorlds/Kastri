@@ -199,6 +199,8 @@ Use [PushIt](https://github.com/DelphiWorlds/PushIt) to send test messages. Ensu
 - **Compile error** - `[DCC Error] E2597 ld: file not found: PromisesObjC`: The source has not been patched as per [these instructions](#delphi-source-patch). 
 - **Other Compiler errors**: Check framework paths and Firebase SDK compatibility.
 - **No token received**: Verify the Provisioning Profile and ensure Push Notifications are enabled.
+  
+  In the project output folder, Delphi generates a file called <project>.entitlements. Inside this file (which is just xml) you should be able to see an entry with a `key` value of: `aps-environment`. If not, the provisioning profile that was used does not use an Application ID that has Push Notifications enabled.
 
 ### Android
-- **Messages not received**: Ensure the payload format is correct and omit the `notification` element.
+- **Messages not received**: Ensure the payload format is correct and omit the `notification` element. Also ensure that the [changes to `AndroidManifest.template.xml`](#android-manifest) are correct.
