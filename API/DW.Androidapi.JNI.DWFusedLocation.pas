@@ -24,6 +24,7 @@ type
   JDWFusedLocationClientClass = interface(JObjectClass)
     ['{159B5068-9D62-4A8F-A3A2-2BA5D9E45657}']
     {class} function init(context: JContext; delegate: JDWFusedLocationClientDelegate): JDWFusedLocationClient; cdecl;
+    {class} function getPreferencesName(context: JContext): JString; cdecl;
   end;
 
   [JavaSignature('com/delphiworlds/kastri/DWFusedLocationClient')]
@@ -58,6 +59,7 @@ type
     procedure onLocationUpdatesChange(active: Boolean); cdecl;
     procedure onSetMockLocationResult(location: JLocation); cdecl;
     procedure onSetMockModeResult(success: Boolean); cdecl;
+    function useCallback: Boolean; cdecl;
   end;
   TJDWFusedLocationClientDelegate = class(TJavaGenericImport<JDWFusedLocationClientDelegateClass, JDWFusedLocationClientDelegate>) end;
 
