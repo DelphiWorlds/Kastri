@@ -40,6 +40,7 @@ type
     procedure SetOnLongPress(const Value: TNotifyEvent);
   protected
     function DefineModelClass: TDataModelClass; override;
+    procedure Paint; override;
     function RecommendSize(const AWishedSize: TSizeF): TSizeF; override;
     procedure SetText(const Value: string); override;
   public
@@ -97,14 +98,14 @@ procedure Register;
 
 implementation
 
-{$IF Defined(IOS)}
 uses
-  DW.NativeButton.iOS;
+{$IF Defined(IOS)}
+  DW.NativeButton.iOS,
 {$ENDIF}
 {$IF Defined(ANDROID)}
-uses
-  DW.NativeButton.Android;
+  DW.NativeButton.Android,
 {$ENDIF}
+  FMX.Controls, FMX.Graphics;
 
 procedure Register;
 begin
@@ -151,6 +152,16 @@ end;
 function TCustomNativeButton.GetOnLongPress: TNotifyEvent;
 begin
   Result := Model.OnLongPress;
+end;
+
+procedure TCustomNativeButton.Paint;
+begin
+  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  begin
+    Canvas.Font.Assign(TextSettings.Font);
+    Canvas.Fill.Color := TextSettings.FontColor;
+    Canvas.FillText(TRectF.Create(0, 0, Width, Height), Text, TextSettings.WordWrap, 1, [], TextSettings.HorzAlign, TextSettings.VertAlign);
+  end;
 end;
 
 procedure TCustomNativeButton.SetOnLongPress(const Value: TNotifyEvent);
