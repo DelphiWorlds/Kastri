@@ -15,8 +15,7 @@ interface
 
 implementation
 
-// A cross-platform way of including units in a project for pre-compiling, specifically for the Kastri project source
-// This unit should not be included in a regular application
+// This unit is provided for compiler checks *ONLY*, and should not be included in a regular application
 
 uses
 {$IF Defined(ANDROID)}
@@ -109,7 +108,7 @@ uses
 {$ENDIF}
 
 {$IF Defined(MACOS)}
-  // DW.Connectivity.Mac,                 // <---- Requires SystemConfiguration framework to be added to the SDK
+  // DW.Connectivity.Mac,
   DW.Graphics.Helpers.Mac,
   DW.IOUtils.Helpers.Mac,
   DW.OSLog.Mac,
@@ -124,53 +123,53 @@ uses
 {$IF Defined(OSX)}
   DW.Macapi.AppKit,
   DW.Macapi.AVFoundation,
-  // DW.Macapi.AVKit,                     // <---- Requires AVKit framework to be added to the SDK
+  DW.Macapi.AVKit,
   DW.Macapi.Foundation,
   DW.Macapi.FSEvents,
   DW.Macapi.IOKit,
   DW.Macapi.Simd,
-  // DW.Macapi.SystemConfiguration,       // <---- Requires SystemConfiguration framework to be added to the SDK
+  // DW.Macapi.SystemConfiguration,
   DW.OSPower.Mac,
-  // DW.RunProcess.Mac,
+  DW.RunProcess.Mac,
   DW.StatusBarMenu.Mac,
 {$ENDIF}
 
 {$IF Defined(IOS)}
-  // DW.AuthenticationServices.iOS,       // <---- Requires AuthenticationServices framework to be added to the SDK
-  // DW.BarcodeReader,
-  // DW.BarcodeReader.iOS,
+  DW.AuthenticationServices.iOS,
+  DW.BarcodeReader,
+  DW.BarcodeReader.iOS,
   DW.Biometric.iOS,
   // DW.Camera,
   // DW.CameraPreview,
-  // DW.Camera.iOS,                       // <---- Requires Vision framework to be added to the SDK
-  // DW.CameraPreview.iOS,                // <---- Requires Vision framework to be added to the SDK
-  DW.Connectivity.iOS,
+  // DW.Camera.iOS,
+  // DW.CameraPreview.iOS,
   DW.EXIF,
   DW.EXIF.iOS,
   DW.FilesSelector.iOS,
   // DW.Firebase.Messaging.iOS,
   // DW.GoogleSignIn,
   // DW.GoogleSignIn.iOS,
-  // DW.iOSapi.AppTrackingTransparency,   // <---- Requires AppTrackingTransparency framework to be added to the SDK
-  // DW.iOSapi.ARKit,                     // <---- Requires ARKit framework to be added to the SDK
-  // DW.iOSapi.AuthenticationServices,    // <---- Requires AuthenticationServices framework to be added to the SDK
+  DW.iOSapi.AppTrackingTransparency,
+  DW.iOSapi.ARKit,
+  DW.iOSapi.AuthenticationServices,
   DW.iOSapi.AVFoundation,
-  // DW.iOSapi.CallKit,                   // <---- Requires CallKit framework to be added to the SDK
-  // DW.iOSapi.CarPlay,                   // <---- Requires CarPlay framework to be added to the SDK
+  DW.iOSapi.CallKit,
+  DW.iOSapi.CarPlay,
   DW.iOSapi.Contacts,
   DW.iOSapi.CoreImage,
   DW.iOSapi.CoreML,
-  // DW.iOSapi.CoreNFC,                   // <---- Requires CoreNFC framework to be added to the SDK
+  DW.iOSapi.CoreNFC,
   DW.iOSapi.CoreVideo,
   DW.iOSapi.DeviceCheck,
   DW.iOSapi.EventKit,
-  // DW.iOSapi.FBAudienceNetwork,
-  // DW.iOSapi.Firebase,
-  // DW.iOSapi.FirebaseAnalytics,
-  // DW.iOSapi.FirebaseAuth,
-  // DW.iOSapi.FirebaseCore,
+  DW.iOSapi.EventKitExtra,
+  DW.iOSapi.FBAudienceNetwork,
+  DW.iOSapi.Firebase,
+  DW.iOSapi.FirebaseAnalytics,
+  DW.iOSapi.FirebaseAuth,
+  DW.iOSapi.FirebaseCore,
   DW.iOSapi.Foundation,
-  // DW.iOSapi.GoogleSignIn,
+  DW.iOSapi.GoogleSignIn,
   DW.iOSapi.Helpers,
   DW.iOSapi.ImageIO,
   DW.iOSapi.Intents,
@@ -181,26 +180,27 @@ uses
   DW.iOSapi.Messages,
   DW.iOSapi.MessageUI,
   DW.iOSapi.Metal,
-  // DW.iOSapi.MLKitBarcodeScanning,
-  // DW.iOSapi.MLKitCommon,
-  // DW.iOSapi.MLKitVision,
-  // DW.iOSapi.Network,                  // <---- Requires Network framework to be added to the SDK
-  // DW.iOSapi.NetworkExtension,         // <---- Requires Network framework to be added to the SDK
+  DW.iOSapi.MLKitBarcodeScanning,
+  DW.iOSapi.MLKitCommon,
+  DW.iOSapi.MLKitVision,
+  DW.iOSapi.Network,
+  DW.iOSapi.NetworkExtension,
   DW.iOSapi.PassKit,
   DW.iOSapi.PDFKit,
   DW.iOSapi.Photos,
   DW.iOSapi.PhotosUI,
   DW.iOSapi.PushKit,
   DW.iOSapi.QuickLook,
-  // DW.iOSapi.SceneKit,                  // <---- Requires SceneKit framework to be added to the SDK
+  DW.iOSapi.SceneKit,
   DW.iOSapi.Speech,
-  // DW.iOSapi.SpriteKit,                 // <---- Requires SpriteKit framework to be added to the SDK
-  // DW.iOSapi.SpriteKitExtra,            // <---- Requires SpriteKit framework to be added to the SDK
+  DW.iOSapi.SpriteKit,
+  DW.iOSapi.SpriteKitExtra,
   DW.iOSapi.SystemConfiguration,
   DW.iOSapi.UIKit,
+  DW.iOSapi.UIKitExtra,
   DW.iOSapi.UserNotifications,
-  // DW.iOSapi.Vision,                    // <---- Requires Vision framework to be added to the SDK
-  // DW.iOSapi.VisionKit,                 // <---- Requires VisionKit framework to be added to the SDK
+  DW.iOSapi.Vision,
+  DW.iOSapi.VisionKit,
   DW.Location.iOS,
   DW.MuteCheck,
   DW.MuteCheck.iOS,
@@ -210,7 +210,7 @@ uses
   DW.NativeSlider.iOS,
   DW.Orientation.iOS,
   DW.OSPower.iOS,
-  // DW.PushNotification.iOS, <---- Firebase
+  // DW.PushNotification.iOS,
   DW.QuickLook.iOS,
   DW.UIHelper.iOS,
   DW.UserDefaults.iOS,
