@@ -1,0 +1,11 @@
+{
+  "includedJars":[
+    
+  ],
+  "javaFiles":[
+    ".\\StartService\\DWStartServiceReceiver.java"
+  ],
+  "outputFile":"..\\Lib\\dw-startservice.jar",
+  "sourceVersion":"1.10",
+  "targetVersion":"1.10"
+}
