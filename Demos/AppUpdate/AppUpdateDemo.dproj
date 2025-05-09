@@ -314,10 +314,6 @@
             <ContainerId>ClassesdexFile</ContainerId>
             <Disabled/>
         </JavaReference>
-        <JavaReference Include="..\..\ThirdParty\Android\core-common-2.0.3.jar">
-            <ContainerId>ClassesdexFile</ContainerId>
-            <Disabled/>
-        </JavaReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
