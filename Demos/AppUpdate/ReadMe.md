@@ -11,19 +11,17 @@ Please refer to the demo as a guide on how to use `TAppUpdate`.
 
 ## Supported Delphi versions
 
-Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
+Delphi 12.3. See notes just below for other versions
 
 ## Project Configuration
 
-These are instructions for configuring your own project to use the App Update feature
+These are instructions for configuring your own project to use the App Update feature. NOTE: If you use Delphi 12.2 or perhaps lower, see the [Android libraries](#android-libraries) section
 
 ### Android libraries
 
 This feature is dependent on the Play Services App Update library, which does not ship with Delphi. Add `app-update-2.1.0.jar` from the `ThirdParty\Android` folder in Kastri to the Libraries node of the Android 32-bit target in Project Manager.
 
-**Note**:
-
-Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+NOTE: **If you use Delphi 12.2, or perhaps lower**, please add `core-common-2.0.3.jar` as well.
 
 ### Android Manifest/Deployment
 
