@@ -34,7 +34,7 @@ Steps:
    ```
     <activity android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
         android:enabled="false"
-        android:exported="true"
+        android:exported="false"
         android:stateNotNeeded="true"
         android:theme="@style/Theme.PlayCore.Transparent" />
    ```
