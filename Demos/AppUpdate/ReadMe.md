@@ -15,13 +15,16 @@ Delphi 12.3. See notes just below for other versions
 
 ## Project Configuration
 
-These are instructions for configuring your own project to use the App Update feature. NOTE: If you use Delphi 12.2 or perhaps lower, see the [Android libraries](#android-libraries) section
+These are instructions for configuring your own project to use the App Update feature. They have already been done for the demo.
 
 ### Android libraries
 
-This feature is dependent on the Play Services App Update library, which does not ship with Delphi. Add `app-update-2.1.0.jar` from the `ThirdParty\Android` folder in Kastri to the Libraries node of the Android 32-bit target in Project Manager.
+This feature is dependent on the Play Services App Update library and a dependent library, which do not ship with Delphi. Add:
 
-NOTE: **If you use Delphi 12.2, or perhaps lower**, please add `core-common-2.0.3.jar` as well.
+* `app-update-2.1.0.jar` 
+* `play-core-common-2.0.3.jar` 
+  
+from the `ThirdParty\Android` folder in Kastri to the Libraries node of the Android 32-bit target in Project Manager.
 
 ### Android Manifest/Deployment
 
@@ -31,7 +34,6 @@ Steps:
 2. Modify `AndroidManifest.template.xml` to add *before* `<%activity%>`
    ```
     <activity android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
-        android:enabled="false"
         android:exported="false"
         android:stateNotNeeded="true"
         android:theme="@style/Theme.PlayCore.Transparent" />
