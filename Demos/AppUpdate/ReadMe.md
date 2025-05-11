@@ -11,7 +11,7 @@ Please refer to the demo as a guide on how to use `TAppUpdate`.
 
 ## Supported Delphi versions
 
-Delphi 12.3. See notes just below for other versions
+Delphi 12.2 and 12.3, and possibly earlier versions
 
 ## Project Configuration
 
