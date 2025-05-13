@@ -16,6 +16,7 @@ interface
 uses
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Widget, Androidapi.JNI.Util,
+  Androidapi.JNI.App,
   // DW
   DW.Androidapi.JNI.AndroidX.Media3.Common;
 
@@ -26,10 +27,169 @@ type
   JPlayerControlView_OnFullScreenModeChangedListener = interface;
   JPlayerControlView_ProgressUpdateListener = interface;
   JPlayerControlView_VisibilityListener = interface;
+  JPlayerNotificationManager = interface;
+  JPlayerNotificationManager_BitmapCallback = interface;
+  JPlayerNotificationManager_Builder = interface;
+  JPlayerNotificationManager_CustomActionReceiver = interface;
+  JPlayerNotificationManager_MediaDescriptionAdapter = interface;
+  JPlayerNotificationManager_NotificationListener = interface;
+  JPlayerNotificationManager_Priority = interface;
+  JPlayerNotificationManager_Visibility = interface;
   JPlayerView = interface;
   JPlayerView_ControllerVisibilityListener = interface;
   JPlayerView_FullscreenButtonClickListener = interface;
   JSubtitleView = interface;
+
+  JPlayerNotificationManagerClass = interface(JObjectClass)
+    ['{8468AD30-39D3-4083-96DE-533C9700D5E4}']
+    {class} function _GetACTION_FAST_FORWARD: JString; cdecl;
+    {class} function _GetACTION_NEXT: JString; cdecl;
+    {class} function _GetACTION_PAUSE: JString; cdecl;
+    {class} function _GetACTION_PLAY: JString; cdecl;
+    {class} function _GetACTION_PREVIOUS: JString; cdecl;
+    {class} function _GetACTION_REWIND: JString; cdecl;
+    {class} function _GetACTION_STOP: JString; cdecl;
+    {class} function _GetEXTRA_INSTANCE_ID: JString; cdecl;
+    {class} property ACTION_FAST_FORWARD: JString read _GetACTION_FAST_FORWARD;
+    {class} property ACTION_NEXT: JString read _GetACTION_NEXT;
+    {class} property ACTION_PAUSE: JString read _GetACTION_PAUSE;
+    {class} property ACTION_PLAY: JString read _GetACTION_PLAY;
+    {class} property ACTION_PREVIOUS: JString read _GetACTION_PREVIOUS;
+    {class} property ACTION_REWIND: JString read _GetACTION_REWIND;
+    {class} property ACTION_STOP: JString read _GetACTION_STOP;
+    {class} property EXTRA_INSTANCE_ID: JString read _GetEXTRA_INSTANCE_ID;
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerNotificationManager')]
+  JPlayerNotificationManager = interface(JObject)
+    ['{B94BE2F0-2682-4223-8756-14E95BFE2EEF}']
+    procedure invalidate; cdecl;
+    procedure setBadgeIconType(int: Integer); cdecl;
+    procedure setColor(int: Integer); cdecl;
+    procedure setColorized(boolean: Boolean); cdecl;
+    procedure setDefaults(int: Integer); cdecl;
+    // procedure setMediaSessionToken(token: JMediaSessionCompat_Token); cdecl; // Deprecated anyway
+    procedure setPlayer(player: JPlayer); cdecl;
+    procedure setPriority(int: Integer); cdecl;
+    procedure setShowPlayButtonIfPlaybackIsSuppressed(boolean: Boolean); cdecl;
+    procedure setSmallIcon(int: Integer); cdecl;
+    procedure setUseChronometer(boolean: Boolean); cdecl;
+    procedure setUseFastForwardAction(boolean: Boolean); cdecl;
+    procedure setUseFastForwardActionInCompactView(boolean: Boolean); cdecl;
+    procedure setUseNextAction(boolean: Boolean); cdecl;
+    procedure setUseNextActionInCompactView(boolean: Boolean); cdecl;
+    procedure setUsePlayPauseActions(boolean: Boolean); cdecl;
+    procedure setUsePreviousAction(boolean: Boolean); cdecl;
+    procedure setUsePreviousActionInCompactView(boolean: Boolean); cdecl;
+    procedure setUseRewindAction(boolean: Boolean); cdecl;
+    procedure setUseRewindActionInCompactView(boolean: Boolean); cdecl;
+    procedure setUseStopAction(boolean: Boolean); cdecl;
+    procedure setVisibility(int: Integer); cdecl;
+  end;
+  TJPlayerNotificationManager = class(TJavaGenericImport<JPlayerNotificationManagerClass, JPlayerNotificationManager>) end;
+
+  JPlayerNotificationManager_VisibilityClass = interface(JAnnotationClass)
+    ['{D6A1820C-62D8-4858-9C72-606FA0A57F73}']
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerNotificationManager$Visibility')]
+  JPlayerNotificationManager_Visibility = interface(JAnnotation)
+    ['{2DD4BB13-888D-44FD-BF14-CF6435565304}']
+  end;
+  TJPlayerNotificationManager_Visibility = class(TJavaGenericImport<JPlayerNotificationManager_VisibilityClass, JPlayerNotificationManager_Visibility>) end;
+
+  JPlayerNotificationManager_PriorityClass = interface(JAnnotationClass)
+    ['{405F9597-FDA3-4E20-A3CD-D630D84ACCEF}']
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerNotificationManager$Priority')]
+  JPlayerNotificationManager_Priority = interface(JAnnotation)
+    ['{9BD654A9-FA5C-4DA4-9CAE-C7A698342008}']
+  end;
+  TJPlayerNotificationManager_Priority = class(TJavaGenericImport<JPlayerNotificationManager_PriorityClass, JPlayerNotificationManager_Priority>) end;
+
+  JPlayerNotificationManager_NotificationListenerClass = interface(IJavaClass)
+    ['{9344992E-93ED-408A-8DA6-63CF42D023A8}']
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerNotificationManager$NotificationListener')]
+  JPlayerNotificationManager_NotificationListener = interface(IJavaInstance)
+    ['{D0C03015-6789-4F94-AB39-3E528B2DD41F}']
+    procedure onNotificationCancelled(int: Integer; boolean: Boolean); cdecl;
+    procedure onNotificationPosted(int: Integer; notification: JNotification; boolean: Boolean); cdecl;
+  end;
+  TJPlayerNotificationManager_NotificationListener = class(TJavaGenericImport<JPlayerNotificationManager_NotificationListenerClass,
+    JPlayerNotificationManager_NotificationListener>) end;
+
+  JPlayerNotificationManager_MediaDescriptionAdapterClass = interface(IJavaClass)
+    ['{2FCA8182-A641-4240-8511-31F37340CFA0}']
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerNotificationManager$MediaDescriptionAdapter')]
+  JPlayerNotificationManager_MediaDescriptionAdapter = interface(IJavaInstance)
+    ['{45A6646D-80C6-4509-A851-A19806BBC776}']
+    function createCurrentContentIntent(player: JPlayer): JPendingIntent; cdecl;
+    function getCurrentContentText(player: JPlayer): JCharSequence; cdecl;
+    function getCurrentContentTitle(player: JPlayer): JCharSequence; cdecl;
+    function getCurrentLargeIcon(player: JPlayer; bitmapCallback: JPlayerNotificationManager_BitmapCallback): JBitmap; cdecl;
+    function getCurrentSubText(player: JPlayer): JCharSequence; cdecl;
+  end;
+  TJPlayerNotificationManager_MediaDescriptionAdapter = class(TJavaGenericImport<JPlayerNotificationManager_MediaDescriptionAdapterClass,
+    JPlayerNotificationManager_MediaDescriptionAdapter>) end;
+
+  JPlayerNotificationManager_CustomActionReceiverClass = interface(IJavaClass)
+    ['{E5036534-7A48-4952-B3AC-4C0992A55A23}']
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerNotificationManager$CustomActionReceiver')]
+  JPlayerNotificationManager_CustomActionReceiver = interface(IJavaInstance)
+    ['{54C4BF83-6D8D-427D-9511-0D731B3BC0A4}']
+    function createCustomActions(context: JContext; int: Integer): JMap; cdecl;
+    function getCustomActions(player: JPlayer): JList; cdecl;
+    procedure onCustomAction(player: JPlayer; string_1: JString; intent: JIntent); cdecl;
+  end;
+  TJPlayerNotificationManager_CustomActionReceiver = class(TJavaGenericImport<JPlayerNotificationManager_CustomActionReceiverClass,
+    JPlayerNotificationManager_CustomActionReceiver>) end;
+
+  JPlayerNotificationManager_BuilderClass = interface(JObjectClass)
+    ['{9170D7AB-EFE9-4A73-8BC9-70DEC61811CD}']
+    {class} function init(context: JContext; int: Integer; string_1: JString;
+      mediaDescriptionAdapter: JPlayerNotificationManager_MediaDescriptionAdapter): JPlayerNotificationManager_Builder; overload; cdecl;
+    {class} function init(context: JContext; int: Integer; string_1: JString): JPlayerNotificationManager_Builder; overload; cdecl;
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerNotificationManager$Builder')]
+  JPlayerNotificationManager_Builder = interface(JObject)
+    ['{A9C9593E-D8AB-4FCD-A743-FE7CE27AA358}']
+    function build: JPlayerNotificationManager; cdecl;
+    function setChannelDescriptionResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setChannelImportance(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setChannelNameResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setCustomActionReceiver(customActionReceiver: JPlayerNotificationManager_CustomActionReceiver): JPlayerNotificationManager_Builder; cdecl;
+    function setFastForwardActionIconResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setGroup(string_1: JString): JPlayerNotificationManager_Builder; cdecl;
+    function setMediaDescriptionAdapter(mediaDescriptionAdapter: JPlayerNotificationManager_MediaDescriptionAdapter): JPlayerNotificationManager_Builder; cdecl;
+    function setNextActionIconResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setNotificationListener(notificationListener: JPlayerNotificationManager_NotificationListener): JPlayerNotificationManager_Builder; cdecl;
+    function setPauseActionIconResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setPlayActionIconResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setPreviousActionIconResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setRewindActionIconResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setSmallIconResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+    function setStopActionIconResourceId(int: Integer): JPlayerNotificationManager_Builder; cdecl;
+  end;
+  TJPlayerNotificationManager_Builder = class(TJavaGenericImport<JPlayerNotificationManager_BuilderClass, JPlayerNotificationManager_Builder>) end;
+
+  JPlayerNotificationManager_BitmapCallbackClass = interface(JObjectClass)
+    ['{C006CB89-54F7-48B0-9465-12C5E1605490}']
+  end;
+
+  [JavaSignature('androidx/media3/ui/PlayerNotificationManager$BitmapCallback')]
+  JPlayerNotificationManager_BitmapCallback = interface(JObject)
+    ['{B9FCA935-C3BE-43E0-BD65-019B0B7128A7}']
+    procedure onBitmap(bitmap: JBitmap); cdecl;
+  end;
+  TJPlayerNotificationManager_BitmapCallback = class(TJavaGenericImport<JPlayerNotificationManager_BitmapCallbackClass, JPlayerNotificationManager_BitmapCallback>) end;
 
   JSubtitleViewClass = interface(JFrameLayoutClass)
     ['{0C297B81-6526-4DC7-8BCD-B7F5BFF6A5B3}']
