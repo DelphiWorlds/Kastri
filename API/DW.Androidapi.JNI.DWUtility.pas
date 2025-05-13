@@ -27,6 +27,7 @@ type
     {class} function getScreenBrightness(activity: JActivity): Single; cdecl;
     {class} function imageToBitmap(image: JImage): JBitmap; cdecl;
     {class} function isPackageInstalled(context: JContext; packageName: JString): Boolean; cdecl;
+    {class} function jpegImageToBytes(image: JImage): TJavaArray<Byte>; cdecl;
     {class} procedure setScreenBrightness(activity: JActivity; brightness: Single); cdecl;
   end;
 
