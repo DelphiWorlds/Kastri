@@ -15,13 +15,17 @@
     ".\\Base\\DWNotificationListenerService.java",
     ".\\Base\\DWNotificationPublisher.java",
     ".\\Base\\DWNotificationPresenter.java",
+    ".\\Base\\DWPDFPrintDocumentAdapter.java",
+    ".\\Base\\DWRectangleDrawable.java",
     ".\\Base\\DWSeekBar.java",
     ".\\Base\\DWUtility.java",
     ".\\Base\\DWWakeUp.java",
     ".\\Base\\Connectivity\\DWNetworkCallback.java",
     ".\\Base\\Connectivity\\DWNetworkCallbackDelegate.java",
     ".\\Base\\TimerTask\\DWTimerTask.java",
-    ".\\Base\\TimerTask\\DWTimerTaskDelegate.java"
+    ".\\Base\\TimerTask\\DWTimerTaskDelegate.java",
+    ".\\Base\\WebView\\DWWebViewClient.java",
+    ".\\Base\\WebView\\DWWebViewClientDelegate.java"
   ],
   "outputFile":"..\\Lib\\dw-kastri-base-3.0.0.jar",
   "sourceVersion":"1.10",
