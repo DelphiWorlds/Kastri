@@ -85,6 +85,7 @@ type
   NSTouchBarItemPriority = Single;
   NSTouchBarCustomizationIdentifier = NSString;
   NSUserInterfaceItemIdentifier = NSString;
+  NSDisplayGamut = NSInteger;
 
   PNSRectEdge = ^NSRectEdge;
   PNSSharingContentScope = ^NSSharingContentScope;
