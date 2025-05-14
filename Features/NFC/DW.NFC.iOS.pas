@@ -33,11 +33,13 @@ type
   private
     FPlatformNFCReader: TPlatformNFCReader;
   public
+    procedure readerSession(session: NFCNDEFReaderSession; didDetectNDEFs: NSArray); overload; cdecl;
+    procedure readerSession(session: NFCNDEFReaderSession; didInvalidateWithError: NSError); overload; cdecl;
+    procedure readerSessionDidBecomeActive(session: NFCNDEFReaderSession); cdecl;
+    [MethodName('readerSession:didDetectTags:')]
+    procedure readerSessionDidDetectTags(session: NFCNDEFReaderSession; didDetectTags: NSArray); cdecl;
+  public
     constructor Create(const APlatformNFCReader: TPlatformNFCReader);
-    [MethodName('readerSession:didInvalidateWithError:')]
-    procedure readerSessionDidInvalidateWithError(session: NFCNDEFReaderSession; didInvalidateWithError: NSError); cdecl;
-    [MethodName('readerSession:didDetectNDEFs:')]
-    procedure readerSessionDidDetectNDEFs(session: NFCNDEFReaderSession; didDetectNDEFs: NSArray); cdecl;
   end;
 
   TPlatformNFCReader = class(TCustomPlatformNFCReader)
@@ -47,8 +49,10 @@ type
   protected
     procedure BeginSession; override;
     procedure EndSession; override;
+    procedure readerSessionDidBecomeActive(session: NFCNDEFReaderSession);
     procedure readerSessionDidInvalidateWithError(session: NFCNDEFReaderSession; didInvalidateWithError: NSError);
     procedure readerSessionDidDetectNDEFs(session: NFCNDEFReaderSession; didDetectNDEFs: NSArray);
+    procedure readerSessionDidDetectTags(session: NFCNDEFReaderSession; didDetectTags: NSArray); cdecl;
   public
     class function IsSupported: Boolean; override;
   public
@@ -76,14 +80,24 @@ begin
   FPlatformNFCReader := APlatformNFCReader;
 end;
 
-procedure TNFCNDEFReaderSessionDelegate.readerSessionDidDetectNDEFs(session: NFCNDEFReaderSession; didDetectNDEFs: NSArray);
+procedure TNFCNDEFReaderSessionDelegate.readerSession(session: NFCNDEFReaderSession; didDetectNDEFs: NSArray);
 begin
   FPlatformNFCReader.readerSessionDidDetectNDEFs(session, didDetectNDEFs);
 end;
 
-procedure TNFCNDEFReaderSessionDelegate.readerSessionDidInvalidateWithError(session: NFCNDEFReaderSession; didInvalidateWithError: NSError);
+procedure TNFCNDEFReaderSessionDelegate.readerSession(session: NFCNDEFReaderSession; didInvalidateWithError: NSError);
 begin
   FPlatformNFCReader.readerSessionDidInvalidateWithError(session, didInvalidateWithError);
+end;
+
+procedure TNFCNDEFReaderSessionDelegate.readerSessionDidBecomeActive(session: NFCNDEFReaderSession);
+begin
+  FPlatformNFCReader.readerSessionDidBecomeActive(session);
+end;
+
+procedure TNFCNDEFReaderSessionDelegate.readerSessionDidDetectTags(session: NFCNDEFReaderSession; didDetectTags: NSArray);
+begin
+
 end;
 
 { TPlatformNFCReader }
@@ -112,6 +126,11 @@ end;
 class function TPlatformNFCReader.IsSupported: Boolean;
 begin
   Result := TOSVersion.Check(11) and TNFCNDEFReaderSession.OCClass.readingAvailable;
+end;
+
+procedure TPlatformNFCReader.readerSessionDidBecomeActive(session: NFCNDEFReaderSession);
+begin
+  DoSessionBecameActive;
 end;
 
 procedure TPlatformNFCReader.readerSessionDidDetectNDEFs(session: NFCNDEFReaderSession; didDetectNDEFs: NSArray);
@@ -146,6 +165,11 @@ begin
       DoResult(LNFCResult);
     end
   );
+end;
+
+procedure TPlatformNFCReader.readerSessionDidDetectTags(session: NFCNDEFReaderSession; didDetectTags: NSArray);
+begin
+
 end;
 
 procedure TPlatformNFCReader.readerSessionDidInvalidateWithError(session: NFCNDEFReaderSession; didInvalidateWithError: NSError);
