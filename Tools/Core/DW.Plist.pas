@@ -101,7 +101,9 @@ end;
 constructor TPlist.Create(const AFileName: string);
 begin
   inherited Create;
+  {$IF Defined(MSWINDOWS)}
   MSXMLDOMDocumentFactory.AddDOMProperty('ProhibitDTD', False);
+  {$ENDIF}
   LoadFromFile(AFileName);
 end;
 
