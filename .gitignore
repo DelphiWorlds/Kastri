@@ -105,3 +105,5 @@ htaccess*
 FMX.*
 thumbs.db
 *.class
+**/Resources/Merged
+!ThirdParty/**/*.a
