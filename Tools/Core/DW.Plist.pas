@@ -24,10 +24,13 @@ type
     ['{C5B31483-0F2A-4BAB-927F-A0E97BAE8E3B}']
     function GetValueType: TValueType;
     function GetValue(out AValue: string): Boolean; // overload;
+    procedure SetValue(const AValue: Boolean); overload;
+    procedure SetValue(const AValue: string); overload;
   end;
 
   IPlistDict = interface(IInterface)
     ['{FE5AE414-FDC4-4AFD-AC42-915F46913A36}']
+    function AddKey(const AKeyName: string; const AValueType: TValueType): IPlistKey;
     function FindKey(const AName: string; out AKey: IPlistKey): Boolean;
     function GetKey(const AIndex: Integer): IPlistKey;
     function GetKeyCount: Integer;
@@ -57,7 +60,15 @@ implementation
 uses
   // RTL
   System.SysUtils, System.IOUtils,
+  // XML
+  {$IF Defined(MSWINDOWS)}
   Xml.Win.msxmldom;
+  {$ELSE}
+  Xml.XMLDom;
+  {$ENDIF}
+
+const
+  cNodeNames: array[TValueType] of string = ('', 'string', 'integer', 'real', '', 'date', 'data', 'array', 'dict');
 
 type
   TCustomPlistNode = class(TInterfacedObject)
@@ -72,6 +83,7 @@ type
   TPlistDict = class(TCustomPlistNode, IPlistDict)
   public
     { IPlistDict }
+    function AddKey(const AKeyName: string; const AValueType: TValueType): IPlistKey;
     function FindKey(const AName: string; out AKey: IPlistKey): Boolean;
     function GetKey(const AIndex: Integer): IPlistKey;
     function GetKeyCount: Integer;
@@ -84,6 +96,8 @@ type
     { IPlistKey }
     function GetValueType: TValueType;
     function GetValue(out AValue: string): Boolean;
+    procedure SetValue(const AValue: Boolean); overload;
+    procedure SetValue(const AValue: string); overload;
   public
     constructor Create(const ANode: IXMLNode); override;
   end;
@@ -132,6 +146,21 @@ begin
 end;
 
 { TPlistDict }
+
+function TPlistDict.AddKey(const AKeyName: string; const AValueType: TValueType): IPlistKey;
+var
+  LKeyNode, LValueNode: IXMLNode;
+  LValueName: string;
+begin
+  LKeyNode := FNode.OwnerDocument.CreateNode(AKeyName);
+  FNode.ChildNodes.Add(LKeyNode);
+  LValueName := cNodeNames[AValueType];
+  if AValueType = TValueType.BooleanValue then
+    LValueName := 'false';
+  LValueNode := FNode.OwnerDocument.CreateNode(LValueName);
+  FNode.ChildNodes.Add(LValueNode);
+  Result := TPlistKey.Create(LKeyNode);
+end;
 
 function TPlistDict.FindKey(const AName: string; out AKey: IPlistKey): Boolean;
 var
@@ -221,6 +250,21 @@ begin
     else if FValueNode.NodeName.Equals('dict') then
       Result := TValueType.DictionaryValue;
   end;
+end;
+
+procedure TPlistKey.SetValue(const AValue: string);
+begin
+  FValueNode.Text := AValue; //!!!! HTML Encoded
+end;
+
+procedure TPlistKey.SetValue(const AValue: Boolean);
+const
+  cValueNodeNames: array[Boolean] of string = ('false', 'true');
+var
+  LValueNode: IXMLNode;
+begin
+  LValueNode := FValueNode.OwnerDocument.CreateNode(cValueNodeNames[AValue]);
+  FValueNode.ParentNode.ChildNodes.ReplaceNode(FValueNode, LValueNode);
 end;
 
 end.
