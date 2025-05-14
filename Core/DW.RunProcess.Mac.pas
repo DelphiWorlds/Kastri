@@ -298,7 +298,7 @@ begin
       TOSLog.d('FTask.launchAndReturnError returned FALSE');
   end
   else
-    TOSLog.d('isExecutableFileAtPath is FALSE');
+    TOSLog.d('isExecutableFileAtPath for "%s" is FALSE', [FCmdLine]);
 end;
 
 function TRunProcess.RunAndWait(const ATimeout: Cardinal = 0): Integer;
