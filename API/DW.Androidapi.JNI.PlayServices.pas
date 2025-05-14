@@ -26,6 +26,7 @@ type
   JDataHolder_Builder = interface;
   JEntityBuffer = interface;
   JGoogleApi = interface;
+  JGoogleApiClient = interface;
   JListenableFuture = interface;
   JReleasable = interface;
   JScope = interface;
@@ -215,6 +216,26 @@ type
     procedure addListener(runnable: JRunnable; executor: JExecutor); cdecl;
   end;
   TJListenableFuture = class(TJavaGenericImport<JListenableFutureClass, JListenableFuture>) end;
+
+  JGoogleApiClientClass = interface(JObjectClass)
+    ['{39FBEEC6-35DC-4004-8C87-A46FF41D4B0C}']
+    {class} function _GetDEFAULT_ACCOUNT: JString; cdecl;
+    {class} function _GetSIGN_IN_MODE_OPTIONAL: Integer; cdecl;
+    {class} function _GetSIGN_IN_MODE_REQUIRED: Integer; cdecl;
+    {class} procedure dumpAll(string_: JString; fileDescriptor: JFileDescriptor; printWriter: JPrintWriter; string_1: TJavaObjectArray<JString>); cdecl;
+    {class} function getAllClients: JSet; cdecl;
+    {class} function init: JGoogleApiClient; cdecl;
+    {class} property DEFAULT_ACCOUNT: JString read _GetDEFAULT_ACCOUNT;
+    {class} property SIGN_IN_MODE_OPTIONAL: Integer read _GetSIGN_IN_MODE_OPTIONAL;
+    {class} property SIGN_IN_MODE_REQUIRED: Integer read _GetSIGN_IN_MODE_REQUIRED;
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/GoogleApiClient')]
+  JGoogleApiClient = interface(JObject)
+    ['{79A91917-155C-4C04-8E26-2C497F3CE53D}']
+    // **** Just a placeholder class, for now ****
+  end;
+  TJGoogleApiClient = class(TJavaGenericImport<JGoogleApiClientClass, JGoogleApiClient>) end;
 
 implementation
 
