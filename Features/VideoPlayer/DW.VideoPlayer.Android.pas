@@ -367,6 +367,10 @@ begin
 //  ExoPlayer.STATE_READY = 3
 //  ExoPlayer.STATE_ENDED = 4
 //!!!!
+  if APlaybackState = 3 then
+    FPlayerView.setKeepScreenOn(True)
+  else
+    FPlayerView.setKeepScreenOn(False);
   if APlaybackState = 4 then
     SetPlayerState(TPlayerState.Completed);
 end;
