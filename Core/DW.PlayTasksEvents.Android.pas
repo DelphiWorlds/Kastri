@@ -18,33 +18,18 @@ uses
   Androidapi.JNI.PlayServices.Tasks, Androidapi.JNI.JavaTypes, Androidapi.JNIBridge;
 
 type
-  IPlayTasksEvents = interface(IInterface)
-    ['{06EC5680-709C-4E72-BDAC-53FE06AE66FC}']
-    function GetOnFailureListener: JOnFailureListener;
-    function GetOnSuccessListener: JOnSuccessListener;
-  end;
-
-  TPlayTasksOnSuccessProc = reference to procedure(const Obj: JObject);
+  TPlayTasksOnCompleteProc = reference to procedure(const task: JTask);
+  TPlayTasksOnSuccessProc = reference to procedure(const obj: JObject);
   TPlayTasksOnFailureProc = reference to procedure(const exception: JException);
 
-  TPlayTasksHandlers = record
-    OnFailure: TPlayTasksOnFailureProc;
-    OnSuccess: TPlayTasksOnSuccessProc;
-  end;
-
-  TPlayTasksEvents = class(TInterfacedObject, IPlayTasksEvents)
+  TPlayTasksOnCompleteListener = class(TJavaLocal, JOnCompleteListener)
   private
-    FHandlers: TPlayTasksHandlers;
-    FFailureListener: JOnFailureListener;
-    FSuccessListener: JOnSuccessListener;
-    procedure FailureListenerHandler(const AException: JException);
-    procedure SuccessListenerHandler(const AObj: JObject);
+    FHandler: TPlayTasksOnCompleteProc;
   public
-    { IPlayTasksEvents }
-    function GetOnFailureListener: JOnFailureListener;
-    function GetOnSuccessListener: JOnSuccessListener;
+    { JOnSuccessListener }
+    procedure onComplete(task: JTask); cdecl;
   public
-    constructor Create(const AHandlers: TPlayTasksHandlers);
+    constructor Create(const AHandler: TPlayTasksOnCompleteProc);
   end;
 
   TPlayTasksOnSuccessListener = class(TJavaLocal, JOnSuccessListener)
@@ -67,38 +52,41 @@ type
     constructor Create(const AHandler: TPlayTasksOnFailureProc);
   end;
 
+  IPlayTasksEvents = interface(IInterface)
+    ['{7A0285D9-BA6D-4184-A09C-BB68500CD634}']
+    function OnComplete(const AHandler: TPlayTasksOnCompleteProc): IPlayTasksEvents;
+    function OnFailure(const AHandler: TPlayTasksOnFailureProc): IPlayTasksEvents;
+    function OnSuccess(const AHandler: TPlayTasksOnSuccessProc): IPlayTasksEvents;
+    function SetTask(const ATask: JTask): IPlayTasksEvents;
+  end;
+
+  TPlayTasksEvents = class(TInterfacedObject, IPlayTasksEvents)
+  private
+    FCompleteListener: JOnCompleteListener;
+    FFailureListener: JOnFailureListener;
+    FSuccessListener: JOnSuccessListener;
+    FTask: JTask;
+  public
+    { IPlayTasksEvents }
+    function OnComplete(const AHandler: TPlayTasksOnCompleteProc): IPlayTasksEvents;
+    function OnFailure(const AHandler: TPlayTasksOnFailureProc): IPlayTasksEvents;
+    function OnSuccess(const AHandler: TPlayTasksOnSuccessProc): IPlayTasksEvents;
+    function SetTask(const ATask: JTask): IPlayTasksEvents;
+  end;
+
 implementation
 
-{ TPlayTasksEvents }
+{ TPlayTasksOnCompleteListener }
 
-constructor TPlayTasksEvents.Create(const AHandlers: TPlayTasksHandlers);
+constructor TPlayTasksOnCompleteListener.Create(const AHandler: TPlayTasksOnCompleteProc);
 begin
   inherited Create;
-  FHandlers := AHandlers;
-  FFailureListener := TPlayTasksOnFailureListener.Create(FailureListenerHandler);
-  FSuccessListener := TPlayTasksOnSuccessListener.Create(SuccessListenerHandler);
+  FHandler := AHandler;
 end;
 
-function TPlayTasksEvents.GetOnFailureListener: JOnFailureListener;
+procedure TPlayTasksOnCompleteListener.onComplete(task: JTask);
 begin
-  Result := FFailureListener;
-end;
-
-function TPlayTasksEvents.GetOnSuccessListener: JOnSuccessListener;
-begin
-  Result := FSuccessListener;
-end;
-
-procedure TPlayTasksEvents.FailureListenerHandler(const AException: JException);
-begin
-  if Assigned(FHandlers.OnFailure) then
-    FHandlers.OnFailure(AException);
-end;
-
-procedure TPlayTasksEvents.SuccessListenerHandler(const AObj: JObject);
-begin
-  if Assigned(FHandlers.OnSuccess) then
-    FHandlers.OnSuccess(AObj);
+  FHandler(task);
 end;
 
 { TPlayTasksOnSuccessListener }
@@ -125,6 +113,52 @@ end;
 procedure TPlayTasksOnFailureListener.onFailure(exception: JException);
 begin
   FHandler(exception);
+end;
+
+{ TPlayTasksEvents }
+
+function TPlayTasksEvents.OnComplete(const AHandler: TPlayTasksOnCompleteProc): IPlayTasksEvents;
+begin
+  if FTask <> nil then
+  begin
+    if FCompleteListener = nil then
+      FCompleteListener := TPlayTasksOnCompleteListener.Create(AHandler);
+    FTask.addOnCompleteListener(FCompleteListener);
+  end;
+  Result := Self;
+end;
+
+function TPlayTasksEvents.OnFailure(const AHandler: TPlayTasksOnFailureProc): IPlayTasksEvents;
+begin
+  if FTask <> nil then
+  begin
+    if FFailureListener = nil then
+      FFailureListener := TPlayTasksOnFailureListener.Create(AHandler);
+    FTask.addOnFailureListener(FFailureListener);
+  end;
+  Result := Self;
+end;
+
+function TPlayTasksEvents.OnSuccess(const AHandler: TPlayTasksOnSuccessProc): IPlayTasksEvents;
+begin
+  if FTask <> nil then
+  begin
+    if FSuccessListener = nil then
+      FSuccessListener := TPlayTasksOnSuccessListener.Create(AHandler);
+    FTask.addOnSuccessListener(FSuccessListener);
+  end;
+  Result := Self;
+end;
+
+function TPlayTasksEvents.SetTask(const ATask: JTask): IPlayTasksEvents;
+begin
+  if FTask <> ATask then
+  begin
+    if FTask <> nil then
+      FTask := nil;
+    FTask := ATask;
+  end;
+  Result := Self;
 end;
 
 end.
