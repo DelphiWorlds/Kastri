@@ -17,16 +17,17 @@ uses
   // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation,
   // iOS
-  iOSapi.Foundation, iOSapi.CocoaTypes, iOSapi.UIKit;
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit;
 
 const
+  kGIDAppCheckUnexpectedError = 1;
   kGIDSignInErrorCodeUnknown = -1;
   kGIDSignInErrorCodeKeychain = -2;
   kGIDSignInErrorCodeHasNoAuthInKeychain = -4;
   kGIDSignInErrorCodeCanceled = -5;
   kGIDSignInErrorCodeEMM = -6;
-  kGIDSignInErrorCodeNoCurrentUser = -7;
   kGIDSignInErrorCodeScopesAlreadyGranted = -8;
+  kGIDSignInErrorCodeMismatchWithCurrentUser = -9;
   kGIDSignInButtonStyleStandard = 0;
   kGIDSignInButtonStyleWide = 1;
   kGIDSignInButtonStyleIconOnly = 2;
@@ -34,46 +35,31 @@ const
   kGIDSignInButtonColorSchemeLight = 1;
 
 type
-  GIDAuthentication = interface;
   GIDConfiguration = interface;
   GIDGoogleUser = interface;
   GIDProfileData = interface;
   GIDSignIn = interface;
+  GIDToken = interface;
+  GIDSignInResult = interface;
   GIDSignInButton = interface;
 
-  GIDAuthenticationAction = procedure(authentication: GIDAuthentication; error: NSError) of object;
+  GIDAppCheckErrorCode = NSInteger;
   GIDSignInErrorCode = NSInteger;
-
-  GIDSignInCallback = procedure(user: GIDGoogleUser; error: NSError) of object;
-
-  GIDDisconnectCallback = procedure(error: NSError) of object;
   GIDSignInButtonStyle = NSInteger;
   GIDSignInButtonColorScheme = NSInteger;
-
-  GIDAuthenticationClass = interface(NSObjectClass)
-    ['{5040A7E4-64B1-4072-AA5B-7B69436735BC}']
-  end;
-
-  GIDAuthentication = interface(NSObject)
-    ['{5F16850E-2AC9-4EEC-8B76-1B866B406B9E}']
-    function accessToken: NSString; cdecl;
-    function accessTokenExpirationDate: NSDate; cdecl;
-    function clientID: NSString; cdecl;
-    procedure doWithFreshTokens(action: GIDAuthenticationAction); cdecl;
-    function fetcherAuthorizer: Pointer; cdecl;
-    function idToken: NSString; cdecl;
-    function idTokenExpirationDate: NSDate; cdecl;
-    function refreshToken: NSString; cdecl;
-  end;
-  TGIDAuthentication = class(TOCGenericImport<GIDAuthenticationClass, GIDAuthentication>) end;
+  TGIDGoogleUserBlockMethod1 = procedure(user: GIDGoogleUser; error: NSError) of object;
+  TGIDGoogleUserBlockMethod2 = procedure(signInResult: GIDSignInResult; error: NSError) of object;
+  TGIDSignInBlockMethod1 = procedure(error: NSError) of object;
+  TGIDSignInBlockMethod2 = procedure(user: GIDGoogleUser; error: NSError) of object;
+  TGIDSignInBlockMethod3 = procedure(signInResult: GIDSignInResult; error: NSError) of object;
 
   GIDConfigurationClass = interface(NSObjectClass)
-    ['{802056A9-B1CF-4735-AFB1-4A7F5B2CEEBE}']
+    ['{AA35DB0D-62B7-4CE7-B828-57D094A15BD6}']
     {class} function new: Pointer; cdecl;
   end;
 
   GIDConfiguration = interface(NSObject)
-    ['{C74457FF-E0D7-4A41-99A0-703F1A709722}']
+    ['{33122608-BA7E-4C27-979A-4CF737334601}']
     function clientID: NSString; cdecl;
     function hostedDomain: NSString; cdecl;
     function initWithClientID(clientID: NSString): Pointer; overload; cdecl;
@@ -85,28 +71,30 @@ type
   TGIDConfiguration = class(TOCGenericImport<GIDConfigurationClass, GIDConfiguration>) end;
 
   GIDGoogleUserClass = interface(NSObjectClass)
-    ['{DA8B3F2E-B389-435C-861F-CCAC4074AA64}']
+    ['{CB03AD41-F23E-420B-9FA9-76D75AF8DB1A}']
   end;
 
   GIDGoogleUser = interface(NSObject)
-    ['{CD4680A3-D134-458E-8A5B-5EC2B4B8009C}']
-    function authentication: GIDAuthentication; cdecl;
+    ['{D7CAF07C-B538-46F0-B36F-32C354F19D85}']
+    function accessToken: GIDToken; cdecl;
+    procedure addScopes(scopes: NSArray; presentingViewController: UIViewController; completion: TGIDGoogleUserBlockMethod2); cdecl;
+    function configuration: GIDConfiguration; cdecl;
+    function fetcherAuthorizer: Pointer; cdecl;
     function grantedScopes: NSArray; cdecl;
-    function hostedDomain: NSString; cdecl;
-    function openIDRealm: NSString; cdecl;
+    function idToken: GIDToken; cdecl;
     function profile: GIDProfileData; cdecl;
-    function serverAuthCode: NSString; cdecl;
-    function serverClientID: NSString; cdecl;
+    function refreshToken: GIDToken; cdecl;
+    procedure refreshTokensIfNeededWithCompletion(completion: TGIDGoogleUserBlockMethod1); cdecl;
     function userID: NSString; cdecl;
   end;
   TGIDGoogleUser = class(TOCGenericImport<GIDGoogleUserClass, GIDGoogleUser>) end;
 
   GIDProfileDataClass = interface(NSObjectClass)
-    ['{D804CECA-2C34-44A6-9010-DE42399588BE}']
+    ['{4A5E849B-F04A-4A51-9446-202A29BE5402}']
   end;
 
   GIDProfileData = interface(NSObject)
-    ['{5F077EB1-4CA3-4EFC-A0F0-4E456E26332C}']
+    ['{2FFE0826-4207-4BA1-82DB-18249C0DB723}']
     function email: NSString; cdecl;
     function familyName: NSString; cdecl;
     function givenName: NSString; cdecl;
@@ -117,33 +105,62 @@ type
   TGIDProfileData = class(TOCGenericImport<GIDProfileDataClass, GIDProfileData>) end;
 
   GIDSignInClass = interface(NSObjectClass)
-    ['{69636B12-0846-42A3-A23B-368BB0EE522F}']
+    ['{DB88611E-21FB-4DDB-9718-93F49D989287}']
     {class} function new: Pointer; cdecl;
     {class} function sharedInstance: GIDSignIn; cdecl;
   end;
 
   GIDSignIn = interface(NSObject)
-    ['{3D734D8D-4FD8-4D45-ABF6-5BAABF41971F}']
-    procedure addScopes(scopes: NSArray; presentingViewController: UIViewController; callback: GIDSignInCallback); cdecl;
+    ['{BFC59FFC-5527-4B01-BB4E-38C7679FC452}']
+    function configuration: GIDConfiguration; cdecl;
+    procedure configureDebugProviderWithAPIKey(APIKey: NSString; completion: TGIDSignInBlockMethod1); cdecl;
+    procedure configureWithCompletion(completion: TGIDSignInBlockMethod1); cdecl;
     function currentUser: GIDGoogleUser; cdecl;
-    procedure disconnectWithCallback(callback: GIDDisconnectCallback); cdecl;
+    procedure disconnectWithCompletion(completion: TGIDSignInBlockMethod1); cdecl;
     function handleURL(url: NSURL): Boolean; cdecl;
     function hasPreviousSignIn: Boolean; cdecl;
-    procedure restorePreviousSignInWithCallback(callback: GIDSignInCallback); cdecl;
-    procedure signInWithConfiguration(configuration: GIDConfiguration; presentingViewController: UIViewController;
-      callback: GIDSignInCallback); overload; cdecl;
-    procedure signInWithConfiguration(configuration: GIDConfiguration; presentingViewController: UIViewController; hint: NSString;
-      callback: GIDSignInCallback); overload; cdecl;
+    procedure restorePreviousSignInWithCompletion(completion: TGIDSignInBlockMethod2); cdecl;
+    procedure setConfiguration(configuration: GIDConfiguration); cdecl;
+    procedure signInWithPresentingViewController(presentingViewController: UIViewController; hint: NSString; additionalScopes: NSArray;
+      completion: TGIDSignInBlockMethod3); overload; cdecl;
+    procedure signInWithPresentingViewController(presentingViewController: UIViewController; completion: TGIDSignInBlockMethod3); overload; cdecl;
+    procedure signInWithPresentingViewController(presentingViewController: UIViewController; hint: NSString;
+      completion: TGIDSignInBlockMethod3); overload; cdecl;
     procedure signOut; cdecl;
   end;
   TGIDSignIn = class(TOCGenericImport<GIDSignInClass, GIDSignIn>) end;
 
+  GIDTokenClass = interface(NSObjectClass)
+    ['{75497CE5-087F-47FC-B36E-17CC9CB6BDC5}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  GIDToken = interface(NSObject)
+    ['{C3ECA282-4BCE-4087-9B41-105D3A632F51}']
+    function expirationDate: NSDate; cdecl;
+    function isEqualToToken(otherToken: GIDToken): Boolean; cdecl;
+    function tokenString: NSString; cdecl;
+  end;
+  TGIDToken = class(TOCGenericImport<GIDTokenClass, GIDToken>) end;
+
+  GIDSignInResultClass = interface(NSObjectClass)
+    ['{0D9AB1C1-8005-4AC5-9FE2-D3DE7C4EEC24}']
+    {class} function new: Pointer; cdecl;
+  end;
+
+  GIDSignInResult = interface(NSObject)
+    ['{F9A9527B-C754-4FA1-8D78-52109EA737DF}']
+    function serverAuthCode: NSString; cdecl;
+    function user: GIDGoogleUser; cdecl;
+  end;
+  TGIDSignInResult = class(TOCGenericImport<GIDSignInResultClass, GIDSignInResult>) end;
+
   GIDSignInButtonClass = interface(UIControlClass)
-    ['{BBE7F445-FA2D-4737-8D0E-87190901D4AC}']
+    ['{E2715A69-6187-4D76-84F8-7F977C917B07}']
   end;
 
   GIDSignInButton = interface(UIControl)
-    ['{2883765F-7275-4EAA-84A9-04E26C5103FB}']
+    ['{9688E24C-01A1-43CF-845D-175D3D58E288}']
     function colorScheme: GIDSignInButtonColorScheme; cdecl;
     procedure setColorScheme(colorScheme: GIDSignInButtonColorScheme); cdecl;
     procedure setStyle(style: GIDSignInButtonStyle); cdecl;
@@ -151,11 +168,22 @@ type
   end;
   TGIDSignInButton = class(TOCGenericImport<GIDSignInButtonClass, GIDSignInButton>) end;
 
-// function kGIDSignInErrorDomain: NSString;
-
 implementation
 
+uses
+  DW.iOSapi.SwiftCompat;
+
+procedure CLangRTLoader; cdecl;
+  {$IF not Defined(IOSSIMULATOR)}
+  external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+  {$ELSE}
+  external '/usr/lib/clang/lib/darwin/libclang_rt.iossim.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
+  {$ENDIF}
 procedure AppAuthLoader; cdecl; external framework 'AppAuth';
+{$IF not Defined(FB108)}
+procedure AppCheckCoreLoader; cdecl; external framework 'AppCheckCore';
+{$ENDIF}
+procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
 procedure GoogleSignInLoader; cdecl; external framework 'GoogleSignIn';
 procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
 procedure GTMAppAuthLoader; cdecl; external framework 'GTMAppAuth';
