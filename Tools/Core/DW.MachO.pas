@@ -73,74 +73,74 @@ type
   size_t = NativeUInt;
 
   mach_header = record
-    magic: Cardinal;      // mach magic number identifier  (uint32_t)
+    magic: UInt32;      // mach magic number identifier  (uint32_t)
     cputype: Integer;     // cpu specifier
     cpusubtype: Integer;  // machine specifier
-    filetype: Cardinal;   // type of file
-    ncmds: Cardinal;      // number of load commands
-    sizeofcmds: Cardinal; // the size of all the load commands
-    flags: Cardinal;      // flags
+    filetype: UInt32;   // type of file
+    ncmds: UInt32;      // number of load commands
+    sizeofcmds: UInt32; // the size of all the load commands
+    flags: UInt32;      // flags
   end;
 
   mach_header_64 = record
-    magic: Cardinal;      // mach magic number identifier
+    magic: UInt32;      // mach magic number identifier
     cputype: Integer;     // cpu specifier
-    cpusubtype: Integer;  // machine specifier
-    filetype: Cardinal;   // type of file
-    ncmds: Cardinal;      // number of load commands
-    sizeofcmds: Cardinal; // the size of all the load commands
-    flags: Cardinal;      // flags
-    reserved: Cardinal;   // reserved
+    cpusubtype: UInt32;  // machine specifier
+    filetype: UInt32;   // type of file
+    ncmds: UInt32;      // number of load commands
+    sizeofcmds: UInt32; // the size of all the load commands
+    flags: UInt32;      // flags
+    reserved: UInt32;   // reserved
   end;
 
   fat_header = record
-    magic: Cardinal;     // FAT_MAGIC or FAT_MAGIC_64
-    nfat_arch: Cardinal; // number of structs that follow
+    magic: UInt32;     // FAT_MAGIC or FAT_MAGIC_64
+    nfat_arch: UInt32; // number of structs that follow
   end;
 
   fat_arch = record
     cputype: Integer;    // cpu specifier (int)
-    cpusubtype: Integer; // machine specifier (int)
-    offset: Cardinal;    // file offset to this object file
-    size: Cardinal;      // size of this object file
-    align: Cardinal;     // alignment as a power of 2
+    cpusubtype: UInt32; // machine specifier (int)
+    offset: UInt32;    // file offset to this object file
+    size: UInt32;      // size of this object file
+    align: UInt32;     // alignment as a power of 2
   end;
 
   fat_arch_64 = record
     cputype: Integer;     // cpu specifier (int)
-    cpusubtype: Integer;  // machine specifier (int)
+    cpusubtype: UInt32;  // machine specifier (int)
     offset: UInt64;       // file offset to this object file
     size: UInt64;         // size of this object file
-    align: Cardinal;      // alignment as a power of 2
-    reserved: Cardinal;   // reserved
+    align: UInt32;      // alignment as a power of 2
+    reserved: UInt32;   // reserved
   end;
 
   lc_str = record
-    offset: Cardinal; // offset to the string
+    offset: UInt32; // offset to the string
   end;
 
   load_command = record
-    cmd: Cardinal;
-    cmdsize: Cardinal;
+    cmd: UInt32;
+    cmdsize: UInt32;
   end;
 
   segment_command = record
-    cmd: Cardinal;             // LC_SEGMENT
-    cmdsize: Cardinal;         // includes sizeof section structs
+    cmd: UInt32;             // LC_SEGMENT
+    cmdsize: UInt32;         // includes sizeof section structs
     segname: array[0..15] of Char; // segment name
-    vmaddr: Cardinal;          // memory address of this segment
-    vmsize: Cardinal;          // memory size of this segment
-    fileoff: Cardinal;         // file offset of this segment
-    filesize: Cardinal;        // amount to map from the file
+    vmaddr: UInt32;          // memory address of this segment
+    vmsize: UInt32;          // memory size of this segment
+    fileoff: UInt32;         // file offset of this segment
+    filesize: UInt32;        // amount to map from the file
     maxprot: Integer;          // maximum VM protection
     initprot: Integer;         // initial VM protection
-    nsects: Cardinal;          // number of sections in segment
-    flags: Cardinal;           // flags
+    nsects: UInt32;          // number of sections in segment
+    flags: UInt32;           // flags
   end;
 
   segment_command_64 = record
-    cmd: Cardinal;             // LC_SEGMENT_64
-    cmdsize: Cardinal;         // includes sizeof section_64 structs
+    cmd: UInt32;             // LC_SEGMENT_64
+    cmdsize: UInt32;         // includes sizeof section_64 structs
     segname: array[0..15] of Char; // segment name
     vmaddr: UInt64;            // memory address of this segment
     vmsize: UInt64;            // memory size of this segment
@@ -148,31 +148,31 @@ type
     filesize: UInt64;          // amount to map from the file
     maxprot: Integer;          // maximum VM protection
     initprot: Integer;         // initial VM protection
-    nsects: Cardinal;          // number of sections in segment
-    flags: Cardinal;           // flags
+    nsects: UInt32;          // number of sections in segment
+    flags: UInt32;           // flags
   end;
 
   dylib = record
     name: lc_str;                   // library's path name
-    timestamp: Cardinal;            // library's build time stamp
-    current_version: Cardinal;      // library's current version number
-    compatibility_version: Cardinal; // library's compatibility version number
+    timestamp: UInt32;            // library's build time stamp
+    current_version: UInt32;      // library's current version number
+    compatibility_version: UInt32; // library's compatibility version number
   end;
 
   dylib_command = record
-    cmd: Cardinal;    // LC_ID_DYLIB, LC_LOAD_{,WEAK_}DYLIB, LC_REEXPORT_DYLIB
-    cmdsize: Cardinal; // includes pathname string
+    cmd: UInt32;    // LC_ID_DYLIB, LC_LOAD_{,WEAK_}DYLIB, LC_REEXPORT_DYLIB
+    cmdsize: UInt32; // includes pathname string
     dylib: dylib;      // the library identification
   end;
 
   dylib_use_command = record
-    cmd: Cardinal;            // LC_LOAD_DYLIB or LC_LOAD_WEAK_DYLIB
-    cmdsize: Cardinal;        // overall size, including path
-    nameoff: Cardinal;        // == 28, dylibs's path offset
-    marker: Cardinal;         // == DYLIB_USE_MARKER
-    current_version: Cardinal; // dylib's current version number
-    compat_version: Cardinal; // dylib's compatibility version number
-    flags: Cardinal;          // DYLIB_USE_... flags
+    cmd: UInt32;            // LC_LOAD_DYLIB or LC_LOAD_WEAK_DYLIB
+    cmdsize: UInt32;        // overall size, including path
+    nameoff: UInt32;        // == 28, dylibs's path offset
+    marker: UInt32;         // == DYLIB_USE_MARKER
+    current_version: UInt32; // dylib's current version number
+    compat_version: UInt32; // dylib's compatibility version number
+    flags: UInt32;          // DYLIB_USE_... flags
   end;
 
 procedure swap_dylib(var value: dylib);
