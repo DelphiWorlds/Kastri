@@ -8,7 +8,7 @@ const
   CRLF = #13#10;
 
 type
-  TAuthorizationStatus = (NotDetermined, Restricted, Denied, Authorized);
+  TAuthorizationStatus = (NotDetermined, Restricted, Denied, Authorized, Limited);
   TAuthorizationStatusProc = reference to procedure(const Status: TAuthorizationStatus);
   TAuthorizationStatusEvent = procedure(Sender: TObject; const Status: TAuthorizationStatus) of object;
 
