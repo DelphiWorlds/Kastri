@@ -21,6 +21,7 @@ const
   cPermissionBluetoothAdvertise = 'android.permission.BLUETOOTH_ADVERTISE';
   cPermissionBluetoothConnect = 'android.permission.BLUETOOTH_CONNECT';
   cPermissionBluetoothScan = 'android.permission.BLUETOOTH_SCAN';
+  cPermissionCallPhone = 'android.permission.CALL_PHONE';
   cPermissionCamera = 'android.permission.CAMERA';
   cPermissionPostNotifications = 'android.permission.POST_NOTIFICATIONS';
   cPermissionReadCallLog = 'android.permission.READ_CALL_LOG';
@@ -34,6 +35,7 @@ const
   cPermissionRecordAudio = 'android.permission.RECORD_AUDIO';
   cPermissionScheduleExactAlarm = 'android.permission.SCHEDULE_EXACT_ALARM';
   cPermissionSendSMS = 'android.permission.SEND_SMS';
+  cPermissionSystemAlertWindow = 'android.permission.SYSTEM_ALERT_WINDOW';
   cPermissionUseFingerprint = 'android.permission.USE_FINGERPRINT';
   cPermissionWriteContacts = 'android.permission.WRITE_CONTACTS';
   cPermissionWriteExternalStorage = 'android.permission.WRITE_EXTERNAL_STORAGE';
