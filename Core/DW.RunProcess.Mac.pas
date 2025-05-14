@@ -160,6 +160,7 @@ type
     procedure PipeErrorFileHandleForReadingReadabilityHandler(AFile: NSFileHandle);
     procedure PipeOutputFileHandleForReadingReadabilityHandler(AFile: NSFileHandle);
     procedure TaskTerminationHandler(task: NSTask);
+    procedure SetCmdLine(const Value: string);
   protected
     function GetIsRunning: Boolean; override;
   public
@@ -168,7 +169,7 @@ type
     function Run: Boolean; override;
     function RunAndWait(const ATimeout: Cardinal = 0): Integer; override;
     procedure Terminate; override;
-    property CommandLine: string read FCmdLine write FCmdLine;
+    property CommandLine: string read FCmdLine write SetCmdLine;
     property IsTerminated: Boolean read FIsTerminated;
     property Params: string read FParams write FParams;
     property OnProcessOutput;
@@ -303,6 +304,20 @@ end;
 function TRunProcess.RunAndWait(const ATimeout: Cardinal = 0): Integer;
 begin
   Result := -1; // Has problems on macOS - use TRunProcessSynch
+end;
+
+procedure TRunProcess.SetCmdLine(const Value: string);
+var
+  LParts: TArray<string>;
+begin
+  LParts := Value.Split([' '], '"');
+  if Length(LParts) > 1 then
+  begin
+    FCmdLine := LParts[0];
+    FParams := Value.Substring(Length(LParts[0])).Trim;
+  end
+  else
+    FCmdLine := Value;
 end;
 
 procedure TRunProcess.TaskTerminationHandler(task: NSTask);
