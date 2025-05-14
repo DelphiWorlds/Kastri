@@ -30,6 +30,7 @@ type
     Magic: UInt32;
     Is64: Boolean;
     IsFat: Boolean;
+    IsMagic: Boolean;
     NeedsSwapBytes: Boolean;
     constructor Create(const AMagic: UInt32);
   end;
@@ -72,7 +73,7 @@ type
 
 function GetCPUType(const AType, ASubtype: Integer): string;
 begin
-  case AType of
+  case AType and CPU_ARCH_MASK of
     CPU_TYPE_X86:
       Result := 'Intel x86';
     CPU_TYPE_X86_64:
@@ -145,7 +146,8 @@ constructor TMagic.Create(const AMagic: UInt32);
 begin
   Magic := AMagic;
   Is64 := (Magic = MH_MAGIC_64) or (Magic = MH_CIGAM_64);
-  IsFat := (Magic = MH_CIGAM) or (Magic = MH_CIGAM_64) or (Magic = FAT_CIGAM);
+  IsFat := (Magic = FAT_MAGIC) or (Magic = FAT_CIGAM);
+  IsMagic := Is64 or IsFat or (Magic = MH_MAGIC) or (Magic = MH_CIGAM);
   NeedsSwapBytes := (Magic = MH_CIGAM) or (Magic = MH_CIGAM_64) or (Magic = FAT_CIGAM);
 end;
 
@@ -162,44 +164,50 @@ var
   LMagic: TMagic;
 begin
   LMagic := ReadMagic(0);
-  if LMagic.IsFat then
-    ExtractFatHeader(LMagic)
-  else
-    ExtractMachHeader(LMagic, 0);
+  if LMagic.IsMagic then
+  begin
+    if LMagic.IsFat then
+      ExtractFatHeader(LMagic)
+    else
+      ExtractMachHeader(LMagic, 0);
+  end;
+  // else ERROR
 end;
 
 procedure TMachOReader.ExtractFatHeader(const AMagic: TMagic);
 var
   LHeader: fat_header;
   LHeaderSize, LArchSize: NativeUInt;
-  LArchOffset, LMachOffset: Int64;
+  LArchOffset, LMachOffset: UInt64;
   LArch: fat_arch;
   I: UInt32;
   LMagic: TMagic;
 begin
   FillChar(LHeader, SizeOf(LHeader), 0);
   LHeaderSize := SizeOf(LHeader);
-  LArchSize := SizeOf(LArch);
   ReadMachOStruct(@LHeader, LHeaderSize, 0);
   if AMagic.NeedsSwapBytes then
     swap_fat_header(LHeader);
+  LArchSize := SizeOf(LArch);
   LArchOffset := LHeaderSize;
   for I := 0 to LHeader.nfat_arch - 1 do
   begin
-    ReadMachOStruct(@LArch, SizeOf(LArch), LArchOffset);
+    ReadMachOStruct(@LArch, LArchSize, LArchOffset);
     if AMagic.NeedsSwapBytes then
       swap_fat_arch(LArch);
     LMachOffset := LArch.offset;
     LArchOffset := LArchOffset + LArchSize;
     LMagic := ReadMagic(LMachOffset);
-    ExtractMachHeader(LMagic, LMachOffset);
+    if LMagic.IsMagic then
+      ExtractMachHeader(LMagic, LMachOffset);
+    // else ERROR
   end;
 end;
 
 procedure TMachOReader.ExtractMachHeader(const AMagic: TMagic; const AOffset: Int64);
 var
   LNCmds: UInt32;
-  LCommandsOffset: Int64;
+  LCommandsOffset: UInt64;
   LHeader64: mach_header_64;
   LHeader: mach_header;
   LHeaderSize: NativeUInt;
