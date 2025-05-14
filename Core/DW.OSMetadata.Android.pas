@@ -58,7 +58,7 @@ end;
 
 class function TPlatformOSMetadata.ContainsKey(const AKey: string): Boolean;
 begin
-  Result := GetMetadata.containsKey(StringToJString(AKey));
+  Result := (GetMetadata <> nil) and GetMetadata.containsKey(StringToJString(AKey));
 end;
 
 class function TPlatformOSMetadata.GetValue(const AKey: string; var AValue: string): Boolean;
