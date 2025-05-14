@@ -91,7 +91,7 @@ begin
       if Length(LMergeFileNames) > 0 then
       begin
         LResultFileName := TPath.ChangeExtension(TPath.GetTempFileName, '.xml');
-        TFile.Copy(AManifestFileName, LResultFileName);
+        TFile.Copy(AManifestFileName, LResultFileName, True);
         try
           for I := 0 to Length(LMergeFileNames) - 1 do
           begin
