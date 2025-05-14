@@ -312,7 +312,7 @@ begin
       if not FIsBackground then
         VerifyFailed;
     end
-    // Failed will happen if auth is working but the user couldn't be autheticated.
+    // Failed will happen if auth is working but the user couldn't be authenticated.
     // E.g. couldn't match the finger or face. The UI will tell the user what's wrong
     // so the error message and code will always be empty.
     else if LAuthRes = TJDWBiometricFragmentActivity.JavaClass.AUTHENTICATION_RESULT_FAILED then
