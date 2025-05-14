@@ -151,7 +151,7 @@ var
   LMemo: TCustomMemo;
 begin
   Result := False;
-  if FFocusedControl is TCustomMemo then
+  if IsFocusedObject and (FFocusedControl is TCustomMemo) then
   begin
     LMemo := TCustomMemo(FFocusedControl);
     if Trunc(LMemo.Caret.Pos.Y) <> Trunc(FCaretPos.Y) then
