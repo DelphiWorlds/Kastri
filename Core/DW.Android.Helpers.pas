@@ -714,7 +714,10 @@ begin
   begin
     LServiceInfo := TJActivityManager_RunningServiceInfo.Wrap(TAndroidHelper.JObjectToID(LRunningServices.get(I)));
     if LServiceName.Equals(JStringToString(LServiceInfo.service.getClassName)) then
-      Exit(LServiceInfo);
+    begin
+      Result := LServiceInfo;
+      Break;
+    end;
   end;
 end;
 
