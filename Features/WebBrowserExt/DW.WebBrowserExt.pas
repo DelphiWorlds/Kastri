@@ -38,12 +38,22 @@ type
 
   TDownloadState = (Completed, Failed, Paused, Pending, Running, Unknown);
 
+  TDownloadableMimeTypes = record
+  private
+    Values: TArray<string>;
+  public
+    procedure Add(const AValues: TArray<string>);
+    procedure Clear;
+    procedure Remove(const AValues: TArray<string>);
+  end;
+
   TCustomPlatformWebBrowserExt = class(TObject)
   private
     FCaptureBitmapHandler: TCaptureBitmapProc;
     FWebBrowserExt: TWebBrowserExt;
     function GetBrowser: TWebBrowser;
     function GetDefaultDownloadsFolder: string;
+    function GetDownloadableMimeTypes: TArray<string>;
   protected
     procedure BitmapCaptured(const ABitmap: TBitmap);
     procedure CaptureBitmap(const AHandler: TCaptureBitmapProc);
@@ -62,6 +72,7 @@ type
     procedure SetInitialScale(const AValue: Integer); virtual;
     procedure SimulateClick(const APoint: TPointF); virtual;
     property DefaultDownloadsFolder: string read GetDefaultDownloadsFolder;
+    property DownloadableMimeTypes: TArray<string> read GetDownloadableMimeTypes;
   public
     constructor Create(const AWebBrowserExt: TWebBrowserExt); virtual;
     property Browser: TWebBrowser read GetBrowser;
@@ -75,10 +86,12 @@ type
   private
     FBrowser: TWebBrowser;
     FDefaultDownloadsFolder: string;
+    FDownloadableMimeTypes: TDownloadableMimeTypes;
     FPlatformWebBrowserExt: TCustomPlatformWebBrowserExt;
     FOnDownloadStateChange: TDownloadStateChangeEvent;
     FOnDownloadStart: TDownloadStartEvent;
     FOnElementClick: TElementClickEvent;
+    procedure AddDownloadableMimeTypes;
   protected
     procedure DoDownloadStateChange(const AFileName: string; const AState: TDownloadState);
     procedure DoDownloadStart(const AUri, AFileExt: string; var AFileName: string);
@@ -98,6 +111,10 @@ type
     procedure SetInitialScale(const AValue: Integer);
     procedure SimulateClick(const APoint: TPointF);
     property DefaultDownloadsFolder: string read FDefaultDownloadsFolder write FDefaultDownloadsFolder;
+    /// <summary>
+    ///   Mime types used in macOS implementation for determining whether the content should be included for downloads
+    /// </summary>
+    property DownloadableMimeTypes: TDownloadableMimeTypes read FDownloadableMimeTypes;
     property OnDownloadStart: TDownloadStartEvent read FOnDownloadStart write FOnDownloadStart;
     property OnDownloadStateChange: TDownloadStateChangeEvent read FOnDownloadStateChange write FOnDownloadStateChange;
     property OnElementClick: TElementClickEvent read FOnElementClick write FOnElementClick;
@@ -106,7 +123,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.Net.Mime, System.IOUtils,
+  System.SysUtils, System.Net.Mime, System.IOUtils, System.StrUtils,
 
   DW.OSLog,
 
@@ -122,6 +139,37 @@ uses
 {$IF Defined(MSWINDOWS)}
   DW.WebBrowserExt.Win;
 {$ENDIF}
+
+{ TDownloadableMimeTypes }
+
+procedure TDownloadableMimeTypes.Add(const AValues: TArray<string>);
+var
+  LValue: string;
+begin
+  for LValue in AValues do
+  begin
+    if not MatchText(LValue, Values) then
+      Values := Values + [LValue];
+  end;
+end;
+
+procedure TDownloadableMimeTypes.Clear;
+begin
+  Values := [];
+end;
+
+procedure TDownloadableMimeTypes.Remove(const AValues: TArray<string>);
+var
+  LValue: string;
+  LIndex: Integer;
+begin
+  for LValue in AValues do
+  begin
+    LIndex := IndexText(LValue, Values);
+    if LIndex > -1 then
+      Delete(Values, LIndex, 1);
+  end;
+end;
 
 { TCustomPlatformWebBrowserExt }
 
@@ -197,6 +245,11 @@ begin
   Result := FWebBrowserExt.DefaultDownloadsFolder;
 end;
 
+function TCustomPlatformWebBrowserExt.GetDownloadableMimeTypes: TArray<string>;
+begin
+  Result := FWebBrowserExt.DownloadableMimeTypes.Values;
+end;
+
 procedure TCustomPlatformWebBrowserExt.GetElementValueByName(const AName: string; const AHandler: TJavaScriptResultProc);
 begin
   ExecuteJavaScript(Format(cJavaScriptGetInputValueByName, [AName]), AHandler);
@@ -250,6 +303,58 @@ begin
   {$ELSE}
   FDefaultDownloadsFolder := TPath.Combine(TPath.Combine(TPath.GetSharedDocumentsPath, TPathHelper.GetAppName), 'Downloads');
   {$ENDIF}
+end;
+
+procedure TWebBrowserExt.AddDownloadableMimeTypes;
+begin
+  FDownloadableMimeTypes.Values := [
+    'application/gzip',
+    'application/java-archive',
+    'application/msword',
+    'application/octet-stream',
+    'application/pdf',
+    'application/rtf',
+    'application/vnd.android.package-archive',
+    'application/vnd.ms-excel',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.oasis.opendocument.spreadsheet',
+    'application/vnd.oasis.opendocument.text',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/x-bzip2',
+    'application/x-csh',
+    'application/x-disk-image',
+    'application/x-font-otf',
+    'application/x-font-ttf',
+    'application/x-iso9660-image',
+    'application/x-msdownload',
+    'application/x-rar-compressed',
+    'application/x-sh',
+    'application/x-tar',
+    'application/x-7z-compressed',
+    'application/zip',
+    'audio/flac',
+    'audio/mpeg',
+    'audio/ogg',
+    'audio/wav',
+    'audio/x-aac',
+    'font/woff',
+    'font/woff2',
+    'image/bmp',
+    'image/gif',
+    'image/jpeg',
+    'image/png',
+    'image/tiff',
+    'image/webp',
+    'text/csv',
+    'video/mp4',
+    'video/quicktime',
+    'video/webm',
+    'video/x-flv',
+    'video/x-matroska',
+    'video/x-msvideo'
+  ];
 end;
 
 procedure TWebBrowserExt.CaptureBitmap(const AHandler: TCaptureBitmapProc);

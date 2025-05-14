@@ -66,7 +66,6 @@ type
     FDownloadSession: NSURLSession;
     FDownloadTasks: TDownloadTasks;
     FURLSessionDelegate: TURLSessionDelegate;
-    procedure AddDownloadableMimeTypes;
     procedure CreateDownloadSession;
   protected
     function CanDownload(const AMimeType: string): Boolean;
@@ -114,7 +113,6 @@ constructor TPlatformCocoaWebBrowserExt.Create(const AWebBrowserExt: TWebBrowser
 begin
   inherited;
   FDownloadTasks := TDownloadTasks.Create;
-  AddDownloadableMimeTypes;
   CreateDownloadSession;
 end;
 
@@ -133,61 +131,9 @@ begin
   FDownloadSession := TNSURLSession.OCClass.sessionWithConfigurationDelegateDelegateQueue(LConfig, FURLSessionDelegate.GetObjectID, nil);
 end;
 
-procedure TPlatformCocoaWebBrowserExt.AddDownloadableMimeTypes;
-begin
-  FDownloadableMimeTypes := [
-    'application/gzip',
-    'application/java-archive',
-    'application/msword',
-    'application/octet-stream',
-    'application/pdf',
-    'application/rtf',
-    'application/vnd.android.package-archive',
-    'application/vnd.ms-excel',
-    'application/vnd.ms-powerpoint',
-    'application/vnd.oasis.opendocument.spreadsheet',
-    'application/vnd.oasis.opendocument.text',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/x-bzip2',
-    'application/x-csh',
-    'application/x-disk-image',
-    'application/x-font-otf',
-    'application/x-font-ttf',
-    'application/x-iso9660-image',
-    'application/x-msdownload',
-    'application/x-rar-compressed',
-    'application/x-sh',
-    'application/x-tar',
-    'application/x-7z-compressed',
-    'application/zip',
-    'audio/flac',
-    'audio/mpeg',
-    'audio/ogg',
-    'audio/wav',
-    'audio/x-aac',
-    'font/woff',
-    'font/woff2',
-    'image/bmp',
-    'image/gif',
-    'image/jpeg',
-    'image/png',
-    'image/tiff',
-    'image/webp',
-    'text/csv',
-    'video/mp4',
-    'video/quicktime',
-    'video/webm',
-    'video/x-flv',
-    'video/x-matroska',
-    'video/x-msvideo'
-  ];
-end;
-
 function TPlatformCocoaWebBrowserExt.CanDownload(const AMimeType: string): Boolean;
 begin
-  Result := IndexText(AMimeType, FDownloadableMimeTypes) > -1;
+  Result := IndexText(AMimeType, DownloadableMimeTypes) > -1;
 end;
 
 procedure TPlatformCocoaWebBrowserExt.DownloadStateChange(const ATask: NSURLSessionTask; const AURL: NSURL; const AError: NSError);
