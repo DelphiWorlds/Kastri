@@ -4,10 +4,9 @@
   ],
   "javaFiles":[
     ".\\MediaProjection\\DWMediaProjectionCallback.java",
-    ".\\MediaProjection\\DWMediaProjectionCallbackDelegate.java",
-    ".\\MediaProjection\\DWMediaProjectionService.java"
+    ".\\MediaProjection\\DWMediaProjectionCallbackDelegate.java"
   ],
   "outputFile":"..\\Lib\\dw-media.jar",
-  "sourceVersion":"1.7",
-  "targetVersion":"1.7"
+  "sourceVersion":"1.10",
+  "targetVersion":"1.10"
 }
