@@ -26,6 +26,7 @@ type
     FExitCode: Cardinal;
     FShowExecuting: Boolean;
     FShowCommandInLog: Boolean;
+    FOutputFileName: string;
     FWaitInterval: Integer;
     FOnProcessPartialOutput: TProcessOutputEvent;
     FOnProcessOutput: TProcessOutputEvent;
@@ -71,6 +72,10 @@ type
     ///   Exit code of the process when it terminated
     /// </summary>
     property ExitCode: Cardinal read FExitCode;
+    /// <summary>
+    ///   File to which the output should be directed to
+    /// </summary>
+    property OutputFileName: string read FOutputFileName write FOutputFileName;
     /// <summary>
     ///   Amount of time (in ms) the wait cycle should wait for
     /// </summary>
