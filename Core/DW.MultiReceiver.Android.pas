@@ -148,7 +148,6 @@ begin
   if not FLocal then
   begin
     // https://developer.android.com/about/versions/14/behavior-changes-14#runtime-receivers-exported
-    LFlags := 0;
     if TAndroidHelperEx.CheckBuildAndTarget(TAndroidHelperEx.UPSIDE_DOWN_CAKE) then
     begin
       if IsExported then
