@@ -363,6 +363,8 @@ begin
     try
       LTask := TNSTask.Create;
       try
+        if not ACurrentDir.IsEmpty then
+          LTask.setCurrentDirectoryPath(StrToNSStr(ACurrentDir));
         LTask.setExecutableURL(TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ACmd))));
         if not AParams.IsEmpty then
           LTask.setArguments(StringArrayToNSArray(AParams.Split([' '], '"'), True));
