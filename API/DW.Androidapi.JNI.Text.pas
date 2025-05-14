@@ -110,7 +110,7 @@ type
     {class} function format(inFormat: JCharSequence; inDate: JCalendar): JCharSequence; overload; cdecl;
     {class} function format(inFormat: JCharSequence; inDate: JDate): JCharSequence; overload; cdecl;
     {class} function format(inFormat: JCharSequence; inTimeInMillis: Int64): JCharSequence; overload; cdecl;
-    {class} function getBestDateTimePattern(local: JLocale; skeleton: JString): JString; cdecl;
+    {class} function getBestDateTimePattern(locale: JLocale; skeleton: JString): JString; cdecl;
     {class} function getDateFormat(context: JContext): JDateFormat; cdecl;
     {class} function getDateFormatOrder(context: JContext): TJavaArray<Char>; cdecl;
     {class} function getLongDateFormat(context: JContext): JDateFormat; cdecl;
