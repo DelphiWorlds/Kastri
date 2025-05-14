@@ -176,8 +176,11 @@ type
   end;
 
   TRunProcessSync = record
+  private
+    class function InternalRun(const ACmd, AParams: string; var AOutput: string; const ACurrentDir, AOutputFileName: string): Integer; static;
   public
     class function Run(const ACmd, AParams: string; var AOutput: string; const ACurrentDir: string = ''): Integer; static;
+    class function RunRedir(const ACmd, AParams: string; const AOutputFileName: string; const ACurrentDir: string = ''): Integer; static;
   end;
 
 implementation
@@ -262,7 +265,7 @@ var
   LOutput: string;
   LString: NSString;
 begin
-  if not FIsTerminated then
+  if not FIsTerminated and OutputFileName.IsEmpty then
   begin
     LString := TNSString.Wrap(TNSString.OCClass.alloc);
     LOutput := NSStrToStr(TNSString.Wrap(LString.initWithData(AFile.availableData, NSUTF8StringEncoding)));
@@ -312,6 +315,8 @@ begin
       LStatus := task.terminationStatus
     else
       LStatus := -1;
+    if not OutputFileName.IsEmpty then
+      FPipeOutput.fileHandleForReading.readDataToEndOfFile.writeToFile(StrToNSStr(OutputFileName), True);
     DestroyTask;
     DoTerminated(LStatus);
   end;
@@ -328,7 +333,7 @@ end;
 
 { TRunProcessSync }
 
-class function TRunProcessSync.Run(const ACmd, AParams: string; var AOutput: string; const ACurrentDir: string = ''): Integer;
+class function TRunProcessSync.InternalRun(const ACmd, AParams: string; var AOutput: string; const ACurrentDir, AOutputFileName: string): Integer;
 var
   LTask: NSTask;
   {LInPipe, } LOutPipe, LErrorPipe: NSPipe;
@@ -358,16 +363,33 @@ begin
       finally
         LTask.release;
       end;
-      LOutput := TNSString.Wrap(TNSString.OCClass.alloc);
-      AOutput := NSStrToStr(TNSString.Wrap(LOutput.initWithData(LOutPipe.fileHandleForReading.readDataToEndOfFile, NSUTF8StringEncoding)));
-      if (Result <> 0) and AOutput.IsEmpty then
-        AOutput := NSStrToStr(TNSString.Wrap(LOutput.initWithData(LErrorPipe.fileHandleForReading.readDataToEndOfFile, NSUTF8StringEncoding)));
+      if AOutputFileName.IsEmpty then
+      begin
+        LOutput := TNSString.Wrap(TNSString.OCClass.alloc);
+        AOutput := NSStrToStr(TNSString.Wrap(LOutput.initWithData(LOutPipe.fileHandleForReading.readDataToEndOfFile, NSUTF8StringEncoding)));
+        if (Result <> 0) and AOutput.IsEmpty then
+          AOutput := NSStrToStr(TNSString.Wrap(LOutput.initWithData(LErrorPipe.fileHandleForReading.readDataToEndOfFile, NSUTF8StringEncoding)));
+      end
+      else
+        LOutPipe.fileHandleForReading.readDataToEndOfFile.writeToFile(StrToNSStr(AOutputFileName), True);
     finally
       LErrorPipe.release;
     end;
   finally
     LOutPipe.release;
   end;
+end;
+
+class function TRunProcessSync.Run(const ACmd, AParams: string; var AOutput: string; const ACurrentDir: string = ''): Integer;
+begin
+  Result := InternalRun(ACmd, AParams, AOutput, ACurrentDir, '');
+end;
+
+class function TRunProcessSync.RunRedir(const ACmd, AParams: string; const AOutputFileName, ACurrentDir: string): Integer;
+var
+  LOutput: string;
+begin
+  Result := InternalRun(ACmd, AParams, LOutput, ACurrentDir, AOutputFileName);
 end;
 
 end.
