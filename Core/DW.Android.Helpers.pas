@@ -129,6 +129,13 @@ type
     class function HasClass(const AClassName: string; const ALibraryName: string = ''): Boolean; overload; static;
     class function HasClass(const ATypeInfo: PTypeInfo; const ALibraryName: string = ''): Boolean; overload; static;
     /// <summary>
+    ///   Determines whether an app is able to have notification sounds whilst the device is in DND mode
+    /// </summary>
+    /// <remarks>
+    ///   See also ShowDoNotDisturbSettings
+    /// </remarks>
+    class function HasDoNotDisturbAccess: Boolean; static;
+    /// <summary>
     ///   Returns whether the application has the specified permission declared in the manifest
     /// </summary>
     class function HasManifestPermission(const APermission: string): Boolean; static;
@@ -232,6 +239,13 @@ type
     ///   See also NeedsAllFilesAccessPermission
     /// </remarks>
     class function ShowAllFilesAccessPermissionSettings: Boolean; static;
+    /// <summary>
+    ///   Shows the Do Not Disturb settings
+    /// </summary>
+    /// <remarks>
+    ///   In order for an app to have DND enabled, it must enable the Access Notification Policy permission
+    /// </remarks>
+    class function ShowDoNotDisturbSettings: Boolean; static;
     /// <summary>
     ///   Shows the exact alarms permissions activity if they are yet to be enabled
     /// </summary>
@@ -546,6 +560,13 @@ begin
   end;
   if not LClassName.IsEmpty then
     Result := HasClass(LClassName, ALibraryName);
+end;
+
+class function TAndroidHelperEx.HasDoNotDisturbAccess: Boolean;
+begin
+  Result := True;
+  if TOSVersion.Check(6) then
+    Result := NotificationManager.isNotificationPolicyAccessGranted;
 end;
 
 class function TAndroidHelperEx.HasManifestPermission(const APermission: string): Boolean;
@@ -940,6 +961,19 @@ begin
   LUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName, nil);
   LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_APPLICATION_DETAILS_SETTINGS, LUri);
   TAndroidHelper.Context.startActivity(LIntent);
+end;
+
+class function TAndroidHelperEx.ShowDoNotDisturbSettings: Boolean;
+var
+  LIntent: JIntent;
+begin
+  Result := False;
+  if not HasDoNotDisturbAccess then
+  begin
+    LIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+    TAndroidHelper.Context.startActivity(LIntent);
+    Result := True;
+  end;
 end;
 
 { TJImageHelper }
