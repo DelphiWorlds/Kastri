@@ -15,6 +15,9 @@ interface
 
 {$SCOPEDENUMS ON}
 
+uses
+  System.Classes;
+
 type
   TNFCPayloadTypeNameFormat = (Empty, NFCWellKnown, Media, AbsoluteURI, NFCExternal, Unknown, Unchanged);
 
@@ -62,6 +65,7 @@ type
     procedure BeginSession; virtual; abstract;
     procedure DoResult(const ANFCResult: TNFCResult);
     procedure DoError(const AError: string);
+    procedure DoSessionBecameActive;
     procedure EndSession; virtual; abstract;
     property IsActive: Boolean read FIsActive write FIsActive;
     property NFCReader: TNFCReader read FNFCReader;
@@ -79,12 +83,14 @@ type
   private
     FAlertMessage: string;
     FPlatformNFCReader: TCustomPlatformNFCReader;
-    FOnResult: TNFCResultEvent;
+    FOnBecameActive: TNotifyEvent;
     FOnError: TNFCErrorEvent;
+    FOnResult: TNFCResultEvent;
     function GetIsActive: Boolean;
   protected
     procedure DoResult(const ANFCResult: TNFCResult);
     procedure DoError(const AError: string);
+    procedure DoSessionBecameActive;
   public
     constructor Create;
     destructor Destroy; override;
@@ -92,8 +98,9 @@ type
     procedure EndSession;
     property AlertMessage: string read FAlertMessage write FAlertMessage;
     property IsActive: Boolean read GetIsActive;
-    property OnResult: TNFCResultEvent read FOnResult write FOnResult;
+    property OnBecameActive: TNotifyEvent read FOnBecameActive write FOnBecameActive;
     property OnError: TNFCErrorEvent read FOnError write FOnError;
+    property OnResult: TNFCResultEvent read FOnResult write FOnResult;
   end;
 
 implementation
@@ -146,6 +153,11 @@ begin
   FNFCReader.DoResult(ANFCResult);
 end;
 
+procedure TCustomPlatformNFCReader.DoSessionBecameActive;
+begin
+  FNFCReader.DoSessionBecameActive;
+end;
+
 procedure TCustomPlatformNFCReader.DoError(const AError: string);
 begin
   FNFCReader.DoError(AError);
@@ -177,6 +189,12 @@ procedure TNFCReader.DoResult(const ANFCResult: TNFCResult);
 begin
   if Assigned(FOnResult) then
     FOnResult(Self, ANFCResult);
+end;
+
+procedure TNFCReader.DoSessionBecameActive;
+begin
+  if Assigned(FOnBecameActive) then
+    FOnBecameActive(Self);
 end;
 
 procedure TNFCReader.DoError(const AError: string);
