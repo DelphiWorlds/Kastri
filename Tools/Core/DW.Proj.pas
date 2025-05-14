@@ -20,12 +20,6 @@ uses
   DW.Proj.Types;
 
 type
-  IProjNode = interface(IInterface)
-    ['{6892E6D3-DE9C-4C8A-8A66-0D462BA08FC5}']
-    function ChildCount: Integer;
-    function GetChild(const AIndex: Integer): IXMLNode;
-  end;
-
   IProjPlatform =  interface(IInterface)
     ['{B1E0FDEF-74AA-4A59-B242-7455F00E7B6F}']
     function GetName: string;
@@ -89,17 +83,19 @@ type
     function GetBorlandProject: IProjBorlandProject;
   end;
 
+(*
   IProjPropertyGroup =  interface(IProjNode)
     ['{06A05376-B340-4FE1-B402-E60101756B7B}']
     function FindValue(const AName: string; out AValue: string): Boolean;
     function GetCondition: string;
   end;
+*)
 
-  IProjItemGroup =  interface(IInterface)
+  IProjItemGroup =  interface(IProjNode)
     ['{DEA593F6-78E9-4E54-9FA3-AC25CF7911F3}']
   end;
 
-  IProj = interface(IInterface)
+  IProj = interface(ICustomProj)
     ['{3FF84EDB-86BD-461F-9CA7-94C47997D067}']
     function FindBasePropertyGroup(out AGroup: IProjPropertyGroup): Boolean;
     function FindPropertyGroup(const AConfigIdent, APlatform: string; out AGroup: IProjPropertyGroup): Boolean;
@@ -109,15 +105,10 @@ type
     function GetProjectDeployment: IProjDeployment;
     function GetProjectExtensions: IProjProjectExtensions;
     function GetProjectPaths(const APlatform: string = ''; const AConfig: string = ''): TArray<string>;
-    function GetPropertyGroup(const AIndex: Integer): IProjPropertyGroup;
-    function GetPropertyGroupCount: Integer;
-    procedure LoadFromFile(const AFileName: string);
   end;
 
-  TProj = class(TInterfacedObject, IProj)
+  TProj = class(TCustomProj, IProj)
   private
-    FDocument: IXMLDocument;
-    FNode: IXMLNode;
     FProjectExtensions: IProjProjectExtensions;
     function FindConfigIdent(const AConfig: string; out AIdent: string): Boolean;
     function InternalFindPropertyGroup(const ACondition: string; out AGroup: IProjPropertyGroup): Boolean;
@@ -133,11 +124,6 @@ type
     function GetProjectDeployment: IProjDeployment;
     function GetProjectExtensions: IProjProjectExtensions;
     function GetProjectPaths(const APlatform: string = ''; const AConfig: string = ''): TArray<string>;
-    function GetPropertyGroup(const AIndex: Integer): IProjPropertyGroup;
-    function GetPropertyGroupCount: Integer;
-    procedure LoadFromFile(const AFileName: string);
-  public
-    constructor Create(const AFileName: string);
   end;
 
 implementation
@@ -165,54 +151,12 @@ type
     function IndexOf(const ACompilerOption: TProjCompilerOption): Integer;
   end;
 
-  TNameValuePair = record
-    Name: string;
-    Value: string;
-  end;
-
-  TNameValuePairs = TArray<TNameValuePair>;
-
-  TNameValuePairsHelper = record helper for TNameValuePairs
-    procedure Add(const AName, AValue: string);
-    function FindValue(const AName: string; out AValue: string): Boolean;
-  end;
-
-  TCustomProjNode = class(TInterfacedObject, IProjNode)
-  private
-    FNode: IXMLNode;
-  protected
-    function GetAttributeText(const AAttributeName: string): string;
-    function GetChildBoolean(const AChildNodeName: string): Boolean;
-    function GetChildInteger(const AChildNodeName: string; const ADefault: Integer = 0): Integer;
-    function GetChildText(const AChildNodeName: string): string;
-    property Node: IXMLNode read FNode;
-  public
-    { IProjNode }
-    function ChildCount: Integer;
-    function GetChild(const AIndex: Integer): IXMLNode;
-  public
-    constructor Create(const ANode: IXMLNode); virtual;
-  end;
-
   TProjProjectExtensions = class(TCustomProjNode, IProjProjectExtensions)
   private
     FBorlandProject: IProjBorlandProject;
   public
     { IProjProjectExtensions }
     function GetBorlandProject: IProjBorlandProject;
-  end;
-
-  TProjPropertyGroup = class(TCustomProjNode, IProjPropertyGroup)
-  private
-    FCondition: string;
-    FValues: TNameValuePairs;
-    procedure GetValues;
-  public
-    { IProjPropertyGroup }
-    function FindValue(const AName: string; out AValue: string): Boolean;
-    function GetCondition: string;
-  public
-    constructor Create(const ANode: IXMLNode); override;
   end;
 
   TProjPlatforms = TArray<IProjPlatform>;
@@ -373,51 +317,7 @@ begin
   end;
 end;
 
-{ TNameValuePairsHelper }
-
-procedure TNameValuePairsHelper.Add(const AName, AValue: string);
-var
-  LPair: TNameValuePair;
-begin
-  LPair.Name := AName;
-  LPair.Value := AValue;
-  Self := Self + [LPair];
-end;
-
-function TNameValuePairsHelper.FindValue(const AName: string; out AValue: string): Boolean;
-var
-  LPair: TNameValuePair;
-begin
-  Result := False;
-  for LPair in Self do
-  begin
-    if LPair.Name.Equals(AName) then
-    begin
-      AValue := LPair.Value;
-      Result := True;
-      Break;
-    end;
-  end;
-end;
-
 { TProj }
-
-constructor TProj.Create(const AFileName: string);
-begin
-  inherited Create;
-  LoadFromFile(AFileName);
-end;
-
-procedure TProj.LoadFromFile(const AFileName: string);
-begin
-  FNode := nil;
-  FDocument := nil;
-  if TFile.Exists(AFileName) then
-  begin
-    FDocument := LoadXMLDocument(AFileName);
-    FNode := FDocument.DocumentElement;
-  end;
-end;
 
 function TProj.FindBasePropertyGroup(out AGroup: IProjPropertyGroup): Boolean;
 begin
@@ -436,9 +336,9 @@ var
   LCondition: string;
 begin
   Result := False;
-  for I := 0 to FNode.ChildNodes.Count - 1 do
+  for I := 0 to Node.ChildNodes.Count - 1 do
   begin
-    LChildNode := FNode.ChildNodes[I];
+    LChildNode := Node.ChildNodes[I];
     LCondition := VarToStrDef(LChildNode.Attributes['Condition'], '');
     if not LCondition.IsEmpty and LChildNode.NodeName.Equals('PropertyGroup') and SameText(ACondition, LCondition) then
     begin
@@ -520,9 +420,9 @@ var
   LCondition: string;
   LParts: TArray<string>;
 begin
-  for I := 0 to FNode.ChildNodes.Count - 1 do
+  for I := 0 to Node.ChildNodes.Count - 1 do
   begin
-    LChildNode := FNode.ChildNodes[I];
+    LChildNode := Node.ChildNodes[I];
     LCondition := VarToStrDef(LChildNode.Attributes['Condition'], '');
     if not LCondition.IsEmpty and ((LChildNode.ChildNodes.Count > 0) and SameText(LChildNode.ChildNodes[0].Text, 'true'))
       and LChildNode.NodeName.Equals('PropertyGroup') and LCondition.StartsWith(cConditionConfigStartsWith, True) then
@@ -616,9 +516,9 @@ var
 begin
   if FProjectExtensions = nil then
   begin
-    for I := 0 to FNode.ChildNodes.Count - 1 do
+    for I := 0 to Node.ChildNodes.Count - 1 do
     begin
-      LNode := FNode.ChildNodes[I];
+      LNode := Node.ChildNodes[I];
       if LNode.NodeName.Equals('ProjectExtensions') and (LNode.ChildNodes.Count > 0) then
       begin
         FProjectExtensions := TProjProjectExtensions.Create(LNode);
@@ -629,93 +529,6 @@ begin
   Result := FProjectExtensions;
 end;
 
-function TProj.GetPropertyGroup(const AIndex: Integer): IProjPropertyGroup;
-var
-  I, LIndex: Integer;
-begin
-  Result := nil;
-  LIndex := -1;
-  for I := 0 to FNode.ChildNodes.Count - 1 do
-  begin
-    if FNode.ChildNodes[I].NodeName.Equals('PropertyGroup') then
-    begin
-      Inc(LIndex);
-      if AIndex = LIndex then
-      begin
-        Result := TProjPropertyGroup.Create(FNode.ChildNodes[I]);
-        Break;
-      end;
-    end;
-  end;
-end;
-
-function TProj.GetPropertyGroupCount: Integer;
-var
-  I: Integer;
-begin
-  Result := 0;
-  for I := 0 to FNode.ChildNodes.Count - 1 do
-  begin
-    if FNode.ChildNodes[I].NodeName.Equals('PropertyGroup') then
-      Inc(Result);
-  end;
-end;
-
-{ TCustomProjNode }
-
-constructor TCustomProjNode.Create(const ANode: IXMLNode);
-begin
-  inherited Create;
-  FNode := ANode;
-end;
-
-function TCustomProjNode.GetAttributeText(const AAttributeName: string): string;
-begin
-  Result := VarToStrDef(FNode.Attributes[AAttributeName], '');
-end;
-
-function TCustomProjNode.GetChild(const AIndex: Integer): IXMLNode;
-begin
-  Result := nil;
-  if (AIndex >= 0) and (AIndex < ChildCount) then
-    Result := FNode.ChildNodes[AIndex];
-end;
-
-function TCustomProjNode.GetChildBoolean(const AChildNodeName: string): Boolean;
-var
-  LNode: IXMLNode;
-begin
-  Result := False;
-  LNode := FNode.ChildNodes.FindNode(AChildNodeName);
-  if LNode <> nil then
-    Result := SameText(LNode.Text, 'true');
-end;
-
-function TCustomProjNode.GetChildInteger(const AChildNodeName: string; const ADefault: Integer = 0): Integer;
-var
-  LNode: IXMLNode;
-begin
-  Result := ADefault;
-  LNode := FNode.ChildNodes.FindNode(AChildNodeName);
-  if LNode <> nil then
-    Result := StrToIntDef(LNode.Text, ADefault);
-end;
-
-function TCustomProjNode.GetChildText(const AChildNodeName: string): string;
-var
-  LNode: IXMLNode;
-begin
-  Result := '';
-  LNode := FNode.ChildNodes.FindNode(AChildNodeName);
-  if LNode <> nil then
-    Result := LNode.Text;
-end;
-
-function TCustomProjNode.ChildCount: Integer;
-begin
-  Result := FNode.ChildNodes.Count;
-end;
-
 { TProjProjectExtensions }
 
 function TProjProjectExtensions.GetBorlandProject: IProjBorlandProject;
@@ -724,7 +537,7 @@ var
 begin
   if FBorlandProject = nil then
   begin
-    LNode := FNode.ChildNodes.FindNode('BorlandProject');
+    LNode := Node.ChildNodes.FindNode('BorlandProject');
     if LNode <> nil then
       FBorlandProject := TProjBorlandProject.Create(LNode);
   end;
@@ -744,10 +557,10 @@ procedure TProjDeployment.GetDeployFiles;
 var
   I: Integer;
 begin
-  for I := 0 to FNode.ChildNodes.Count - 1 do
+  for I := 0 to Node.ChildNodes.Count - 1 do
   begin
-    if FNode.ChildNodes[I].NodeName.Equals('DeployFile') then
-      FDeployFiles := FDeployFiles + [TProjDeployFile.Create(FNode.ChildNodes[I])];
+    if Node.ChildNodes[I].NodeName.Equals('DeployFile') then
+      FDeployFiles := FDeployFiles + [TProjDeployFile.Create(Node.ChildNodes[I])];
   end;
 end;
 
@@ -755,10 +568,10 @@ procedure TProjDeployment.GetDeployClasses;
 var
   I: Integer;
 begin
-  for I := 0 to FNode.ChildNodes.Count - 1 do
+  for I := 0 to Node.ChildNodes.Count - 1 do
   begin
-    if FNode.ChildNodes[I].NodeName.Equals('DeployClass') then
-      FDeployClasses := FDeployClasses + [TProjDeployClass.Create(FNode.ChildNodes[I])];
+    if Node.ChildNodes[I].NodeName.Equals('DeployClass') then
+      FDeployClasses := FDeployClasses + [TProjDeployClass.Create(Node.ChildNodes[I])];
   end;
 end;
 
@@ -825,7 +638,7 @@ end;
 constructor TProjBorlandProject.Create(const ANode: IXMLNode);
 begin
   inherited;
-  FDeployment := TProjDeployment.Create(FNode.ChildNodes.FindNode('Deployment'));
+  FDeployment := TProjDeployment.Create(Node.ChildNodes.FindNode('Deployment'));
   GetPlatforms;
 end;
 
@@ -850,10 +663,10 @@ procedure TProjBorlandProject.GetPlatforms;
 var
   I: Integer;
 begin
-  for I := 0 to FNode.ChildNodes.Count - 1 do
+  for I := 0 to Node.ChildNodes.Count - 1 do
   begin
-    if FNode.ChildNodes[I].NodeName.Equals('Platform') then
-      FPlatforms := FPlatforms +  [TProjPlatform.Create(FNode.ChildNodes[I])];
+    if Node.ChildNodes[I].NodeName.Equals('Platform') then
+      FPlatforms := FPlatforms +  [TProjPlatform.Create(Node.ChildNodes[I])];
   end;
 end;
 
@@ -876,37 +689,6 @@ begin
   Result := FName;
 end;
 
-{ TProjPropertyGroup }
-
-constructor TProjPropertyGroup.Create(const ANode: IXMLNode);
-begin
-  inherited;
-  FCondition := GetAttributeText('Condition');
-  GetValues;
-end;
-
-procedure TProjPropertyGroup.GetValues;
-var
-  LChildNode: IXMLNode;
-  I: Integer;
-begin
-  for I := 0 to Node.ChildNodes.Count - 1 do
-  begin
-    LChildNode := Node.ChildNodes[I];
-    FValues.Add(LChildNode.NodeName, LChildNode.Text);
-  end;
-end;
-
-function TProjPropertyGroup.FindValue(const AName: string; out AValue: string): Boolean;
-begin
-  Result := FValues.FindValue(AName, AValue);
-end;
-
-function TProjPropertyGroup.GetCondition: string;
-begin
-  Result := FCondition;
-end;
-
 { TProjDeployClass }
 
 constructor TProjDeployClass.Create(const ANode: IXMLNode);
@@ -920,10 +702,10 @@ procedure TProjDeployClass.GetPlatforms;
 var
   I: Integer;
 begin
-  for I := 0 to FNode.ChildNodes.Count - 1 do
+  for I := 0 to Node.ChildNodes.Count - 1 do
   begin
-    if FNode.ChildNodes[I].NodeName.Equals('Platform') then
-      FPlatforms := FPlatforms + [TProjDeployClassPlatform.Create(FNode.ChildNodes[I])];
+    if Node.ChildNodes[I].NodeName.Equals('Platform') then
+      FPlatforms := FPlatforms + [TProjDeployClassPlatform.Create(Node.ChildNodes[I])];
   end;
 end;
 
@@ -989,10 +771,10 @@ procedure TProjDeployFile.GetPlatforms;
 var
   I: Integer;
 begin
-  for I := 0 to FNode.ChildNodes.Count - 1 do
+  for I := 0 to Node.ChildNodes.Count - 1 do
   begin
-    if FNode.ChildNodes[I].NodeName.Equals('Platform') then
-      FPlatforms := FPlatforms +  [TProjDeployFilePlatform.Create(FNode.ChildNodes[I])];
+    if Node.ChildNodes[I].NodeName.Equals('Platform') then
+      FPlatforms := FPlatforms +  [TProjDeployFilePlatform.Create(Node.ChildNodes[I])];
   end;
 end;
 
@@ -1041,7 +823,7 @@ end;
 constructor TProjDeployFilePlatform.Create(const ANode: IXMLNode);
 begin
   inherited;
-  FName := VarToStrDef(FNode.Attributes['Name'], '');
+  FName := VarToStrDef(Node.Attributes['Name'], '');
   FOverwrite := GetChildBoolean('Overwrite');
   FRemoteDir := GetChildText('RemoteDir');
   FRemoteName := GetChildText('RemoteName');
