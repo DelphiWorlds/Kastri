@@ -4,7 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, System.Messaging, System.Generics.Collections,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts, FMX.Controls.Presentation, FMX.StdCtrls, FMX.ListBox, FMX.TabControl;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts, FMX.Controls.Presentation, FMX.StdCtrls, FMX.ListBox, FMX.TabControl,
+  FMX.Edit, System.Actions, FMX.ActnList;
 
 type
   TMainView = class(TForm)
@@ -16,10 +17,18 @@ type
     MenuTab: TTabItem;
     FilesButton: TButton;
     StreamsButton: TButton;
+    URLEdit: TEdit;
+    PlayURLButton: TButton;
+    ClearURLButton: TClearEditButton;
+    ActionList: TActionList;
+    PlayURLAction: TAction;
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
     procedure FilesButtonClick(Sender: TObject);
     procedure StreamsButtonClick(Sender: TObject);
+    procedure ClearURLButtonClick(Sender: TObject);
+    procedure PlayURLActionExecute(Sender: TObject);
+    procedure PlayURLActionUpdate(Sender: TObject);
   private
     FTabStack: TStack<TTabItem>;
     procedure CreateViews;
@@ -41,10 +50,18 @@ implementation
 {$R *.fmx}
 
 uses
-  System.IOUtils,
+  System.IOUtils, System.Net.URLClient, System.RegularExpressions,
   FMX.Platform,
   VPD.View.Streams, VPD.View.Files, VPD.View.Player,
   DW.UIHelper;
+
+function IsValidURL(const AURL: string): Boolean;
+var
+  LRegEx: TRegEx;
+begin
+  LRegEx := TRegEx.Create('[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)', [roIgnoreCase]);
+  Result := LRegEx.Match(AUrl).Success;
+end;
 
 { TMainView }
 
@@ -64,6 +81,12 @@ destructor TMainView.Destroy;
 begin
   FTabStack.Free;
   inherited;
+end;
+
+procedure TMainView.ClearURLButtonClick(Sender: TObject);
+begin
+  URLEdit.Text := '';
+  URLEdit.SetFocus;
 end;
 
 procedure TMainView.StreamsButtonClick(Sender: TObject);
@@ -122,6 +145,18 @@ procedure TMainView.GoBack;
 begin
   if FTabStack.Count > 0 then
     TabControl.SetActiveTabWithTransitionAsync(FTabStack.Pop, TTabTransition.Slide, TTabTransitionDirection.Reversed, TabSwitched);
+end;
+
+procedure TMainView.PlayURLActionExecute(Sender: TObject);
+begin
+  Caption := TPath.GetFileName(URLEdit.Text);
+  PlayerView.SelectedURL(URLEdit.Text);
+  SwitchTab(PlayerTab);
+end;
+
+procedure TMainView.PlayURLActionUpdate(Sender: TObject);
+begin
+  PlayURLAction.Enabled := IsValidURL(URLEdit.Text);
 end;
 
 procedure TMainView.CreateViews;

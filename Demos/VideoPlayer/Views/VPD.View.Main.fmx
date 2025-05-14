@@ -2,8 +2,8 @@ object MainView: TMainView
   Left = 0
   Top = 0
   Caption = 'Video Player'
-  ClientHeight = 874
-  ClientWidth = 546
+  ClientHeight = 876
+  ClientWidth = 548
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -12,27 +12,27 @@ object MainView: TMainView
   DesignerMasterStyle = 0
   object RootLayout: TLayout
     Align = Contents
-    Size.Width = 546.000000000000000000
-    Size.Height = 874.000000000000000000
+    Size.Width = 548.000000000000000000
+    Size.Height = 876.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
     object TabControl: TTabControl
       Align = Client
-      Size.Width = 546.000000000000000000
-      Size.Height = 874.000000000000000000
+      Size.Width = 548.000000000000000000
+      Size.Height = 876.000000000000000000
       Size.PlatformDefault = False
       TabIndex = 3
       TabOrder = 0
       TabPosition = None
       Sizes = (
-        546s
-        874s
-        546s
-        874s
-        546s
-        874s
-        546s
-        874s)
+        548s
+        876s
+        548s
+        876s
+        548s
+        876s
+        548s
+        876s)
       object PlayerTab: TTabItem
         CustomIcon = <
           item
@@ -99,10 +99,10 @@ object MainView: TMainView
           Margins.Right = 8.000000000000000000
           Position.X = 8.000000000000000000
           Position.Y = 8.000000000000000000
-          Size.Width = 530.000000000000000000
+          Size.Width = 532.000000000000000000
           Size.Height = 45.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 1
+          TabOrder = 2
           Text = 'Files'
           TextSettings.Trimming = None
           OnClick = FilesButtonClick
@@ -114,15 +114,64 @@ object MainView: TMainView
           Margins.Right = 8.000000000000000000
           Position.X = 8.000000000000000000
           Position.Y = 61.000000000000000000
-          Size.Width = 530.000000000000000000
+          Size.Width = 532.000000000000000000
           Size.Height = 45.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 0
+          TabOrder = 1
           Text = 'Streams'
           TextSettings.Trimming = None
           OnClick = StreamsButtonClick
         end
+        object URLEdit: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Align = Top
+          TabOrder = 3
+          Text = 'https://nr2.newradio.it/proxy/seiresrl?mp=/stream'
+          Position.X = 8.000000000000000000
+          Position.Y = 114.000000000000000000
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 8.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Size.Width = 532.000000000000000000
+          Size.Height = 31.000000000000000000
+          Size.PlatformDefault = False
+          object ClearURLButton: TClearEditButton
+            Touch.InteractiveGestures = [LongTap]
+            CanFocus = False
+            Cursor = crArrow
+            TextSettings.Trimming = None
+            Size.Width = 28.000000000000000000
+            Size.Height = 27.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            OnClick = ClearURLButtonClick
+          end
+        end
+        object PlayURLButton: TButton
+          Action = PlayURLAction
+          Align = Top
+          ImageIndex = -1
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Position.X = 8.000000000000000000
+          Position.Y = 149.000000000000000000
+          Size.Width = 532.000000000000000000
+          Size.Height = 45.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          TextSettings.Trimming = None
+        end
       end
+    end
+  end
+  object ActionList: TActionList
+    Left = 240
+    Top = 336
+    object PlayURLAction: TAction
+      Text = 'Play URL'
+      OnExecute = PlayURLActionExecute
+      OnUpdate = PlayURLActionUpdate
     end
   end
 end
