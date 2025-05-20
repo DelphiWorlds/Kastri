@@ -50,7 +50,11 @@ begin
   LListener := procedure(const Sender: TObject; const M: TMessage)
   begin
     TMessageManager.DefaultManager.Unsubscribe(TIdleMessage, LListener);
-    AProc;
+    try
+      AProc;
+    finally
+      LListener := nil;
+    end;
   end;
   TMessageManager.DefaultManager.SubscribeToMessage(TIdleMessage, LListener);
 end;
