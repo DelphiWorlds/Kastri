@@ -454,11 +454,6 @@ begin
   Result := '';
 end;
 
-function TEmptyPropertyGroup.GetConditionMacroName: string;
-begin
-  Result := '';
-end;
-
 function TEmptyPropertyGroup.GetValues: TNameValuePairs;
 begin
   Result := FValues;
