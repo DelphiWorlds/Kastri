@@ -1945,6 +1945,8 @@ type
   UICloudSharingController = interface;
   UIVisualEffect = interface;
   UIBlurEffect = interface;
+  UIGlassEffect = interface;
+  UIGlassContainerEffect = interface;
   UIVibrancyEffect = interface;
   UIVisualEffectView = interface;
   UIFontPickerViewControllerConfiguration = interface;
@@ -6700,10 +6702,12 @@ type
     {class} function borderedTintedButtonConfiguration: Pointer; cdecl;
     {class} function borderlessButtonConfiguration: Pointer; cdecl;
     {class} function filledButtonConfiguration: Pointer; cdecl;
+    {class} function glassButtonConfiguration: Pointer; cdecl;
     {class} function grayButtonConfiguration: Pointer; cdecl;
     {class} function new: Pointer; cdecl;
     {class} function plainButtonConfiguration: Pointer; cdecl;
     {class} function tintedButtonConfiguration: Pointer; cdecl;
+    {class} function tintedGlassButtonConfiguration: Pointer; cdecl;
   end;
 
   UIButtonConfiguration = interface(NSObject)
@@ -9534,6 +9538,30 @@ type
     ['{FFF03102-0E5F-4372-BDB5-0EDE70E34370}']
   end;
   TUIBlurEffect = class(TOCGenericImport<UIBlurEffectClass, UIBlurEffect>) end;
+
+  UIGlassEffectClass = interface(UIVisualEffectClass)
+    ['{D276AE3A-CE16-4ED1-BB08-63447FD0184D}']
+  end;
+
+  UIGlassEffect = interface(UIVisualEffect)
+    ['{A7799A28-13B0-4CD9-9711-C1154316F258}']
+    function isInteractive: Boolean; cdecl;
+    procedure setInteractive(interactive: Boolean); cdecl;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    function tintColor: UIColor; cdecl;
+  end;
+  TUIGlassEffect = class(TOCGenericImport<UIGlassEffectClass, UIGlassEffect>) end;
+
+  UIGlassContainerEffectClass = interface(UIVisualEffectClass)
+    ['{1D001C01-C5F4-4FCA-A652-4D135234C9DF}']
+  end;
+
+  UIGlassContainerEffect = interface(UIVisualEffect)
+    ['{E225FB6C-B2E7-4B54-BD26-BEB2592ADA1F}']
+    procedure setSpacing(spacing: CGFloat); cdecl;
+    function spacing: CGFloat; cdecl;
+  end;
+  TUIGlassContainerEffect = class(TOCGenericImport<UIGlassContainerEffectClass, UIGlassContainerEffect>) end;
 
   UIVibrancyEffectClass = interface(UIVisualEffectClass)
     ['{9DC0972A-33AF-47CD-B221-76F19B182C05}']
