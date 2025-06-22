@@ -370,13 +370,12 @@ type
   end;
 
   TAndroidFileStream = class(TBytesStream)
-  private
-    class function InternalCopy(const AJURI: Jnet_Uri; const AFileName: string): Boolean;
   public
     /// <summary>
     ///   Copies a file from the specified URI to the destination filename
     /// </summary>
-    class function Copy(const AURI, AFileName: string): Boolean;
+    class function Copy(const AURI, AFileName: string): Boolean; overload;
+    class function Copy(const AJURI: Jnet_Uri; const AFileName: string): Boolean; overload;
   public
     constructor Create(const AFile: JFile); overload;
     constructor Create(const AURI: string); overload;
@@ -1209,7 +1208,7 @@ begin
   Create(LURI);
 end;
 
-class function TAndroidFileStream.InternalCopy(const AJURI: Jnet_Uri; const AFileName: string): Boolean;
+class function TAndroidFileStream.Copy(const AJURI: Jnet_Uri; const AFileName: string): Boolean;
 var
   LInputStream: JInputStream;
   LOutputStream: JFileOutputStream;
@@ -1250,7 +1249,7 @@ var
   LURI: Jnet_Uri;
 begin
   LURI := TJnet_Uri.JavaClass.parse(StringToJString(AURI));
-  Result := InternalCopy(LURI, AFileName);
+  Result := Copy(LURI, AFileName);
 end;
 
 constructor TAndroidFileStream.Create(const AJURI: Jnet_Uri);
