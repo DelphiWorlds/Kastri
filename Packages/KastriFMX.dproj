@@ -186,11 +186,11 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="fmx.dcp"/>
-        <DCCReference Include="Z:\Controls\DW.NativeImage.pas"/>
-        <DCCReference Include="Z:\Controls\DW.NativeButton.pas"/>
-        <DCCReference Include="Z:\Controls\DW.NativeSlider.pas"/>
-        <DCCReference Include="Z:\Controls\DW.NativeShape.pas"/>
-        <DCCReference Include="Z:\Controls\DW.NativeControlModel.pas"/>
+        <DCCReference Include="..\Controls\DW.NativeImage.pas"/>
+        <DCCReference Include="..\Controls\DW.NativeButton.pas"/>
+        <DCCReference Include="..\Controls\DW.NativeSlider.pas"/>
+        <DCCReference Include="..\Controls\DW.NativeShape.pas"/>
+        <DCCReference Include="..\Controls\DW.NativeControlModel.pas"/>
         <RcItem Include="Resources\TNativeButton.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>Bitmap_1</ResourceId>
