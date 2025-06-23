@@ -31,6 +31,6 @@ requires
   rtl;
 
 contains
-  DW.Precompile;
+  DW.Precompile in '..\Core\DW.Precompile.pas';
 
 end.
