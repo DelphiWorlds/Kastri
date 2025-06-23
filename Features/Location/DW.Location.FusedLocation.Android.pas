@@ -36,6 +36,7 @@ type
     procedure onLocationUpdatesChange(active: Boolean); cdecl;
     procedure onSetMockLocationResult(location: JLocation); cdecl;
     procedure onSetMockModeResult(success: Boolean); cdecl;
+    function useCallback: Boolean; cdecl;
   public
     constructor Create(const ALocation: TLocation);
   end;
@@ -175,6 +176,11 @@ end;
 procedure TFusedLocationClientDelegate.onSetMockModeResult(success: Boolean);
 begin
   //
+end;
+
+function TFusedLocationClientDelegate.useCallback: Boolean;
+begin
+  Result := False;
 end;
 
 { TNmeaMessageListener }
