@@ -4,7 +4,7 @@ This demo allows you to record your speech and convert it into text
 
 ## Supported Delphi versions
 
-The demo should compile and work for at least versions 10.3.3, 10.4.x and 11
+The demo should compile and work for at least versions 11.x and 12.x
 
 When moving between Delphi versions, for Android please make sure you right-click the Libraries node under Target Platforms > Android (32 or 64-bit) and click "Revert System files to default"
 
@@ -14,13 +14,8 @@ Supported platforms are iOS and Android
 
 ## Project Configuration
 
-### Build Event/Android Manifest
+### Android Manifest
 
-**Delphi 12.1, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md)**
-
-Due to changes in the Android build process:
-
-* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
 * Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
 * Modify `AndroidManifest.template.xml` to add the following **inside of** `<queries>`
 
@@ -30,14 +25,7 @@ Due to changes in the Android build process:
     </intent>
   ```
 
-**Delphi 12.0 or earlier:**
-
-Configure Build Events in Project Options to add a Post-Build event with the command:  
-
-```
-  [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
-```  
-Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
+NOTE: This change is already done for the demo.
 
 ## Compiling for iOS
 
