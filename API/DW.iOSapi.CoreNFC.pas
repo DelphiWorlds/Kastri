@@ -385,13 +385,20 @@ type
   end;
   TNFCISO15693ReaderSession = class(TOCGenericImport<NFCISO15693ReaderSessionClass, NFCISO15693ReaderSession>) end;
 
-  NFCNDEFTag = interface(IObjectiveC)
+  NFCNDEFTagClass = interface(NSObjectClass)
+    ['{B2B7476A-1A6E-4C9D-9A90-4237C65FA64A}']
+  end;
+
+  NFCNDEFTag = interface(NSObject)
     ['{4A7EFC32-37B3-4812-B832-928FEECBC1ED}']
     function isAvailable: Boolean; cdecl;
     procedure queryNDEFStatusWithCompletionHandler(completionHandler: TNFCNDEFTagBlockMethod1); cdecl;
     procedure readNDEFWithCompletionHandler(completionHandler: TNFCNDEFTagBlockMethod2); cdecl;
     procedure writeLockWithCompletionHandler(completionHandler: TNFCNDEFTagBlockMethod3); cdecl;
     procedure writeNDEF(ndefMessage: NFCNDEFMessage; completionHandler: TNFCNDEFTagBlockMethod3); cdecl;
+  end;
+
+    TNFCNDEFTag = class(TOCGenericImport<NFCNDEFTagClass, NFCNDEFTag>)
   end;
 
   NFCFeliCaTag = interface(IObjectiveC)
