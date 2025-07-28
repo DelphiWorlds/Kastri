@@ -388,10 +388,10 @@ type
   NFCNDEFTag = interface(IObjectiveC)
     ['{4A7EFC32-37B3-4812-B832-928FEECBC1ED}']
     function isAvailable: Boolean; cdecl;
-    procedure queryNDEFStatusWithCompletionHandler(completionHandler: Pointer); cdecl;
-    procedure readNDEFWithCompletionHandler(completionHandler: Pointer); cdecl;
-    procedure writeLockWithCompletionHandler(completionHandler: Pointer); cdecl;
-    procedure writeNDEF(ndefMessage: NFCNDEFMessage; completionHandler: Pointer); cdecl;
+    procedure queryNDEFStatusWithCompletionHandler(completionHandler: TNFCNDEFTagBlockMethod1); cdecl;
+    procedure readNDEFWithCompletionHandler(completionHandler: TNFCNDEFTagBlockMethod2); cdecl;
+    procedure writeLockWithCompletionHandler(completionHandler: TNFCNDEFTagBlockMethod3); cdecl;
+    procedure writeNDEF(ndefMessage: NFCNDEFMessage; completionHandler: TNFCNDEFTagBlockMethod3); cdecl;
   end;
 
   NFCFeliCaTag = interface(IObjectiveC)
