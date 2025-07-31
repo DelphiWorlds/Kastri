@@ -166,7 +166,7 @@ The reason for making this change is so that the Embarcadero Firebase Messaging 
 
 ## Relay Demo
 
-**NOTE: If you are using Delphi 12.3** please see [this report in the Quality Portal](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3108) for a workaround to the compiler error you will receive.
+**NOTE: If you are using Delphi 12.3** please ensure that you have applied all patches. See [this report in the Quality Portal](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3108) for a workaround to the compiler error you will receive, if you have not applied the patch.
 
 The **Relay Demo** handles push notifications using a service (`FCMRelayService`), even when the app is inactive. For details on setting up the service, refer to the demo’s documentation.
 
@@ -199,9 +199,10 @@ Use [PushIt](https://github.com/DelphiWorlds/PushIt) to send test messages. Ensu
 - **Compile error** - `[DCC Error] E2597 ld: file not found: PromisesObjC`: The source has not been patched as per [these instructions](#delphi-source-patch). 
 - **Other Compiler errors**: Check framework paths and Firebase SDK compatibility.
 - **No token received**: Verify the Provisioning Profile and ensure Push Notifications are enabled.
-- **App crashes on start**: Ensure that your GoogleServices-info.plist being deployed as per [this section](#deployment-of-google-services-info-plist).
-  
+
   In the project output folder, Delphi generates a file called <project>.entitlements. Inside this file (which is just xml) you should be able to see an entry with a `key` value of: `aps-environment`. If not, the provisioning profile that was used does not use an Application ID that has Push Notifications enabled.
 
+- **App crashes on start**: Ensure that your GoogleServices-info.plist being deployed as per [this section](#deployment-of-google-services-info-plist).
+  
 ### Android
 - **Messages not received**: Ensure the payload format is correct and omit the `notification` element. Also ensure that the [changes to `AndroidManifest.template.xml`](#android-manifest) are correct.
