@@ -168,7 +168,31 @@ The reason for making this change is so that the Embarcadero Firebase Messaging 
 
 **NOTE: If you are using Delphi 12.3** please ensure that you have applied all patches. See [this report in the Quality Portal](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-3108) for a workaround to the compiler error you will receive, if you have not applied the patch.
 
-The **Relay Demo** handles push notifications using a service (`FCMRelayService`), even when the app is inactive. For details on setting up the service, refer to the demo’s documentation.
+The **Relay Demo** handles push notifications using a service (`FCMRelayService`), even when the app is inactive.
+
+### Android Manifest
+
+As per the [base demo](#android-manifest), the changes to `AndroidManifest.template.xml` are the same, *as well as*:
+
+Adding the following lines after the `<%application-metadata%>` tag:
+
+```xml
+    <meta-data android:name="com.delphiworlds.kastri.FIREBASE_RELAY_SERVICE" android:value="com.embarcadero.services.FCMRelayService" />
+    <meta-data android:name="com.delphiworlds.kastri.FIREBASE_RELAY_SERVICE_JOB_ID" android:value="12345" />
+```
+
+The value for `com.delphiworlds.kastri.FIREBASE_RELAY_SERVICE_JOB_ID` can be any integer as long as it is unique to any other job ID in your app.
+
+This service information is used by `DWFirebaseMessagingService` to schedule the `FCMRelayService` to run in the background when a push notification is received.
+
+Also, add the following service entry at the same level as the other `<service>` entries:
+
+```xml
+    <service android:name="com.embarcadero.services.FCMRelayService"
+        android:exported="false"
+        android:permission="android.permission.BIND_JOB_SERVICE"
+        android:foregroundServiceType="remoteMessaging" />
+```
 
 Example push notification payload for the Relay Demo:
 ```json
