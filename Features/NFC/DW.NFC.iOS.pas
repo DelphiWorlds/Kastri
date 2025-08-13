@@ -174,7 +174,6 @@ end;
 
 function TNFCPayloadHelper.ToNativePointer: Pointer;
 var
-  LURL: NSURL;
   LLocale: NSLocale;
 begin
   Result := nil;
@@ -398,7 +397,7 @@ begin
   for I := 0 to High(FTags) do
   begin
     WrapInterface(didDetectTags.objectAtIndex(I), TypeInfo(NFCNDEFTag), LTag);
-    FTags[I] := TPlatformNDEFTag.Create(LTag, FReaderSession);
+    FTags[I] := TPlatformNDEFTag.Create(LTag, Self);
   end;
   DoDetectedTags(FTags);
 end;
