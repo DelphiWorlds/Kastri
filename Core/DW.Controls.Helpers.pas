@@ -15,7 +15,7 @@ interface
 
 uses
   // RTL
-  System.Generics.Defaults,
+  System.Generics.Defaults, System.Types,
   // FMX
   FMX.Controls, FMX.Graphics;
 
@@ -33,6 +33,7 @@ type
     ///   Finds the first parent control matching the class: T
     /// </summary>
     function FindParent<T: TControl>(var AFindControl: T): Boolean;
+    function OuterRect: TRectF;
   end;
 
 implementation
@@ -84,6 +85,12 @@ begin
   Result := (LControl <> nil) and (LControl is T);
   if Result then
     AFindControl := T(LControl);
+end;
+
+function TControlHelper.OuterRect: TRectF;
+begin
+  Result := BoundsRect;
+  Result.Inflate(Margins.Left, Margins.Top, Margins.Right, Margins.Bottom);
 end;
 
 end.
