@@ -465,9 +465,9 @@ type
     function performRequests(requests: NSArray; pixelBuffer: CVPixelBufferRef; orientation: CGImagePropertyOrientation;
       error: PPointer): Boolean; overload; cdecl;
     [MethodName('performRequests:onCGImage:error:')]
-    function performRequests(requests: NSArray; image: CGImageRef; error: PPointer): Boolean; overload; cdecl;
+    function performRequestsOnCGImage(requests: NSArray; image: CGImageRef; error: PPointer): Boolean; overload; cdecl;
     [MethodName('performRequests:onCGImage:orientation:error:')]
-    function performRequests(requests: NSArray; image: CGImageRef; orientation: CGImagePropertyOrientation; error: PPointer): Boolean; overload; cdecl;
+    function performRequestsOnCGImage(requests: NSArray; image: CGImageRef; orientation: CGImagePropertyOrientation; error: PPointer): Boolean; overload; cdecl;
     [MethodName('performRequests:onCIImage:error:')]
     function performRequests(requests: NSArray; image: CIImage; error: PPointer): Boolean; overload; cdecl;
   end;
