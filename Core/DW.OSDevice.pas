@@ -153,7 +153,6 @@ implementation
 
 uses
   // DW
-  DW.OSLog,
   {$IF Defined(POSIX)}
   DW.OSDevice.Posix,
   {$ENDIF}
