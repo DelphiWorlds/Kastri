@@ -75,6 +75,7 @@ type
     class function AudioManager: JAudioManager; static;
     /// <summary>
     ///   Determines whether or not exact alarms can be scheduled. Applies to Android 14+
+    /// </summary>
     class function CanScheduleExactAlarms: Boolean; static;
     /// <summary>
     ///   Checks if both build and target are greater or equal to the tested value
