@@ -6,7 +6,7 @@ unit DW.Orientation.iOS;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2024 Dave Nottage under MIT license   }
+{  Copyright 2020-2025 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
@@ -64,11 +64,19 @@ end;
 
 procedure TOrientationNotificationListener.AddOrientationObservers;
 begin
+  {$IF CompilerVersion < 37}
   TiOSHelper.DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('onOrientationDidChange:'),
     StringToID('UIDeviceOrientationDidChangeNotification'), nil);
   //  !!!! Undocumented!!
   TiOSHelper.DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('onOrientationWillChange:'),
     StringToID('UIDeviceOrientationWillChangeNotification'), nil);
+  {$ELSE}
+  TiOSHelper.DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('onOrientationDidChange:'),
+    StrToNSStr('UIDeviceOrientationDidChangeNotification'), nil);
+  //  !!!! Undocumented!!
+  TiOSHelper.DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('onOrientationWillChange:'),
+    StrToNSStr('UIDeviceOrientationWillChangeNotification'), nil);
+  {$ENDIF}
 end;
 
 function TOrientationNotificationListener.GetObjectiveCClass: PTypeInfo;

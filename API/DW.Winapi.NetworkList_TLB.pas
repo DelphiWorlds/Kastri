@@ -6,7 +6,7 @@ unit DW.Winapi.NetworkList_TLB;
 {                                                       }
 {         Delphi Worlds Cross-Platform Library          }
 {                                                       }
-{  Copyright 2020-2024 Dave Nottage under MIT license   }
+{  Copyright 2020-2025 Dave Nottage under MIT license   }
 {  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
