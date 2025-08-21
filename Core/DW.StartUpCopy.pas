@@ -124,7 +124,7 @@ begin
 end;
 
 {$ELSE}
-class procedure TStartUpCopy.CopyDocuments(const AFileNames: TArray<string>);
+class procedure TStartUpCopy.CopyDocuments(const AFileNames: TArray<string>; const AParentFolder: string = '');
 begin
 
 end;
