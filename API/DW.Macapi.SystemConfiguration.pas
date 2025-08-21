@@ -1,9 +1,11 @@
 {*******************************************************}
 {                                                       }
-{            CodeGear Delphi Runtime Library            }
+{                      Kastri                           }
 {                                                       }
-{ Copyright(c) 2010-2024 Embarcadero Technologies, Inc. }
-{                  All rights reserved                  }
+{         Delphi Worlds Cross-Platform Library          }
+{                                                       }
+{  Copyright 2020-2025 Dave Nottage under MIT license   }
+{  which is located in the root folder of this library  }
 {                                                       }
 {*******************************************************}
 
