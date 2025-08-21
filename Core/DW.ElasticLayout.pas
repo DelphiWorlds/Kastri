@@ -67,6 +67,19 @@ type
     property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
    end;
 
+  TGridLayout = class(FMX.Layouts.TGridLayout)
+  private
+    FElasticDimensions: TElasticDimensions;
+    FIsElastic: Boolean;
+    procedure SetIsElastic(const Value: Boolean);
+    procedure SetElasticDimensions(const Value: TElasticDimensions);
+  protected
+    procedure DoRealign; override;
+  public
+    property IsElastic: Boolean read FIsElastic write SetIsElastic;
+    property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
+  end;
+
   TGridPanelLayout = class(FMX.Layouts.TGridPanelLayout)
   private
     FElasticDimensions: TElasticDimensions;
@@ -234,6 +247,33 @@ begin
 end;
 
 procedure TGridPanelLayout.SetIsElastic(const Value: Boolean);
+begin
+  if Value <> FIsElastic then
+  begin
+    FIsElastic := Value;
+    if FIsElastic then
+      FElasticDimensions := [TElasticDimension.Width, TElasticDimension.Height]
+    else
+      FElasticDimensions := [];
+    Realign;
+  end;
+end;
+
+{ TGridLayout }
+
+procedure TGridLayout.DoRealign;
+begin
+  inherited;
+  TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
+end;
+
+procedure TGridLayout.SetElasticDimensions(const Value: TElasticDimensions);
+begin
+  FElasticDimensions := Value;
+  Realign;
+end;
+
+procedure TGridLayout.SetIsElastic(const Value: Boolean);
 begin
   if Value <> FIsElastic then
   begin
