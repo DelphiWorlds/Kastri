@@ -89,7 +89,7 @@ procedure TVideoPlayerView.VisibleChanged;
 begin
   inherited;
   if Assigned(FOnVisibleChanged) then
-   FOnVisibleChanged(Self);
+    FOnVisibleChanged(Self);
 end;
 
 function TVideoPlayerView.RecommendSize(const AWishedSize: TSizeF): TSizeF;
