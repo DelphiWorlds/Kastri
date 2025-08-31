@@ -117,6 +117,7 @@ begin
       LIPAddress := Default(TIPAddress);
       if IsEthernet(LAddrInfo.ifa_flags) then
       begin
+        LIPAddress.InterfaceName := UTF8String(MarshaledAString(LAddrInfo.ifa_name));
         case LAddrInfo.ifa_addr.sa_family of
           AF_INET:
           begin

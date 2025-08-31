@@ -21,6 +21,7 @@ type
   TIPAddress = record
     IP: string;
     Version: TIPVersion;
+    InterfaceName: string;
   end;
 
   TIPAddresses = TArray<TIPAddress>;

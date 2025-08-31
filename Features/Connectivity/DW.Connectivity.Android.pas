@@ -285,13 +285,16 @@ begin
   LInterfaces := TJNetworkInterface.JavaClass.getNetworkInterfaces;
   while LInterfaces.hasMoreElements do
   begin
-    LAddresses := TJNetworkInterface.Wrap(LInterfaces.nextElement).getInetAddresses;
+    var
+    LInterface := TJNetworkInterface.Wrap(LInterfaces.nextElement);
+    LAddresses := TJNetworkInterface.Wrap(LInterface).getInetAddresses;
     while LAddresses.hasMoreElements do
     begin
       LAddress := TJInetAddress.Wrap(LAddresses.nextElement);
       if not LAddress.isLoopbackAddress then
       begin
         LClassName := JStringToString(LAddress.getClass.getName);
+        LIPAddress.InterfaceName := LInterface.getName;
         if LClassName.Contains('Inet4Address') then
           LIPAddress.Version := TIPVersion.IPv4
         else if LClassName.Contains('Inet6Address') then
