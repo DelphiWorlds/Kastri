@@ -294,7 +294,7 @@ begin
       if not LAddress.isLoopbackAddress then
       begin
         LClassName := JStringToString(LAddress.getClass.getName);
-        LIPAddress.InterfaceName := LInterface.getName;
+        LIPAddress.InterfaceName := JStringToString(LInterface.getName);
         if LClassName.Contains('Inet4Address') then
           LIPAddress.Version := TIPVersion.IPv4
         else if LClassName.Contains('Inet6Address') then
