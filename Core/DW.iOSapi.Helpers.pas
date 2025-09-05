@@ -20,8 +20,9 @@ uses
   Macapi.ObjectiveC,
   // iOS
   iOSapi.Foundation, iOSapi.CocoaTypes,
+  {$IF CompilerVersion > 36} iOSapi.UIKit; {$ENDIF}
   // DW
-  DW.iOSapi.UIKit;
+  {$IF CompilerVersion < 37} DW.iOSapi.UIKit; {$ENDIF}
 
 type
   TiOSHelperEx = record
@@ -60,7 +61,11 @@ begin
     LObject := NSObjectToID(AObject)
   else
     LObject := nil;
+  {$IF CompilerVersion < 37}
   TiOSHelper.DefaultNotificationCenter.addObserver(AObserver, sel_getUid(AMethod), NSObjectToID(AName), LObject);
+  {$ELSE}
+  TiOSHelper.DefaultNotificationCenter.addObserver(AObserver, sel_getUid(AMethod), AName, LObject);
+  {$ENDIF}
 end;
 
 class procedure TiOSHelperEx.AddObserver(const AObserver: Pointer; const AMethod: MarshaledAString; const AName: string; const AObject: NSObject = nil);

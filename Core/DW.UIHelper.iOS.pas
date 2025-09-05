@@ -49,10 +49,11 @@ uses
   Macapi.ObjectiveC, Macapi.Helpers,
   // iOS
   iOSapi.Foundation, iOSapi.CocoaTypes, iOSapi.Helpers, iOSapi.CoreGraphics,
+  {$IF CompilerVersion > 36} iOSapi.UIKit, {$ENDIF}
   // FMX
-  FMX.Forms, FMX.Platform.iOS,
+  FMX.Forms, FMX.Platform.iOS
   // DW
-  DW.iOSapi.UIKit;
+  {$IF CompilerVersion < 37}, DW.iOSapi.UIKit {$ENDIF};
 
 { TPlatformUIHelper }
 

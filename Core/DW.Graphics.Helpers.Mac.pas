@@ -20,6 +20,9 @@ uses
   {$ELSEIF Defined(MACOS)}
   // macOS
   Macapi.CocoaTypes,
+  {$IF CompilerVersion > 36}
+  DW.Macapi.CoreVideo,
+  {$ENDIF}
   {$ENDIF}
   // FMX
   FMX.Graphics;
@@ -55,7 +58,10 @@ uses
   {$IF Defined(IOS)}
   iOSapi.Foundation, DW.iOSapi.CoreVideo,
   {$ELSEIF Defined(MACOS)}
-  Macapi.CoreGraphics, Macapi.CoreVideo, Macapi.Foundation,
+  Macapi.CoreGraphics, Macapi.Foundation,
+  {$IF CompilerVersion < 37}
+  Macapi.CoreVideo,
+  {$ENDIF}
   {$ENDIF}
   // FMX
   FMX.Surfaces, FMX.Types;
@@ -165,13 +171,22 @@ var
   LContext: CGContextRef;
   LImage: CGImageRef;
 begin
+  {$IF CompilerVersion < 37}
   Result := 0;
   LBuffer := 0;
+  {$ELSE}
+  LBuffer := nil;
+  Result := nil;
+  {$ENDIF}
   LOptions := TNSMutableDictionary.Create;
   LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGImageCompatibilityKey);
   LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGBitmapContextCompatibilityKey);
   LStatus := CVPixelBufferCreate(kCFAllocatorDefault, AWidth, AHeight, kCVPixelFormatType_32ARGB, NSObjectToID(LOptions), @LBuffer);
+  {$IF CompilerVersion < 37}
   if (LStatus = kCVReturnSuccess) and (LBuffer <> 0) then
+  {$ELSE}
+  if (LStatus = kCVReturnSuccess) and (LBuffer <> nil) then
+  {$ENDIF}
   begin
     CVPixelBufferLockBaseAddress(LBuffer, 0);
     try

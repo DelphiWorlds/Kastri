@@ -128,7 +128,11 @@ var
 begin
   FURLSessionDelegate := TURLSessionDelegate.Create(Self);
   LConfig := TNSURLSessionConfiguration.OCClass.defaultSessionConfiguration;
+  {$IF (CompilerVersion < 37) or Defined(OSX)} //!!!!!
   FDownloadSession := TNSURLSession.OCClass.sessionWithConfigurationDelegateDelegateQueue(LConfig, FURLSessionDelegate.GetObjectID, nil);
+  {$ELSE}
+  FDownloadSession := TNSURLSession.OCClass.sessionWithConfiguration(LConfig, FURLSessionDelegate.GetObjectID, nil);
+  {$ENDIF}
 end;
 
 function TPlatformCocoaWebBrowserExt.CanDownload(const AMimeType: string): Boolean;
@@ -141,6 +145,9 @@ var
   LFileName: string;
   LState: TDownloadState;
   LFileURL: NSURL;
+  {$IF CompilerVersion > 36}
+  LError: Pointer;
+  {$ENDIF}
 begin
   if FDownloadTasks.TryGetValue(NSObjectToID(ATask), LFileName) then
   begin
@@ -161,8 +168,14 @@ begin
         if TFile.Exists(LFileName) then
           TFile.Delete(LFileName);
         LFileURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(LFileName)));
+        {$IF CompilerVersion > 36}
+        LError := nil;
+        if not TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager).moveItemAtURL(AURL, LFileURL, @LError) then
+          LFileName := NSStrToStr(AURL.absoluteString);
+        {$ELSE}
         if not TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager).moveItemAtURL(AURL, LFileURL) then
           LFileName := NSStrToStr(AURL.absoluteString);
+        {$ENDIF}
       end
       else
         LFileName := NSStrToStr(AURL.absoluteString);

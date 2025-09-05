@@ -18,6 +18,9 @@ uses
   Macapi.ObjectiveC, Macapi.ObjCRuntime,
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.CoreGraphics, iOSapi.CoreImage,
+  {$IF CompilerVersion > 36}
+  iOSapi.CoreVideo,
+  {$ENDIF}
   // DW
   DW.iOSapi.CoreImage;
 

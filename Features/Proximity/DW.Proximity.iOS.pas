@@ -67,8 +67,13 @@ constructor TProximityNotificationListener.Create(const APlatformProximity: TPla
 begin
   inherited Create;
   FPlatformProximity := APlatformProximity;
+  {$IF CompilerVersion < 37}
   TiOSHelper.DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('onProximityStateDidChange:'),
     StringToID('UIDeviceProximityStateDidChangeNotification'), nil);
+  {$ELSE}
+  TiOSHelper.DefaultNotificationCenter.addObserver(GetObjectID, sel_getUid('onProximityStateDidChange:'),
+    StrToNSStr('UIDeviceProximityStateDidChangeNotification'), nil);
+  {$ENDIF}
 end;
 
 function TProximityNotificationListener.GetObjectiveCClass: PTypeInfo;

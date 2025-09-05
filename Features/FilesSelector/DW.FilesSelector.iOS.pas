@@ -18,8 +18,10 @@ uses
   Macapi.ObjectiveC, 
   // iOS
   iOSapi.Foundation, iOSapi.CocoaTypes, iOSapi.AVFoundation,
+  {$IF CompilerVersion > 36} iOSapi.UIKit, {$ENDIF}
   // DW
-  DW.iOSapi.Foundation, DW.iOSapi.UIKit, DW.iOSapi.PhotosUI, DW.FilesSelector;
+  {$IF CompilerVersion < 37} DW.iOSapi.UIKit, {$ENDIF}
+  DW.iOSapi.Foundation, DW.iOSapi.PhotosUI, DW.FilesSelector;
 
 type
   IItemProviderHandler = interface(IInterface)
@@ -516,7 +518,7 @@ begin
   LGenerator.setAppliesPreferredTrackTransform(True);
   LTime := CMTimeMakeWithSeconds(1, NSEC_PER_SEC);
   LError := nil;
-  LImageRef := LGenerator.copyCGImageAtTime(LTime, nil, LError);
+  LImageRef := LGenerator.copyCGImageAtTime(LTime, nil, @LError);
   if LError = nil then
   try
     Result := TUIImage.Wrap(TUIImage.Alloc.initWithCGImage(LImageRef));

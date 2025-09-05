@@ -130,6 +130,10 @@ type
 implementation
 
 uses
+  {$IF CompilerVersion < 37}
   DW.iOSapi.UIKit;
+  {$ELSE}
+  iOSapi.UIKit;
+  {$ENDIF}
 
 end.

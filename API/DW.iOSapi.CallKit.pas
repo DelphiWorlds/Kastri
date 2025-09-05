@@ -17,7 +17,9 @@ uses
   // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation, Macapi.Dispatch,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.AVFoundation;
+  iOSapi.CocoaTypes,
+  {$IF CompilerVersion < 37} iOSapi.AVFoundation, {$ELSE} iOSapi.AVFAudio, {$ENDIF}
+  iOSapi.Foundation;
 
 const
   CXErrorCodeUnknownError = 0;

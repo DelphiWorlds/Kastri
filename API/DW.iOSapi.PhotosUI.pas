@@ -18,8 +18,10 @@ uses
   Macapi.ObjectiveC,
   // iOS
   iOSapi.Foundation, iOSapi.CocoaTypes,
+  {$IF CompilerVersion > 36} iOSapi.UIKit, {$ENDIF}
   // DW
-  DW.iOSapi.UIKit, DW.iOSapi.Foundation, DW.iOSapi.Photos;
+  {$IF CompilerVersion < 37} DW.iOSapi.UIKit, {$ENDIF}
+  DW.iOSapi.Foundation, DW.iOSapi.Photos;
 
 const
   PHLivePhotoBadgeOptionsOverContent = 1;

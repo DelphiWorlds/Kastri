@@ -25,7 +25,8 @@ uses
   // FMX
   FMX.Presentation.Messages, FMX.Presentation.iOS, FMX.Presentation.Factory, FMX.Controls, FMX.Controls.Presentation, FMX.Controls.Model, FMX.Types,
   // DW
-  DW.iOSapi.UIKit, DW.iOSapi.GoogleMobileAds, DW.AdMob, DW.AdMobBannerAd;
+  {$IF CompilerVersion < 37} DW.iOSapi.UIKit, {$ENDIF}
+  DW.iOSapi.GoogleMobileAds, DW.AdMob, DW.AdMobBannerAd;
 
 type
   IGADBannerView = interface(iOSapi.UIKit.UIView)

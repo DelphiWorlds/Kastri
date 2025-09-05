@@ -15,9 +15,9 @@ interface
 
 uses
   // macOS
-  Macapi.ObjectiveC, Macapi.CoreFoundation, iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics,
+  Macapi.ObjectiveC, Macapi.CoreFoundation, iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics
   // DW
-  DW.iOSapi.UIKit;
+  {$IF CompilerVersion < 37}, DW.iOSapi.UIKit {$ENDIF};
 
 const
   GADAdFormatBanner = 0;

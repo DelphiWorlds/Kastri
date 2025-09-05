@@ -31,7 +31,8 @@ type
     function GetBDSEXEPath(const AIndex: Integer): string; overload;
     function GetBDSPath(const AVersion: string): string; overload;
     function GetBDSPath(const AIndex: Integer): string; overload;
-    procedure GetBDSValues(const AIndex: Integer; const APath: string; const AValues: TStrings);
+    procedure GetBDSValues(const AIndex: Integer; const APath: string; const AValues: TStrings); overload;
+    procedure GetBDSValues(const AIndex: Integer; const APath: string; out AValues: TArray<string>); overload;
     function GetDefaultSDKName(const AVersion, APlatform: string): string;
     function GetDefaultSDKValue(const AVersion, APlatform, AKey: string): string;
     procedure GetSDKNames(const AVersion: string; const ASDKNames: TStrings);
@@ -50,12 +51,13 @@ uses
   System.SysUtils, System.IOUtils;
 
 const
-  cKnownVersions: array[0..8] of string = (
-    '15.0', '16.0', '17.0', '18.0', '19.0', '20.0', '21.0', '22.0', '23.0'
+  cKnownVersions: array[0..10] of string = (
+    '15.0', '16.0', '17.0', '18.0', '19.0', '20.0', '21.0', '22.0', '23.0', '37.0', '38.0'
   );
-  cKnownVersionNames: array[0..8] of string = (
+  // Yes, the last version name is a joke ;-)
+  cKnownVersionNames: array[0..10] of string = (
     'Delphi XE7', 'Delphi XE8', 'Delphi 10 Seattle', 'Delphi 10.1 Berlin', 'Delphi 10.2 Tokyo', 'Delphi 10.3 Rio',
-    'Delphi 10.4 Sydney', 'Delphi 11 Alexandria', 'Delphi 12 Athens'
+    'Delphi 10.4 Sydney', 'Delphi 11 Alexandria', 'Delphi 12 Athens', 'Delphi 13 Florence', 'Delphi 14 Camelot'
   );
 
 { TBDSEnvironment }
@@ -118,6 +120,19 @@ procedure TBDSEnvironment.GetBDSValues(const AIndex: Integer; const APath: strin
 begin
   AValues.Clear;
   GetValues(GetVersion(AIndex) + '\' + APath, AValues);
+end;
+
+procedure TBDSEnvironment.GetBDSValues(const AIndex: Integer; const APath: string; out AValues: TArray<string>);
+var
+  LStrings: TStrings;
+begin
+  LStrings := TStringList.Create;
+  try
+    GetBDSValues(AIndex, APath, LStrings);
+    AValues := LStrings.ToStringArray;
+  finally
+    LStrings.Free;
+  end;
 end;
 
 function TBDSEnvironment.GetVersion(const AIndex: Integer): string;

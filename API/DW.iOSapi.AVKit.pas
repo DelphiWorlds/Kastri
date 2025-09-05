@@ -19,7 +19,8 @@ uses
   // iOSapi
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreMedia, iOSapi.AVFoundation, iOSapi.CoreGraphics,
   // DW
-  DW.iOSapi.UIKit, DW.iOSapi.AVFoundation;
+  {$IF CompilerVersion < 37} DW.iOSapi.UIKit, {$ENDIF}
+  DW.iOSapi.AVFoundation;
 
 const
   AVKitPlatformViewClass = UIView;
