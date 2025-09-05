@@ -242,9 +242,9 @@ end;
 function TSoundPlayer.AddSound(const AFileName: string; const ASoundName: string = ''): Integer;
 begin
   if ASoundName.IsEmpty then
-    FPlatformSoundPlayer.AddSound(AFileName, TPath.GetFileNameWithoutExtension(TPath.GetFileName(AFileName)))
+    Result := FPlatformSoundPlayer.AddSound(AFileName, TPath.GetFileNameWithoutExtension(TPath.GetFileName(AFileName)))
   else
-    FPlatformSoundPlayer.AddSound(AFileName, ASoundName);
+    Result := FPlatformSoundPlayer.AddSound(AFileName, ASoundName);
 end;
 
 end.
