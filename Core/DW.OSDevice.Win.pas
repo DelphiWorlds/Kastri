@@ -71,6 +71,11 @@ begin
   end
   else
     Result.LanguageCode := 'en';
+  LLength := GetLocaleInfo(GetUserDefaultLCID, LOCALE_SABBREVLANGNAME, LBuffer, Length(LBuffer));
+  if LLength > 0 then
+    SetString(Result.LanguageCodeISO639_2, LBuffer, LLength - 1)
+  else
+    Result.LanguageCodeISO639_2 := 'en';
   LLength := GetLocaleInfo(GetUserDefaultLCID, LOCALE_SLANGUAGE, LBuffer, Length(LBuffer));
   if LLength > 0 then
     SetString(Result.LanguageDisplayName, LBuffer, LLength - 1)
