@@ -285,8 +285,7 @@ begin
   LInterfaces := TJNetworkInterface.JavaClass.getNetworkInterfaces;
   while LInterfaces.hasMoreElements do
   begin
-    var
-    LInterface := TJNetworkInterface.Wrap(LInterfaces.nextElement);
+    var LInterface := TJNetworkInterface.Wrap(LInterfaces.nextElement);
     LAddresses := TJNetworkInterface.Wrap(LInterface).getInetAddresses;
     while LAddresses.hasMoreElements do
     begin
@@ -338,3 +337,4 @@ begin
 end;
 
 end.
+
