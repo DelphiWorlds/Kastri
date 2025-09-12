@@ -192,8 +192,13 @@ procedure TPlatformFCMManager.AddCategories;
 var
   LCategory: INotificationCategory;
   LAction: INotificationAction;
+  {$IF CompilerVersion < 37}
   LNativeCategory: UNNotificationCategory;
   LNativeAction: UNNotificationAction;
+  {$ELSE}
+  LNativeCategory: Pointer;
+  LNativeAction: Pointer;
+  {$ENDIF}
   LNativeActions, LNativeCategories: NSMutableArray;
   I: Integer;
 begin
@@ -206,11 +211,19 @@ begin
       LAction := LCategory.Actions[I];
       LNativeAction := TUNNotificationAction.OCClass.actionWithIdentifier(StrToNSStr(LAction.ID), StrToNSStr(LAction.Title),
         GetNativeActionOptions(LAction.Options));
+      {$IF CompilerVersion < 37}
       LNativeActions.addObject(NSObjectToID(LNativeAction));
+      {$ELSE}
+      LNativeActions.addObject(LNativeAction);
+      {$ENDIF}
     end;
     LNativeCategory := TUNNotificationCategory.OCClass.categoryWithIdentifier(StrToNSStr(LCategory.ID), LNativeActions, nil,
       GetNativeCategoryOptions(LCategory.Options));
+    {$IF CompilerVersion < 37}
     LNativeCategories.addObject(NSObjectToID(LNativeCategory));
+    {$ELSE}
+    LNativeCategories.addObject(LNativeCategory);
+    {$ENDIF}
   end;
   NotificationCenter.setNotificationCategories(TNSSet.Wrap(TNSSet.OCClass.setWithArray(LNativeCategories)));
 end;

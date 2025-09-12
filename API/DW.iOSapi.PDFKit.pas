@@ -17,9 +17,9 @@ uses
   // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation,
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics,
+  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics
   // DW
-  DW.iOSapi.UIKit;
+  {$IF CompilerVersion < 37}, DW.iOSapi.UIKit {$ENDIF};
 
 const
   kPDFActionNamedNone = 0;

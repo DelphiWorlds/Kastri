@@ -13,6 +13,8 @@ unit DW.iOSapi.UIKit;
 
 interface
 
+{$IF CompilerVersion = 37} As of Delphi 13, this unit has now become superfluous, due to the updated iOSapi.UIKit {$ENDIF}
+
 uses
   // macOS
   Macapi.ObjectiveC, Macapi.CoreFoundation, Macapi.ObjCRuntime,

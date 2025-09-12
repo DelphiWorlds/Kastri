@@ -119,7 +119,11 @@ var
   LStatus: OSStatus;
 begin
   DisposeSound;
+  {$IF CompilerVersion < 37}
   LStatus := AudioServicesCreateSystemSoundID(TNSURL.OCClass.fileURLWithPath(StrToNSStr(Value)), @FSoundID);
+  {$ELSE}
+  LStatus := AudioServicesCreateSystemSoundID(NSObjectToID(TNSURL.OCClass.fileURLWithPath(StrToNSStr(Value))), @FSoundID);
+  {$ENDIF}
   if LStatus = kAudioServicesNoError then
   begin
     LStatus := AudioServicesAddSystemSoundCompletion(FSoundID, CFRunLoopGetMain, kCFRunLoopDefaultMode, TPlatformMuteCheck.SystemSoundCompletion, Self);

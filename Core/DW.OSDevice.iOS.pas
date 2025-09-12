@@ -15,13 +15,14 @@ interface
 
 uses
   // iOS
-  iOSapi.Foundation,
+  iOSapi.Foundation, iOSapi.AVFoundation,
   // DW
   DW.OSDevice;
 
 type
   TPlatformOSDevice = record
   private
+    class function LockDevice(const ADevice: AVCaptureDevice): Boolean; static;
     class procedure OpenNSURL(const AURL: NSURL; const ACompletion: TOpenURLCompletionMethod); static;
   public
     class function EnableTorch(const AEnable: Boolean): Boolean; static;
@@ -50,11 +51,13 @@ uses
   // macOS
   Macapi.Helpers,
   // iOS
-  iOSapi.Helpers, iOSapi.AVFoundation, iOSapi.CoreLocation,
+  iOSapi.Helpers, iOSapi.CoreLocation,
+  {$IF CompilerVersion > 36} iOSapi.UIKit, {$ENDIF}
   // Posix
   Posix.SysUtsname,
   // DW
-  DW.Macapi.Helpers, DW.iOSapi.Foundation, DW.iOSapi.UIKit;
+  {$IF CompilerVersion < 37} DW.iOSapi.UIKit, {$ENDIF}
+  DW.Macapi.Helpers, DW.iOSapi.Foundation;
 
 function SharedApplication: UIApplication;
 begin
@@ -63,6 +66,22 @@ end;
 
 { TPlatformOSDevice }
 
+{$IF CompilerVersion < 37}
+class function TPlatformOSDevice.LockDevice(const ADevice: AVCaptureDevice): Boolean;
+begin
+  Result := ADevice.lockForConfiguration;
+end;
+
+{$ELSE}
+class function TPlatformOSDevice.LockDevice(const ADevice: AVCaptureDevice): Boolean;
+var
+  LError: Pointer;
+begin
+  LError := nil;
+  Result := ADevice.lockForConfiguration(@LError) and (LError = nil);
+end;
+{$ENDIF}
+
 class function TPlatformOSDevice.EnableTorch(const AEnable: Boolean): Boolean;
 var
   LDevice: AVCaptureDevice;
@@ -70,7 +89,7 @@ var
 begin
   Result := False;
   LDevice := TAVCaptureDevice.Wrap(TAVCaptureDevice.OCClass.defaultDeviceWithMediaType(AVMediaTypeVideo));
-  if (LDevice <> nil) and LDevice.hasTorch and LDevice.lockForConfiguration then
+  if (LDevice <> nil) and LDevice.hasTorch and LockDevice(LDevice) then
   try
     if AEnable then
       LMode := AVCaptureTorchModeOn

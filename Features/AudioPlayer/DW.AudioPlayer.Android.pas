@@ -264,11 +264,9 @@ begin
   if FMediaPlayer <> nil then
   begin
     if FMediaPlayer.isPlaying then
-    begin
       FMediaPlayer.stop;
-      SetIsReady(False);
-    end;
   end;
+  SetIsReady(False);
   if AudioState <> TAudioState.None then
     DoAudioStateChange(TAudioState.Stopped);
 end;

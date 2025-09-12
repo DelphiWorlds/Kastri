@@ -28,6 +28,7 @@ type
   public
     { JView_OnLongClickListener }
     function onLongClick(view: JView): Boolean; cdecl;
+    function onLongClickUseDefaultHapticFeedback(v: JView): Boolean; cdecl;
   public
     constructor Create(const ANativeControl: TNativeControl);
   end;
@@ -52,6 +53,12 @@ begin
 end;
 
 function TLongClickListener.onLongClick(view: JView): Boolean;
+begin
+  Result := True;
+  FNativeControl.DoLongPress;
+end;
+
+function TLongClickListener.onLongClickUseDefaultHapticFeedback(v: JView): Boolean;
 begin
   Result := True;
   FNativeControl.DoLongPress;

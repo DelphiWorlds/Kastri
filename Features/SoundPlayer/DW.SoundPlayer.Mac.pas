@@ -20,7 +20,7 @@ uses
   Macapi.CocoaTypes, Macapi.Foundation, Macapi.AVFoundation,
   {$ELSE}
   // iOS
-  iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.AVFoundation,
+  iOSapi.CocoaTypes, iOSapi.Foundation, {$IF CompilerVersion < 37} iOSapi.AVFoundation, {$ELSE} iOSapi.AVFAudio, {$ENDIF}
   {$ENDIF}
   // DW
   DW.SoundPlayer;

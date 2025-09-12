@@ -19,7 +19,8 @@ uses
   // iOS
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, iOSapi.CoreGraphics,
   // DW
-  DW.iOSapi.UIKit, DW.iOSapi.Foundation, iOSapi.MapKit;
+  {$IF CompilerVersion < 37} DW.iOSapi.UIKit, {$ENDIF}
+  DW.iOSapi.Foundation, iOSapi.MapKit;
 
 const
   CPAlertActionStyleDefault = 0;

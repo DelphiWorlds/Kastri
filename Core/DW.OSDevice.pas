@@ -27,6 +27,7 @@ type
     CountryDisplayName: string;
     CurrencySymbol: string;
     LanguageCode: string;
+    LanguageCodeISO639_2: string;
     LanguageDisplayName: string;
     function Culture: string;
   end;

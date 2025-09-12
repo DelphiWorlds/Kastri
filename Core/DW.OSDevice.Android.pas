@@ -97,9 +97,8 @@ var
   LLocale: JLocale;
 begin
   LLocale := TJLocale.JavaClass.getDefault;
-  Result.LanguageCode := JStringToString(LLocale.getISO3Language);
-  if Length(Result.LanguageCode) > 2 then
-    Delete(Result.LanguageCode, 3, MaxInt);
+  Result.LanguageCode := JStringToString(LLocale.getLanguage);
+  Result.LanguageCodeISO639_2 := JStringToString(LLocale.getISO3Language);
   Result.LanguageDisplayName := JStringToString(LLocale.getDisplayLanguage);
   Result.CountryCode := JStringToString(LLocale.getCountry);
   Result.CountryDisplayName := JStringToString(LLocale.getDisplayCountry);

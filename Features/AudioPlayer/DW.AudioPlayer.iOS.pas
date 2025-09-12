@@ -17,9 +17,9 @@ uses
   // macOS
   Macapi.ObjectiveC,
   // iOS
-  iOSapi.AVFoundation, iOSapi.Foundation,
+  iOSapi.AVFoundation, iOSapi.Foundation, {$IF CompilerVersion > 36} iOSapi.AVFAudio, {$ENDIF}
   // DW
-  DW.AudioPlayer;
+  {$IF CompilerVersion < 37} DW.iOSapi.AVFAudio, {$ENDIF} DW.AudioPlayer;
 
 type
   TPlatformAudioPlayer = class;
