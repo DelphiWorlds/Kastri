@@ -53,7 +53,10 @@ Unzip the SDK to a shared folder and create an [Environment Variable Override](h
 
 Due to updates in the Firebase SDK, patching the Delphi `FMX.PushNotification.FCM.iOS` unit is necessary. For instructions on how to patch the unit, refer to [FCMManualPatch.md](../../Features/Firebase/FCMManualPatch.md).
 
-> **Note:** Place the patched file in the project folder or a location in the search path. Avoid modifying the Delphi source folder directly.
+**NOTES:** 
+
+* The `FMX.PushNotification.FCM.iOS.patch` file that was available previously has been removed, as it was not entirely correct, and now 2 patch files would have been needed for Delphi 12.x and for Delphi 13.0
+* Place the patched FMX.PushNotification.FCM.iOS.pas file in the project folder or a location in the search path. Avoid modifying the Delphi source folder directly.
 
 #### Framework Search Path
 
