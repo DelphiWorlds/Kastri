@@ -8,7 +8,7 @@ Copy `FMX.PushNotification.FCM.iOS.pas` from the the Delphi `source\fmx` folder 
 
 ## Modify the copied source file
 
-In the `interface` section:
+In the `implementation` section:
 
 Modify the uses clause to:
 
@@ -35,7 +35,11 @@ Modify the `TFIRMessagingDelegate` declaration to:
   end;
 ```
 
-In the `implementation` section:
+Modify the `TFcmPushService` **declaration** to add this method just before the `Unregister` method:
+
+```delphi
+    procedure RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
+```
 
 Remove these methods:
 
@@ -75,6 +79,16 @@ end;
 ```
 
 i.e. the calls to `RequestAuthorization` and `Register` are **swapped**.
+
+Add this method:
+
+```delphi
+procedure TFcmPushService.RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
+begin
+  if not TiOSHelper.SharedApplication.isRegisteredForRemoteNotifications then
+    TiOSHelper.SharedApplication.registerForRemoteNotifications;
+end;
+```
 
 Modify the `TFcmPushService.RegisterRemoteNotificationsIOS10OrLater` method to look like this:
 
