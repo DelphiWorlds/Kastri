@@ -51,15 +51,7 @@ Unzip the SDK to a shared folder and create an [Environment Variable Override](h
 
 #### Delphi Source Patch
 
-Due to updates in the Firebase SDK, patching the Delphi `FMX.PushNotification.FCM.iOS` unit is necessary. To apply the patch:
-
-1. Navigate to `<Kastri>\Features\Firebase`.
-2. Run the command:
-   ```bash
-   FCMPatch.cmd
-   ```
-
-For manual patching instructions, refer to [FCMManualPatch.md](../../Features/Firebase/FCMManualPatch.md).
+Due to updates in the Firebase SDK, patching the Delphi `FMX.PushNotification.FCM.iOS` unit is necessary. For instructions on how to patch the unit, refer to [FCMManualPatch.md](../../Features/Firebase/FCMManualPatch.md).
 
 > **Note:** Place the patched file in the project folder or a location in the search path. Avoid modifying the Delphi source folder directly.
 

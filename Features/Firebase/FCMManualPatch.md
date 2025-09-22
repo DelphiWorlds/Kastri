@@ -76,10 +76,13 @@ end;
 
 i.e. the calls to `RequestAuthorization` and `Register` are **swapped**.
 
-Modify the `TFcmPushService.RegisterRemoteNotificationsIOS8OrLater` method to change the line where LSettings is assigned, to look like this:
+Modify the `TFcmPushService.RegisterRemoteNotificationsIOS10OrLater` method to look like this:
 
 ```delphi
-  LSettings := TUIUserNotificationSettings.Wrap(TUIUserNotificationSettings.OCClass.settingsForTypes(FCM.GetNativeAuthOptions, nil));
+procedure TFcmPushService.RegisterRemoteNotificationsIOS10OrLater;
+begin
+  UserNotificationCenter.requestAuthorizationWithOptions(FCM.GetNativeAuthOptions, RequestAuthorizationWithOptionsCompletionHandler);
+end;
 ```
 
 This enables the support for the full authorization options available via the `AuthOptions` property of `IFCMManager`
