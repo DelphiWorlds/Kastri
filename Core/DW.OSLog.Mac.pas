@@ -65,12 +65,21 @@ procedure _os_log_impl(dso: Pointer; log: os_log_t; type_: os_log_type_t; format
 function _dyld_get_image_header(image_index: Cardinal): Pointer; cdecl;
   external libdyld;
 
+function GetMainBundle: NSBundle;
+begin
+  {$IF Defined(IOS) and (CompilerVersion > 36)}
+  Result := TNSBundle.OCClass.mainBundle;
+  {$ELSE}
+  Result := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
+  {$ENDIF}
+end;
+
 function GetBundleIdentifier: string;
 var
   LValue: Pointer;
 begin
   Result := '';
-  LValue := TNSBundle.OCClass.mainBundle.infoDictionary.objectForKey(StringToID('CFBundleIdentifier'));
+  LValue := GetMainBundle.infoDictionary.objectForKey(StringToID('CFBundleIdentifier'));
   if LValue <> nil then
     Result := NSStrToStr(TNSString.Wrap(LValue));
 end;
