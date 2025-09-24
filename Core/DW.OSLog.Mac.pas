@@ -22,6 +22,9 @@ type
   ///   DO NOT ADD ANY FMX UNITS TO THESE FUNCTIONS
   /// </remarks>
   TPlatformOSLog = record
+  private
+    class var FImageHeader: Pointer;
+    class var FLogHandle: Pointer;
   public
     class procedure Log(const ALogType: TLogType; const AMsg: string); static;
   end;
@@ -32,21 +35,59 @@ uses
   // RTL
   System.SysUtils,
   // macOS
-  Macapi.Helpers, Macapi.ObjCRuntime;
+  Macapi.Helpers,
+  {$IF Defined(OSX)}
+  Macapi.Foundation;
+  {$ELSE}
+  iOSapi.Foundation;
+  {$ENDIF}
 
 const
-  libFoundation = '/System/Library/Frameworks/Foundation.framework/Foundation';
+  libSystem = '/usr/lib/libSystem.dylib';
+  libdyld = '/usr/lib/system/libdyld.dylib';
+
+  OS_LOG_TYPE_DEFAULT = $00;
+  OS_LOG_TYPE_INFO = $01;
+  OS_LOG_TYPE_DEBUG = $02;
+  OS_LOG_TYPE_ERROR = $10;
+  OS_LOG_TYPE_FAULT = $11;
 
 type
-  PNSString = Pointer;
+  os_log_t = Pointer;
+  os_log_type_t = Byte;
 
-procedure NSLog(format: PNSString); cdecl; varargs; external libFoundation name _PU + 'NSLog';
+function os_log_create(subsystem: MarshaledAString; category: MarshaledAString): os_log_t; cdecl;
+  external libSystem;
+function os_log_type_enabled(oslog: os_log_t; type_: os_log_type_t): Boolean; cdecl;
+  external libSystem;
+procedure _os_log_impl(dso: Pointer; log: os_log_t; type_: os_log_type_t; format: MarshaledAString; buf: PByte; size: Cardinal); cdecl;
+  external libSystem;
+function _dyld_get_image_header(image_index: Cardinal): Pointer; cdecl;
+  external libdyld;
+
+function GetBundleIdentifier: string;
+var
+  LValue: Pointer;
+begin
+  Result := '';
+  LValue := TNSBundle.OCClass.mainBundle.infoDictionary.objectForKey(StringToID('CFBundleIdentifier'));
+  if LValue <> nil then
+    Result := NSStrToStr(TNSString.Wrap(LValue));
+end;
 
 { TPlatformOSLog }
 
 class procedure TPlatformOSLog.Log(const ALogType: TLogType; const AMsg: string);
+var
+  LBuf: UInt16;
+  M: TMarshaller;
 begin
-  NSLog(StringToID(cLogTypeCaptions[ALogType] + ': ' + AMsg));
+  if FLogHandle = nil then
+    FLogHandle := os_log_create(M.AsAnsi(GetBundleIdentifier).ToPointer, 'Debug');
+  if FImageHeader = nil then
+    FImageHeader := _dyld_get_image_header(0);
+  LBuf := 0;
+  _os_log_impl(FImageHeader, FLogHandle, OS_LOG_TYPE_DEFAULT, M.AsAnsi(cLogTypeCaptions[ALogType] + ': ' + AMsg).ToPointer, @LBuf, SizeOf(LBuf));
 end;
 
 end.
