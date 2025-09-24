@@ -22,6 +22,7 @@ uses
 type
   JArrayDeque = interface;
   JExecutors = interface;
+  JExecutorService = interface;
   JFormatter = interface;
   JInflater = interface;
   JLinkedHashSet = interface;
@@ -33,6 +34,28 @@ type
   JTimer = interface;
   JTreeMap = interface;
   JStatus = interface;
+
+  JExecutorServiceClass = interface(JExecutorClass)
+    ['{E8B019B7-07FA-4DCB-A717-56C4D8985442}']
+  end;
+
+  [JavaSignature('java/util/concurrent/ExecutorService')]
+  JExecutorService = interface(JExecutor)
+    ['{7CBEF054-5D1A-42FD-9836-747C6517408C}']
+    function awaitTermination(long: Int64; timeunit: JTimeUnit): Boolean; cdecl;
+    function invokeAll(collection: JCollection): JList; overload; cdecl;
+    function invokeAll(collection: JCollection; long: Int64; timeunit: JTimeUnit): JList; overload; cdecl;
+    function invokeAny(collection: JCollection; long: Int64; timeunit: JTimeUnit): JObject; overload; cdecl;
+    function invokeAny(collection: JCollection): JObject; overload; cdecl;
+    function isShutdown: Boolean; cdecl;
+    function isTerminated: Boolean; cdecl;
+    procedure shutdown; cdecl;
+    function shutdownNow: JList; cdecl;
+    function submit(callable: JCallable): JFuture; overload; cdecl;
+    function submit(runnable: JRunnable; t: JObject): JFuture; overload; cdecl;
+    function submit(runnable: JRunnable): JFuture; overload; cdecl;
+  end;
+  TJExecutorService = class(TJavaGenericImport<JExecutorServiceClass, JExecutorService>) end;
 
   JExecutorsClass = interface(JObjectClass)
     ['{83F13D1F-378D-4541-A348-A863638BF5DF}']
