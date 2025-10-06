@@ -238,7 +238,13 @@ begin
     if LItem is TSharingItemText then
       LActivityItems.addObject(StringToID(TSharingItemText(LItem).Text))
     else if LItem is TSharingItemFile then
+    begin
+      {$IF CompilerVersion < 37}
       LActivityItems.addObject(TNSURL.OCClass.fileURLWithPath(StrToNSStr(TSharingItemFile(LItem).Text)))
+      {$ELSE}
+      LActivityItems.addObject(NSObjectToID(TNSURL.OCClass.fileURLWithPath(StrToNSStr(TSharingItemFile(LItem).Text))))
+      {$ENDIF}
+    end
     else if LItem is TSharingItemImage then
       LActivityItems.addObject(NSObjectToID(BitmapToUIImage(TSharingItemImage(LItem).Image)))
   end;
