@@ -45,6 +45,7 @@ type
   private
     FDelegate: TAVAudioPlayerDelegate;
     FPlayer: AVAudioPlayer;
+    FSession: AVAudioSession;
   protected
     procedure DoAudioStateChange(const AState: TAudioState); override;
     procedure LoadFromFile(const AFileName: string); override;
@@ -86,6 +87,7 @@ end;
 constructor TPlatformAudioPlayer.Create(const AAudioPlayer: TAudioPlayer);
 begin
   inherited;
+  FSession := TAVAudioSession.OCClass.sharedInstance;
   FDelegate := TAVAudioPlayerDelegate.Create(Self);
 end;
 
@@ -106,7 +108,11 @@ var
   LPointer: Pointer;
 begin
   LPointer := nil;
+  {$IF (CompilerVersion < 37)}
   LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(AFileName)));
+  {$ELSE}
+  LURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(AFileName));
+  {$ENDIF}
   FPlayer := nil;
   FPlayer := TAVAudioPlayer.Wrap(TAVAudioPlayer.Alloc.initWithContentsOfURL(LURL, @LPointer));
   FPlayer.setDelegate(FDelegate.GetObjectID);
@@ -127,6 +133,8 @@ procedure TPlatformAudioPlayer.Play;
 begin
   if FPlayer <> nil then
   begin
+    FSession.setCategory(AVAudioSessionCategoryPlayback, AVAudioSessionCategoryOptionDefaultToSpeaker, nil);
+    FSession.setActive(True, nil);
     FPlayer.play;
     DoAudioStateChange(TAudioState.Playing);
   end;

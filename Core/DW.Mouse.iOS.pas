@@ -165,7 +165,11 @@ type
 
 function SharedApplication: UIApplication;
 begin
+  {$IF (CompilerVersion < 37)}
   Result := TUIApplication.Wrap(TUIApplication.OCClass.sharedApplication);
+  {$ELSE}
+  Result := TUIApplication.OCClass.sharedApplication;
+  {$ENDIF}
 end;
 
 { TContextMenuInteractionDelegate }
@@ -242,7 +246,11 @@ end;
 
 function TPlatformMouse.GetScale: Single;
 begin
+  {$IF (CompilerVersion < 37)}
   Result := TUIScreen.Wrap(TUIScreen.OCClass.mainScreen).nativeScale;
+  {$ELSE}
+  Result := TUIScreen.OCClass.mainScreen.nativeScale;
+  {$ENDIF}
 end;
 
 function TPlatformMouse.GetView: UIView;

@@ -197,7 +197,11 @@ end;
 constructor TQLPreviewItem.Create(const AFileName: string);
 begin
   inherited Create;
+  {$IF (CompilerVersion < 37)}
   FURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(AFileName)));
+  {$ELSE}
+  FURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(AFileName));
+  {$ENDIF}
   FTitle := StrToNSStr('');
 end;
 

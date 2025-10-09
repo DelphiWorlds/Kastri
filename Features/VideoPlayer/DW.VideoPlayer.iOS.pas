@@ -14,6 +14,8 @@ unit DW.VideoPlayer.iOS;
 interface
 
 uses
+  // RTL
+  System.TypInfo,
   // macOS
   Macapi.ObjectiveC,
   // iOS
@@ -69,19 +71,45 @@ type
     constructor Create(const APlatformVideoPlayer: TPlatformVideoPlayer);
   end;
 
+  IGesturesHandler = interface(NSObject)
+    ['{29785A5E-D750-4AA2-A6B7-25D3B02AE0D6}']
+    procedure handleTap(gestureRecognizer: UITapGestureRecognizer); cdecl;
+  end;
+
+  TTapEvent = procedure(Sender: TObject; const View: UIView) of object;
+
+  TGesturesHandler = class(TOCLocal)
+  private
+    FTapGestureRecognizer: UITapGestureRecognizer;
+    FOnTap: TTapEvent;
+  protected
+    function GetObjectiveCClass: PTypeInfo; override;
+  public
+    { IGestureHandlers }
+    procedure handleTap(gestureRecognizer: UITapGestureRecognizer); cdecl;
+  public
+    constructor Create;
+    procedure AddTap(const AView: UIView);
+    property OnTap: TTapEvent read FOnTap write FOnTap;
+  end;
+
   TPlatformVideoPlayer = class(TCustomPlatformVideoPlayer)
   private
     FController: AVPlayerViewController;
     FControllerDelegate: TAVPlayerViewControllerDelegate;
+    FGesturesHandler: TGesturesHandler;
     FPlayer: AVPlayer;
     FPlayerItem: AVPlayerItem;
     FPlayerItemNotifications: TAVPlayerItemNotifications;
     FPlayerLayer: AVPlayerLayer;
     FValueObserver: TKeyValueObserver;
     FView: UIView;
+    procedure CheckControllerTimeout;
     procedure CreateAVPlayer(const AURL: string);
     procedure DestroyAVPlayer;
+    function GetControllerView: UIView;
     function HasPlayer: Boolean;
+    procedure TapHandler(Sender: TObject; const AView: UIView);
     procedure ValueChangeHandler(const AKeyPath: string; const AChange: NSDictionary);
   protected
     procedure ControllerWillEndFullScreenPresentation;
@@ -105,16 +133,18 @@ type
 implementation
 
 uses
+  DW.OSLog,
   // RTL
-  System.Classes, System.TypInfo, System.SysUtils,
+  System.Classes, System.SysUtils, System.DateUtils,
   // macOS
   Macapi.Helpers, Macapi.ObjCRuntime,
   // iOS
-  iOSapi.Helpers,
+  iOSapi.Helpers, iOSapi.CoreMedia, {$IF CompilerVersion > 36} iOSapi.AVFAudio, {$ENDIF}
   // FMX
-  FMX.Controls, FMX.Presentation.iOS, FMX.Presentation.Factory,
+  FMX.Presentation.iOS,
+  FMX.Controls, FMX.Presentation.Factory,
   // DW
-  DW.VideoPlayer.View, DW.iOSapi.Helpers;
+  DW.VideoPlayer.View, DW.iOSapi.Helpers, DW.OSTimer;
 
 type
   TiOSVideoPlayerView = class(TiOSNativeView);
@@ -129,6 +159,18 @@ begin
   Result := CocoaNSStringConst(libAVFoundation, 'AVLayerVideoGravityResizeAspectFill');
 end;
 
+{$IF CompilerVersion < 37}
+function GetName(const AName: string): Pointer;
+begin
+  Result := StringToID(AName);
+end;
+{$ELSE}
+function GetName(const AName: string): NSString;
+begin
+  Result := StrToNSStr(AName);
+end;
+{$ENDIF}
+
 { TAVPlayerItemNotifications }
 
 constructor TAVPlayerItemNotifications.Create(const APlatformVideoPlayer: TPlatformVideoPlayer);
@@ -142,21 +184,23 @@ var
   LCenter: NSNotificationCenter;
 begin
   LCenter := TiOSHelper.DefaultNotificationCenter;
-  LCenter.addObserver(GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), APlayerItemID);
-  LCenter.addObserver(GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), APlayerItemID);
-  LCenter.addObserver(GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), APlayerItemID);
-  LCenter.addObserver(GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), APlayerItemID);
-  LCenter.addObserver(GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), APlayerItemID);
-  LCenter.addObserver(GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), APlayerItemID);
+  LCenter.addObserver(GetObjectID, sel_getUid('ItemDidPlayToEndTime'), GetName('AVPlayerItemDidPlayToEndTimeNotification'), APlayerItemID);
+  LCenter.addObserver(GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), GetName('AVPlayerItemFailedToPlayToEndTimeNotification'), APlayerItemID);
+  LCenter.addObserver(GetObjectID, sel_getUid('ItemNewAccessLogEntry'), GetName('AVPlayerItemNewAccessLogEntryNotification'), APlayerItemID);
+  LCenter.addObserver(GetObjectID, sel_getUid('ItemNewErrorLogEntry'), GetName('AVPlayerItemNewErrorLogEntryNotification'), APlayerItemID);
+  LCenter.addObserver(GetObjectID, sel_getUid('ItemPlaybackStalled'), GetName('AVPlayerItemPlaybackStalledNotification'), APlayerItemID);
+  LCenter.addObserver(GetObjectID, sel_getUid('ItemTimeJumped'), GetName('AVPlayerItemTimeJumpedNotification'), APlayerItemID);
 end;
 
 procedure TAVPlayerItemNotifications.ItemDidPlayToEndTime;
 begin
+  TOSLog.d('TAVPlayerItemNotifications.ItemDidPlayToEndTime');
   FPlatformVideoPlayer.ItemDidPlayToEndTime;
 end;
 
 procedure TAVPlayerItemNotifications.ItemFailedToPlayToEndTime;
 begin
+  TOSLog.d('TAVPlayerItemNotifications.ItemFailedToPlayToEndTime');
   FPlatformVideoPlayer.ItemFailedToPlayToEndTime;
 end;
 
@@ -172,6 +216,7 @@ end;
 
 procedure TAVPlayerItemNotifications.ItemPlaybackStalled;
 begin
+  TOSLog.d('TAVPlayerItemNotifications.ItemPlaybackStalled');
   FPlatformVideoPlayer.ItemPlaybackStalled;
 end;
 
@@ -203,14 +248,22 @@ begin
   FControllerDelegate := TAVPlayerViewControllerDelegate.Create(Self);
   FController := TAVPlayerViewController.Create;
   FController.setDelegate(FControllerDelegate.GetObjectID);
+  FGesturesHandler := TGesturesHandler.Create;
+  FGesturesHandler.AddTap(GetControllerView);
+  FGesturesHandler.OnTap := TapHandler;
   FPlayerItemNotifications := TAVPlayerItemNotifications.Create(Self);
   FView := TiOSVideoPlayerView(View.Presentation).View;
   FView.setContentMode(UIViewContentModeScaleAspectFit);
+  {$IF CompilerVersion < 37}
   TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance).setCategory(AVAudioSessionCategoryPlayback, nil);
+  {$ELSE}
+  TAVAudioSession.OCClass.sharedInstance.setCategory(AVAudioSessionCategoryPlayback, nil);
+  {$ENDIF}
 end;
 
 destructor TPlatformVideoPlayer.Destroy;
 begin
+  FGesturesHandler.Free;
   DestroyAVPlayer;
   FPlayerItemNotifications.Free;
   FControllerDelegate.Free;
@@ -226,13 +279,23 @@ begin
   if AURL.StartsWith('http://', True) or AURL.StartsWith('https://', True) or AURL.StartsWith('rtsp://', True) then
     LURL := TNSURL.Wrap(TNSURL.OCClass.URLWithString(StrToNSStr(AURL)))
   else
+  begin
+    {$IF CompilerVersion < 37}
     LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(AURL)));
+    {$ELSE}
+    LURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(AURL));
+    {$ENDIF}
+  end;
   FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
-  FPlayerItemNotifications.AddObservers(NSObjectToID(FPlayerItem));
   FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem));
+  FPlayerItemNotifications.AddObservers(NSObjectToID(FPlayerItem));
   FValueObserver.Observe(FPlayer, 'rate', NSKeyValueObservingOptionNew or NSKeyValueObservingOptionOld);
   ShowController(UseController);
+  {$IF CompilerVersion < 37}
   FPlayerLayer := TAVPlayerLayer.Wrap(TAVPlayerLayer.OCClass.playerLayerWithPlayer(FPlayer));
+  {$ELSE}
+  FPlayerLayer := TAVPlayerLayer.OCClass.playerLayerWithPlayer(FPlayer);
+  {$ENDIF}
   FPlayerLayer.setVideoGravity(AVLayerVideoGravityResizeAspect);
   FView.layer.addSublayer(FPlayerLayer);
   ViewResized;
@@ -245,6 +308,11 @@ begin
   if FPlayerLayer <> nil then
     FPlayerLayer.removeFromSuperlayer;
   FPlayerLayer := nil;
+end;
+
+function TPlatformVideoPlayer.GetControllerView: UIView;
+begin
+  Result := TUIView.Wrap(NSObjectToID(FController.view));
 end;
 
 function TPlatformVideoPlayer.HasPlayer: Boolean;
@@ -272,8 +340,16 @@ begin
 end;
 
 procedure TPlatformVideoPlayer.ItemDidPlayToEndTime;
+const
+  NSEC_PER_SEC = 1000000000;
 begin
-  // May need this for looping
+  if NeedsLoop then
+  begin
+    FPlayer.seekToTime(CMTimeMakeWithSeconds(0, NSEC_PER_SEC));
+    FPlayer.play;
+  end
+  else
+    SetPlayerState(TPlayerState.Completed);
 end;
 
 procedure TPlatformVideoPlayer.ItemFailedToPlayToEndTime;
@@ -306,7 +382,16 @@ begin
   if not AURL.IsEmpty then
     Prepare(AURL);
   if HasPlayer then
+  begin
+    if FPlayer.currentItem = nil then
+      FPlayer.replaceCurrentItemWithPlayerItem(FPlayerItem);
     FPlayer.play;
+  end;
+end;
+
+procedure TPlatformVideoPlayer.TapHandler(Sender: TObject; const AView: UIView);
+begin
+  FController.setShowsPlaybackControls(True);
 end;
 
 procedure TPlatformVideoPlayer.Prepare(const AURL: string);
@@ -323,7 +408,28 @@ end;
 procedure TPlatformVideoPlayer.Stop;
 begin
   if HasPlayer then
+  begin
     FPlayer.pause;
+    FPlayer.replaceCurrentItemWithPlayerItem(nil);
+    FPlayerLayer.setPlayer(nil);
+    FPlayerLayer.removeFromSuperlayer;
+    FPlayerLayer := nil;
+  end;
+end;
+
+procedure TPlatformVideoPlayer.CheckControllerTimeout;
+begin
+  if ControllerTimeout > 0 then
+  begin
+    TOSTimer.FireOnce(ControllerTimeout,
+      procedure
+      begin
+        FController.setShowsPlaybackControls(False);
+      end
+    );
+  end
+  else
+    FController.setShowsPlaybackControls(False);
 end;
 
 procedure TPlatformVideoPlayer.ValueChangeHandler(const AKeyPath: string; const AChange: NSDictionary);
@@ -331,7 +437,13 @@ begin
   if AKeyPath.Equals('rate') then
   begin
     if FPlayer.rate > 0 then
-      SetPlayerState(TPlayerState.Playing)
+    begin
+      if PlayerState <> TPlayerState.Playing then
+      begin
+        CheckControllerTimeout;
+        SetPlayerState(TPlayerState.Playing);
+      end;
+    end
     else if FPlayer.status = AVPlayerStatusReadyToPlay then
       SetPlayerState(TPlayerState.Paused)
     else
@@ -343,6 +455,30 @@ procedure TPlatformVideoPlayer.ViewResized;
 begin
   if FPlayerLayer <> nil then
     FPlayerLayer.setFrame(FView.frame);
+end;
+
+{ TGesturesHandler }
+
+constructor TGesturesHandler.Create;
+begin
+  inherited Create;
+  FTapGestureRecognizer := TUITapGestureRecognizer.Wrap(TUITapGestureRecognizer.Alloc.initWithTarget(GetObjectID, sel_getUid('handleTap:')))
+end;
+
+function TGesturesHandler.GetObjectiveCClass: PTypeInfo;
+begin
+  Result := TypeInfo(IGesturesHandler);
+end;
+
+procedure TGesturesHandler.AddTap(const AView: UIView);
+begin
+  AView.addGestureRecognizer(FTapGestureRecognizer);
+end;
+
+procedure TGesturesHandler.handleTap(gestureRecognizer: UITapGestureRecognizer);
+begin
+  if Assigned(FOnTap) then
+    FOnTap(Self, gestureRecognizer.view);
 end;
 
 initialization

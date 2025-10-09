@@ -75,7 +75,11 @@ begin
   if FPreviewLayer = nil then
   begin
     FPreviewLayer := TAVCaptureVideoPreviewLayer.Wrap(TAVCaptureVideoPreviewLayer.OCClass.layerWithSession(ASession));
+    {$IF (CompilerVersion < 37)}
     FPreviewLayer.setBackgroundColor(TUIColor.Wrap(TUIColor.OCClass.blackColor).CGColor);
+    {$ELSE}
+    FPreviewLayer.setBackgroundColor(TUIColor.OCClass.blackColor.CGColor);
+    {$ENDIF}
     FPreviewLayer.setVideoGravity(AVLayerVideoGravityResizeAspectFill);
     View.layer.addSublayer(FPreviewLayer);
   end

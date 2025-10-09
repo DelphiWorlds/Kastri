@@ -83,7 +83,11 @@ begin
     if LIsCopy then
       LMemoryStream.CopyFrom(AImage, AImage.Size);
     LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(LMemoryStream.Memory, LMemoryStream.Size, False));
+    {$IF (CompilerVersion < 37)}
     LPasteboard := TUIPasteboard.Wrap(TUIPasteboard.OCClass.generalPasteboard);
+    {$ELSE}
+    LPasteboard := TUIPasteboard.OCClass.generalPasteboard;
+    {$ENDIF}
     LPasteboard.setData(LData, StrToNSStr('public.jpeg'));
   finally
     if LIsCopy then

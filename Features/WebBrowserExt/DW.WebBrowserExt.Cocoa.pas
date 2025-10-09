@@ -167,12 +167,13 @@ begin
       begin
         if TFile.Exists(LFileName) then
           TFile.Delete(LFileName);
-        LFileURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(LFileName)));
         {$IF CompilerVersion > 36}
         LError := nil;
+        LFileURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(LFileName));
         if not TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager).moveItemAtURL(AURL, LFileURL, @LError) then
           LFileName := NSStrToStr(AURL.absoluteString);
         {$ELSE}
+        LFileURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(LFileName)));
         if not TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager).moveItemAtURL(AURL, LFileURL) then
           LFileName := NSStrToStr(AURL.absoluteString);
         {$ENDIF}

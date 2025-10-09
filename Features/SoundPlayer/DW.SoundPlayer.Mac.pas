@@ -114,7 +114,11 @@ var
   LPointer: Pointer;
 begin
   LPointer := nil;
+  {$IF (CompilerVersion < 37) or Defined(OSX)}
   LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(AItem.FileName)));
+  {$ELSE}
+  LURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(AItem.FileName));
+  {$ENDIF}
   FPlayer := nil;
   FPlayer := TAVAudioPlayer.Wrap(TAVAudioPlayer.Alloc.initWithContentsOfURL(LURL, @LPointer));
   FPlayer.setDelegate(FDelegate.GetObjectID);

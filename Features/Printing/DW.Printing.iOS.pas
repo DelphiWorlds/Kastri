@@ -91,7 +91,11 @@ function TPlatformPrinting.GetController(const AJobNumber: Integer): UIPrintInte
 var
   LInfo: UIPrintInfo;
 begin
+  {$IF (CompilerVersion < 37)}
   LInfo := TUIPrintInfo.Wrap(TUIPrintInfo.OCClass.printInfo);
+  {$ELSE}
+  LInfo := TUIPrintInfo.OCClass.printInfo;
+  {$ENDIF}
   LInfo.setJobName(StrToNSStr(Format('%s Print Job %d', [TOSDevice.GetDeviceName, AJobNumber])));
   LInfo.setOutputType(UIPrintInfoOutputGeneral);
   Result := TUIPrintInteractionController.OCClass.sharedPrintController;

@@ -114,7 +114,11 @@ procedure TMacOSTimer.CreateTimer;
 begin
   if FInterval > 0 then
   begin
+    {$IF (CompilerVersion < 37) or Defined(OSX)}
     FTimer := TNSTimer.Wrap(TNSTimer.OCClass.scheduledTimerWithTimeInterval(FInterval / 1000, GetObjectID, sel_getUid('timerEvent:'), nil, True));
+    {$ELSE}
+    FTimer := TNSTimer.OCClass.scheduledTimerWithTimeInterval(FInterval / 1000, GetObjectID, sel_getUid('timerEvent:'), nil, True);
+    {$ENDIF}
     FIsEnabled := True;
   end;
 end;

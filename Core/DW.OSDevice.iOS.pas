@@ -88,7 +88,11 @@ var
   LMode: AVCaptureTorchMode;
 begin
   Result := False;
+  {$IF CompilerVersion < 37}
   LDevice := TAVCaptureDevice.Wrap(TAVCaptureDevice.OCClass.defaultDeviceWithMediaType(AVMediaTypeVideo));
+  {$ELSE}
+  LDevice := TAVCaptureDevice.OCClass.defaultDeviceWithMediaType(AVMediaTypeVideo);
+  {$ENDIF}
   if (LDevice <> nil) and LDevice.hasTorch and LockDevice(LDevice) then
   try
     if AEnable then

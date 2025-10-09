@@ -59,7 +59,11 @@ var
   LImageSourceRef: CGImageSourceRef;
 begin
   Result := nil;
+  {$IF CompilerVersion < 37}
   LDataRef := TNSData.OCClass.dataWithContentsOfURL(TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(AFileName)));
+  {$ELSE}
+  LDataRef := TNSData.OCClass.dataWithContentsOfURL(TNSURL.OCClass.fileURLWithPath(AFileName));
+  {$ENDIF}
   if LDataRef <> nil then
   begin
     LImageSourceRef := CGImageSourceCreateWithData(LDataRef, nil);

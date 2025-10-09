@@ -66,7 +66,11 @@ begin
   {$IF Defined(IOS)}
   if Supports(WebBrowser, WKWebView, LWebView) then
   begin
+    {$IF (CompilerVersion < 37)}
     LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(AFileName)));
+    {$ELSE}
+    LURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(AFileName));
+    {$ENDIF}
     LWebView.loadFileURL(LURL, LURL);
   end;
   {$ELSE}

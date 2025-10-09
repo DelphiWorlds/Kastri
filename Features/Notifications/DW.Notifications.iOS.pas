@@ -94,7 +94,11 @@ end;
 // Non-buggy version (as opposed to the one in Macapi.Helpers)
 function GetGMTDateTime(const ADateTime: TDateTime): TDateTime;
 begin
+  {$IF (CompilerVersion < 37)}
   Result := IncSecond(ADateTime, -TNSTimeZone.Wrap(TNSTimeZone.OCClass.localTimeZone).secondsFromGMT);
+  {$ELSE}
+  Result := IncSecond(ADateTime, -TNSTimeZone.OCClass.localTimeZone.secondsFromGMT);
+  {$ENDIF}
 end;
 
 { TUserNotificationCenterDelegate }
@@ -245,7 +249,11 @@ begin
   if not ANotification.Image.IsEmpty then
   begin
     LPointer := nil;
+    {$IF (CompilerVersion < 37)}
     LImageURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ANotification.Image)));
+    {$ELSE}
+    LImageURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(ANotification.Image));
+    {$ENDIF}
     LAttachment := TUNNotificationAttachment.OCClass.attachmentWithIdentifier(StrToNSStr(''), LImageURL, nil, @LPointer);
     Result.setAttachments(TNSArray.Wrap(TNSArray.OCClass.arrayWithObject(LAttachment)));
   end;
@@ -279,7 +287,11 @@ var
   LRepeating: Boolean;
   LDate: TDateTime;
 begin
+  {$IF (CompilerVersion < 37)}
   LCalendar := TNSCalendar.Wrap(TNSCalendar.OCClass.currentCalendar);
+  {$ELSE}
+  LCalendar := TNSCalendar.OCClass.currentCalendar;
+  {$ENDIF}
   LDateUnits := cDayDateUnits;
   // Does not seem to consistently allow immediate within a second of the current time
   LDate := IncSecond(Now);
@@ -311,7 +323,11 @@ begin
   LContent := GetNotificationContent(ANotification);
   if not ANotification.Image.IsEmpty and TFile.Exists(ANotification.Image) then
   begin
+    {$IF (CompilerVersion < 37)}
     LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(ANotification.Image)));
+    {$ELSE}
+    LURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(ANotification.Image));
+    {$ENDIF}
     LError := nil;
     LAttachment := TUNNotificationAttachment.OCClass.attachmentWithIdentifier(StrToNSStr('image'), LURL, nil, @LError);
     LContent.setAttachments(TNSArray.Wrap(TNSArray.OCClass.arrayWithObject(LAttachment)));

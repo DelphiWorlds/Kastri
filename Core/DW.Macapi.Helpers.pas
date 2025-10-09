@@ -213,7 +213,11 @@ end;
 
 procedure TNSMutableDictionaryHelper.SetValue(const AValue: Integer; const AKey: string);
 begin
+  {$IF (CompilerVersion < 37) or Defined(OSX)}
   FDictionary.setObject(TNSNumber.OCClass.numberWithInt(AValue), NSObjectToID(StrToNSStr(AKey)));
+  {$ELSE}
+  FDictionary.setObject(NSObjectToID(TNSNumber.OCClass.numberWithInt(AValue)), NSObjectToID(StrToNSStr(AKey)));
+  {$ENDIF}
 end;
 
 procedure TNSMutableDictionaryHelper.SetValue(const AValue, AKey: string);
@@ -312,7 +316,11 @@ end;
 
 function GetLocalDateTime(const ADateTime: TDateTime): TDateTime;
 begin
+  {$IF (CompilerVersion < 37) or Defined(OSX)}
   Result := IncSecond(ADateTime, TNSTimeZone.Wrap(TNSTimeZone.OCClass.localTimeZone).secondsFromGMT);
+  {$ELSE}
+  Result := IncSecond(ADateTime, TNSTimeZone.OCClass.localTimeZone.secondsFromGMT);
+  {$ENDIF}
 end;
 
 { TNSArrayHelper }
@@ -375,7 +383,11 @@ end;
 
 class function TMacHelperEx.StandardUserDefaults: NSUserDefaults;
 begin
+  {$IF (CompilerVersion < 37) or Defined(OSX)}
   Result := TNSUserDefaults.Wrap(TNSUserDefaults.OCClass.standardUserDefaults);
+  {$ELSE}
+  Result := TNSUserDefaults.OCClass.standardUserDefaults;
+  {$ENDIF}
 end;
 
 { TNSDataHelper }

@@ -345,7 +345,11 @@ begin
   LDataStore.removeDataOfTypes(LDataTypes, LDateFrom, NOPCompletionHandler);
   if ARemove then
   begin
+    {$IF (CompilerVersion < 37) or Defined(OSX)}
     LCookieStorage := TNSHTTPCookieStorage.Wrap(TNSHTTPCookieStorage.OCClass.sharedHTTPCookieStorage);
+    {$ELSE}
+    LCookieStorage := TNSHTTPCookieStorage.OCClass.sharedHTTPCookieStorage;
+    {$ENDIF}
     for I := LCookieStorage.cookies.count - 1 downto 0 do
       LCookieStorage.deleteCookie(TNSHTTPCookie.Wrap(LCookieStorage.cookies.objectAtIndex(I)));
   end;

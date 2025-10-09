@@ -104,7 +104,11 @@ var
   LIndex: Integer;
   LMainBundle: NSBundle;
 begin
+  {$IF (CompilerVersion < 37)}
   LMainBundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
+  {$ELSE}
+  LMainBundle := TNSBundle.OCClass.mainBundle;
+  {$ENDIF}
   LSourcePath := UTF8ToString(LMainBundle.resourcePath.UTF8String) + PathDelim + 'StartUp' + PathDelim + 'Documents';
   if not AParentFolder.IsEmpty then
     LSourcePath := LSourcePath + PathDelim + AParentFolder;

@@ -94,7 +94,11 @@ var
   LInt: Double;
 begin
   LInt := Interval / 1000;
+  {$IF (CompilerVersion < 37) or Defined(OSX)}
   FTimer := TNSTimer.Wrap(TNSTimer.OCClass.scheduledTimerWithTimeInterval(LInt, FDelegate.GetObjectID, sel_getUid('timerEvent:'), nil, ARepeating));
+  {$ELSE}
+  FTimer := TNSTimer.OCClass.scheduledTimerWithTimeInterval(LInt, FDelegate.GetObjectID, sel_getUid('timerEvent:'), nil, ARepeating);
+  {$ENDIF}
 end;
 
 procedure TPlatformOSTimer.StopTimer;

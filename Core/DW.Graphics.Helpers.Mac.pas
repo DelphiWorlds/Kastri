@@ -171,16 +171,18 @@ var
   LContext: CGContextRef;
   LImage: CGImageRef;
 begin
+  LOptions := TNSMutableDictionary.Create;
   {$IF CompilerVersion < 37}
   Result := 0;
   LBuffer := 0;
+  LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGImageCompatibilityKey);
+  LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGBitmapContextCompatibilityKey);
   {$ELSE}
   LBuffer := nil;
   Result := nil;
+  LOptions.setObject(NSObjectToID(TNSNumber.OCClass.numberWithBool(True)), kCVPixelBufferCGImageCompatibilityKey);
+  LOptions.setObject(NSObjectToID(TNSNumber.OCClass.numberWithBool(True)), kCVPixelBufferCGBitmapContextCompatibilityKey);
   {$ENDIF}
-  LOptions := TNSMutableDictionary.Create;
-  LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGImageCompatibilityKey);
-  LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGBitmapContextCompatibilityKey);
   LStatus := CVPixelBufferCreate(kCFAllocatorDefault, AWidth, AHeight, kCVPixelFormatType_32ARGB, NSObjectToID(LOptions), @LBuffer);
   {$IF CompilerVersion < 37}
   if (LStatus = kCVReturnSuccess) and (LBuffer <> 0) then

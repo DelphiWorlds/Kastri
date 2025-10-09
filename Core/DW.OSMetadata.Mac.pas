@@ -44,7 +44,13 @@ uses
 class function TPlatformOSMetadata.GetMetadata: NSBundle;
 begin
   if FMetadata = nil then
+  begin
+    {$IF (CompilerVersion < 37) or Defined(OSX)}
     FMetadata := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
+    {$ELSE}
+    FMetadata := TNSBundle.OCClass.mainBundle;
+    {$ENDIF}
+  end;
   Result := FMetadata;
 end;
 
