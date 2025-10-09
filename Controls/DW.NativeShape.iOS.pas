@@ -29,18 +29,6 @@ uses
   DW.NativeShape, DW.NativeControl.iOS;
 
 type
-  INativeShape = interface(UIView)
-    ['{BC29FC38-7022-4CDA-8F1C-51CB7B86A979}']
-    { Native methods }
-    function canBecomeFirstResponder: Boolean; cdecl;
-    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
-    { Handlers }
-    procedure HandleLongPress(gestureRecognizer: UILongPressGestureRecognizer); cdecl;
-  end;
-
   TiOSNativeShape = class(TNativeControl)
   private
     FFillPath: UIBezierPath;
@@ -70,6 +58,18 @@ type
     property View: UIView read GetView;
   end;
 
+  INativeEllipse = interface(UIView)
+    ['{06697D0B-440C-42B0-B313-8C38F425ABB6}']
+    { Native methods }
+    function canBecomeFirstResponder: Boolean; cdecl;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
+    { Handlers }
+    procedure HandleLongPress(gestureRecognizer: UILongPressGestureRecognizer); cdecl;
+  end;
+
   TiOSNativeEllipse = class(TiOSNativeShape)
   private
     function GetModel: TCustomNativeEllipseModel; overload;
@@ -80,6 +80,18 @@ type
   public
     constructor Create; override;
     property Model: TCustomNativeEllipseModel read GetModel;
+  end;
+
+  INativeRectangle = interface(UIView)
+    ['{DB164071-41B2-4660-8A33-A9D4320847A4}']
+    { Native methods }
+    function canBecomeFirstResponder: Boolean; cdecl;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
+    { Handlers }
+    procedure HandleLongPress(gestureRecognizer: UILongPressGestureRecognizer); cdecl;
   end;
 
   TiOSNativeRectangle = class(TiOSNativeShape)
@@ -208,7 +220,7 @@ end;
 
 function TiOSNativeEllipse.GetObjectiveCClass: PTypeInfo;
 begin
-  Result := TypeInfo(INativeShape);
+  Result := TypeInfo(INativeEllipse);
 end;
 
 function TiOSNativeEllipse.DefineModelClass: TDataModelClass;
@@ -245,7 +257,7 @@ end;
 
 function TiOSNativeRectangle.GetObjectiveCClass: PTypeInfo;
 begin
-  Result := TypeInfo(INativeShape);
+  Result := TypeInfo(INativeRectangle);
 end;
 
 function TiOSNativeRectangle.DefineModelClass: TDataModelClass;
