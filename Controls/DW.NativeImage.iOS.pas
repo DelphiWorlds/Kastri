@@ -112,8 +112,7 @@ begin
   Result := inherited GetView<UIImageView>;
   if FLabel = nil then
   begin
-    FLabel := TUILabel.Alloc;
-    FLabel := TUILabel.Wrap(FLabel.initWithFrame(Result.frame));
+    FLabel := TUILabel.Wrap(TUILabel.Alloc.initWithFrame(Result.frame));
     FLabel.setNumberOfLines(0);
     Result.addSubview(FLabel);
   end;
@@ -126,7 +125,11 @@ end;
 
 procedure TiOSNativeImage.MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>);
 begin
+  {$IF CompilerVersion < 37}
   View.setImage(TUIImage.Wrap(TUIImage.OCClass.imageNamed(StrToNSStr(AMessage.Value))));
+  {$ELSE}
+  View.setImage(TUIImage.OCClass.imageNamed(StrToNSStr(AMessage.Value)));
+  {$ENDIF}
 end;
 
 procedure TiOSNativeImage.MMLoadFromStream(var AMessage: TDispatchMessageWithValue<TStream>);
@@ -138,7 +141,11 @@ begin
   begin
     LStream := TCustomMemoryStream(AMessage.Value);
     LData := TNSData.Wrap(TNSData.OCClass.dataWithBytes(LStream.Memory, LStream.Size));
+    {$IF CompilerVersion < 37}
     View.setImage(TUIImage.Wrap(TUIImage.OCClass.imageWithData(LData)));
+    {$ELSE}
+    View.setImage(TUIImage.OCClass.imageWithData(LData));
+    {$ENDIF}
   end;
 end;
 
