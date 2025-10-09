@@ -95,6 +95,7 @@ const
   cServiceStateStopped = 2;
 
   cEMBTJavaServicePrefix = 'com.embarcadero.services.';
+  cEMBTFMXNativeActivity = 'com.embarcadero.firemonkey.FMXNativeActivity';
 
 implementation
 
