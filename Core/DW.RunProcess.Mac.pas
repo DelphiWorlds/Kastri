@@ -189,6 +189,7 @@ implementation
 uses
   // RTL
   System.SysUtils,
+  System.Classes,
   // Mac
   Macapi.Helpers,
   // DW
@@ -200,6 +201,7 @@ constructor TRunProcess.Create;
 begin
   inherited;
   FIsDestroyed := True;
+  FIsTerminated := True;
 end;
 
 destructor TRunProcess.Destroy;
@@ -322,14 +324,14 @@ end;
 
 procedure TRunProcess.TaskTerminationHandler(task: NSTask);
 var
-  LStatus: Integer;
+  LStatus: Cardinal;
 begin
   if not FIsDestroyed then
   begin
     if not FIsTerminated then
       LStatus := task.terminationStatus
     else
-      LStatus := -1;
+      LStatus := $FFFFFFFF;
     if not OutputFileName.IsEmpty then
       FPipeOutput.fileHandleForReading.readDataToEndOfFile.writeToFile(StrToNSStr(OutputFileName), True);
     DestroyTask;
@@ -339,11 +341,14 @@ end;
 
 procedure TRunProcess.Terminate;
 begin
-  FIsTerminated := True;
-  if FTask <> nil then
-    FTask.terminate
-  else
-    TOSLog.d('TRunProcess.Terminate (FTask = nil)');
+  if not FIsTerminated then
+  begin
+    FIsTerminated := True;
+    if FTask <> nil then
+      FTask.terminate
+    else
+      TOSLog.d('TRunProcess.Terminate (FTask = nil)');
+  end;
 end;
 
 { TRunProcessSync }
