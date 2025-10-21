@@ -18,6 +18,7 @@ uses
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.Java.Security;
 
 type
+  JAttestedKeyPair = interface;
   JCipher = interface;
   JExemptionMechanism = interface;
   JKeyGenerator = interface;
@@ -27,6 +28,19 @@ type
   JMac = interface;
   JResultData = interface;
   JSecretKey = interface;
+
+  JAttestedKeyPairClass = interface(JObjectClass)
+    ['{21CB9B2E-4CE6-4A6A-A29C-567D2CFAEE49}']
+    {class} function init(keypair: JKeyPair; list: JList): JAttestedKeyPair; cdecl;
+  end;
+
+  [JavaSignature('android/security/AttestedKeyPair')]
+  JAttestedKeyPair = interface(JObject)
+    ['{6AC85A2A-359D-42AB-928F-11D279E240D4}']
+    function getAttestationRecord: JList; cdecl;
+    function getKeyPair: JKeyPair; cdecl;
+  end;
+  TJAttestedKeyPair = class(TJavaGenericImport<JAttestedKeyPairClass, JAttestedKeyPair>) end;
 
   JCipherClass = interface(JObjectClass)
     ['{F8374D1B-F939-4B8F-A356-FBD254F8ADA4}']
