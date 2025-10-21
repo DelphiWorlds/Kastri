@@ -75,7 +75,6 @@ end;
 class function TPlatformPath.GetAppSupportPath(const AFolder: string): string;
 var
   LURLs: NSArray;
-  LFileManager: NSFileManager;
   LPath: NSString;
 begin
   LURLs := FileManager.URLsForDirectory(NSApplicationSupportDirectory, NSUserDomainMask);
