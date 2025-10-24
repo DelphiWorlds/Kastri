@@ -22,6 +22,9 @@ uses
 
 type
   JActivityOptions = interface;
+  {$IF CompilerVersion < 37}
+  JContext_BindServiceFlags = interface;
+  {$ENDIF}
   JDevicePolicyManager = interface;
   JDevicePolicyManager_InstallSystemUpdateCallback = interface;
   JDevicePolicyManager_OnClearApplicationUserDataListener = interface;
@@ -61,6 +64,19 @@ type
     ['{B73384F1-C48B-4785-AAE6-C5D0FA12E104}']
   end;
   TJLocalTime = class(TJavaGenericImport<JLocalTimeClass, JLocalTime>) end;
+  {$ENDIF}
+
+  {$IF CompilerVersion < 37}
+  JContext_BindServiceFlagsClass = interface(JObjectClass)
+    ['{F9531A8D-CF72-4B28-B127-1612561C83DB}']
+    {class} function &of(value: Int64): JContext_BindServiceFlags; cdecl;
+  end;
+
+  [JavaSignature('android/content/Context$BindServiceFlags')]
+  JContext_BindServiceFlags = interface(JObject)
+    ['{457A4FBF-AAAC-40E4-8E62-4F798039FBEF}']
+  end;
+  TJContext_BindServiceFlags = class(TJavaGenericImport<JContext_BindServiceFlagsClass, JContext_BindServiceFlags>) end;
   {$ENDIF}
 
   JActivityOptionsClass = interface(JObjectClass)
