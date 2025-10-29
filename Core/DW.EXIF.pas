@@ -28,6 +28,12 @@ type
     Orientation: TEXIFOrientation;
   end;
 
+  TGPSDetails = record
+    Altitude: Double;
+    Latitude: Double;
+    Longitude: Double;
+  end;
+
   /// <summary>
   ///   Helper for extracting EXIF data on Android and iOS
   /// </summary>
@@ -37,6 +43,7 @@ type
     ///   Extract EXIF data from the specified file
     /// </summary>
     class function GetEXIF(const AFileName: string; out AProperties: TEXIFProperties): Boolean; static;
+    class function SetGPS(const AFileName: string; const AGPSDetails: TGPSDetails): Boolean; static;
   end;
 
 implementation
@@ -62,6 +69,11 @@ begin
   AProperties.Latitude := 0;
   AProperties.Longitude := 0;
   Result := TPlatformEXIF.GetEXIF(AFileName, AProperties);
+end;
+
+class function TEXIF.SetGPS(const AFileName: string; const AGPSDetails: TGPSDetails): Boolean;
+begin
+  Result := TPlatformEXIF.SetGPS(AFileName, AGPSDetails);
 end;
 
 end.
