@@ -79,7 +79,7 @@ end;
 
 class function TPlatformEXIF.GetRationalString(const AValue: Double; const ADivisor: Integer): JString;
 begin
-  Result := StringToJString(Format('%d/%d', [Trunc(AValue * ADivisor)]));
+  Result := StringToJString(Format('%d/%d', [Trunc(AValue * ADivisor), ADivisor]));
 end;
 
 class function TPlatformEXIF.SetGPS(const AFileName: string; const AGPSDetails: TGPSDetails): Boolean;
