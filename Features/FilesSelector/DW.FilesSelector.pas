@@ -245,7 +245,7 @@ begin
     FOnComplete(Self, AOK);
 end;
 
-procedure TFilesSelector. DoImageStream(const AFileName: string; const AImageStream: TStream);
+procedure TFilesSelector.DoImageStream(const AFileName: string; const AImageStream: TStream);
 begin
   if Assigned(FOnImageStream) then
     FOnImageStream(Self, AFileName, AImageStream);
