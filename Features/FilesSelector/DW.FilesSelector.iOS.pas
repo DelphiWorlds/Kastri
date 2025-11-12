@@ -37,6 +37,7 @@ type
   private
     FController: PHPickerViewController;
     FItemProviderHandlers: TItemProviderHandlers;
+    FPickedCount: Integer;
     FSelector: TPlatformFilesSelector;
     procedure DestroyController;
     procedure RemoveItemProviderHandler(const AHandler: IItemProviderHandler);
@@ -102,6 +103,7 @@ type
     procedure DoSelect(const AMode: TSelectionMode); override;
     procedure FileKindsChanged; override;
     procedure FileTypesChanged; override;
+    procedure SelectionComplete;
     property UTIs: TArray<string> read FUTIs;
   public
     constructor Create(const ASelector: TFilesSelector); override;
@@ -269,7 +271,8 @@ var
   LItemProvider: NSItemProvider;
 begin
   picker.dismissModalViewControllerAnimated(True);
-  for I := 0 to didFinishPicking.count - 1 do
+  FPickedCount := didFinishPicking.count;
+  for I := 0 to FPickedCount - 1 do
   begin
     LItemProvider := TPHPickerResult.Wrap(didFinishPicking.objectAtIndex(I)).itemProvider;
     FItemProviderHandlers := FItemProviderHandlers + [TItemProviderHandler.Create(Self, LItemProvider)];
@@ -286,6 +289,12 @@ begin
     begin
       FItemProviderHandlers[I] := nil;
       Delete(FItemProviderHandlers, I, 1);
+      if FPickedCount > 0 then
+      begin
+        Dec(FPickedCount);
+        if FPickedCount = 0 then
+          FSelector.SelectionComplete;
+      end;
       Break;
     end;
   end;
@@ -483,6 +492,11 @@ begin
   end
   else
     ShowDocumentPicker;
+end;
+
+procedure TPlatformFilesSelector.SelectionComplete;
+begin
+  DoComplete(True);
 end;
 
 procedure TPlatformFilesSelector.FileKindsChanged;
