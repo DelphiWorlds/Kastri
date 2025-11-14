@@ -43,6 +43,7 @@ type
     ///   Extract EXIF data from the specified file
     /// </summary>
     class function GetEXIF(const AFileName: string; out AProperties: TEXIFProperties): Boolean; static;
+    class function SetEXIF(const AFileName: string; const AProperties: TEXIFProperties): Boolean; static;
     class function SetGPS(const AFileName: string; const AGPSDetails: TGPSDetails): Boolean; static;
   end;
 
@@ -69,6 +70,11 @@ begin
   AProperties.Latitude := 0;
   AProperties.Longitude := 0;
   Result := TPlatformEXIF.GetEXIF(AFileName, AProperties);
+end;
+
+class function TEXIF.SetEXIF(const AFileName: string; const AProperties: TEXIFProperties): Boolean;
+begin
+  Result := TPlatformEXIF.SetEXIF(AFileName, AProperties);
 end;
 
 class function TEXIF.SetGPS(const AFileName: string; const AGPSDetails: TGPSDetails): Boolean;

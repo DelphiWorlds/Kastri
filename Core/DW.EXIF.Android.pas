@@ -24,9 +24,11 @@ type
   private
     class function GetCoordString(const AValue: Double): JString; static;
     class function GetOrientation(const AValue: Integer): TEXIFOrientation; static;
+    class function GetOrientationValue(const AOrientation: TEXIFOrientation): Integer; static;
     class function GetRationalString(const AValue: Double; const ADivisor: Integer): JString; static;
   public
     class function GetEXIF(const AFileName: string; out AProperties: TEXIFProperties): Boolean; static;
+    class function SetEXIF(const AFileName: string; const AProperties: TEXIFProperties): Boolean; static;
     class function SetGPS(const AFileName: string; const AGPSDetails: TGPSDetails): Boolean; static;
   end;
 
@@ -77,9 +79,51 @@ begin
     Result := TEXIFOrientation.Unknown;
 end;
 
+class function TPlatformEXIF.GetOrientationValue(const AOrientation: TEXIFOrientation): Integer;
+begin
+  case AOrientation of
+    TEXIFOrientation.Normal:
+      Result := TJExifInterface.JavaClass.ORIENTATION_NORMAL;
+    TEXIFOrientation.FlipHorizontal:
+      Result := TJExifInterface.JavaClass.ORIENTATION_FLIP_HORIZONTAL;
+    TEXIFOrientation.Rotate180:
+      Result := TJExifInterface.JavaClass.ORIENTATION_ROTATE_180;
+    TEXIFOrientation.FlipVertical:
+      Result := TJExifInterface.JavaClass.ORIENTATION_FLIP_VERTICAL;
+    TEXIFOrientation.Rotate270:
+      Result := TJExifInterface.JavaClass.ORIENTATION_ROTATE_90;
+    TEXIFOrientation.Transpose:
+      Result := TJExifInterface.JavaClass.ORIENTATION_TRANSPOSE;
+    TEXIFOrientation.Rotate90:
+      Result := TJExifInterface.JavaClass.ORIENTATION_ROTATE_270;
+    TEXIFOrientation.Transverse:
+      Result := TJExifInterface.JavaClass.ORIENTATION_TRANSVERSE;
+  else
+    Result := TJExifInterface.JavaClass.ORIENTATION_NORMAL;
+  end;
+end;
+
 class function TPlatformEXIF.GetRationalString(const AValue: Double; const ADivisor: Integer): JString;
 begin
   Result := StringToJString(Format('%d/%d', [Trunc(AValue * ADivisor), ADivisor]));
+end;
+
+class function TPlatformEXIF.SetEXIF(const AFileName: string; const AProperties: TEXIFProperties): Boolean;
+var
+  LGPSDetails: TGPSDetails;
+  LEXIF: JExifInterface;
+begin
+  LGPSDetails.Altitude := AProperties.Altitude;
+  LGPSDetails.Latitude := AProperties.Latitude;
+  LGPSDetails.Longitude := AProperties.Longitude;
+  SetGPS(AFileName, LGPSDetails);
+  LEXIF := TJExifInterface.JavaClass.init(StringToJString(AFileName));
+  LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_DATETIME, StringToJString(AProperties.DateTaken));
+  LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_MAKE, StringToJString(AProperties.CameraMake));
+  LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_MODEL, StringToJString(AProperties.CameraModel));
+  LEXIF.setAttribute(TJExifInterface.JavaClass.TAG_ORIENTATION, StringToJString(IntToStr(GetOrientationValue(AProperties.Orientation))));
+  LEXIF.saveAttributes;
+  Result := True;
 end;
 
 class function TPlatformEXIF.SetGPS(const AFileName: string; const AGPSDetails: TGPSDetails): Boolean;
