@@ -64,8 +64,11 @@ type
   public
     constructor Create(const ADictionary: NSMutableDictionary);
     function Dictionary: NSDictionary;
+    procedure SetValue(const AValue: Double; const AKey: string); overload;
+    procedure SetValue(const AValue: Double; const AKey: NSString); overload;
     procedure SetValue(const AValue: Integer; const AKey: string); overload;
     procedure SetValue(const AValue, AKey: string); overload;
+    procedure SetValue(const AValue: string; const AKey: NSString); overload;
   end;
 
   TNSArrayHelper = record
@@ -211,18 +214,37 @@ begin
   Result := TNSDictionary.Wrap(NSObjectToID(FDictionary));
 end;
 
+procedure TNSMutableDictionaryHelper.SetValue(const AValue: Double; const AKey: NSString);
+begin
+  {$IF (CompilerVersion < 37) or Defined(OSX)}
+  FDictionary.setObject(TNSNumber.OCClass.numberWithDouble(AValue), StringToID(AKey));
+  {$ELSE}
+  FDictionary.setObject(NSObjectToID(TNSNumber.OCClass.numberWithDouble(AValue)), NSObjectToID(AKey));
+  {$ENDIF}
+end;
+
+procedure TNSMutableDictionaryHelper.SetValue(const AValue: Double; const AKey: string);
+begin
+  SetValue(AValue, StrToNSStr(AKey));
+end;
+
 procedure TNSMutableDictionaryHelper.SetValue(const AValue: Integer; const AKey: string);
 begin
   {$IF (CompilerVersion < 37) or Defined(OSX)}
-  FDictionary.setObject(TNSNumber.OCClass.numberWithInt(AValue), NSObjectToID(StrToNSStr(AKey)));
+  FDictionary.setObject(TNSNumber.OCClass.numberWithInt(AValue), StringToID(AKey));
   {$ELSE}
-  FDictionary.setObject(NSObjectToID(TNSNumber.OCClass.numberWithInt(AValue)), NSObjectToID(StrToNSStr(AKey)));
+  FDictionary.setObject(NSObjectToID(TNSNumber.OCClass.numberWithInt(AValue)), StringToID(AKey));
   {$ENDIF}
+end;
+
+procedure TNSMutableDictionaryHelper.SetValue(const AValue: string; const AKey: NSString);
+begin
+  FDictionary.setObject(StringToID(AValue), NSObjectToID(AKey));
 end;
 
 procedure TNSMutableDictionaryHelper.SetValue(const AValue, AKey: string);
 begin
-  FDictionary.setObject(NSObjectToID(StrToNSStr(AValue)), NSObjectToID(StrToNSStr(AKey)));
+  SetValue(AValue, StrToNSStr(AKey));
 end;
 
 function GetDictionaryNumberValue(const ADictionary: NSDictionary; const AKey: NSString; const ADefault: Double = 0): Double;
@@ -238,6 +260,7 @@ end;
 function GetDictionaryStringValue(const ADictionary: NSDictionary; const AKey: NSString; const ADefault: string = ''): string;
 var
   LValuePtr: Pointer;
+  LObject: NSObject;
 begin
   Result := ADefault;
   LValuePtr := ADictionary.valueForKey(AKey);
