@@ -14,9 +14,11 @@ type
     Layout1: TLayout;
     PrevButton: TButton;
     NextButton: TButton;
+    SetEXIFButton: TButton;
     procedure PrevButtonClick(Sender: TObject);
     procedure NextButtonClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure SetEXIFButtonClick(Sender: TObject);
   private
     FFiles: TArray<string>;
     FIndex: Integer;
@@ -99,6 +101,24 @@ begin
   end
   else
     Memo1.Lines.Add('Unable to obtain EXIF data');
+end;
+
+procedure TForm1.SetEXIFButtonClick(Sender: TObject);
+var
+  LFileName: string;
+  LProperties: TEXIFProperties;
+begin
+  LFileName := FFiles[FIndex];
+  if TEXIF.GetEXIF(LFileName, LProperties) then
+  begin
+    LProperties.CameraMake := 'DaveCam';
+    LProperties.CameraModel := 'UltraAwesome';
+    LProperties.Orientation := TEXIFOrientation.Rotate180;
+    LProperties.Altitude := -123;
+    LProperties.DateTaken := FormatDateTime('yyyy:mm:dd hh:nn:ss', Now);
+    TEXIF.SetEXIF(LFileName, LProperties);
+    SelectedImage;
+  end;
 end;
 
 end.

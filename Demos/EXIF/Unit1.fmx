@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 530
-  ClientWidth = 362
+  ClientHeight = 532
+  ClientWidth = 364
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -18,20 +18,20 @@ object Form1: TForm1
     Margins.Top = 4.000000000000000000
     Margins.Right = 4.000000000000000000
     Margins.Bottom = 4.000000000000000000
-    Size.Width = 354.000000000000000000
-    Size.Height = 334.000000000000000000
+    Size.Width = 356.000000000000000000
+    Size.Height = 336.000000000000000000
     Size.PlatformDefault = False
   end
   object Memo1: TMemo
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
     Align = Bottom
-    Position.Y = 342.000000000000000000
-    Size.Width = 362.000000000000000000
+    Position.Y = 344.000000000000000000
+    Size.Width = 364.000000000000000000
     Size.Height = 136.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
-    Viewport.Width = 358.000000000000000000
+    Viewport.Width = 360.000000000000000000
     Viewport.Height = 132.000000000000000000
   end
   object Layout1: TLayout
@@ -40,8 +40,8 @@ object Form1: TForm1
     Padding.Top = 4.000000000000000000
     Padding.Right = 4.000000000000000000
     Padding.Bottom = 12.000000000000000000
-    Position.Y = 478.000000000000000000
-    Size.Width = 362.000000000000000000
+    Position.Y = 480.000000000000000000
+    Size.Width = 364.000000000000000000
     Size.Height = 52.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
@@ -60,7 +60,7 @@ object Form1: TForm1
     object NextButton: TButton
       Align = Right
       Enabled = False
-      Position.X = 273.000000000000000000
+      Position.X = 275.000000000000000000
       Position.Y = 4.000000000000000000
       Size.Width = 85.000000000000000000
       Size.Height = 36.000000000000000000
@@ -68,6 +68,15 @@ object Form1: TForm1
       StyleLookup = 'arrowrighttoolbutton'
       Text = 'NextAction'
       OnClick = NextButtonClick
+    end
+    object SetEXIFButton: TButton
+      Align = Center
+      Size.Width = 95.000000000000000000
+      Size.Height = 27.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Set EXIF'
+      OnClick = SetEXIFButtonClick
     end
   end
 end
