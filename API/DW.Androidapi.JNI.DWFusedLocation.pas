@@ -44,7 +44,7 @@ type
     procedure setPriority(interval: Integer); cdecl;
     procedure setSmallestDisplacement(value: Single); cdecl;
     procedure startLocationUpdates; cdecl;
-    procedure stopLocationUpdates; cdecl;
+    procedure stopLocationUpdates(noCallback: Boolean); cdecl;
   end;
   TJDWFusedLocationClient = class(TJavaGenericImport<JDWFusedLocationClientClass, JDWFusedLocationClient>) end;
 
