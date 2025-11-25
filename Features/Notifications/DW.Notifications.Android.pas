@@ -430,6 +430,7 @@ var
   LBuilder: JNotificationCompat_Builder;
   LContentSmall, LContentBig: JRemoteViews;
   LBitmap: JBitmap;
+  LBigTextStyle: JNotificationCompat_BigTextStyle;
 begin
   LBuilder := TJNotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context)
     .setDefaults(TJNotification.JavaClass.DEFAULT_LIGHTS)
@@ -463,6 +464,13 @@ begin
     LContentBig.setImageViewBitmap(TAndroidHelper.GetResourceID('id/notification_custom_image'), LBitmap);
     LBuilder := LBuilder.setCustomContentView(LContentSmall)
       .setCustomBigContentView(LContentBig);
+  end
+  else if ANotification.UseBigText then
+  begin
+    LBigTextStyle := TJNotificationCompat_BigTextStyle.JavaClass.init
+	    .bigText(StrToJCharSequence(ANotification.AlertBody))
+      .setBigContentTitle(StrToJCharSequence(ANotification.Title));
+    LBuilder.setStyle(LBigTextStyle);
   end;
   Result := LBuilder.Build;
   if ANotification.IsInsistent then

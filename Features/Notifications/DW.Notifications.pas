@@ -24,6 +24,13 @@ type
     EnableSound: Boolean;
     FireDate: TDateTime;
     HasAction: Boolean;
+    /// <summary>
+    ///   Allows an image to be included for immediate notifications ONLY, with AlertBody being able to appear over multiple lines
+    ///   The value should be a path to a file accessible by regular file access
+    /// </summary>
+    /// <remarks>
+    ///   UseBigText property is ignored since including an image supports multiple lines of text
+    /// </remarks>
     Image: string;
     IsInsistent: Boolean;
     Name: string;
@@ -32,6 +39,14 @@ type
     SoundName: string;
     Subtitle: string;
     Title: string;
+    /// <summary>
+    ///   Allows AlertBody to appear over multiple lines when the notification is at the top of the notification list
+    /// </summary>
+    /// <remarks>
+    ///   Applies to Android ONLY.
+    ///   Will be ignored if an image is included. See Image property
+    /// </remarks>
+    UseBigText: Boolean;
   end;
 
   TCustomPlatformNotificationChannel = class(TObject)
