@@ -10,9 +10,11 @@ Note that support with this feature is currently for **Android and iOS only**.
 
 ## Supported Delphi versions
 
-Delphi 12.x, Delphi 11.x. May or may not work in earlier versions.
+Delphi 13.0, Delphi 12.x. May or may not work in earlier versions.
 
 ## Project Configuration
+
+The following instructions are for using the notification support *in your own project*. The required modifications are already applied in the demo
 
 ### Android and iOS
 
@@ -22,27 +24,14 @@ If you plan to include images in your notifications, you will need to ensure tha
 
 The notifications feature relies on:
 
-* Delphi 12.x: 
+* Delphi 13.0, 12.x: 
 
   `dw-kastri-base-3.0.0.jar`
-
-* Delphi 11.x: 
-  
-  `dw-kastri-base-2.0.0.jar`
  
 from the `Lib` folder in Kastri, so add them to the `Libraries` node under the Android 32-bit platform in Project Manager.
 
-**Note**:
+### Android Manifest
 
-Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will need to either apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
-
-### Build Event/Android Manifest
-
-**Delphi 12.1, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md)**
-
-Due to changes in the Android build process:
-
-* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
 * Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
 * Modify `AndroidManifest.template.xml` to add the following *just before* `<%receivers%>`
 
@@ -55,21 +44,9 @@ Due to changes in the Android build process:
       </intent-filter>
     </receiver>
   ```
-
-**Delphi 12.0 or earlier:**
-
-Configure Build Events in Project Options to add a Post-Build event with the command:  
-
-```
-  [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
-```  
-Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
-
-`AndroidManifest.merge.xml` can be found in the root folder of the demo, and should be copied to the root folder of your project
-
 ### Android custom notifications
 
-Using the notifications feature in Kastri, it requires two files to be deployed, namely:
+This requires two files to be deployed, namely:
 
 ```
 notification_custom.xml
