@@ -14,13 +14,12 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 68.000000000000000000
+    Position.Y = 187.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 5
     Text = 'Immediate'
-    TextSettings.Trimming = None
     OnClick = ImmediateButtonClick
   end
   object ScheduleButton: TButton
@@ -29,13 +28,12 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 166.000000000000000000
+    Position.Y = 285.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
     Text = 'Schedule 5 Seconds'
-    TextSettings.Trimming = None
     OnClick = ScheduleButtonClick
   end
   object CancelScheduled: TButton
@@ -44,13 +42,12 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 264.000000000000000000
+    Position.Y = 383.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Cancel Scheduled'
-    TextSettings.Trimming = None
     OnClick = CancelScheduledClick
   end
   object LogMemo: TMemo
@@ -62,11 +59,11 @@ object Form1: TForm1
     Margins.Right = 4.000000000000000000
     Margins.Bottom = 4.000000000000000000
     Size.Width = 528.000000000000000000
-    Size.Height = 485.000000000000000000
+    Size.Height = 366.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 7
+    TabOrder = 8
     Viewport.Width = 524.000000000000000000
-    Viewport.Height = 481.000000000000000000
+    Viewport.Height = 362.000000000000000000
   end
   object ScheduleRepeatingButton: TButton
     Align = Top
@@ -74,13 +71,12 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 215.000000000000000000
+    Position.Y = 334.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
     Text = 'Schedule Repeating Every Minute'
-    TextSettings.Trimming = None
     OnClick = ScheduleRepeatingButtonClick
   end
   object CancelImmediateButton: TButton
@@ -89,13 +85,12 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 117.000000000000000000
+    Position.Y = 236.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
     Text = 'Cancel Immediate'
-    TextSettings.Trimming = None
     OnClick = CancelImmediateButtonClick
   end
   object IncludeImageCheckBox: TCheckBox
@@ -109,21 +104,57 @@ object Form1: TForm1
     Size.Width = 524.000000000000000000
     Size.Height = 19.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 9
+    TabOrder = 11
     Text = 'Include image in notification'
+    OnChange = IncludeImageCheckBoxChange
   end
   object InsistentCheckBox: TCheckBox
     Align = Top
     Margins.Left = 6.000000000000000000
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
-    Margins.Bottom = 12.000000000000000000
     Position.X = 6.000000000000000000
     Position.Y = 31.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 19.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 8
+    TabOrder = 10
     Text = 'Insistent (Android only)'
+  end
+  object UseBigTextCheckBox: TCheckBox
+    Align = Top
+    Margins.Left = 6.000000000000000000
+    Margins.Top = 6.000000000000000000
+    Margins.Right = 6.000000000000000000
+    Margins.Bottom = 12.000000000000000000
+    Position.X = 6.000000000000000000
+    Position.Y = 56.000000000000000000
+    Size.Width = 524.000000000000000000
+    Size.Height = 19.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 9
+    Text = 'Use Big Text (Android only)'
+    OnChange = UseBigTextCheckBoxChange
+  end
+  object BodyMemo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Lines.Strings = (
+      'This is the body of a test notification'
+      'It has more than one line'
+      'In fact, it has 3 lines. Thanks')
+    Align = Top
+    Margins.Left = 4.000000000000000000
+    Margins.Top = 4.000000000000000000
+    Margins.Right = 4.000000000000000000
+    Margins.Bottom = 4.000000000000000000
+    Position.X = 4.000000000000000000
+    Position.Y = 91.000000000000000000
+    Size.Width = 528.000000000000000000
+    Size.Height = 86.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    Viewport.Width = 524.000000000000000000
+    Viewport.Height = 82.000000000000000000
   end
 end

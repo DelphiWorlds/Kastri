@@ -18,11 +18,15 @@ type
     CancelImmediateButton: TButton;
     IncludeImageCheckBox: TCheckBox;
     InsistentCheckBox: TCheckBox;
+    UseBigTextCheckBox: TCheckBox;
+    BodyMemo: TMemo;
     procedure ImmediateButtonClick(Sender: TObject);
     procedure ScheduleButtonClick(Sender: TObject);
     procedure CancelScheduledClick(Sender: TObject);
     procedure ScheduleRepeatingButtonClick(Sender: TObject);
     procedure CancelImmediateButtonClick(Sender: TObject);
+    procedure UseBigTextCheckBoxChange(Sender: TObject);
+    procedure IncludeImageCheckBoxChange(Sender: TObject);
   private
     FImageFileName: string;
     FNotifications: TNotifications;
@@ -92,12 +96,18 @@ begin
   LNotification.Name := 'ImmediateNotification';
   LNotification.Title := 'Immediate Notification';
   LNotification.Subtitle := 'Subtitles are cool';
-  LNotification.AlertBody := 'This is an immediate notification';
+  LNotification.AlertBody := BodyMemo.Text;
   if IncludeImageCheckBox.IsChecked then
     LNotification.Image := FImageFileName;
   if InsistentCheckBox.IsChecked then
     LNotification.IsInsistent := True;
+  LNotification.UseBigText := UseBigTextCheckBox.IsChecked;
   FNotifications.PresentNotification(LNotification);
+end;
+
+procedure TForm1.IncludeImageCheckBoxChange(Sender: TObject);
+begin
+  UseBigTextCheckBox.IsChecked := not IncludeImageCheckBox.IsChecked;
 end;
 
 procedure TForm1.ScheduleButtonClick(Sender: TObject);
@@ -122,10 +132,10 @@ var
 begin
   LNotification := Default(TNotification);
   LNotification.Name := 'ScheduledNotification';
-  LNotification.Title := 'I do not speak italian';
+  LNotification.Title := 'Scheduled Notification';
   LNotification.Subtitle := 'Io non parlo italiano';
   LNotification.EnableSound := False;
-  LNotification.AlertBody := 'This notification was scheduled';
+  LNotification.AlertBody := BodyMemo.Text;
   if IncludeImageCheckBox.IsChecked then
     LNotification.Image := FImageFileName;
   if InsistentCheckBox.IsChecked then
@@ -135,12 +145,18 @@ begin
     LNotification.RepeatInterval := TRepeatInterval.Minute
   else
     LNotification.RepeatInterval := TRepeatInterval.None;
+  LNotification.UseBigText := UseBigTextCheckBox.IsChecked;
   FNotifications.ScheduleNotification(LNotification);
 end;
 
 procedure TForm1.ScheduleRepeatingButtonClick(Sender: TObject);
 begin
   ScheduleNotification(10, True);
+end;
+
+procedure TForm1.UseBigTextCheckBoxChange(Sender: TObject);
+begin
+  IncludeImageCheckBox.IsChecked := not UseBigTextCheckBox.IsChecked;
 end;
 
 procedure TForm1.CancelImmediateButtonClick(Sender: TObject);
