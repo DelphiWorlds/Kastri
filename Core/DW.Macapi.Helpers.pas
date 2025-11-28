@@ -217,7 +217,7 @@ end;
 procedure TNSMutableDictionaryHelper.SetValue(const AValue: Double; const AKey: NSString);
 begin
   {$IF (CompilerVersion < 37) or Defined(OSX)}
-  FDictionary.setObject(TNSNumber.OCClass.numberWithDouble(AValue), StringToID(AKey));
+  FDictionary.setObject(TNSNumber.OCClass.numberWithDouble(AValue), NSObjectToID(AKey));
   {$ELSE}
   FDictionary.setObject(NSObjectToID(TNSNumber.OCClass.numberWithDouble(AValue)), NSObjectToID(AKey));
   {$ENDIF}
