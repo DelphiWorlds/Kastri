@@ -26,12 +26,17 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class DWNotificationPresenter
 {
   private static final String TAG = "DWNotificationPresenter";
+  private static final String FMX_NATIVE_ACTIVITY = "com.embarcadero.firemonkey.FMXNativeActivity";
   private static int mUniqueId = 0;
+  private static int mRequestCode = 0;
   
   private static Bitmap getBitmap(URL url) {
     Bitmap bitmap = null;
@@ -56,37 +61,12 @@ public class DWNotificationPresenter
     return null;
   }
 
-  private static int getResourceId(Context context, String id) { 
-    return context.getResources().getIdentifier(id, null, context.getPackageName()); 
+  private static int getResourceId(Context context, String id, String type) { 
+    return context.getResources().getIdentifier(id, type, context.getPackageName()); 
   }
- 
-  private static RemoteViews getCustomContentView(Context context, String layout, String title, String body, String imageUrl) {
-    int layoutId = getResourceId(context, "layout/" + layout); // notification_custom
-    RemoteViews remoteViews = null;
-    if (layoutId > 0) {
-      if ((imageUrl != null && !imageUrl.isEmpty())) {
-        Log.d(TAG, "imageUrl: " + imageUrl);
-        remoteViews = new RemoteViews(context.getPackageName(), layoutId);
-        remoteViews.setTextViewText(getResourceId(context, "id/notification_custom_title"), title);
-        remoteViews.setTextViewText(getResourceId(context, "id/notification_custom_body"), body);
-        Bitmap bitmap = null;
-        try {
-          bitmap = getBitmap(new URL(imageUrl));
-        } catch (MalformedURLException e) {
-          Log.w(TAG, "imageUrl invalid: " + imageUrl);
-        } 
-        int imageId = getResourceId(context, "id/notification_custom_image");
-        if (bitmap != null) {
-          remoteViews.setImageViewBitmap(imageId, bitmap);
-        } else {
-          remoteViews.setViewVisibility(imageId, View.GONE);
-        } 
-      } else
-      Log.i(TAG, "No imageUrl specified");
-    } else {
-      Log.i(TAG, "Unable to locate resource notification_custom");
-    }  
-    return remoteViews;
+
+  private static int getAndroidResourceId(Context context, String id, String type) { 
+    return context.getResources().getIdentifier(id, type, "android"); 
   }
 
   private static String getChannelId(Intent intent, String defaultChannelId) {
@@ -112,7 +92,37 @@ public class DWNotificationPresenter
     }
     return channel.getId();
   }
+
+  private static PendingIntent createActionPendingIntent(Context context, String actionName, int notificationId) {
+    Intent intent = new Intent(DWMultiBroadcastReceiver.ACTION_NOTIFICATION_ACTION);
+    intent.setClassName(context, FMX_NATIVE_ACTIVITY);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    intent.putExtra(DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_ID, notificationId);
+    intent.putExtra(DWMultiBroadcastReceiver.EXTRA_NOTIFICATION_ACTION_NAME, actionName);
+    PendingIntent pendingIntent = PendingIntent.getActivity(context, mRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    mRequestCode++;
+    Log.i(TAG, "Created pending intent for: " + actionName);
+    return pendingIntent;
+  }
   
+  private static RemoteViews getCustomContentView(Context context, String resourceName, String title, String body, Bitmap image) {
+    int layoutId = getResourceId(context, resourceName, "layout");
+    RemoteViews remoteViews = null;
+    if (layoutId > 0) {
+      remoteViews = new RemoteViews(context.getPackageName(), layoutId);
+      remoteViews.setTextViewText(getResourceId(context, resourceName + "_title", "id"), title);
+      remoteViews.setTextViewText(getResourceId(context, resourceName + "_body", "id"), body);
+      int imageId = getResourceId(context, resourceName + "_image", "id");
+      if (imageId != 0) {
+        if (image != null)
+          remoteViews.setImageViewBitmap(imageId, image);
+        else
+          remoteViews.setViewVisibility(imageId, View.GONE);
+      } 
+    }
+    return remoteViews;
+  }
+
   public static void presentNotification(Context context, Intent intent, String channelId, int iconId) {
     // presentNotification can be called from more than one origin, so if it is silent, stop it here..
     if (intent.hasExtra("isSilent") && intent.getStringExtra("isSilent").equals("1"))
@@ -122,17 +132,26 @@ public class DWNotificationPresenter
       mUniqueId++;
       notifyId = mUniqueId;
     }
-    intent.setClassName(context, "com.embarcadero.firemonkey.FMXNativeActivity");
+    intent.setClassName(context, FMX_NATIVE_ACTIVITY);
     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     PendingIntent pendingIntent = PendingIntent.getActivity(context, mUniqueId, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+    String resourceName = intent.hasExtra("resource_name") ? intent.getStringExtra("resource_name") : "notification_custom";
     String title = intent.hasExtra("title") ? intent.getStringExtra("title") : "";
     String body = intent.hasExtra("body") ? intent.getStringExtra("body") : "";
-    String imageUrl = intent.hasExtra("imageUrl") ? intent.getStringExtra("imageUrl") : "";
-    RemoteViews smallView = getCustomContentView(context, "notification_custom", title, body, imageUrl);
-    RemoteViews bigView = getCustomContentView(context, "notification_custom_big", title, body, imageUrl);
+    Bitmap image = null;
+    String imageUrl = intent.hasExtra("imageUrl") ? intent.getStringExtra("imageUrl") : null;
+    if (imageUrl != null) {
+      try {
+        image = getBitmap(new URI(imageUrl).toURL());
+      } catch (Exception e) {
+        Log.w(TAG, "imageUrl invalid: " + imageUrl);
+      } 
+    }
+    RemoteViews smallView = getCustomContentView(context, resourceName, title, body, image);
     NotificationManager notificationManager = (NotificationManager)context.getSystemService("notification");
     String notificationChannelId = DWNotificationPresenter.getChannelId(intent, channelId);
     notificationChannelId = (notificationChannelId != null) ? notificationChannelId : getDefaultChannelId(notificationManager);
+    Bitmap nullBitmap = null;
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationChannelId)
       .setContentTitle(title)
       .setContentText(body)
@@ -141,15 +160,32 @@ public class DWNotificationPresenter
       .setContentIntent(pendingIntent)
       .setWhen(System.currentTimeMillis())
       .setShowWhen(true)
-      .setAutoCancel(true);
-    if ((smallView != null) || (bigView != null))
-      builder = builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+      .setAutoCancel(true)
+      .setStyle(new NotificationCompat.BigPictureStyle()
+        .bigPicture(image)
+        .bigLargeIcon(nullBitmap) // Hides compact thumbnail in expanded mode
+        .setBigContentTitle(title) 
+        .setSummaryText(body)
+      );
     if (smallView != null)
       builder = builder.setCustomContentView(smallView);
-    if (bigView != null)
-      builder = builder.setCustomBigContentView(bigView);
     if (intent.hasExtra("isFullScreen"))
       builder = builder.setFullScreenIntent(pendingIntent, true);
+    ArrayList<String> actions = intent.getStringArrayListExtra("notification_actions");
+    if (actions != null && !actions.isEmpty()) {
+      for (String action : actions) {
+        String[] actionParts = action.split("=", 2); // actionname=text
+        int actionResId = getAndroidResourceId(context, "btn_default", "drawable");
+        if (actionResId != 0) {
+          PendingIntent actionPendingIntent = createActionPendingIntent(context, actionParts[0], notifyId);
+          builder.addAction(actionResId, actionParts[1], actionPendingIntent);
+        }
+        else
+          Log.e(TAG, "Drawable resource: btn_default not found. Pending intent not created");
+      }
+    }
+    else
+      Log.i(TAG, "notification_actions extra not found or is empty");
     Notification notification = builder.build();
     if (intent.hasExtra("isInsistent"))
       notification.flags |= Notification.FLAG_INSISTENT;
