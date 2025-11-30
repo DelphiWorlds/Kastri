@@ -20,6 +20,7 @@ type
     InsistentCheckBox: TCheckBox;
     UseBigTextCheckBox: TCheckBox;
     BodyMemo: TMemo;
+    UseSpecialLayoutCheckBox: TCheckBox;
     procedure ImmediateButtonClick(Sender: TObject);
     procedure ScheduleButtonClick(Sender: TObject);
     procedure CancelScheduledClick(Sender: TObject);
@@ -31,6 +32,7 @@ type
     FImageFileName: string;
     FNotifications: TNotifications;
     procedure ImmediateNotification;
+    procedure NotificationActionResponseHandler(Sender: TObject; const AResponse: TNotificationActionResponse);
     procedure NotificationReceivedHandler(Sender: TObject; const ANotification: TNotification);
     procedure ScheduleNotification(const ASeconds: Integer; const ARepeating: Boolean);
   public
@@ -63,6 +65,7 @@ begin
   end;
   FNotifications := DW.Notifications.TNotifications.Create;
   FNotifications.OnNotificationReceived := NotificationReceivedHandler;
+  FNotifications.OnNotificationActionResponse := NotificationActionResponseHandler;
 end;
 
 destructor TForm1.Destroy;
@@ -101,13 +104,18 @@ begin
     LNotification.Image := FImageFileName;
   if InsistentCheckBox.IsChecked then
     LNotification.IsInsistent := True;
+  if UseSpecialLayoutCheckBox.IsChecked then
+    LNotification.ResourceName := 'notification_special';
   LNotification.UseBigText := UseBigTextCheckBox.IsChecked;
+  LNotification.AddAction('CallNumber', 'Call Number');
+  LNotification.AddAction('OpenLink', 'Open Link');
   FNotifications.PresentNotification(LNotification);
 end;
 
 procedure TForm1.IncludeImageCheckBoxChange(Sender: TObject);
 begin
-  UseBigTextCheckBox.IsChecked := not IncludeImageCheckBox.IsChecked;
+  if IncludeImageCheckBox.IsChecked then
+    UseBigTextCheckBox.IsChecked := False;
 end;
 
 procedure TForm1.ScheduleButtonClick(Sender: TObject);
@@ -146,6 +154,10 @@ begin
   else
     LNotification.RepeatInterval := TRepeatInterval.None;
   LNotification.UseBigText := UseBigTextCheckBox.IsChecked;
+  if UseSpecialLayoutCheckBox.IsChecked then
+    LNotification.ResourceName := 'notification_special';
+  LNotification.AddAction('CallNumber', 'Call Number');
+  LNotification.AddAction('OpenLink', 'Open Link');
   FNotifications.ScheduleNotification(LNotification);
 end;
 
@@ -156,7 +168,8 @@ end;
 
 procedure TForm1.UseBigTextCheckBoxChange(Sender: TObject);
 begin
-  IncludeImageCheckBox.IsChecked := not UseBigTextCheckBox.IsChecked;
+  if UseBigTextCheckBox.IsChecked then
+    IncludeImageCheckBox.IsChecked := False;
 end;
 
 procedure TForm1.CancelImmediateButtonClick(Sender: TObject);
@@ -167,6 +180,11 @@ end;
 procedure TForm1.CancelScheduledClick(Sender: TObject);
 begin
   FNotifications.CancelNotification('ScheduledNotification');
+end;
+
+procedure TForm1.NotificationActionResponseHandler(Sender: TObject; const AResponse: TNotificationActionResponse);
+begin
+  LogMemo.Lines.Add('Clicked notification action: ' + AResponse.ActionName);
 end;
 
 procedure TForm1.NotificationReceivedHandler(Sender: TObject; const ANotification: TNotification);

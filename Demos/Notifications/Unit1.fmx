@@ -14,7 +14,7 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 187.000000000000000000
+    Position.Y = 212.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
@@ -28,7 +28,7 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 285.000000000000000000
+    Position.Y = 310.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
@@ -42,7 +42,7 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 383.000000000000000000
+    Position.Y = 408.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
@@ -59,11 +59,11 @@ object Form1: TForm1
     Margins.Right = 4.000000000000000000
     Margins.Bottom = 4.000000000000000000
     Size.Width = 528.000000000000000000
-    Size.Height = 366.000000000000000000
+    Size.Height = 341.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 8
     Viewport.Width = 524.000000000000000000
-    Viewport.Height = 362.000000000000000000
+    Viewport.Height = 337.000000000000000000
   end
   object ScheduleRepeatingButton: TButton
     Align = Top
@@ -71,7 +71,7 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 334.000000000000000000
+    Position.Y = 359.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
@@ -85,7 +85,7 @@ object Form1: TForm1
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
     Position.X = 6.000000000000000000
-    Position.Y = 236.000000000000000000
+    Position.Y = 261.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 43.000000000000000000
     Size.PlatformDefault = False
@@ -104,7 +104,7 @@ object Form1: TForm1
     Size.Width = 524.000000000000000000
     Size.Height = 19.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 11
+    TabOrder = 12
     Text = 'Include image in notification'
     OnChange = IncludeImageCheckBoxChange
   end
@@ -118,7 +118,7 @@ object Form1: TForm1
     Size.Width = 524.000000000000000000
     Size.Height = 19.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 10
+    TabOrder = 11
     Text = 'Insistent (Android only)'
   end
   object UseBigTextCheckBox: TCheckBox
@@ -126,13 +126,12 @@ object Form1: TForm1
     Margins.Left = 6.000000000000000000
     Margins.Top = 6.000000000000000000
     Margins.Right = 6.000000000000000000
-    Margins.Bottom = 12.000000000000000000
     Position.X = 6.000000000000000000
     Position.Y = 56.000000000000000000
     Size.Width = 524.000000000000000000
     Size.Height = 19.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 9
+    TabOrder = 10
     Text = 'Use Big Text (Android only)'
     OnChange = UseBigTextCheckBoxChange
   end
@@ -149,12 +148,26 @@ object Form1: TForm1
     Margins.Right = 4.000000000000000000
     Margins.Bottom = 4.000000000000000000
     Position.X = 4.000000000000000000
-    Position.Y = 91.000000000000000000
+    Position.Y = 116.000000000000000000
     Size.Width = 528.000000000000000000
     Size.Height = 86.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 7
     Viewport.Width = 524.000000000000000000
     Viewport.Height = 82.000000000000000000
+  end
+  object UseSpecialLayoutCheckBox: TCheckBox
+    Align = Top
+    Margins.Left = 6.000000000000000000
+    Margins.Top = 6.000000000000000000
+    Margins.Right = 6.000000000000000000
+    Margins.Bottom = 12.000000000000000000
+    Position.X = 6.000000000000000000
+    Position.Y = 81.000000000000000000
+    Size.Width = 524.000000000000000000
+    Size.Height = 19.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 9
+    Text = 'Use "Special" Layout (Android only)'
   end
 end
