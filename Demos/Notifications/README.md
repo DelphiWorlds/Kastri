@@ -44,18 +44,49 @@ from the `Lib` folder in Kastri, so add them to the `Libraries` node under the A
       </intent-filter>
     </receiver>
   ```
-### Android custom notifications
 
-This requires two files to be deployed, namely:
+### Notification layout files
 
+If you wish to use yor own layouts, you will need to add them to the deployment. See the [Android custom notifications](#android-custom-notifications) section.
+
+## Android custom notifications
+
+This requires a notification layout to be deployed. In the demo, there are two files are in the `Resources\layout` folder:
+
+* `notification_custom.xml` is the original file that is fairly plain, and has the image aligned to the right
+* `notification_special.xml` is an updated layout with a bit more attention to margins, and aligns the image to the left
+
+For custom notifications to work, the layout files need to be deployed with a **Remote Path value of: `res\layout`**
+
+If you are daring enough, and want to change the layout, modify these files. There's a tutorial about [layouts in Android here](https://www.tutorialspoint.com/android/android_user_interface_layouts.htm).
+
+**NOTE - The custom notification implementation has been altered significantly (on Dec 1st, 2025)**:
+
+Using both "compact" and "big" layouts is considered deprecated, so this is no longer supported in Kastri. Instead, use is made of [BigPictureStyle](https://developer.android.com/reference/androidx/core/app/NotificationCompat.BigPictureStyle?hl=en) which requires much less code, is easier to manage, and is considered to be the "defacto standard", being used in major apps such as GMail, WhatsApp, Telegram, Instagram etc.
+
+## Android notification actions
+
+To add an action, call the `AddAction` method of `TNotification`, e.g.
+
+```delphi
+  LNotification.AddAction('Call', 'Call Number');
 ```
-notification_custom.xml
-notification_custom_big.xml
-```
 
-`notification_custom.xml` is used for when the unexpanded notification is displayed and `notification_custom_big.xml` when the notification is expanded. If you are daring enough, and want to change the layout, modify these files. There's a tutorial about [layouts in Android here](https://www.tutorialspoint.com/android/android_user_interface_layouts.htm).
+The parameters are:
 
-In the demo, the files are in the `Resources\layout` folder. **The files need to be deployed with a Remote Path value of: `res\layout`**
+* ActionName - a name to identify the action. In a single notification, this should be unique 
+* Text - This is displayed in the action
+
+This example will display an action at the bottom of the notification with the text "Call Number".
+
+When the user taps the action, the `OnNotificationActionResponse` event of `TNotifications` is called, passing a record containing:
+
+* ActionName - as above. Helps to identify which action was executed
+* NotificationID - A unique identifier for the notification
+* NotificationName - The Name property of the notification when it was presented, or scheduled
+
+
+
 
 
 
