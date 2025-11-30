@@ -24,6 +24,8 @@ type
   JNotificationBuilderWithBuilderAccessor = interface;
   JNotificationCompat = interface;
   JNotificationCompat_Action = interface;
+  JNotificationCompat_Action_Builder = interface;
+  JNotificationCompat_BigPictureStyle = interface;
   JNotificationCompat_BigTextStyle = interface;
   JNotificationCompat_BubbleMetadata = interface;
   JNotificationCompat_Builder = interface;
@@ -412,6 +414,30 @@ type
   end;
   TJNotificationCompat_Action = class(TJavaGenericImport<JNotificationCompat_ActionClass, JNotificationCompat_Action>) end;
 
+  JNotificationCompat_Action_BuilderClass = interface(JObjectClass)
+    ['{F0E1B9CC-F8E5-4E2C-A1C9-933B3C61D3C8}']
+    // {class} function init(iconCompat: JIconCompat; charSequence: JCharSequence; pendingIntent: JPendingIntent): JNotificationCompat_Action_Builder; cdecl; overload;
+    {class} function init(i: Integer; charSequence: JCharSequence; pendingIntent: JPendingIntent): JNotificationCompat_Action_Builder; cdecl; overload;
+    {class} function init(action: JNotificationCompat_Action): JNotificationCompat_Action_Builder; cdecl; overload;
+    {class} function fromAndroidAction(action: JNotification_Action): JNotificationCompat_Action_Builder; cdecl;
+  end;
+
+  [JavaSignature('androidx/core/app/NotificationCompat$Action$Builder')]
+  JNotificationCompat_Action_Builder = interface(JObject)
+    ['{A190E5D6-BBDC-4B20-8456-30C7C48E6FAD}']
+    function addExtras(bundle: JBundle): JNotificationCompat_Action_Builder; cdecl;
+    function addRemoteInput(remoteInput: JRemoteInput): JNotificationCompat_Action_Builder; cdecl;
+    function build: JNotificationCompat_Action; cdecl;
+    // function extend(extender: JNotificationCompat_Action_Extender): JNotificationCompat_Action_Builder; cdecl;
+    function getExtras: JBundle; cdecl;
+    function setAllowGeneratedReplies(b: Boolean): JNotificationCompat_Action_Builder; cdecl;
+    function setAuthenticationRequired(b: Boolean): JNotificationCompat_Action_Builder; cdecl;
+    function setContextual(b: Boolean): JNotificationCompat_Action_Builder; cdecl;
+    function setSemanticAction(i: Integer): JNotificationCompat_Action_Builder; cdecl;
+    function setShowsUserInterface(b: Boolean): JNotificationCompat_Action_Builder; cdecl;
+  end;
+  TJNotificationCompat_Action_Builder = class(TJavaGenericImport<JNotificationCompat_Action_BuilderClass, JNotificationCompat_Action_Builder>) end;
+
   JNotificationCompat_BuilderClass = interface(JObjectClass)
     ['{BF06ED8F-16CF-4D2D-A029-4A43FD71907F}']
     {class} function init(context: JContext): JNotificationCompat_Builder; cdecl; overload;
@@ -575,6 +601,26 @@ type
     function getBuilder: JNotification_Builder; cdecl;
   end;
   TJNotificationBuilderWithBuilderAccessor = class(TJavaGenericImport<JNotificationBuilderWithBuilderAccessorClass, JNotificationBuilderWithBuilderAccessor>) end;
+
+  JNotificationCompat_BigPictureStyleClass = interface(JNotificationCompat_StyleClass)
+    ['{7391005B-039A-47EA-9053-4F84A9BA51A1}']
+    {class} function init: JNotificationCompat_BigPictureStyle; cdecl; overload;
+    {class} function init(builder: JNotificationCompat_Builder): JNotificationCompat_BigPictureStyle; cdecl; overload;
+  end;
+
+  [JavaSignature('androidx/core/app/NotificationCompat$BigPictureStyle')]
+  JNotificationCompat_BigPictureStyle = interface(JNotificationCompat_Style)
+    ['{FD5C00B8-47BE-4E9B-A9D6-6696F571164F}']
+    function bigLargeIcon(bitmap: JBitmap): JNotificationCompat_BigPictureStyle; cdecl; overload;
+    function bigLargeIcon(icon: JIcon): JNotificationCompat_BigPictureStyle; cdecl; overload;  // API 23
+    function bigPicture(bitmap: JBitmap): JNotificationCompat_BigPictureStyle; cdecl; overload;
+    function bigPicture(icon: JIcon): JNotificationCompat_BigPictureStyle; cdecl; overload;  // API 31
+    function setBigContentTitle(title: JCharSequence): JNotificationCompat_BigPictureStyle; cdecl;
+    function setContentDescription(contentDescription: JCharSequence): JNotificationCompat_BigPictureStyle; cdecl; // API 31
+    function setSummaryText(charSequence: JCharSequence): JNotificationCompat_BigPictureStyle; cdecl;
+    function showBigPictureWhenCollapsed(show: Boolean): JNotificationCompat_BigPictureStyle; cdecl; // API 31
+  end;
+  TJNotificationCompat_BigPictureStyle = class(TJavaGenericImport<JNotificationCompat_BigPictureStyleClass, JNotificationCompat_BigPictureStyle>) end;
 
 
   JNotificationCompat_BigTextStyleClass = interface(JNotificationCompat_StyleClass)
