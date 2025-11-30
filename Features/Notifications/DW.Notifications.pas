@@ -18,7 +18,15 @@ interface
 type
   TRepeatInterval = (None, Second, Minute, Hour, Day, Week, Weekday, Month, Quarter, Year, Era);
 
+  TNotificationAction = record
+    ActionName: string;
+    Text: string;
+  end;
+
+  TNotificationActions = TArray<TNotificationAction>;
+
   TNotification = record
+    Actions: TNotificationActions;
     AlertAction: string;
     AlertBody: string;
     EnableSound: Boolean;
@@ -36,6 +44,14 @@ type
     Name: string;
     Number: Integer;
     RepeatInterval: TRepeatInterval;
+    /// <summary>
+    ///   Specifies the resource layout to use for the notification.
+    ///   If this value is blank, a ResourceName of notification_custom is the default
+    /// </summary>
+    /// <remarks>
+    ///   Android ONLY
+    /// </remarks>
+    ResourceName: string;
     SoundName: string;
     Subtitle: string;
     Title: string;
@@ -47,6 +63,14 @@ type
     ///   Will be ignored if an image is included. See Image property
     /// </remarks>
     UseBigText: Boolean;
+    /// <summary>
+    ///   Adds actions that appear at the bottom of the notification
+    ///   Handle actions in the OnNotificationActionResponse event of TNotifications
+    /// </summary>
+    /// <remarks>
+    ///   Applies to Android ONLY.
+    /// </remarks>
+    procedure AddAction(const AActionName, AText: string);
   end;
 
   TCustomPlatformNotificationChannel = class(TObject)
@@ -84,6 +108,12 @@ type
 
   TNotifications = class;
 
+  TNotificationActionResponse = record
+    ActionName: string;
+    NotificationID: Integer;
+    NotificationName: string;
+  end;
+
   TCustomPlatformNotifications = class(TObject)
   private
     FChannels: TNotificationChannels;
@@ -91,6 +121,8 @@ type
   protected
     procedure CancelAll; virtual;
     procedure CancelNotification(const AName: string); virtual;
+    procedure DoNotificationActionResponse(const AResponse: TNotificationActionResponse);
+    procedure DoNotificationReceived(const ANotification: TNotification); virtual;
     procedure PresentNotification(const ANotification: TNotification); virtual;
     procedure ScheduleNotification(const ANotification: TNotification); virtual;
     property Channels: TNotificationChannels read FChannels;
@@ -100,14 +132,17 @@ type
     destructor Destroy; override;
   end;
 
+  TNotificationActionResponseEvent = procedure(Sender: TObject; const Response: TNotificationActionResponse) of object;
   TNotificationReceivedEvent = procedure(Sender: TObject; const Notification: TNotification) of object;
 
   TNotifications = class(TObject)
   private
     FPlatformNotifications: TCustomPlatformNotifications;
+    FOnNotificationActionResponse: TNotificationActionResponseEvent;
     FOnNotificationReceived: TNotificationReceivedEvent;
     function GetChannels: TNotificationChannels;
   protected
+    procedure DoNotificationActionResponse(const AResponse: TNotificationActionResponse);
     procedure DoNotificationReceived(const ANotification: TNotification);
   public
     constructor Create;
@@ -117,6 +152,7 @@ type
     procedure PresentNotification(const ANotification: TNotification);
     procedure ScheduleNotification(const ANotification: TNotification);
     property Channels: TNotificationChannels read GetChannels;
+    property OnNotificationActionResponse: TNotificationActionResponseEvent read FOnNotificationActionResponse write FOnNotificationActionResponse;
     property OnNotificationReceived: TNotificationReceivedEvent read FOnNotificationReceived write FOnNotificationReceived;
   end;
 
@@ -130,6 +166,17 @@ uses
   {$ELSE}
   DW.Notifications.Default;
   {$ENDIF}
+
+{ TNotification }
+
+procedure TNotification.AddAction(const AActionName, AText: string);
+var
+  LAction: TNotificationAction;
+begin
+  LAction.ActionName := AActionName;
+  LAction.Text := AText;
+  Actions := Actions + [LAction];
+end;
 
 { TCustomPlatformNotificationChannel }
 
@@ -155,6 +202,16 @@ destructor TCustomPlatformNotifications.Destroy;
 begin
   //
   inherited;
+end;
+
+procedure TCustomPlatformNotifications.DoNotificationActionResponse(const AResponse: TNotificationActionResponse);
+begin
+  FNotifications.DoNotificationActionResponse(AResponse);
+end;
+
+procedure TCustomPlatformNotifications.DoNotificationReceived(const ANotification: TNotification);
+begin
+  FNotifications.DoNotificationReceived(ANotification);
 end;
 
 procedure TCustomPlatformNotifications.CancelAll;
@@ -189,6 +246,12 @@ destructor TNotifications.Destroy;
 begin
   FPlatformNotifications.Free;
   inherited;
+end;
+
+procedure TNotifications.DoNotificationActionResponse(const AResponse: TNotificationActionResponse);
+begin
+  if Assigned(FOnNotificationActionResponse) then
+    FOnNotificationActionResponse(Self, AResponse);
 end;
 
 procedure TNotifications.DoNotificationReceived(const ANotification: TNotification);

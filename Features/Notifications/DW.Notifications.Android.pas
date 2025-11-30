@@ -14,10 +14,12 @@ unit DW.Notifications.Android;
 interface
 
 uses
+  // RTL
+  System.Messaging,
   // Android
   Androidapi.JNI.App, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.JavaTypes, Androidapi.JNIBridge,
   {$IF CompilerVersion > 32}
-  Androidapi.JNI.Os, Androidapi.JNI.Net, Androidapi.JNI.Media,
+  Androidapi.JNI.Os, Androidapi.JNI.Net, Androidapi.JNI.Media, Androidapi.JNI.Widget,
   {$ENDIF}
   // DW
   DW.Notifications, DW.MultiReceiver.Android, DW.Androidapi.JNI.App,
@@ -150,14 +152,16 @@ type
   end;
   {$ENDIF}
 
+  TPlatformNotifications = class;
+
   TNotificationReceiver = class(TMultiReceiver)
   private
-    FNotifications: TNotifications;
+    FNotifications: TPlatformNotifications;
   protected
     procedure Receive(context: JContext; intent: JIntent); override;
     procedure ConfigureActions; override;
   public
-    constructor Create(const ANotifications: TNotifications);
+    constructor Create(const ANotifications: TPlatformNotifications);
   end;
 
   TPlatformNotificationChannel = class(TCustomPlatformNotificationChannel)
@@ -189,21 +193,30 @@ type
     class var FNotificationManager: JNotificationManager;
     class function GetNotificationManager: JNotificationManager; static;
   private
+    FIntent: JIntent;
+    FIsLaunching: Boolean;
     FNotificationChannel: JNotificationChannel;
     FNotificationReceiver: TNotificationReceiver;
     FNotificationStore: JSharedPreferences;
+    procedure ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
+    procedure CheckNotificationAction;
+    function CreateRemoteViews(const ANotification: TNotification; const AID: Integer): JRemoteViews;
     function GetNativeNotification(const ANotification: TNotification; const AID: Integer; const AScheduled: Boolean): JNotification;
     function GetNotificationPendingIntent(const ANotification: TNotification; const AID: Integer): JPendingIntent;
     function GetUniqueID: Integer;
     function GetNotificationIntent(const ANotification: TNotification; const AID: Integer): JPendingIntent;
+    procedure MessageReceivedNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
     procedure RemoveNotification(const ANotification: TNotification);
     function RetrieveNotification(const AName: string; var ANotification: TNotification): Integer;
+    procedure SetRemoteViewsImage(const ARemoteViews: JRemoteViews; const AResourceName: string; const ABitmap: JBitmap);
+    procedure SetRemoteViewsText(const ARemoteViews: JRemoteViews; const AResourceName, AValue: string);
     procedure StoreNotification(const ANotification: TNotification; const AID: Integer);
   protected
     class property NotificationManager: JNotificationManager read GetNotificationManager;
   protected
     procedure CancelAll; override;
     procedure CancelNotification(const AName: string); override;
+    procedure DoNotificationReceived(const ANotification: TNotification); override;
     procedure PresentNotification(const ANotification: TNotification); override;
     procedure ScheduleNotification(const ANotification: TNotification); override;
   public
@@ -220,16 +233,78 @@ uses
   {$IF CompilerVersion < 33}
   Androidapi.JNI.Net, Androidapi.JNI.Os,
   {$ENDIF}
-  Androidapi.Helpers, Androidapi.JNI.Embarcadero, Androidapi.JNI.Widget,
+  Androidapi.Helpers,
+  // FMX
+  FMX.Platform, FMX.Platform.Android,
   // DW
+  DW.Consts.Android,
   DW.Androidapi.JNI.DWMultiBroadcastReceiver, DW.Android.Helpers;
 
 type
-  TOpenNotifications = class(TNotifications);
+  TNotificationActionResponseHelper = record helper for TNotificationActionResponse
+    constructor Create(const AIntent: JIntent);
+  end;
+
+  TNotificationActionHelper = record helper for TNotificationAction
+    function GetValue: string;
+  end;
+
+  TNotificationActionsHelper = record helper for TNotificationActions
+    function GetExtraValue: JArrayList;
+  end;
+
+function GetResourceID(const AResourceName, AResourceType: string; const APackageName: string = ''): Integer; overload;
+var
+  LContext: JContext;
+  LPackageName, LResourceType: JString;
+begin
+  LContext := TAndroidHelper.Context;
+  if APackageName.IsEmpty then
+    LPackageName := LContext.getPackageName
+  else
+    LPackageName := StringToJString(APackageName);
+  if AResourceType.IsEmpty then
+    LResourceType := nil
+  else
+    LResourceType := StringToJString(AResourceType);
+  Result := LContext.getResources.getIdentifier(StringToJString(AResourceName), LResourceType, LPackageName);
+end;
+
+function GetAndroidResourceID(const AResourceName, AResourceType: string): Integer;
+begin
+  Result := GetResourceID(AResourceName, AResourceType, 'android');
+end;
+
+{ TNotificationActionResponseHelper }
+
+constructor TNotificationActionResponseHelper.Create(const AIntent: JIntent);
+begin
+  NotificationID := AIntent.getIntExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_ID, 0);
+  NotificationName := JStringToString(AIntent.getStringExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_NAME));
+  ActionName := JStringToString(AIntent.getStringExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_ACTION_NAME));
+end;
+
+{ TNotificationActionHelper }
+
+function TNotificationActionHelper.GetValue: string;
+begin
+  Result := ActionName + '=' + Text;
+end;
+
+{ TNotificationActionsHelper }
+
+function TNotificationActionsHelper.GetExtraValue: JArrayList;
+var
+  LAction: TNotificationAction;
+begin
+  Result := TJArrayList.Create;
+  for LAction in Self do
+    Result.add(StringToJString(LAction.GetValue));
+end;
 
 { TNotificationReceiver }
 
-constructor TNotificationReceiver.Create(const ANotifications: TNotifications);
+constructor TNotificationReceiver.Create(const ANotifications: TPlatformNotifications);
 begin
   inherited Create(True);
   FNotifications := ANotifications;
@@ -254,7 +329,7 @@ begin
   LNotification.FireDate := Now;
   LNotification.RepeatInterval := TRepeatInterval(intent.getIntExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_REPEATINTERVAL, 0));
   LNotification.Image := JStringToString(LNativeNotification.extras.getString(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_IMAGE));
-  TOpenNotifications(FNotifications).DoNotificationReceived(LNotification);
+  FNotifications.DoNotificationReceived(LNotification);
 end;
 
 { TPlatformNotificationChannel }
@@ -350,6 +425,11 @@ end;
 constructor TPlatformNotifications.Create(const ANotifications: TNotifications);
 begin
   inherited;
+  // Intent from launching the app from NOT RUNNING state
+  FIntent := TAndroidHelper.Activity.getIntent;
+  MainActivity.registerIntentAction(TJDWMultiBroadcastReceiver.JavaClass.ACTION_NOTIFICATION_ACTION);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TMessageReceivedNotification, MessageReceivedNotificationMessageHandler);
   FNotificationStore := TAndroidHelper.Context.getSharedPreferences(StringToJString(ClassName), TJContext.JavaClass.MODE_PRIVATE);
   if TAndroidHelperEx.CheckBuildAndTarget(TAndroidHelperEx.OREO) then
   begin
@@ -358,16 +438,24 @@ begin
     FNotificationChannel.enableVibration(True);
     FNotificationChannel.setLightColor(TJColor.JavaClass.GREEN);
     FNotificationChannel.setLockscreenVisibility(TJNotification.JavaClass.VISIBILITY_PRIVATE);
+    FNotificationChannel.setImportance(TJNotificationManager.JavaClass.IMPORTANCE_HIGH);
     NotificationManager.createNotificationChannel(FNotificationChannel);
   end;
-  FNotificationReceiver := TNotificationReceiver.Create(ANotifications);
+  FNotificationReceiver := TNotificationReceiver.Create(Self);
 end;
 
 destructor TPlatformNotifications.Destroy;
 begin
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TMessageReceivedNotification, MessageReceivedNotificationMessageHandler);
   FNotificationStore := nil;
   FNotificationChannel := nil;
   FNotificationReceiver.Free;
+  inherited;
+end;
+
+procedure TPlatformNotifications.DoNotificationReceived(const ANotification: TNotification);
+begin
   inherited;
 end;
 
@@ -376,6 +464,47 @@ begin
   if FNotificationManager = nil then
     FNotificationManager := TJNotificationManager.Wrap(TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE));
   Result := FNotificationManager;
+end;
+
+procedure TPlatformNotifications.ApplicationEventMessageHandler(const Sender: TObject; const AMsg: TMessage);
+begin
+  case TApplicationEventMessage(AMsg).Value.Event of
+    TApplicationEvent.WillBecomeForeground:
+      // App is being launched, or switched to from another app
+      FIsLaunching := True;
+    TApplicationEvent.BecameActive:
+    begin
+      if FIsLaunching then
+      begin
+        FIsLaunching := False;
+        CheckNotificationAction;
+      end;
+      FIntent := nil;
+    end;
+  end;
+end;
+
+procedure TPlatformNotifications.MessageReceivedNotificationMessageHandler(const Sender: TObject; const AMsg: TMessage);
+begin
+  // Intent from launching the app from RUNNING state
+  FIntent := TMessageReceivedNotification(AMsg).Value;
+  CheckNotificationAction;
+end;
+
+procedure TPlatformNotifications.CheckNotificationAction;
+var
+  LResponse: TNotificationActionResponse;
+begin
+  if (FIntent <> nil) and (FIntent.getAction <> nil) and FIntent.getAction.equals(TJDWMultiBroadcastReceiver.JavaClass.ACTION_NOTIFICATION_ACTION) then
+  begin
+    LResponse := TNotificationActionResponse.Create(FIntent);
+    if LResponse.NotificationName.IsEmpty then
+      TAndroidHelperEx.NotificationManager.cancel(LResponse.NotificationID)
+    else
+      CancelNotification(LResponse.NotificationName);
+    DoNotificationActionResponse(LResponse);
+    FIntent := nil;
+  end;
 end;
 
 function TPlatformNotifications.GetUniqueID: Integer;
@@ -421,16 +550,69 @@ begin
   LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION, TJParcelable.Wrap(TAndroidHelper.JObjectToID(LNotification)));
   if ANotification.IsInsistent then
     LIntent.putExtra(StringToJString('isInsistent'), StringToJString('1'));
+  if not ANotification.ResourceName.IsEmpty then
+    LIntent.putExtra(StringToJString('resource_name'), StringToJString(ANotification.ResourceName));
+  if Length(ANotification.Actions) > 0 then
+    LIntent.putStringArrayListExtra(StringToJString('notification_actions'), ANotification.Actions.GetExtraValue);
   LFlags := TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT or TJPendingIntent.JavaClass.FLAG_IMMUTABLE;
   Result := TJPendingIntent.JavaClass.getBroadcast(TAndroidHelper.Context, AID, LIntent, LFlags);
+end;
+
+procedure TPlatformNotifications.SetRemoteViewsImage(const ARemoteViews: JRemoteViews; const AResourceName: string; const ABitmap: JBitmap);
+var
+  LResId: Integer;
+begin
+  LResId := GetResourceID(AResourceName, 'id');
+  if LResId <> 0 then
+    ARemoteViews.setImageViewBitmap(LResId, ABitmap);
+end;
+
+procedure TPlatformNotifications.SetRemoteViewsText(const ARemoteViews: JRemoteViews; const AResourceName, AValue: string);
+var
+  LResId: Integer;
+begin
+  LResId := GetResourceID(AResourceName, 'id');
+  if LResId <> 0 then
+    ARemoteViews.setTextViewText(LResId, StrToJCharSequence(AValue));
+end;
+
+function TPlatformNotifications.CreateRemoteViews(const ANotification: TNotification; const AID: Integer): JRemoteViews;
+var
+  LBitmap: JBitmap;
+  LResourceName: string;
+  LResId: Integer;
+begin
+  Result := nil;
+  if TFile.Exists(ANotification.Image) then
+    LBitmap := TJBitmapFactory.JavaClass.decodeFile(StringToJString(ANotification.Image))
+  else
+    LBitmap := nil;
+  if ANotification.ResourceName.IsEmpty then
+    LResourceName := 'notification_custom'
+  else
+    LResourceName := ANotification.ResourceName;
+  LResId := GetResourceID(LResourceName, 'layout');
+  if LResId <> 0 then
+  begin
+    Result := TJRemoteViews.JavaClass.init(TAndroidHelper.Context.getPackageName, LResId);
+    SetRemoteViewsText(Result, 'id/' + LResourceName + '_title', ANotification.Title);
+    SetRemoteViewsText(Result, 'id/' + LResourceName + '_body', ANotification.AlertBody);
+    if LBitmap <> nil then
+      SetRemoteViewsImage(Result, 'id/' + LResourceName + '_image', LBitmap);
+  end;
 end;
 
 function TPlatformNotifications.GetNativeNotification(const ANotification: TNotification; const AID: Integer; const AScheduled: Boolean): JNotification;
 var
   LBuilder: JNotificationCompat_Builder;
-  LContentSmall, LContentBig: JRemoteViews;
-  LBitmap: JBitmap;
+  LCompactViews: JRemoteViews;
+  LBitmap, LNilBitmap: JBitmap;
   LBigTextStyle: JNotificationCompat_BigTextStyle;
+  LActionResId: Integer;
+  LAction: TNotificationAction;
+  LIntent: JIntent;
+  LPendingIntent: JPendingIntent;
+  LFlags: Integer;
 begin
   LBuilder := TJNotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context)
     .setDefaults(TJNotification.JavaClass.DEFAULT_LIGHTS)
@@ -451,19 +633,18 @@ begin
     else
       LBuilder := LBuilder.setSound(StrToJURI(ANotification.SoundName));
   end;
-  if not AScheduled and TFile.Exists(ANotification.Image) then
+  if not AScheduled and (TFile.Exists(ANotification.Image) or not ANotification.ResourceName.IsEmpty) then
   begin
     LBitmap := TJBitmapFactory.JavaClass.decodeFile(StringToJString(ANotification.Image));
-    LContentSmall := TJRemoteViews.JavaClass.init(TAndroidHelper.Context.getPackageName, TAndroidHelper.GetResourceID('layout/notification_custom'));
-    LContentSmall.setTextViewText(TAndroidHelper.GetResourceID('id/notification_custom_title'), StrToJCharSequence(ANotification.Title));
-    LContentSmall.setTextViewText(TAndroidHelper.GetResourceID('id/notification_custom_body'), StrToJCharSequence(ANotification.AlertBody));
-    LContentSmall.setImageViewBitmap(TAndroidHelper.GetResourceID('id/notification_custom_image'), LBitmap);
-    LContentBig := TJRemoteViews.JavaClass.init(TAndroidHelper.Context.getPackageName, TAndroidHelper.GetResourceID('layout/notification_custom_big'));
-    LContentBig.setTextViewText(TAndroidHelper.GetResourceID('id/notification_custom_title'), StrToJCharSequence(ANotification.Title));
-    LContentBig.setTextViewText(TAndroidHelper.GetResourceID('id/notification_custom_body'), StrToJCharSequence(ANotification.AlertBody));
-    LContentBig.setImageViewBitmap(TAndroidHelper.GetResourceID('id/notification_custom_image'), LBitmap);
-    LBuilder := LBuilder.setCustomContentView(LContentSmall)
-      .setCustomBigContentView(LContentBig);
+    LNilBitmap := nil;
+    LCompactViews := CreateRemoteViews(ANotification, AID);
+    LBuilder := LBuilder.setCustomContentView(LCompactViews)
+      .setStyle(TJNotificationCompat_BigPictureStyle.JavaClass.init
+        .bigPicture(LBitmap)
+        .bigLargeIcon(LNilBitmap) // Hides compact thumbnail in expanded mode
+        .setBigContentTitle(StrToJCharSequence(ANotification.Title))
+        .setSummaryText(StrToJCharSequence(ANotification.AlertBody))
+      );
   end
   else if ANotification.UseBigText then
   begin
@@ -472,7 +653,24 @@ begin
       .setBigContentTitle(StrToJCharSequence(ANotification.Title));
     LBuilder.setStyle(LBigTextStyle);
   end;
-  Result := LBuilder.Build;
+  for LAction in ANotification.Actions do
+  begin
+    LActionResId := GetAndroidResourceID('btn_default', 'drawable');
+    if LActionResId <> 0 then
+    begin
+      LIntent := TJIntent.JavaClass.init(TJDWMultiBroadcastReceiver.JavaClass.ACTION_NOTIFICATION_ACTION);
+      LIntent.setClassName(TAndroidHelper.Context, StringToJString(cEMBTFMXNativeActivity));
+      LFlags := TJIntent.JavaClass.FLAG_ACTIVITY_NEW_TASK or TJIntent.JavaClass.FLAG_ACTIVITY_CLEAR_TOP or TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP;
+      LIntent.setFlags(LFlags);
+      LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_ID, AID);
+      LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_NAME, StringToJString(ANotification.Name));
+      LIntent.putExtra(TJDWMultiBroadcastReceiver.JavaClass.EXTRA_NOTIFICATION_ACTION_NAME, StringToJString(LAction.ActionName));
+      LFlags := TJPendingIntent.JavaClass.FLAG_UPDATE_CURRENT or TJPendingIntent.JavaClass.FLAG_IMMUTABLE;
+      LPendingIntent := TJPendingIntent.JavaClass.getActivity(TAndroidHelper.Context, GetUniqueID, LIntent, LFlags);
+      LBuilder.addAction(LActionResId, StrToJCharSequence(LAction.Text), LPendingIntent);
+    end;
+  end;
+  Result := LBuilder.setPriority(TJNotificationCompat.JavaClass.PRIORITY_HIGH).build;
   if ANotification.IsInsistent then
     Result.flags := Result.flags or TJNotification.JavaClass.FLAG_INSISTENT;
 end;
