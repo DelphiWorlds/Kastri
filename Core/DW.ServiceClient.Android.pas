@@ -41,7 +41,6 @@ type
 implementation
 
 uses
-  DW.OSLog,
   // RTL
   System.SysUtils,
   // Android
@@ -63,7 +62,6 @@ procedure TServiceClient.Start(const AIntent: JIntent = nil);
 var
   LIntent: JIntent;
 begin
-  TOSLog.d('TServiceClient.Start for: %s', [FServiceName]);
   LIntent := AIntent;
   if LIntent = nil then
     LIntent := TJIntent.JavaClass.init;
