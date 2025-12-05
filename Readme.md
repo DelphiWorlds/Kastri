@@ -6,7 +6,7 @@ From [Delphi Worlds](https://x.com/delphiworlds)
 
 [![Twitter](https://img.shields.io/badge/-Twitter-1DA1F2?style=plastic&logo=Twitter)](https://x.com/DelphiWorlds)  [![Facebook](https://img.shields.io/badge/-Facebook-green?style=plastic&logo=Facebook)](https://www.facebook.com/DelphiWorlds) 
 
-Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two major releases** (e.g. at present that includes Delphi 12.x and Delphi 11.x) are "officially" supported. 
+Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two major releases** (e.g. at present that includes Delphi 13.x and Delphi 12.x) are "officially" supported. 
 
 Development of Kastri can be helped along with [Github Sponsorship](https://github.com/sponsors/DelphiWorlds), so please consider sponsoring today!
 
