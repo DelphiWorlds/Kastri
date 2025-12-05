@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{9C0CF1A7-3877-401B-B60A-E50EF49D0E5A}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ABLSticky.dproj">
+            <Dependencies>Service\ABLStickyService.dproj</Dependencies>
+        </Projects>
+        <Projects Include="Service\ABLStickyService.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ABLSticky" DependsOnTargets="ABLStickyService">
+        <MSBuild Projects="ABLSticky.dproj"/>
+    </Target>
+    <Target Name="ABLSticky:Clean" DependsOnTargets="ABLStickyService:Clean">
+        <MSBuild Projects="ABLSticky.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ABLSticky:Make" DependsOnTargets="ABLStickyService:Make">
+        <MSBuild Projects="ABLSticky.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ABLStickyService">
+        <MSBuild Projects="Service\ABLStickyService.dproj"/>
+    </Target>
+    <Target Name="ABLStickyService:Clean">
+        <MSBuild Projects="Service\ABLStickyService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ABLStickyService:Make">
+        <MSBuild Projects="Service\ABLStickyService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ABLSticky;ABLStickyService"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ABLSticky:Clean;ABLStickyService:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ABLSticky:Make;ABLStickyService:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
