@@ -11,8 +11,10 @@ unit DW.Location.FusedLocation.Android;
 {                                                       }
 {*******************************************************}
 
-
-// *** NOTE ***: Requires dw-fusedlocation.jar (in the Lib folder) to be added to the Libraries node under the Android platform in Project Manager
+// *** NOTES ***:
+//   This unit is considered as being DEPRECATED and is present only for legacy projects that use it - the preferred unit is now: DW.FusedLocation.Android
+//   See also the ABLSticky demo (as featured in CodeRage 2025)
+//   Requires dw-fusedlocation.jar (in the Lib folder) to be added to the Libraries node under the Android platform in Project Manager
 
 interface
 
