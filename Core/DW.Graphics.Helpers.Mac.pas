@@ -172,7 +172,7 @@ var
   LImage: CGImageRef;
 begin
   LOptions := TNSMutableDictionary.Create;
-  {$IF CompilerVersion < 37}
+  {$IF (CompilerVersion < 37) or Defined(OSX)}
   Result := 0;
   LBuffer := 0;
   LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGImageCompatibilityKey);

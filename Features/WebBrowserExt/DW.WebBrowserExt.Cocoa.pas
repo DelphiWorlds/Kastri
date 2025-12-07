@@ -167,7 +167,7 @@ begin
       begin
         if TFile.Exists(LFileName) then
           TFile.Delete(LFileName);
-        {$IF CompilerVersion > 36}
+        {$IF (CompilerVersion > 36) and not Defined(OSX)}
         LError := nil;
         LFileURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(LFileName));
         if not TNSFileManager.Wrap(TNSFileManager.OCClass.defaultManager).moveItemAtURL(AURL, LFileURL, @LError) then
