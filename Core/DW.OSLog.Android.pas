@@ -54,10 +54,16 @@ begin
   case ALogType of
     TLogType.Debug:
       TJLog.JavaClass.d(FTag, LMsg);
-    TLogType.Warning:
-      TJLog.JavaClass.w(FTag, LMsg);
     TLogType.Error:
       TJLog.JavaClass.e(FTag, LMsg);
+    TLogType.Fatal:
+      TJLog.JavaClass.wtf(FTag, LMsg);
+    TLogType.Info:
+      TJLog.JavaClass.i(FTag, LMsg);
+    TLogType.Verbose:
+      TJLog.JavaClass.v(FTag, LMsg);
+    TLogType.Warning:
+      TJLog.JavaClass.w(FTag, LMsg);
   end;
 end;
 

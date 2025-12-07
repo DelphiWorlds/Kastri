@@ -16,7 +16,7 @@ interface
 {$SCOPEDENUMS ON}
 
 type
-  TLogType = (Debug, Warning, Error);
+  TLogType = (Debug, Warning, Error, Info, Verbose, Fatal);
 
   /// <summary>
   ///   Operating System specific logging
@@ -44,6 +44,12 @@ type
     class procedure d(const AFmt: string; const AParams: array of const; const ACloud: Boolean = False); overload; static;
     class procedure e(const AFmt: string; const ACloud: Boolean = False); overload; static;
     class procedure e(const AFmt: string; const AParams: array of const; const ACloud: Boolean = False); overload; static;
+    class procedure f(const AFmt: string; const ACloud: Boolean = False); overload; static;
+    class procedure f(const AFmt: string; const AParams: array of const; const ACloud: Boolean = False); overload; static;
+    class procedure i(const AFmt: string; const ACloud: Boolean = False); overload; static;
+    class procedure i(const AFmt: string; const AParams: array of const; const ACloud: Boolean = False); overload; static;
+    class procedure v(const AFmt: string; const ACloud: Boolean = False); overload; static;
+    class procedure v(const AFmt: string; const AParams: array of const; const ACloud: Boolean = False); overload; static;
     class procedure w(const AFmt: string; const ACloud: Boolean = False); overload; static;
     class procedure w(const AFmt: string; const AParams: array of const; const ACloud: Boolean = False); overload; static;
     /// <summary>
@@ -66,7 +72,7 @@ type
   end;
 
 const
-  cLogTypeCaptions: array[TLogType] of string = ('DEBUG', 'WARN', 'ERROR');
+  cLogTypeCaptions: array[TLogType] of string = ('DEBUG', 'WARN', 'ERROR', 'INFO', 'VERBOSE', 'FATAL');
 
 implementation
 
@@ -117,6 +123,22 @@ begin
   {$ENDIF}
   if LUseTimestamp then
     Result := Format('%s - %s', [FormatDateTime('yyyy/mm/dd hh:nn:ss.zzz', Now), Result]);
+end;
+
+class procedure TOSLog.v(const AFmt: string; const ACloud: Boolean = False);
+begin
+  if FEnabled then
+    TPlatformOSLog.Log(TLogType.Verbose, FormatMsg(ts(AFmt), []));
+end;
+
+class procedure TOSLog.v(const AFmt: string; const AParams: array of const; const ACloud: Boolean = False);
+begin
+  if FEnabled then
+  begin
+    TPlatformOSLog.Log(TLogType.Verbose, FormatMsg(ts(AFmt), AParams));
+    if ACloud then
+      LogCloud(AFmt, AParams, TLogType.Debug);
+   end;
 end;
 
 class procedure TOSLog.LogCloud(AFmt: string; const AParams: array of const; const ALogType: TLogType);
@@ -194,6 +216,22 @@ begin
   end;
 end;
 
+class procedure TOSLog.f(const AFmt: string; const ACloud: Boolean);
+begin
+  if FEnabled then
+    TPlatformOSLog.Log(TLogType.Fatal, FormatMsg(ts(AFmt), []));
+end;
+
+class procedure TOSLog.f(const AFmt: string; const AParams: array of const; const ACloud: Boolean);
+begin
+  if FEnabled then
+  begin
+    TPlatformOSLog.Log(TLogType.Fatal, FormatMsg(ts(AFmt), AParams));
+    if ACloud then
+      LogCloud(AFmt, AParams, TLogType.Fatal);
+  end;
+end;
+
 class procedure TOSLog.w(const AFmt: string; const ACloud: Boolean = False);
 begin
   if FEnabled then
@@ -221,6 +259,22 @@ begin
   {$ELSE}
   Result := '';
   {$ENDIF}
+end;
+
+class procedure TOSLog.i(const AFmt: string; const AParams: array of const; const ACloud: Boolean);
+begin
+  if FEnabled then
+  begin
+    TPlatformOSLog.Log(TLogType.Info, FormatMsg(ts(AFmt), AParams));
+    if ACloud then
+      LogCloud(AFmt, AParams, TLogType.Info);
+  end;
+end;
+
+class procedure TOSLog.i(const AFmt: string; const ACloud: Boolean);
+begin
+  if FEnabled then
+    TPlatformOSLog.Log(TLogType.Info, FormatMsg(ts(AFmt), []));
 end;
 
 class procedure TOSLog.Trace;
