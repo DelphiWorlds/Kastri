@@ -24,8 +24,6 @@ type
   ///   DO NOT ADD ANY FMX UNITS TO THESE FUNCTIONS
   /// </remarks>
   TPlatformOSLog = record
-  private
-    class var FTag: JString;
   public
     class function GetTrace: string; static;
     class procedure Log(const ALogType: TLogType; const AMsg: string); static;
@@ -46,24 +44,23 @@ uses
 
 class procedure TPlatformOSLog.Log(const ALogType: TLogType; const AMsg: string);
 var
-  LMsg: JString;
+  LTag, LMsg: JString;
 begin
-  if FTag = nil then
-    FTag := StringToJString(TOSLog.Tag);
+  LTag := StringToJString(TOSLog.Tag);
   LMsg := StringToJString(AMsg);
   case ALogType of
     TLogType.Debug:
-      TJLog.JavaClass.d(FTag, LMsg);
+      TJLog.JavaClass.d(LTag, LMsg);
     TLogType.Error:
-      TJLog.JavaClass.e(FTag, LMsg);
+      TJLog.JavaClass.e(LTag, LMsg);
     TLogType.Fatal:
-      TJLog.JavaClass.wtf(FTag, LMsg);
+      TJLog.JavaClass.wtf(LTag, LMsg);
     TLogType.Info:
-      TJLog.JavaClass.i(FTag, LMsg);
+      TJLog.JavaClass.i(LTag, LMsg);
     TLogType.Verbose:
-      TJLog.JavaClass.v(FTag, LMsg);
+      TJLog.JavaClass.v(LTag, LMsg);
     TLogType.Warning:
-      TJLog.JavaClass.w(FTag, LMsg);
+      TJLog.JavaClass.w(LTag, LMsg);
   end;
 end;
 
