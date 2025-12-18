@@ -303,6 +303,7 @@ begin
   {$ELSE}
   FDefaultDownloadsFolder := TPath.Combine(TPath.Combine(TPath.GetSharedDocumentsPath, TPathHelper.GetAppName), 'Downloads');
   {$ENDIF}
+  AddDownloadableMimeTypes;
 end;
 
 procedure TWebBrowserExt.AddDownloadableMimeTypes;

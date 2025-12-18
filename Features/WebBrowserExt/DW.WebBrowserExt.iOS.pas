@@ -26,31 +26,40 @@ uses
 type
   TPlatformWebBrowserExt = class;
 
-  TWebBrowserExtNavigationDelegate = class(TOCLocal, WKNavigationDelegateSlim)
+  TWebBrowserExtNavigationDelegate = class(TOCLocal, WKNavigationDelegateEx)
   private
+    FDownloadDelegate: TDownloadDelegate;
     FPlatformWebBrowserExt: TPlatformWebBrowserExt;
     FWebViewNavigationDelegate: WKNavigationDelegateSlim;
   public
-    { WKNavigationDelegateSlim }
-    [MethodName('webView:decidePolicyForNavigationAction:decisionHandler:')]
-    procedure webViewDecidePolicyForNavigationAction(webView: WKWebView; navigationAction: WKNavigationAction;
+    { WKNavigationDelegateEx }
+    procedure webView(webView: WKWebView; didFailProvisionalNavigation: WKNavigation; withError: NSError); overload; cdecl;
+    procedure webView(webView: WKWebView; navigationResponse: WKNavigationResponse; didBecomeDownload: WKDownload); overload; cdecl;
+    procedure webView(webView: WKWebView; didReceiveAuthenticationChallenge: NSURLAuthenticationChallenge; completionHandler: Pointer); overload; cdecl;
+    procedure webView(webView: WKWebView; navigationAction: WKNavigationAction; didBecomeDownload: WKDownload); overload; cdecl;
+    // procedure webView(webView: WKWebView; shouldGoToBackForwardListItem: WKBackForwardListItem; willUseInstantBack: Boolean;
+    //   completionHandler: Pointer); overload; cdecl;
+    procedure webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer); overload; cdecl;
+    procedure webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; preferences: WKWebpagePreferences;
       decisionHandler: Pointer); overload; cdecl;
-    [MethodName('webView:decidePolicyForNavigationResponse:decisionHandler:')]
-    procedure webViewDecidePolicyForNavigationResponse(webView: WKWebView; navigationResponse: WKNavigationResponse;
-      decisionHandler: Pointer); cdecl;
+    procedure webView(webView: WKWebView; decidePolicyForNavigationResponse: WKNavigationResponse; decisionHandler: Pointer); overload; cdecl;
+    procedure webView(webView: WKWebView; didStartProvisionalNavigation: WKNavigation); overload; cdecl;
+    // [MethodName('webView:authenticationChallenge:shouldAllowDeprecatedTLS:')]
+    // procedure webViewAuthenticationChallenge(webView: WKWebView; authenticationChallenge: NSURLAuthenticationChallenge;
+    //   shouldAllowDeprecatedTLS: Pointer); cdecl;
+    [MethodName('webView:didCommitNavigation:')]
+    procedure webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation); cdecl;
     [MethodName('webView:didFailNavigation:withError:')]
-    procedure webViewDidFailNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError); cdecl;
-    [MethodName('webView:didFailProvisionalNavigation:withError:')]
-    procedure webViewDidFailProvisionalNavigation(webView: WKWebView; navigation: WKNavigation; error: NSError); cdecl;
+    procedure webViewDidFailNavigation(webView: WKWebView; didFailNavigation: WKNavigation; withError: NSError); cdecl;
     [MethodName('webView:didFinishNavigation:')]
-    procedure webViewDidFinishNavigation(webView: WKWebView; navigation: WKNavigation); cdecl;
-    [MethodName('webView:didReceiveAuthenticationChallenge:completionHandler:')]
-    procedure webViewDidReceiveAuthenticationChallenge(webView: WKWebView; challenge: NSURLAuthenticationChallenge;
-      completionHandler: Pointer); cdecl;
-    [MethodName('webView:didStartProvisionalNavigation:')]
-    procedure webViewDidStartProvisionalNavigation(webView: WKWebView; navigation: WKNavigation); cdecl;
+    procedure webViewDidFinishNavigation(webView: WKWebView; didFinishNavigation: WKNavigation); cdecl;
+    [MethodName('webView:didReceiveServerRedirectForProvisionalNavigation:')]
+    procedure webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView;
+      didReceiveServerRedirectForProvisionalNavigation: WKNavigation); cdecl;
+    // procedure webViewWebContentProcessDidTerminate(webView: WKWebView); cdecl;
   public
     constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+    destructor Destroy; override;
   end;
 
   // The following class is yet to be in use:
@@ -119,8 +128,16 @@ begin
   FPlatformWebBrowserExt := APlatformWebBrowserExt;
   // The following line converts the delegate object id into the desired interface
   WrapInterface(FPlatformWebBrowserExt.WebView.navigationDelegate, TypeInfo(WKNavigationDelegateSlim), FWebViewNavigationDelegate);
+  FDownloadDelegate := TDownloadDelegate.Create(FPlatformWebBrowserExt);
 end;
 
+destructor TWebBrowserExtNavigationDelegate.Destroy;
+begin
+  FDownloadDelegate.Free;
+  inherited;
+end;
+
+(*
 procedure TWebBrowserExtNavigationDelegate.webViewDecidePolicyForNavigationAction(webView: WKWebView; navigationAction: WKNavigationAction;
   decisionHandler: Pointer);
 var
@@ -183,7 +200,140 @@ procedure TWebBrowserExtNavigationDelegate.webViewDidStartProvisionalNavigation(
 begin
   FWebViewNavigationDelegate.webViewDidStartProvisionalNavigation(webView, navigation);
 end;
+*)
 
+//procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; shouldGoToBackForwardListItem: WKBackForwardListItem;
+//  willUseInstantBack: Boolean; completionHandler: Pointer);
+//begin
+//
+//end;
+
+procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction; decisionHandler: Pointer);
+var
+  LBlockImp: procedure(policy: WKNavigationActionPolicy); cdecl;
+  LURL: string;
+  LPreventDefault: Boolean;
+  LPolicy: WKNavigationActionPolicy;
+begin
+  // Just highjacking this method
+  LURL := NSStrToStr(decidePolicyForNavigationAction.request.URL.absoluteString);
+  LPreventDefault := False;
+  if decidePolicyForNavigationAction.navigationType = WKNavigationTypeLinkActivated then
+    FPlatformWebBrowserExt.DoElementClick(THitTestKind.SrcAnchor, LURL, LPreventDefault);
+  LPolicy := WKNavigationActionPolicyAllow;
+  if LPreventDefault then
+    LPolicy := WKNavigationActionPolicyCancel
+  else if TWKNavigationActionEx.Wrap(decidePolicyForNavigationAction).shouldPerformDownload then
+    LPolicy := WKNavigationActionPolicyDownload;
+  // If preventing the default, tell the OS to cancel
+  // If a download should be performed, do that
+  // Otherwise, fall through to the "hijacked" delegate
+  if LPolicy <> WKNavigationActionPolicyAllow then
+  begin
+    @LBlockImp := imp_implementationWithBlock(decisionHandler);
+    LBlockImp(LPolicy);
+    imp_removeBlock(@LBlockImp);
+  end
+  else
+    FWebViewNavigationDelegate.webViewDecidePolicyForNavigationAction(webView, decidePolicyForNavigationAction, decisionHandler);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; decidePolicyForNavigationAction: WKNavigationAction;
+  preferences: WKWebpagePreferences; decisionHandler: Pointer);
+var
+  LBlockImp: procedure(policy: WKNavigationActionPolicy; ignored: Pointer; preferences: Pointer); cdecl;
+  LPolicy: WKNavigationActionPolicy;
+  LURL: string;
+  LPreventDefault: Boolean;
+begin
+  // Basically repeat the one above, but pass preferences - Delphi is yet to support this, so do not forward to "hijacked" delegate
+  LURL := NSStrToStr(decidePolicyForNavigationAction.request.URL.absoluteString);
+  LPreventDefault := False;
+  if decidePolicyForNavigationAction.navigationType = WKNavigationTypeLinkActivated then
+    FPlatformWebBrowserExt.DoElementClick(THitTestKind.SrcAnchor, LURL, LPreventDefault);
+  LPolicy := WKNavigationActionPolicyAllow;
+  if LPreventDefault then
+    LPolicy := WKNavigationActionPolicyCancel
+  else if TWKNavigationActionEx.Wrap(decidePolicyForNavigationAction).shouldPerformDownload then
+    LPolicy := WKNavigationActionPolicyDownload;
+  @LBlockImp := imp_implementationWithBlock(decisionHandler);
+  LBlockImp(LPolicy, nil, NSObjectToID(preferences));
+  imp_removeBlock(@LBlockImp);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; navigationAction: WKNavigationAction; didBecomeDownload: WKDownload);
+begin
+  didBecomeDownload.setDelegate(FDownloadDelegate.ObjectID);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; navigationResponse: WKNavigationResponse; didBecomeDownload: WKDownload);
+begin
+  didBecomeDownload.setDelegate(FDownloadDelegate.ObjectID);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; didFailProvisionalNavigation: WKNavigation; withError: NSError);
+begin
+  FWebViewNavigationDelegate.webViewDidFailProvisionalNavigation(webView, didFailProvisionalNavigation, withError);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; didReceiveAuthenticationChallenge: NSURLAuthenticationChallenge;
+  completionHandler: Pointer);
+begin
+  FWebViewNavigationDelegate.webViewDidReceiveAuthenticationChallenge(webView, didReceiveAuthenticationChallenge, completionHandler);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; didStartProvisionalNavigation: WKNavigation);
+begin
+  FWebViewNavigationDelegate.webViewDidStartProvisionalNavigation(webView, didStartProvisionalNavigation);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webView(webView: WKWebView; decidePolicyForNavigationResponse: WKNavigationResponse;
+  decisionHandler: Pointer);
+var
+  LBlockImp: procedure(policy: WKNavigationActionPolicy); cdecl;
+begin
+//  Log.d('decidePolicyForNavigationResponse > WillDownload');
+  if FPlatformWebBrowserExt.WillDownload(decidePolicyForNavigationResponse.response) then
+  begin
+    @LBlockImp := imp_implementationWithBlock(decisionHandler);
+    LBlockImp(WKNavigationActionPolicyCancel);
+    imp_removeBlock(@LBlockImp);
+  end
+  else
+    FWebViewNavigationDelegate.webViewDecidePolicyForNavigationResponse(webView, decidePolicyForNavigationResponse, decisionHandler);
+end;
+
+//procedure TWebBrowserExtNavigationDelegate.webViewAuthenticationChallenge(webView: WKWebView; authenticationChallenge: NSURLAuthenticationChallenge;
+//  shouldAllowDeprecatedTLS: Pointer);
+//begin
+//
+//end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidCommitNavigation(webView: WKWebView; didCommitNavigation: WKNavigation);
+begin
+  // "Default" delegate for iOS does not support this
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidFailNavigation(webView: WKWebView; didFailNavigation: WKNavigation; withError: NSError);
+begin
+  FWebViewNavigationDelegate.webViewDidFailNavigation(webView, didFailNavigation, withError);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidFinishNavigation(webView: WKWebView; didFinishNavigation: WKNavigation);
+begin
+  FWebViewNavigationDelegate.webViewDidFinishNavigation(webView, didFinishNavigation);
+end;
+
+procedure TWebBrowserExtNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView: WKWebView;
+  didReceiveServerRedirectForProvisionalNavigation: WKNavigation);
+begin
+  // "Default" delegate for iOS does not support this
+end;
+
+//procedure TWebBrowserExtNavigationDelegate.webViewWebContentProcessDidTerminate(webView: WKWebView);
+//begin
+//
+//end;
 { TScriptMessageHandler }
 
 constructor TScriptMessageHandler.Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
