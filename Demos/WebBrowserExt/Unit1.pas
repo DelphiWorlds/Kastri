@@ -132,11 +132,10 @@ begin
   //   Which part(s) of the Uri should be used for the filename
   //   What to do if AFileExt ends up being blank (not a valid mime type, or whatever other reason)
   //   How to construct AFileName as a whole.
-  Memo.Lines.Add(Format('> WebBrowserExtDownloadStartHandler - AUri: %s, AFileExt: %s', [AUri, AFileExt]));
+  Memo.Lines.Add(Format('> WebBrowserExtDownloadStartHandler - AUri: %s, AFileName: %s, AFileExt: %s', [AUri, AFileName, AFileExt]));
   // This variation provides just the filename
-  AFileName := TPath.GetFileNameWithoutExtension(AUri) + AFileExt;
-  // This variation includes a folder in the filename
-  // AFileName := TPath.Combine(TPath.GetDocumentsPath, TPath.GetFileNameWithoutExtension(AUri) + AFileExt);
+  if not AFileName.EndsWith(AFileExt) then
+    AFileName := TPath.ChangeExtension(AFileName, AFileExt);
 end;
 
 procedure TForm1.WebBrowserExtDownloadStateChangeHandler(Sender: TObject; const AFileName: string; const AState: TDownloadState);
@@ -164,7 +163,7 @@ begin
       // Clear the params
       LURI.Params := [];
       Memo.Lines.Add(Format('Download URL is: %s', [LURI.ToString]));
-      APreventDefault := True;
+      APreventDefault := False;
     end;
   end;
 end;
