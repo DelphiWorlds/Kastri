@@ -219,7 +219,7 @@ begin
   LFolder := TPath.GetDirectoryName(FFileName);
   if not LFolder.IsEmpty and ForceDirectories(LFolder) then
   begin
-    {$IF (CompilerVersion > 36) or Defined(OSX)}
+    {$IF (CompilerVersion > 36) and not Defined(OSX)}
     LURL := TNSURL.OCClass.fileURLWithPath(StrToNSStr(FFileName));
     {$ELSE}
     LURL := TNSURL.Wrap(TNSURL.OCClass.fileURLWithPath(StrToNSStr(FFileName)));
