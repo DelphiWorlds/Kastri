@@ -4,15 +4,15 @@
 
 Advertising implementation, specifically for AdMob (Google Mobile Ads)
 
-Support for User Messsaging Platform (UMP) has been added (Android support for **Delphi 12 only**, iOS support for Delphi 11.x and Delphi 12), which is required by Google in some geographic locations. This is **enabled by default**, and will require configuration in your [AdMob settings](https://apps.admob.com).
+Support for User Messsaging Platform (UMP) has been added, which is required by Google in some geographic locations. This is **enabled by default**, and will require configuration in your [AdMob settings](https://apps.admob.com).
 
 See [below](#user-messaging-platform-ump-support) for further information about the UMP support.
 
 ## Supported Delphi versions
 
-Delphi 12.x, Delphi 11.3 (limited support)
+Delphi 13.x, 12.x
 
-**NOTE: The project for Delphi 12 is `AdTestD12.dproj` and the project for Delphi 11.x is `AdTest.dproj`**
+**NOTE: The project for Delphi 12 or later is `AdTestD12.dproj` and the project for Delphi 11.x is `AdTest.dproj`** (Delphi 11.x is considered legacy here)
 
 ## Usage Notes
 
@@ -37,8 +37,6 @@ The former method may result in a poor user experience, given that it takes a li
 A package containing the component is available as [KastriAdMob.dproj](https://github.com/DelphiWorlds/Kastri/blob/master/Packages/KastriAdMob.dproj) in the Packages folder of Kastri.
 
 ### User Messaging Platform (UMP) support
-
-As described in the update info, UMP support for Android is for **Delphi 12 only**. It should work on iOS for Delphi 12 and Delphi 11.x.
 
 As [required by Google](https://support.google.com/admob/answer/10114014), if using AdMob, your app must show a consent message before ads can be shown. Kastri supports this via the `DW.AdMob` unit. Call RequestConsent when your app is ready to request constent.
 
@@ -75,18 +73,19 @@ See the `TForm1.Create` method in the demo for examples.
 
 If creating your own project, you will need to add the supporting library:
 
-* For Delphi 11.x: [`dw-admob.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob.jar) 
-* For Delphi 12.x: [`dw-admob-3.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob-3.0.0.jar)
+* For Delphi 11.x (considered legacy, here): [`dw-admob.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob.jar) 
+* For Delphi 12.x or later: [`dw-admob-3.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob-3.0.0.jar)
 
-to the Libraries node under the Android 32-bit platform in Project Manager
+to the Libraries node under the Android 32-bit platform in Project Manager. To do this, in Project Manager:
 
-**Note**:
-
-Due to a bug in **Delphi 11.3 ONLY**, if you need to compile for Android 64-bit, you will need to either apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the required jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
+1. Expand the Target Platforms
+2. Expand Android 32-bit
+3. Right-click the Libraries node and click Add..
+4. Select the relevant .jar file and click Open
 
 #### Android Entitlements
 
-Ensure your project has the `AdMob Service` enabled. This adds Google Play services metadata and the Ads activity to the manifest.
+Ensure your project has the `AdMob Service` enabled in the Entitlement List in Project Options. This adds Google Play services metadata and the Ads activity to the manifest.
 
 #### Android Permission
 
@@ -94,13 +93,13 @@ Ensure your project has the `Access Network State` permission in Project Options
 
 #### Generating a jar that contains R classes
 
-This process is required only if you are **not disabling UMP support** ([see above](#user-messaging-platform-ump-support))
+This process is required **ONLY if you are using UMP support** ([see above](#user-messaging-platform-ump-support))
 
-User Messaging Platform (UMP) requires `R` classes associated with the play-services-ads-22.2.0.jar file that is part of the "default" libraries used by Delphi 12.x. When using Android Studio, these are generated automatically; with Delphi, they need to be generated separately. 
+User Messaging Platform (UMP) requires `R` classes associated with the play-services-ads-22.2.0.jar file that is part of the "default" libraries used by Delphi 12.x **or later**. When using Android Studio, these are generated automatically; with Delphi, they need to be generated separately. 
 
 This process could be done manually via the command line or in a batch file, however an easier way is through the use of [Codex](https://github.com/DelphiWorlds/Codex). Once you install Codex, you can follow these steps:
 
-1. Build and deploy your project at least once. This step is important for merging the resources Delphi creates, with resources in the Play Services Base library
+1. Build and deploy your project **at least once**. This step is important for merging the resources Delphi creates, with resources in the Play Services Base library
 2. From the Codex menu in Delphi, in the Android Tools section, use the Download Package function:
 
    <img src="./Screenshots/CodexPackageDownload.png" alt="Codex Package Download" height="200">
@@ -128,6 +127,10 @@ This process could be done manually via the command line or in a batch file, how
 4. Rebuild/deploy your project
 
 This adds a library with the same name as the project, with an extension of `.R.jar`, to the Libraries node of the Android 32-bit target in Project Manager. If you compile for Android 64-bit, the jar will still be compiled in with your app.
+
+#### Ad UnitIds
+
+If you are using Ad UnitIds that are **not** for testing, please see [this section](#using-non-test-ad-unitids).
 
 ### iOS
 
