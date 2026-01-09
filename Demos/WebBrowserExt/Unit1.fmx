@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 1324
+  ClientHeight = 965
   ClientWidth = 1832
   FormFactor.Width = 320
   FormFactor.Height = 480
@@ -14,7 +14,7 @@ object Form1: TForm1
     Padding.Top = 6.000000000000000000
     Padding.Right = 6.000000000000000000
     Padding.Bottom = 6.000000000000000000
-    Position.Y = 1274.000000000000000000
+    Position.Y = 915.000000000000000000
     Size.Width = 1832.000000000000000000
     Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
@@ -22,7 +22,7 @@ object Form1: TForm1
     object ExecJSButton: TButton
       Align = Left
       Margins.Right = 12.000000000000000000
-      Position.X = 193.000000000000000000
+      Position.X = 161.000000000000000000
       Position.Y = 6.000000000000000000
       Size.Width = 99.000000000000000000
       Size.Height = 38.000000000000000000
@@ -43,23 +43,23 @@ object Form1: TForm1
       Size.PlatformDefault = False
       TabOrder = 0
     end
-    object DownloadButton: TButton
+    object WBExtExamplesButton: TButton
       Align = Left
       Margins.Right = 12.000000000000000000
       Position.X = 6.000000000000000000
       Position.Y = 6.000000000000000000
-      Size.Width = 175.000000000000000000
+      Size.Width = 143.000000000000000000
       Size.Height = 38.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
-      Text = 'Download Test'
-      OnClick = DownloadButtonClick
+      Text = 'Examples Test'
+      OnClick = WBExtExamplesButtonClick
     end
   end
   object WebBrowser: TWebBrowser
     Align = Client
     Size.Width = 1832.000000000000000000
-    Size.Height = 1101.000000000000000000
+    Size.Height = 742.000000000000000000
     Size.PlatformDefault = False
     WindowsEngine = EdgeOnly
     OnDidFinishLoad = WebBrowserDidFinishLoad
@@ -104,7 +104,7 @@ object Form1: TForm1
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
     Align = Bottom
-    Position.Y = 1150.000000000000000000
+    Position.Y = 791.000000000000000000
     Size.Width = 1832.000000000000000000
     Size.Height = 124.000000000000000000
     Size.PlatformDefault = False

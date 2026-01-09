@@ -20,13 +20,13 @@ type
     PrintButton: TButton;
     ActionList: TActionList;
     PrintAction: TAction;
-    DownloadButton: TButton;
+    WBExtExamplesButton: TButton;
     procedure ExecJSButtonClick(Sender: TObject);
     procedure GoButtonClick(Sender: TObject);
     procedure WebBrowserDidFinishLoad(ASender: TObject);
     procedure PrintActionExecute(Sender: TObject);
     procedure PrintActionUpdate(Sender: TObject);
-    procedure DownloadButtonClick(Sender: TObject);
+    procedure WBExtExamplesButtonClick(Sender: TObject);
   private
     FWebBrowserExt: TWebBrowserExt;
     FIsLoggingIn: Boolean;
@@ -34,6 +34,7 @@ type
     procedure WebBrowserExtDownloadStartHandler(Sender: TObject; const AUri, AFileExt: string; var AFileName: string);
     procedure WebBrowserExtDownloadStateChangeHandler(Sender: TObject; const AFileName: string; const AState: TDownloadState);
     procedure WebBrowserExtElementClickHandler(Sender: TObject; const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean);
+    procedure WebBrowserExtStringMessagePostedHandler(Sender: TObject; const AData: string; var AReply: string);
     procedure WebBrowserShouldStartLoadWithRequestHandler(Sender: TObject; const AURL: string);
   public
     constructor Create(AOwner: TComponent); override;
@@ -84,9 +85,14 @@ begin
   inherited;
   WebBrowser.OnShouldStartLoadWithRequest := WebBrowserShouldStartLoadWithRequestHandler;
   FWebBrowserExt := TWebBrowserExt.Create(WebBrowser);
+  // *** WARNING ***: Allowing ANY origins (e.g. ['*'] can be a security risk
+  // Preference is to allow only origins that are known to be secure
+  FWebBrowserExt.SetWebListenerParams('WBExt', ['https://delphiworlds.com']);
+  // FWebBrowserExt.SetWebListenerParams('WBExt', ['*']);
   FWebBrowserExt.OnElementClick := WebBrowserExtElementClickHandler;
   FWebBrowserExt.OnDownloadStart := WebBrowserExtDownloadStartHandler;
   FWebBrowserExt.OnDownloadStateChange := WebBrowserExtDownloadStateChangeHandler;
+  FWebBrowserExt.OnStringMessagePosted := WebBrowserExtStringMessagePostedHandler;
 end;
 
 destructor TForm1.Destroy;
@@ -95,8 +101,9 @@ begin
   inherited;
 end;
 
-procedure TForm1.DownloadButtonClick(Sender: TObject);
+procedure TForm1.WBExtExamplesButtonClick(Sender: TObject);
 begin
+  FWebBrowserExt.ClearCache;
   URLEdit.Text := 'https://delphiworlds.com/files/Example.html';
   FIsPageLoaded := False;
   WebBrowser.Navigate(URLEdit.Text);
@@ -166,6 +173,11 @@ begin
       APreventDefault := False;
     end;
   end;
+end;
+
+procedure TForm1.WebBrowserExtStringMessagePostedHandler(Sender: TObject; const AData: string; var AReply: string);
+begin
+  Memo.Lines.Add('JavaScript message received: '#13#10 + AData);
 end;
 
 procedure TForm1.ExecJSButtonClick(Sender: TObject);
