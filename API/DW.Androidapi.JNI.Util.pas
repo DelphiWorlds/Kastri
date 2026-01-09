@@ -26,6 +26,7 @@ type
   JFormatter = interface;
   JInflater = interface;
   JLinkedHashSet = interface;
+  JLruCache = interface;
   JMap_Entry = interface;
   JNavigableMap = interface;
   JNavigableSet = interface;
@@ -34,6 +35,32 @@ type
   JTimer = interface;
   JTreeMap = interface;
   JStatus = interface;
+
+  JLruCacheClass = interface(JObjectClass)
+    ['{2566CDD7-E1D0-4BFC-A807-75AD197DDC4A}']
+    {class} function init(int: Integer): JLruCache; cdecl;
+  end;
+
+  [JavaSignature('android/util/LruCache')]
+  JLruCache = interface(JObject)
+    ['{41F957DE-AB59-413C-8A82-B9DBCEEB4C54}']
+    function createCount: Integer; cdecl;
+    procedure evictAll; cdecl;
+    function evictionCount: Integer; cdecl;
+    function get(k: JObject): JObject; cdecl;
+    function hitCount: Integer; cdecl;
+    function maxSize: Integer; cdecl;
+    function missCount: Integer; cdecl;
+    function put(k: JObject; v: JObject): JObject; cdecl;
+    function putCount: Integer; cdecl;
+    function remove(k: JObject): JObject; cdecl;
+    procedure resize(int: Integer); cdecl;
+    function size: Integer; cdecl;
+    function snapshot: JMap; cdecl;
+    function toString: JString; cdecl;
+    procedure trimToSize(int: Integer); cdecl;
+  end;
+  TJLruCache = class(TJavaGenericImport<JLruCacheClass, JLruCache>) end;
 
   JExecutorServiceClass = interface(JExecutorClass)
     ['{E8B019B7-07FA-4DCB-A717-56C4D8985442}']

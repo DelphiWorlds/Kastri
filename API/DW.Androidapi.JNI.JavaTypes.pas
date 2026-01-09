@@ -24,7 +24,34 @@ type
   JFilterInputStream = interface;
   JFilterOutputStream = interface;
   JInputStreamReader = interface;
+  JInvocationHandler = interface;
   JStringWriter = interface;
+  JUnsupportedOperationException = interface;
+
+  JInvocationHandlerClass = interface(IJavaClass)
+    ['{6A007CA5-3D80-4B09-9FFC-B88E3C887FB2}']
+  end;
+
+  [JavaSignature('java/lang/reflect/InvocationHandler')]
+  JInvocationHandler = interface(IJavaInstance)
+    ['{C23EFD3B-082E-4C1E-8E2C-BA2AD7C6F02D}']
+    function invoke(proxy: JObject; method: JMethod; args: TJavaObjectArray<JObject>): JObject; cdecl;
+  end;
+  TJInvocationHandler = class(TJavaGenericImport<JInvocationHandlerClass, JInvocationHandler>) end;
+
+  JUnsupportedOperationExceptionClass = interface(JRuntimeExceptionClass)
+    ['{D8EA4F2D-37BE-45DD-9A06-535FFB278BA3}']
+    {class} function init(throwable: JThrowable): JUnsupportedOperationException; overload; cdecl;
+    {class} function init(string_1: JString; throwable: JThrowable): JUnsupportedOperationException; overload; cdecl;
+    {class} function init(string_1: JString): JUnsupportedOperationException; overload; cdecl;
+    {class} function init: JUnsupportedOperationException; overload; cdecl;
+  end;
+
+  [JavaSignature('java/lang/UnsupportedOperationException')]
+  JUnsupportedOperationException = interface(JRuntimeException)
+    ['{DA84580C-05A0-4B39-AE12-9AA6688463A1}']
+  end;
+  TJUnsupportedOperationException = class(TJavaGenericImport<JUnsupportedOperationExceptionClass, JUnsupportedOperationException>) end;
 
   JFilterOutputStreamClass = interface(JOutputStreamClass)
     ['{9D236492-DD2D-4445-8A05-170AEA2891F2}']
