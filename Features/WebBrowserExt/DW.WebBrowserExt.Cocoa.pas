@@ -167,13 +167,11 @@ type
 
   TPlatformCocoaWebBrowserExt = class(TCustomPlatformWebBrowserExt)
   private
-    FDownloadableMimeTypes: TArray<string>;
     FDownloadSession: NSURLSession;
     FDownloadTasks: TDownloadTasks;
     FURLSessionDelegate: TURLSessionDelegate;
     procedure CreateDownloadSession;
   protected
-    function CanDownload(const AMimeType: string): Boolean;
     procedure DownloadStateChange(const ATask: NSURLSessionTask; const AURL: NSURL; const AError: NSError);
     function WillDownload(const AResponse: NSURLResponse): Boolean;
   public
@@ -285,11 +283,6 @@ begin
   {$ENDIF}
 end;
 
-function TPlatformCocoaWebBrowserExt.CanDownload(const AMimeType: string): Boolean;
-begin
-  Result := IndexText(AMimeType, DownloadableMimeTypes) > -1;
-end;
-
 procedure TPlatformCocoaWebBrowserExt.DownloadStateChange(const ATask: NSURLSessionTask; const AURL: NSURL; const AError: NSError);
 var
   LFileName: string;
@@ -345,7 +338,7 @@ begin
 //  TOSLog.d('+TPlatformCocoaWebBrowserExt.WillDownload');
   Result := False;
   LMimeType := NSStrToStr(AResponse.MIMEType);
-  if CanDownload(LMimeType) then
+  if IsMatchingMimeType(LMimeType) then
   begin
     TOSLog.d('> DoDownloadStart');
     DoDownloadStart(NSStrToStr(AResponse.URL.absoluteString), LMimeType, LFileName);
