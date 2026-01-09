@@ -88,6 +88,8 @@ Settings.bundle
 **/iOSDevice64/Release/
 **/OSX64/Debug/
 **/OSX64/Release/
+**/OSXARM64/Debug/
+**/OSXARM64/Release/
 **/Win32/Debug/
 **/Win32/Release/
 **/Win64/Debug/
