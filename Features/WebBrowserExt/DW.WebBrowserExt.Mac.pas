@@ -17,11 +17,11 @@ uses
   // RTL
   System.Classes,
   // macOS
-  Macapi.WebKit, Macapi.Foundation, Macapi.ObjectiveC,
+  Macapi.WebKit, Macapi.Foundation, Macapi.ObjectiveC, Macapi.AppKit,
   // FMX
   FMX.WebBrowser.Delegate.Mac,
   // DW
-  DW.WebBrowserExt, DW.WebBrowserExt.Cocoa, DW.JavaScript;
+  DW.WebBrowserExt, DW.WebBrowserExt.Cocoa, DW.JavaScript, DW.Macapi.AppKit;
 
 type
   TPlatformWebBrowserExt = class;
@@ -62,11 +62,46 @@ type
     destructor Destroy; override;
   end;
 
+  TWebBrowserExtUIDelegate = class(TOCLocal, WKUIDelegateEx)
+  private
+    FPlatformWebBrowserExt: TPlatformWebBrowserExt;
+    // Weird thing: For most completion blocks, if only one parameter, the type is the actual OC type (here it would be NSArray)
+    // In this case, for some reason it needs to be a Pointer
+    FRunOpenPanelBlock: procedure(urls: Pointer); cdecl;
+    FRunOpenPanel: NSOpenPanel;
+    FWebViewUIDelegate: WKUIDelegate;
+    procedure OpenPanelCompletionHandler(result: NSModalResponse);
+  public
+    { WKUIDelegateEx }
+    [MethodName('webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:')]
+    function webViewCreateWebViewWithConfigurationForNavigationActionWindowFeatures(webView: WKWebView;
+      createWebViewWithConfiguration: WKWebViewConfiguration; forNavigationAction: WKNavigationAction;
+      windowFeatures: WKWindowFeatures): WKWebView; cdecl;
+    [MethodName('webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:')]
+    procedure webViewRunJavaScriptAlertPanelWithMessageInitiatedByFrameCompletionHandler(webView: WKWebView;
+      runJavaScriptAlertPanelWithMessage: NSString; initiatedByFrame: WKFrameInfo;
+      completionHandler: Pointer); cdecl;
+    [MethodName('webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:')]
+    procedure webViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrameCompletionHandler(webView: WKWebView;
+      runJavaScriptConfirmPanelWithMessage: NSString; initiatedByFrame: WKFrameInfo;
+      completionHandler: Pointer); cdecl;
+    [MethodName('webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:')]
+    procedure webViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrameCompletionHandler
+      (webView: WKWebView; runJavaScriptTextInputPanelWithPrompt: NSString; defaultText: NSString;
+      initiatedByFrame: WKFrameInfo; completionHandler: Pointer); cdecl;
+    procedure webView(webView: WKWebView; runOpenPanelWithParameters: WKOpenPanelParameters; initiatedByFrame: WKFrameInfo;
+      completionHandler: Pointer); overload; cdecl;
+  public
+    constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+  end;
+
   TPlatformWebBrowserExt = class(TPlatformCocoaWebBrowserExt)
   private
     FJavaScriptResultHandler: TJavaScriptResultProc;
     FNavigationDelegate: TWebBrowserExtNavigationDelegate;
+    FUIDelegate: TWebBrowserExtUIDelegate;
     FWebView: WKWebView;
+    procedure NOPCompletionHandler;
     procedure JavaScriptCompletionHandler(obj: Pointer; error: NSError);
   protected
     procedure ClearCache(const ADataKinds: TCacheDataKinds); override;
@@ -310,10 +345,72 @@ begin
   FWebViewNavigationDelegate.webViewDidReceiveServerRedirectForProvisionalNavigation(webView, didReceiveServerRedirectForProvisionalNavigation);
 end;
 
-//procedure TWebBrowserExtNavigationDelegate.webViewWebContentProcessDidTerminate(webView: WKWebView);
-//begin
-//
-//end;
+{ TWebBrowserExtUIDelegate }
+
+constructor TWebBrowserExtUIDelegate.Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+begin
+  inherited Create;
+  FPlatformWebBrowserExt := APlatformWebBrowserExt;
+  WrapInterface(FPlatformWebBrowserExt.WebView.UIDelegate, TypeInfo(WKUIDelegate), FWebViewUIDelegate);
+end;
+
+procedure TWebBrowserExtUIDelegate.webView(webView: WKWebView; runOpenPanelWithParameters: WKOpenPanelParameters; initiatedByFrame: WKFrameInfo;
+  completionHandler: Pointer);
+begin
+  @FRunOpenPanelBlock := imp_implementationWithBlock(completionHandler);
+  FRunOpenPanel := TNSOpenPanel.Wrap(TNSOpenPanel.OCClass.openPanel);
+  FRunOpenPanel.setCanChooseFiles(True);
+  FRunOpenPanel.setCanChooseDirectories(False);
+  FRunOpenPanel.setAllowsMultipleSelection(runOpenPanelWithParameters.allowsMultipleSelection);
+  FRunOpenPanel.setAllowedFileTypes(nil); // NOTEL This allows ANY file types.
+  FRunOpenPanel.beginSheetModalForWindow(FPlatformWebBrowserExt.WebView.window, OpenPanelCompletionHandler);
+end;
+
+procedure TWebBrowserExtUIDelegate.OpenPanelCompletionHandler(result: NSModalResponse);
+var
+  LURLs: Pointer;
+begin
+  LURLs := nil;
+  if result = NSModalResponseOK then
+  begin
+    if FRunOpenPanel.URLs = nil then
+      LURLs := TNSArray.OCClass.arrayWithObject(NSObjectToID(FRunOpenPanel.URL))
+    else
+      LURLs := NSObjectToID(FRunOpenPanel.URLs);
+  end;
+  FRunOpenPanelBlock(LURLs);
+  imp_removeBlock(@FRunOpenPanelBlock);
+  FRunOpenPanelBlock := nil;
+  FRunOpenPanel := nil;
+end;
+
+function TWebBrowserExtUIDelegate.webViewCreateWebViewWithConfigurationForNavigationActionWindowFeatures(webView: WKWebView;
+  createWebViewWithConfiguration: WKWebViewConfiguration; forNavigationAction: WKNavigationAction; windowFeatures: WKWindowFeatures): WKWebView;
+begin
+  FWebViewUIDelegate.webViewCreateWebViewWithConfigurationForNavigationActionWindowFeatures(webView, createWebViewWithConfiguration,
+    forNavigationAction, windowFeatures);
+end;
+
+procedure TWebBrowserExtUIDelegate.webViewRunJavaScriptAlertPanelWithMessageInitiatedByFrameCompletionHandler(webView: WKWebView;
+  runJavaScriptAlertPanelWithMessage: NSString; initiatedByFrame: WKFrameInfo; completionHandler: Pointer);
+begin
+  FWebViewUIDelegate.webViewRunJavaScriptAlertPanelWithMessageInitiatedByFrameCompletionHandler(webView, runJavaScriptAlertPanelWithMessage,
+    initiatedByFrame, completionHandler);
+end;
+
+procedure TWebBrowserExtUIDelegate.webViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrameCompletionHandler(webView: WKWebView;
+  runJavaScriptConfirmPanelWithMessage: NSString; initiatedByFrame: WKFrameInfo; completionHandler: Pointer);
+begin
+   FWebViewUIDelegate.webViewRunJavaScriptConfirmPanelWithMessageInitiatedByFrameCompletionHandler(webView, runJavaScriptConfirmPanelWithMessage,
+     initiatedByFrame, completionHandler);
+end;
+
+procedure TWebBrowserExtUIDelegate.webViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrameCompletionHandler(webView: WKWebView;
+  runJavaScriptTextInputPanelWithPrompt, defaultText: NSString; initiatedByFrame: WKFrameInfo; completionHandler: Pointer);
+begin
+  FWebViewUIDelegate.webViewRunJavaScriptTextInputPanelWithPromptDefaultTextInitiatedByFrameCompletionHandler(webView,
+    runJavaScriptTextInputPanelWithPrompt, defaultText, initiatedByFrame, completionHandler);
+end;
 
 { TPlatformWebBrowserExt }
 
@@ -321,15 +418,23 @@ constructor TPlatformWebBrowserExt.Create(const AWebBrowserExt: TWebBrowserExt);
 begin
   inherited;
   Supports(Browser, WKWebView, FWebView);
-  // Hijack the original navigation delegate
+  // Hijack the original navigation and UI delegates
   FNavigationDelegate := TWebBrowserExtNavigationDelegate.Create(Self);
+  FUIDelegate := TWebBrowserExtUIDelegate.Create(Self);
   FWebView.setNavigationDelegate(FNavigationDelegate.GetObjectID);
+  FWebView.setUIDelegate(FUIDelegate.GetObjectID);
 end;
 
 destructor TPlatformWebBrowserExt.Destroy;
 begin
-  //
+  FNavigationDelegate.Free;
+  FUIDelegate.Free;
   inherited;
+end;
+
+procedure TPlatformWebBrowserExt.NOPCompletionHandler;
+begin
+  // Does nothing
 end;
 
 procedure TPlatformWebBrowserExt.ClearCache(const ADataKinds: TCacheDataKinds);
@@ -364,7 +469,8 @@ begin
   end;
   LDataTypes := TNSSet.Wrap(TNSSet.OCClass.setWithArray(LArray));
   LSinceDate := TNSDate.Wrap(TNSDate.OCClass.dateWithTimeIntervalSince1970(0));
-  TWKWebsiteDataStore.OCClass.defaultDataStore.removeDataOfTypes(LDataTypes, LSinceDate, nil);
+  // NOTE: removeDataOfTypes will call the completion handler, so it cannot be nil
+  TWKWebsiteDataStore.OCClass.defaultDataStore.removeDataOfTypes(LDataTypes, LSinceDate, NOPCompletionHandler);
 end;
 
 procedure TPlatformWebBrowserExt.ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc);

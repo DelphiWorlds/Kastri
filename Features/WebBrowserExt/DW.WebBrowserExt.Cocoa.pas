@@ -132,6 +132,23 @@ type
   end;
   TWKNavigationActionEx = class(TOCGenericImport<WKNavigationActionClass, WKNavigationActionEx>) end;
 
+  WKOpenPanelParametersClass = interface(NSObjectClass)
+    ['{6BA8152A-5089-411E-84C5-1E3865938DCA}']
+  end;
+
+  WKOpenPanelParameters = interface(NSObject)
+    ['{D9FEF6AE-CF7F-49B7-B729-75466B2BD1B9}']
+    function allowsDirectories: Boolean; cdecl;
+    function allowsMultipleSelection: Boolean; cdecl;
+  end;
+  TWKOpenPanelParameters = class(TOCGenericImport<WKOpenPanelParametersClass, WKOpenPanelParameters>) end;
+
+  WKUIDelegateEx = interface(WKUIDelegate)
+    ['{3E007B36-95A1-4852-A675-CA2BCCFB95F5}']
+    procedure webView(webView: WKWebView; runOpenPanelWithParameters: WKOpenPanelParameters; initiatedByFrame: WKFrameInfo;
+      completionHandler: Pointer); overload; cdecl;
+  end;
+
   TPlatformCocoaWebBrowserExt = class;
 
   TDownloadDelegate = class(TOCLocal, WKDownloadDelegate)
