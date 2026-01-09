@@ -16,9 +16,62 @@ Demonstrates some of the usage of `TWebBrowserExt`, found in the `Features\WebBr
 * FlushCookies with optional parameter for removing all cookies (currently Android and iOS)
 * Control over zooming (currently Android only)
 * OnElementClick (currently Android, iOS, macOS) for intercepting clicks on elements
-* JavaScript event handling (demo of this coming soon)
+* JavaScript message handling (Android ONLY)
 
-### Interception of downloads
+## Supported Delphi versions
+
+Delphi 12.3, Delphi 13.x (May also work in earlier versions of Delphi 12)
+
+## Project Configuration
+
+When using `TWebBrowserExt` in your own code, you will need to add `dw-kastri-base-3.0.0.jar` (from the `Lib` folder in Kastri) to the project (this is already done in the demo). 
+
+To do so, in Project Manager expand the Android 32-bit target (it will still be included when compiling for 64-bit), right click the `Libraries` node, click `Add..`, select the file and click `Open`.
+
+## JavaScript message handling 
+
+**Requires the androidx webkit .jar file - see below**
+
+For Android ONLY, `TWebBrowserExt` supports messages from JavaScript in the web page via the `SetWebListenerParams` method and the `OnStringMessagePosted` event.
+
+In your hosted (or file-based) web page, a message can be sent using JavaScript like this:
+
+```javascript
+  function sendMessage(data) {
+    if (window.WBExt && window.WBExt.postMessage)
+      window.WBExt.postMessage(data);
+  }  
+```
+
+Here, `WBExt` is a JavaScript object created when `SetWebListenerParams` is called. e.g. In the Delphi code:
+
+```delphi
+  FWebBrowserExt.SetWebListenerParams('WBExt', ['https://delpiworlds.com']);
+```
+
+The second parameter is a list of allowed origins which must be in a valid scheme format, e.g. `file:///` for local files, `https://*.example.com`, which matches any sub-domain (and ONLY subdomains) e.g. `https://app.example.com`.
+
+The underlying code adds a web message listener using the JavaScript object name and the allowed origins. 
+
+When a message is posted from the web page via `postMessage`, the data is received by `TWebBrowserExt`, and calls the `OnStringMessagePosted` event. The string data in the message is passed to this event, and if a reply is required, it the `Reply` parameter of the event handler should be populated.
+
+To receive a reply in the web page, the `onmessage` handler of the JavaScript object needs to be set, e.g.
+
+```javascript
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.WBExt) {
+      window.WBExt.onmessage = function(event) {
+        console.log('Reply from Android: ', event.data)
+      }
+    }
+  });
+```
+
+The JavaScript message handling support requires adding the androidx webkit .jar file to the Delphi project. At time of writing, this is `webkit-1.15.0.jar`, which can be found in the `ThirdParty\Android` folder of Kastri. 
+
+To do so, in Project Manager expand the Android 32-bit target (it will still be included when compiling for 64-bit), right click the `Libraries` node, click `Add..`, select the file and click `Open`.
+
+## Interception of downloads
 
 `TWebBrowserExt` has the following properties/events to allow control over downloading of files - presently supported on **iOS/macOS and Android**:
 
@@ -26,25 +79,3 @@ Demonstrates some of the usage of `TWebBrowserExt`, found in the `Features\WebBr
 * OnDownloadStart - event invoked when a downloadable link is clicked. Passes the full uri of the link, a suggested file extension, and a variable to return the filename, which can include the desired path if the app has rights to access it
 * OnDownloadStateChange - event invoked when a download state changes, such as when a download is complete. The full path of the download is included in the `FileName` parameter 
 
-## Known Issues
-
-**NOTE: The issue below has been fixed in Delphi 12**
-
-There is an outstanding [issue in Delphi 11.x for `TWebBrowser` that affects the Windows platform](https://quality.embarcadero.com/browse/RSP-38165). For TWebBrowserExt to work on Windows, please follow these steps:
-
-1. Make a copy of `FMX.WebBrowser.Win.pas` from the `fmx` folder in the Delphi source and put it somewhere in the project's search path
-2. Modify the `TWinNativeWebBrowser.QueryInterface` method to look like this:
-
-    ```
-    function TWinNativeWebBrowser.QueryInterface(const IID: TGUID; out Obj): HResult;
-    begin
-      Result := inherited QueryInterface(IID, Obj);
-      if (FWebView <> nil) and (Result <> S_OK) then
-      begin
-        ICoreWebView2(Obj) := FWebView;
-        Result := S_OK;
-      end;
-    end;
-    ```
-
-As per my comment dated 19th April 2023 on the report, the other parts of the issue have been fixed.
