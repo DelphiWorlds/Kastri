@@ -425,7 +425,7 @@ begin
   end;
   LDataTypes := TNSSet.Wrap(TNSSet.OCClass.setWithArray(LArray));
   LSinceDate := TNSDate.Wrap(TNSDate.OCClass.dateWithTimeIntervalSince1970(0));
-  TWKWebsiteDataStore.OCClass.defaultDataStore.removeDataOfTypes(LDataTypes, LSinceDate, nil);
+  TWKWebsiteDataStore.OCClass.defaultDataStore.removeDataOfTypes(LDataTypes, LSinceDate, NOPCompletionHandler);
 end;
 
 procedure TPlatformWebBrowserExt.DidReceiveScriptMessage(const AMessage: WKScriptMessage);
