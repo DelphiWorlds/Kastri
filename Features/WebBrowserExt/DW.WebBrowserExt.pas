@@ -133,7 +133,7 @@ type
     property OnDownloadStateChange: TDownloadStateChangeEvent read FOnDownloadStateChange write FOnDownloadStateChange;
     property OnElementClick: TElementClickEvent read FOnElementClick write FOnElementClick;
     /// <summary>
-    ///   Event called when the browser page uses a JavaScript call to post a message to the browser, e.g. window.chrome.webview.postMessage('hello')
+    ///   Event called when the browser page uses a JavaScript call to post a message to the browser, e.g. window.WBExt.postMessage('hello')
     /// </summary>
     /// <remarks>
     ///   If a reply is required, populate the Reply parameter in the event, otherwise leave it empty (the default)
