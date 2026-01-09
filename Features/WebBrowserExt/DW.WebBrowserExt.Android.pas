@@ -22,10 +22,20 @@ uses
   // FMX
   FMX.Graphics,
   // DW
-  DW.WebBrowserExt, DW.JavaScript, DW.Androidapi.JNI.App, DW.MultiReceiver.Android;
+  DW.WebBrowserExt, DW.JavaScript, DW.Androidapi.JNI.App, DW.MultiReceiver.Android, DW.Androidapi.JNI.AndroidX.WebKit;
 
 type
   TPlatformWebBrowserExt = class;
+
+  TWebMessageListener = class(TJavaLocal, JWebViewCompat_WebMessageListener)
+  private
+    FPlatformWebBrowserExt: TPlatformWebBrowserExt;
+  public
+    { JWebViewCompat_WebMessageListener }
+    procedure onPostMessage(webView: JWebView; webMessageCompat: JWebMessageCompat; uri: Jnet_Uri; b: Boolean; javaScriptReplyProxy: JJavaScriptReplyProxy); cdecl;
+  public
+    constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+  end;
 
   TValueCallback = class(TJavaLocal, JValueCallback)
   private
@@ -81,6 +91,7 @@ type
     FTouchListener: JView_OnTouchListener;
     FValueCallbacks: TArray<JValueCallback>;
     FWebView: JWebView;
+    FWebMessageListener: JWebViewCompat_WebMessageListener;
     function CreateValueCallback(const AHandler: TJavaScriptResultProc): JValueCallback;
     procedure RemoveValueCallback(const ACallback: JValueCallback);
   protected
@@ -95,6 +106,9 @@ type
     procedure ResetZoom; override;
     procedure SetAllowZoom(const AValue: Boolean); override;
     procedure SetInitialScale(const AValue: Integer); override;
+    procedure WebListenerParamsUpdated; override;
+    procedure WebViewPostMessage(const AView: JWebView; const AMessage: JWebMessageCompat; const ASourceOrigin: Jnet_Uri; const AIsMainFrame: Boolean;
+      const AReplyProxy: JJavaScriptReplyProxy);
     function WebViewTouch(const AView: JView; const AEvent: JMotionEvent): Boolean;
   public
     constructor Create(const AWebBrowserExt: TWebBrowserExt); override;
@@ -111,6 +125,20 @@ uses
   // DW
   DW.OSLog, System.TypInfo,
   DW.Graphics.Helpers.Android;
+
+{ TWebMessageListener }
+
+constructor TWebMessageListener.Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
+begin
+  inherited Create;
+  FPlatformWebBrowserExt := APlatformWebBrowserExt;
+end;
+
+procedure TWebMessageListener.onPostMessage(webView: JWebView; webMessageCompat: JWebMessageCompat; uri: Jnet_Uri; b: Boolean;
+  javaScriptReplyProxy: JJavaScriptReplyProxy);
+begin
+  FPlatformWebBrowserExt.WebViewPostMessage(webView, webMessageCompat, uri, b, javaScriptReplyProxy);
+end;
 
 { TValueCallback }
 
@@ -195,6 +223,43 @@ begin
   FDownloadCompleteReceiver.Free;
   FDownloads.Free;
   inherited;
+end;
+
+procedure TPlatformWebBrowserExt.WebListenerParamsUpdated;
+var
+  LAllowedOrigins: JHashSet;
+  LOrigin: string;
+begin
+  if FWebMessageListener <> nil then
+    TJWebViewCompat.JavaClass.removeWebMessageListener(FWebView, StringToJString(JavaScriptObjectName));
+  FWebMessageListener := nil;
+  if TJWebViewFeature.JavaClass.isFeatureSupported(TJWebViewFeature.JavaClass.WEB_MESSAGE_LISTENER) then
+  begin
+    FWebMessageListener := TWebMessageListener.Create(Self);
+    LAllowedOrigins := TJHashSet.JavaClass.init;
+    for LOrigin in AllowedMessageOrigins do
+      LAllowedOrigins.add(StringToJString(LOrigin));
+    TJWebViewCompat.JavaClass.addWebMessageListener(FWebView, StringToJString(JavaScriptObjectName), TJSet.Wrap(LAllowedOrigins), FWebMessageListener);
+  end
+  else
+    TOSLog.e('WEB_MESSAGE_LISTENER is not supported');
+end;
+
+procedure TPlatformWebBrowserExt.WebViewPostMessage(const AView: JWebView; const AMessage: JWebMessageCompat; const ASourceOrigin: Jnet_Uri;
+  const AIsMainFrame: Boolean; const AReplyProxy: JJavaScriptReplyProxy);
+var
+  LDataString, LReply: string;
+begin
+  // AMessage.getPorts // <---- Requires Java code to create a descendant of WebMessagePortCompat.WebMessageCallbackCompat
+  // AMessage.getArrayBuffer // <---- Not handled here. Maybe in the future
+  if AMessage.getType = TJWebMessageCompat.JavaClass.TYPE_STRING then
+  begin
+    LDataString := JStringToString(AMessage.getData);
+    LReply := '';
+    DoStringMessagePosted(LDataString, LReply);
+    if not LReply.IsEmpty then
+      AReplyProxy.postMessage(StringToJString(LReply));
+  end;
 end;
 
 procedure TPlatformWebBrowserExt.ClearCache(const ADataKinds: TCacheDataKinds);

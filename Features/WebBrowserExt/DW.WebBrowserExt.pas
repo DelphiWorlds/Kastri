@@ -17,7 +17,7 @@ interface
 
 uses
   // RTL
-  System.Classes, System.Types,
+  System.Classes, System.Types, System.SysUtils,
   // FMX
   FMX.WebBrowser, FMX.Graphics,
   // DW
@@ -49,19 +49,25 @@ type
 
   TCustomPlatformWebBrowserExt = class(TObject)
   private
+    FAllowedMessageOrigins: TArray<string>;
     FCaptureBitmapHandler: TCaptureBitmapProc;
+    FJavaScriptObjectName: string;
     FWebBrowserExt: TWebBrowserExt;
     function GetBrowser: TWebBrowser;
     function GetDefaultDownloadsFolder: string;
     function GetDownloadableMimeTypes: TArray<string>;
+    function GetAllowedMessageOrigins: TArray<string>;
+    function GetJavaScriptObjectName: string;
   protected
     procedure BitmapCaptured(const ABitmap: TBitmap);
+    function IsMatchingMimeType(const AMimeType: string): Boolean;
     procedure CaptureBitmap(const AHandler: TCaptureBitmapProc);
     procedure ClearCache(const ADataKinds: TCacheDataKinds); virtual;
     procedure DoCaptureBitmap; virtual;
     procedure DoDownloadStateChange(const AFileName: string; const AState: TDownloadState);
     procedure DoDownloadStart(const AUri, AMimeType: string; var AFileName: string);
     procedure DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean); virtual;
+    procedure DoStringMessagePosted(const AData: string; var AReply: string);
     procedure ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc); virtual;
     procedure FlushCookies(const ARemove: Boolean); virtual;
     procedure GetElementValueByName(const AName: string; const AHandler: TJavaScriptResultProc); virtual;
@@ -70,9 +76,13 @@ type
     procedure ResetZoom; virtual;
     procedure SetAllowZoom(const AValue: Boolean); virtual;
     procedure SetInitialScale(const AValue: Integer); virtual;
+    procedure SetWebListenerParams(const AObjectName: string; const AAllowedOrigins: TArray<string>);
     procedure SimulateClick(const APoint: TPointF); virtual;
+    procedure WebListenerParamsUpdated; virtual;
+    property AllowedMessageOrigins: TArray<string> read FAllowedMessageOrigins;
     property DefaultDownloadsFolder: string read GetDefaultDownloadsFolder;
     property DownloadableMimeTypes: TArray<string> read GetDownloadableMimeTypes;
+    property JavaScriptObjectName: string read GetJavaScriptObjectName;
   public
     constructor Create(const AWebBrowserExt: TWebBrowserExt); virtual;
     property Browser: TWebBrowser read GetBrowser;
@@ -81,6 +91,7 @@ type
   TElementClickEvent = procedure(Sender: TObject; const HitTestKind: THitTestKind; const Extra: string; var PreventDefault: Boolean) of object;
   TDownloadStartEvent = procedure(Sender: TObject; const Uri, FileExt: string; var FileName: string) of object;
   TDownloadStateChangeEvent = procedure(Sender: TObject; const FileName: string; const State: TDownloadState) of object;
+  TStringMessagePostedEvent = procedure(Sender: TObject; const Data: string; var Reply: string) of object;
 
   TWebBrowserExt = class(TComponent)
   private
@@ -91,11 +102,13 @@ type
     FOnDownloadStateChange: TDownloadStateChangeEvent;
     FOnDownloadStart: TDownloadStartEvent;
     FOnElementClick: TElementClickEvent;
+    FOnStringMessagePosted: TStringMessagePostedEvent;
     procedure AddDownloadableMimeTypes;
   protected
     procedure DoDownloadStateChange(const AFileName: string; const AState: TDownloadState);
     procedure DoDownloadStart(const AUri, AFileExt: string; var AFileName: string);
     procedure DoElementClick(const AHitTestKind: THitTestKind; const AExtra: string; var APreventDefault: Boolean);
+    procedure DoStringMessagePosted(const AData: string; var AReply: string);
     property Browser: TWebBrowser read FBrowser;
   public
     constructor Create(AOwner: TComponent); override;
@@ -108,6 +121,7 @@ type
     procedure Navigate(const AURL: string);
     procedure ResetZoom;
     procedure SetAllowZoom(const AValue: Boolean);
+    procedure SetWebListenerParams(const AObjectName: string; const AAllowedOrigins: TArray<string>);
     procedure SetInitialScale(const AValue: Integer);
     procedure SimulateClick(const APoint: TPointF);
     property DefaultDownloadsFolder: string read FDefaultDownloadsFolder write FDefaultDownloadsFolder;
@@ -118,12 +132,19 @@ type
     property OnDownloadStart: TDownloadStartEvent read FOnDownloadStart write FOnDownloadStart;
     property OnDownloadStateChange: TDownloadStateChangeEvent read FOnDownloadStateChange write FOnDownloadStateChange;
     property OnElementClick: TElementClickEvent read FOnElementClick write FOnElementClick;
+    /// <summary>
+    ///   Event called when the browser page uses a JavaScript call to post a message to the browser, e.g. window.chrome.webview.postMessage('hello')
+    /// </summary>
+    /// <remarks>
+    ///   If a reply is required, populate the Reply parameter in the event, otherwise leave it empty (the default)
+    /// </remarks>
+    property OnStringMessagePosted: TStringMessagePostedEvent read FOnStringMessagePosted write FOnStringMessagePosted;
   end;
 
 implementation
 
 uses
-  System.SysUtils, System.Net.Mime, System.IOUtils, System.StrUtils,
+  System.Net.Mime, System.IOUtils, System.StrUtils,
 
   DW.OSLog,
 
@@ -186,6 +207,25 @@ begin
   FCaptureBitmapHandler := nil;
 end;
 
+function TCustomPlatformWebBrowserExt.IsMatchingMimeType(const AMimeType: string): Boolean;
+var
+  LMimeType, LWildcard: string;
+begin
+  Result := False;
+  for LMimeType in DownloadableMimeTypes do
+  begin
+    if LMimeType.EndsWith('/*') then
+      LWildCard := LMimeType.Substring(0, LMimeType.IndexOf('/'))
+    else
+      LWildCard := '';
+    if SameText(LMimeType, AMimeType) or (not LWildCard.IsEmpty and LMimeType.StartsWith(LWildCard, True)) then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
 procedure TCustomPlatformWebBrowserExt.CaptureBitmap(const AHandler: TCaptureBitmapProc);
 begin
   if not Assigned(FCaptureBitmapHandler) then
@@ -225,6 +265,11 @@ begin
   FWebBrowserExt.DoElementClick(AHitTestKind, AExtra, APreventDefault);
 end;
 
+procedure TCustomPlatformWebBrowserExt.DoStringMessagePosted(const AData: string; var AReply: string);
+begin
+  FWebBrowserExt.DoStringMessagePosted(AData, AReply);
+end;
+
 procedure TCustomPlatformWebBrowserExt.ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc);
 begin
   //
@@ -233,6 +278,11 @@ end;
 procedure TCustomPlatformWebBrowserExt.FlushCookies(const ARemove: Boolean);
 begin
   //
+end;
+
+function TCustomPlatformWebBrowserExt.GetAllowedMessageOrigins: TArray<string>;
+begin
+  Result := FAllowedMessageOrigins;
 end;
 
 function TCustomPlatformWebBrowserExt.GetBrowser: TWebBrowser;
@@ -253,6 +303,11 @@ end;
 procedure TCustomPlatformWebBrowserExt.GetElementValueByName(const AName: string; const AHandler: TJavaScriptResultProc);
 begin
   ExecuteJavaScript(Format(cJavaScriptGetInputValueByName, [AName]), AHandler);
+end;
+
+function TCustomPlatformWebBrowserExt.GetJavaScriptObjectName: string;
+begin
+  Result := FJavaScriptObjectName;
 end;
 
 procedure TCustomPlatformWebBrowserExt.Navigate(const AURL: string);
@@ -282,12 +337,24 @@ begin
   //
 end;
 
+procedure TCustomPlatformWebBrowserExt.SetWebListenerParams(const AObjectName: string; const AAllowedOrigins: TArray<string>);
+begin
+  FJavaScriptObjectName := AObjectName;
+  FAllowedMessageOrigins := AAllowedOrigins;
+  WebListenerParamsUpdated;
+end;
+
 procedure TCustomPlatformWebBrowserExt.SimulateClick(const APoint: TPointF);
 var
   LNativePoint: TPoint;
 begin
   LNativePoint := APoint.Round;
   ExecuteJavaScript(Format(cJavaScriptClickAtXY, [LNativePoint.X, LNativePoint.Y]), nil);
+end;
+
+procedure TCustomPlatformWebBrowserExt.WebListenerParamsUpdated;
+begin
+  //
 end;
 
 { TWebBrowserExt }
@@ -335,26 +402,12 @@ begin
     'application/x-tar',
     'application/x-7z-compressed',
     'application/zip',
-    'audio/flac',
-    'audio/mpeg',
-    'audio/ogg',
-    'audio/wav',
-    'audio/x-aac',
+    'audio/*',
     'font/woff',
     'font/woff2',
-    'image/bmp',
-    'image/gif',
-    'image/jpeg',
-    'image/png',
-    'image/tiff',
-    'image/webp',
-    'text/csv',
-    'video/mp4',
-    'video/quicktime',
-    'video/webm',
-    'video/x-flv',
-    'video/x-matroska',
-    'video/x-msvideo'
+    'image/*',
+    'text/*',
+    'video/*'
   ];
 end;
 
@@ -384,6 +437,12 @@ procedure TWebBrowserExt.DoElementClick(const AHitTestKind: THitTestKind; const 
 begin
   if Assigned(FOnElementClick) then
     FOnElementClick(Self, AHitTestKind, AExtra, APreventDefault);
+end;
+
+procedure TWebBrowserExt.DoStringMessagePosted(const AData: string; var AReply: string);
+begin
+  if Assigned(FOnStringMessagePosted) then
+    FOnStringMessagePosted(Self, AData, AReply);
 end;
 
 procedure TWebBrowserExt.ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc = nil);
@@ -424,6 +483,11 @@ end;
 procedure TWebBrowserExt.SetInitialScale(const AValue: Integer);
 begin
   FPlatformWebBrowserExt.SetInitialScale(AValue);
+end;
+
+procedure TWebBrowserExt.SetWebListenerParams(const AObjectName: string; const AAllowedOrigins: TArray<string>);
+begin
+  FPlatformWebBrowserExt.SetWebListenerParams(AObjectName, AAllowedOrigins);
 end;
 
 procedure TWebBrowserExt.SimulateClick(const APoint: TPointF);
