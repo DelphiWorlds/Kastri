@@ -4,6 +4,12 @@
 
 From [Delphi Worlds](https://x.com/delphiworlds)
 
+**Notice**: As at January 15th, 2026, additions to Kastri will become limited. This is due mainly to low sponsorship levels and prioritization of my time. 
+
+If however, you have an interest in something being implemented and are willing to finance it, please either raise an issue indicating that you will provide compensation on the understanding that it wull be included in Kastri, **OR** contact me personally, either via the [Slack workspace](#slack-channel), or via email (davidn at radsoft dot com dot au - obviously replacing the relevant words with characters), so we can discuss arrangements.
+
+For anything already existing in Kastri, I will continue to resolve issues if they do not involve substantial rework, e.g. due to OS changes
+
 [![Twitter](https://img.shields.io/badge/-Twitter-1DA1F2?style=plastic&logo=Twitter)](https://x.com/DelphiWorlds)  [![Facebook](https://img.shields.io/badge/-Facebook-green?style=plastic&logo=Facebook)](https://www.facebook.com/DelphiWorlds) 
 
 Compatible with [Embarcadero](https://wwww.embarcadero.com) [Delphi](https://www.embarcadero.com/products/delphi). Please note: Only the **last two major releases** (e.g. at present that includes Delphi 13.x and Delphi 12.x) are "officially" supported. 
