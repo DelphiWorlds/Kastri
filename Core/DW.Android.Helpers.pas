@@ -20,7 +20,7 @@ uses
   Androidapi.JNI.JavaTypes, Androidapi.JNI.Net, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App, Androidapi.JNI.Media,
   Androidapi.JNIBridge,
   // DW
-  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes, DW.Androidapi.JNI.DWUtility, DW.Androidapi.JNI.PlayCore;
+  DW.Androidapi.JNI.App, DW.Androidapi.JNI.Os, DW.Androidapi.JNI.JavaTypes, DW.Androidapi.JNI.DWUtility;
 
 type
   TUncaughtExceptionHandler = class(TJavaLocal, JThread_UncaughtExceptionHandler)
@@ -332,42 +332,6 @@ type
     procedure DoRun; override;
   public
     constructor Create(const ARunHandler: TThreadProcedure; const ASync: Boolean = True);
-  end;
-
-  TPlayCoreOnCompleteProc = reference to procedure(const ATask: JTask);
-
-  TPlayCoreOnCompleteListener = class(TJavaLocal, JOnCompleteListener)
-  private
-    FHandler: TPlayCoreOnCompleteProc;
-  public
-    { JOnCompleteListener }
-    procedure onComplete(task: JTask); cdecl;
-  public
-    constructor Create(const AHandler: TPlayCoreOnCompleteProc);
-  end;
-
-  TPlayCoreOnSuccessProc = reference to procedure(const Obj: JObject);
-
-  TPlayCoreOnSuccessListener = class(TJavaLocal, JOnSuccessListener)
-  private
-    FHandler: TPlayCoreOnSuccessProc;
-  public
-    { JOnSuccessListener }
-    procedure onSuccess(result: JObject); cdecl;
-  public
-    constructor Create(const AHandler: TPlayCoreOnSuccessProc);
-  end;
-
-  TPlayCoreOnFailureProc = reference to procedure(const exception: JException);
-
-  TPlayCoreOnFailureListener = class(TJavaLocal, JOnFailureListener)
-  private
-    FHandler: TPlayCoreOnFailureProc;
-  public
-    { JOnFailureListener }
-    procedure onFailure(exception: JException); cdecl;
-  public
-    constructor Create(const AHandler: TPlayCoreOnFailureProc);
   end;
 
   TAndroidFileStream = class(TBytesStream)
@@ -1147,48 +1111,6 @@ begin
     TThread.ForceQueue(nil, FRunHandler)
   else
     FRunHandler;
-end;
-
-{ TPlayCoreOnCompleteListener }
-
-constructor TPlayCoreOnCompleteListener.Create(const AHandler: TPlayCoreOnCompleteProc);
-begin
-  inherited Create;
-  FHandler := AHandler;
-end;
-
-procedure TPlayCoreOnCompleteListener.onComplete(task: JTask);
-begin
-  if Assigned(FHandler) then
-    FHandler(task);
-end;
-
-{ TPlayCoreSuccessListener }
-
-constructor TPlayCoreOnSuccessListener.Create(const AHandler: TPlayCoreOnSuccessProc);
-begin
-  inherited Create;
-  FHandler := AHandler;
-end;
-
-procedure TPlayCoreOnSuccessListener.onSuccess(result: JObject);
-begin
-  if Assigned(FHandler) then
-    FHandler(result);
-end;
-
-{ TPlayCoreOnFailureListener }
-
-constructor TPlayCoreOnFailureListener.Create(const AHandler: TPlayCoreOnFailureProc);
-begin
-  inherited Create;
-  FHandler := AHandler;
-end;
-
-procedure TPlayCoreOnFailureListener.onFailure(exception: JException);
-begin
-  if Assigned(FHandler) then
-    FHandler(exception);
 end;
 
 { TAndroidFileStream }
