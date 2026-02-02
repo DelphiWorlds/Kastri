@@ -341,6 +341,8 @@ type
     /// </summary>
     class function Copy(const AURI, AFileName: string): Boolean; overload;
     class function Copy(const AJURI: Jnet_Uri; const AFileName: string): Boolean; overload;
+    class function Copy(const AJURI: Jnet_Uri; const AFile: JFile): Boolean; overload;
+    class function Copy(const AFile: JFile; const AJURI: Jnet_Uri): Boolean; overload;
   public
     constructor Create(const AFile: JFile); overload;
     constructor Create(const AURI: string); overload;
@@ -1132,35 +1134,79 @@ begin
 end;
 
 class function TAndroidFileStream.Copy(const AJURI: Jnet_Uri; const AFileName: string): Boolean;
-var
-  LInputStream: JInputStream;
-  LOutputStream: JFileOutputStream;
-  LInputChannel: JReadableByteChannel;
-  LOutputChannel: JFileChannel;
 begin
-  Result := False;
-  LInputStream := TAndroidHelper.Context.getContentResolver.openInputStream(AJURI);
+  Result := Copy(AJURI, TJFile.JavaClass.init(StringToJString(AFileName)));
+end;
+
+class function TAndroidFileStream.Copy(const AFile: JFile; const AJURI: Jnet_Uri): Boolean;
+var
+  LInputStream: JFileInputStream;
+  LOutputStream: JFileOutputStream;
+  LInputChannel: JFileChannel;
+  LOutputChannel: JFileChannel;
+  LPFD: JParcelFileDescriptor;
+begin
+  LInputStream := TJFileInputStream.JavaClass.init(AFile);
   if LInputStream <> nil then
   try
-    LOutputStream := TJFileOutputStream.JavaClass.init(StringToJString(AFileName));
-    if LOutputStream <> nil then
+    LInputChannel := LInputStream.getChannel;
+    if LInputChannel <> nil then
     try
-      LInputChannel := TJChannels.JavaClass.newChannel(LInputStream);
-      if LInputChannel <> nil then
+      LPFD := TAndroidHelper.ContentResolver.openFileDescriptor(AJURI, StringToJString('w'));
+      if LPFD <> nil then
+      begin
+        LOutputStream := TJFileOutputStream.JavaClass.init(LPFD.getFileDescriptor);
+        try
+          LOutputChannel := LOutputStream.getChannel;
+          try
+            Result := LOutputChannel.transferFrom(TJReadableByteChannel.Wrap(LInputChannel), 0, LInputChannel.size) = LInputChannel.size;
+          finally
+            LOutputChannel.close;
+          end;
+        finally
+          LOutputStream.close;
+        end;
+      end;
+    finally
+      LInputChannel.close;
+    end;
+  finally
+    LInputStream.close;
+  end;
+end;
+
+class function TAndroidFileStream.Copy(const AJURI: Jnet_Uri; const AFile: JFile): Boolean;
+var
+  LInputStream: JFileInputStream;
+  LInputPFD: JParcelFileDescriptor;
+  LOutputStream: JFileOutputStream;
+  LInputChannel, LOutputChannel: JFileChannel;
+  LSize: Int64;
+begin
+  Result := False;
+  LInputPFD := TAndroidHelper.ContentResolver.openFileDescriptor(AJURI, StringToJString('r'));
+  LInputStream := TJFileInputStream.JavaClass.init(LInputPFD.getFileDescriptor);
+  if LInputStream <> nil then
+  try
+    LInputChannel := LInputStream.getChannel;
+    if LInputChannel <> nil then
+    try
+      LOutputStream := TJFileOutputStream.JavaClass.init(AFile);
+      if LOutputStream <> nil then
       try
+        LSize := LInputChannel.size;
         LOutputChannel := LOutputStream.getChannel;
         if LOutputChannel <> nil then
         try
-          LOutputStream.getChannel.transferFrom(LInputChannel, 0, Int64.MaxValue);
-          Result := True;
+          Result := LOutputStream.getChannel.transferFrom(TJReadableByteChannel.Wrap(LInputChannel), 0, LSize) = LSize;
         finally
           LOutputChannel.close;
         end;
       finally
-        LInputChannel.close;
+        LOutputStream.close;
       end;
     finally
-      LOutputStream.close;
+      LInputChannel.close;
     end;
   finally
     LInputStream.close;
