@@ -134,7 +134,11 @@ begin
       kCLAuthorizationStatusNotDetermined, kCLAuthorizationStatusAuthorizedWhenInUse:
       begin
         if GetNeedsBackgroundLocation then
-          FLocationManager.requestAlwaysAuthorization
+        begin
+          FLocationManager.requestAlwaysAuthorization;
+          // iOS no longer prompts the user immediately, so a state of RequestedAlways is needed. Sheesh
+          PermissionsRequestComplete(TPermissionsState.RequestedAlways);
+        end
         else if FLocationManager.authorizationStatus = kCLAuthorizationStatusAuthorizedWhenInUse then
           PermissionsRequestComplete(TPermissionsState.Granted)
         else
