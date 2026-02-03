@@ -14,7 +14,11 @@ unit DW.LocationPermissions;
 interface
 
 type
-  TPermissionsState = (Denied, Restricted, Granted, NoBackground);
+  TPermissionsState = (Denied, Restricted, Granted, NoBackground, RequestedAlways);
+
+  TPermissionsStateHelper = record helper for TPermissionsState
+    function AsString: string;
+  end;
 
   TPermissionsCompleteProc = reference to procedure(const State: TPermissionsState);
 
@@ -67,6 +71,17 @@ uses
 {$IF Defined(ANDROID)}
   DW.LocationPermissions.Android;
 {$ENDIF}
+
+{ TPermissionsStateHelper }
+
+function TPermissionsStateHelper.AsString: string;
+const
+  cPermissionsStateCaptions: array[TPermissionsState] of string = (
+    'Denied', 'Restricted', 'Granted', 'No Background', 'Requested Always'
+  );
+begin
+  Result := cPermissionsStateCaptions[Self];
+end;
 
 { TCustomLocationPermissions }
 
