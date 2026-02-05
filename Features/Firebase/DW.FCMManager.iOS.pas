@@ -29,7 +29,7 @@ uses
   FMX.Platform, // Application event messsage
   DW.OSLog,
   DW.UserDefaults.iOS, DW.iOSapi.FirebaseMessaging, DW.iOSapi.FirebaseCore, DW.Firebase.Common.iOS,
-  DW.FCMManager;
+  DW.FCMManager, DW.FMX.Helpers;
 
 const
   UNAuthorizationStatusEphemeral = 4;
@@ -43,6 +43,7 @@ type
     procedure CheckPushEnabledCompletionHandler(settings: UNNotificationSettings);
     function GetNativeActionOptions(const AOptions: TNotificationActionOptions): UNNotificationActionOptions;
     function GetNativeCategoryOptions(const AOptions: TNotificationCategoryOptions): UNNotificationCategoryOptions;
+    procedure InternalStart;
     function NotificationCenter: UNUserNotificationCenter;
     procedure PushDeviceTokenMessageHandler(const Sender: TObject; const AMsg: TMessage);
     procedure SubscribeToTopicCompletionHandler(error: NSError);
@@ -188,6 +189,15 @@ begin
   end;
 end;
 
+procedure TPlatformFCMManager.InternalStart;
+begin
+  if Length(Categories) > 0 then
+    AddCategories;
+  TFirebaseCommon.Configure;
+  FMessaging := TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging);
+  DoStart;
+end;
+
 procedure TPlatformFCMManager.AddCategories;
 var
   LCategory: INotificationCategory;
@@ -230,11 +240,7 @@ end;
 
 procedure TPlatformFCMManager.Start;
 begin
-  if Length(Categories) > 0 then
-    AddCategories;
-  TFirebaseCommon.Configure;
-  FMessaging := TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging);
-  DoStart;
+  TIdleCaller.CallOnNextIdle(InternalStart);
 end;
 
 procedure TPlatformFCMManager.SubscribeToTopic(const ATopic: string);
