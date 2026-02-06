@@ -47,6 +47,7 @@ type
     procedure Request(const AAdditionalPermissions: TArray<string>; const ACompletion: TPermissionsCompleteProc); overload; override;
     procedure RequestBackground(const ACompletion: TPermissionsCompleteProc); overload; override;
     procedure RequestBackground(const AAdditionalPermissions: TArray<string>; const ACompletion: TPermissionsCompleteProc); overload; override;
+    procedure ShowPermissionPrompt(const ACompletionHandler: TGrantCompletionProc); override;
   end;
 
 { TLocationPermissions }
@@ -186,6 +187,11 @@ begin
   end
   else
     APostRationaleProc;
+end;
+
+procedure TLocationPermissions.ShowPermissionPrompt(const ACompletionHandler: TGrantCompletionProc);
+begin
+  // TODO, if ever needed
 end;
 
 initialization

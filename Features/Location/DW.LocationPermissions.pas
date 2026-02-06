@@ -22,6 +22,8 @@ type
 
   TPermissionsCompleteProc = reference to procedure(const State: TPermissionsState);
 
+  TGrantCompletionProc = reference to procedure(const IsGranted: Boolean);
+
   ILocationPermissions = interface(IInterface)
     ['{6DF2A4C1-92AB-4D68-BC82-275F59EA8B79}']
     function GetBackgroundPermissionMessage: string;
@@ -33,6 +35,7 @@ type
     procedure RequestBackground(const AAdditionalPermissions: TArray<string>; const ACompletion: TPermissionsCompleteProc); overload;
     procedure SetBackgroundPermissionMessage(const Value: string);
     procedure SetNeedsBackgroundLocation(const Value: Boolean);
+    procedure ShowPermissionPrompt(const ACompletionHandler: TGrantCompletionProc);
     property BackgroundPermissionMessage: string read GetBackgroundPermissionMessage write SetBackgroundPermissionMessage;
     property NeedsBackgroundLocation: Boolean read GetNeedsBackgroundLocation write SetNeedsBackgroundLocation;
   end;
@@ -55,6 +58,7 @@ type
     procedure RequestBackground(const AAdditionalPermissions: TArray<string>; const ACompletion: TPermissionsCompleteProc); overload; virtual;
     procedure SetBackgroundPermissionMessage(const Value: string);
     procedure SetNeedsBackgroundLocation(const Value: Boolean);
+    procedure ShowPermissionPrompt(const ACompletionHandler: TGrantCompletionProc); virtual;
   public
     constructor Create;
   end;
@@ -141,6 +145,11 @@ end;
 procedure TCustomLocationPermissions.SetNeedsBackgroundLocation(const Value: Boolean);
 begin
   FNeedsBackgroundLocation := Value;
+end;
+
+procedure TCustomLocationPermissions.ShowPermissionPrompt(const ACompletionHandler: TGrantCompletionProc);
+begin
+  //
 end;
 
 end.
