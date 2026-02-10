@@ -22,8 +22,12 @@ Two demos are included:
 
 ## Supported Delphi Versions
 
-- **Delphi 12.x**
-- **Delphi 11.3** (limited support)
+- **Delphi 13.x**
+- **Delphi 12.2, 12.3**
+
+NOTE: Although "official" support (from Delphi Worlds) for Delphi 12.1, 12.0 and 11.3 has been removed, it is possible to use the code in those versions as described in the "legacy" section.
+
+Note also that support for **iOS Simulator has been dropped completely** - it is next to useless for FCM, even for testing.
 
 ---
 
@@ -38,16 +42,25 @@ Two demos are included:
 3. Create a Provisioning Profile linked to the App ID.
 4. Download the Provisioning Profile to your Mac.
 
-#### Firebase SDK
+Ensure that the APNs key (mentioned in step 1) is uploaded to [FCM Console for your Firebase project](https://firebase.google.com/docs/cloud-messaging/ios/get-started#upload-apn-authentication-key).
 
-To use FCM, download the appropriate Firebase iOS SDK based on your Delphi version:
+#### Firebase iOS Framework Binaries
 
-- **Delphi 12.2:** [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
-- **Delphi 12.1 and earlier:** [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
+To use FCM, download the appropriate Firebase iOS binaries.
 
-Unzip the SDK to a shared folder and create an [Environment Variable Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) named `Firebase` pointing to the folder. Alternatively, update the [Framework Search Path](#framework-search-path).
+For those using Delphi 12.1 (e.g. Delphi CE) or earlier, see [below](#legacy). 
 
-> **Note:** For Firebase iOS SDK 11.2.0, the minimum iOS version must be set to **13.0**.
+Previously this involved the official releases from Firebase. They are now sourced from the [Binaries repo from Delphi Worlds](). The current [release to support FCM is here]().
+
+Unzip the file to a folder of your choice and create an [Environment Variable Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) named `Firebase` pointing to the folder. Alternatively, update the [Framework Search Path](#framework-search-path).
+
+##### Legacy
+
+For Delphi 12.1 or earlier, you will need to download this Firebase iOS SDK:
+
+[Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
+
+This is due to a linker issue in your version of Delphi.
 
 #### Delphi Source Patch
 
@@ -62,17 +75,15 @@ Due to updates in the Firebase SDK, patching the Delphi `FMX.PushNotification.FC
 
 Configure the framework paths based on the Firebase SDK version:
 
-**For Firebase iOS SDK 10.8.0**:
+**For Delphi 12.2 or later** (see above re [Firebase iOS Binaries](#firebase-ios-framework-binaries)):
+```text
+$(Firebase)
+```
+
+**For Delphi 12.1 or earlier**:
 ```text
 $(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanoPB.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
 ```
-
-**For Firebase iOS SDK 11.2.0 (Delphi 12.2 or later)**:
-```text
-$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseAnalytics.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanoPB.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64;$(Firebase)\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
-```
-
-For **iOS Simulator** paths, use `ios-arm64_x86_64-simulator` instead of `ios-arm64`.
 
 #### Additional Frameworks
 
@@ -95,8 +106,7 @@ In order to compile successfully for iOS, it's also necessary to:
 
 #### Linker Options
 
-For Firebase iOS SDK 11.2.0:
-- Set the **Minimum iOS version supported** to `13.0` (or `14.0` for iOS Simulator).
+- Set the **Minimum iOS version supported** to `13.0`
 - Add the following linker options:
   ```text
   -ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib -weak_library /usr/lib/swift/libswiftFileProvider.dylib -weak_library /usr/lib/swift/libswiftOSLog.dylib -weak_library /usr/lib/swift/libswiftXPC.dylib
@@ -223,5 +233,7 @@ Use [PushIt](https://github.com/DelphiWorlds/PushIt) to send test messages. Ensu
 
 - **App crashes on start**: Ensure that your GoogleServices-info.plist being deployed as per [this section](#deployment-of-google-services-info-plist).
   
+- **Messages not received**: Ensure that the [provisioning profile has Push Notifications enabled (via the App ID)](#apple-developer-portal), and that the APNs key is not expired, and [configured in FCM console](https://firebase.google.com/docs/cloud-messaging/ios/get-started#upload-apn-authentication-key)
+
 ### Android
 - **Messages not received**: Ensure the payload format is correct and omit the `notification` element. Also ensure that the [changes to `AndroidManifest.template.xml`](#android-manifest) are correct.
