@@ -15,7 +15,7 @@ unit DW.OpenSSL;
 // Extended with AES encryption/decryption functionality
 
 // Binaries for OpenSSL 3.x are here:
-//   https://github.com/TaurusTLS-Developers/OpenSSL-Distribution/tree/main/binaries
+//   https://github.com/TaurusTLS-Developers/OpenSSL-Distribution/releases
 
 interface
 
