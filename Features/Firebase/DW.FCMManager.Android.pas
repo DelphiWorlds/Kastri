@@ -247,7 +247,6 @@ var
   LAction: string;
   LCategory: INotificationCategory;
 begin
-  AServiceNotification.Json.TryGetValue('click_action', LAction);
   if AServiceNotification.Json.TryGetValue('click_action', LAction) and FindCategory(LAction, LCategory) then
     LCategory.Handler();
 end;
