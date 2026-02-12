@@ -195,6 +195,7 @@ type
     procedure DoStart;
     function FindCategory(const AID: string; out ACategory: INotificationCategory): Boolean;
     procedure HandleNotification(const AServiceNotification: TPushServiceNotification);
+    procedure ReceiveNotification(const AServiceNotification: TPushServiceNotification); virtual;
     procedure Started;
     property Categories: TNotificationCategories read FCategories;
     property IsForeground: Boolean read FIsForeground;
@@ -622,6 +623,11 @@ begin
     ReceiveNotificationHandler(Self, AServiceNotification);
 end;
 
+procedure TCustomPlatformFCMManager.ReceiveNotification(const AServiceNotification: TPushServiceNotification);
+begin
+  //
+end;
+
 procedure TCustomPlatformFCMManager.ReceiveNotificationHandler(Sender: TObject; const AServiceNotification: TPushServiceNotification);
 begin
   if Assigned(FOnNotificationReceived) then
@@ -630,6 +636,7 @@ begin
   begin
     if Assigned(FOnMessageReceived) and CanHandleNotification(AServiceNotification) then
       FOnMessageReceived(Self, AServiceNotification.Json);
+    ReceiveNotification(AServiceNotification);
   end;
 end;
 

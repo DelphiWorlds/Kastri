@@ -95,6 +95,7 @@ type
   protected
     function CanHandleNotification(const AServiceNotification: TPushServiceNotification): Boolean; override;
     procedure CreateChannel; override;
+    procedure ReceiveNotification(const AServiceNotification: TPushServiceNotification); override;
   public
     constructor Create;
     destructor Destroy; override;
@@ -239,6 +240,16 @@ end;
 procedure TPlatformFCMManager.CheckPushEnabled(const AHandler: TCheckPushEnabledMethod);
 begin
   AHandler(IsAndroidPushEnabled);
+end;
+
+procedure TPlatformFCMManager.ReceiveNotification(const AServiceNotification: TPushServiceNotification);
+var
+  LAction: string;
+  LCategory: INotificationCategory;
+begin
+  AServiceNotification.Json.TryGetValue('click_action', LAction);
+  if AServiceNotification.Json.TryGetValue('click_action', LAction) and FindCategory(LAction, LCategory) then
+    LCategory.Handler();
 end;
 
 procedure TPlatformFCMManager.RemoveNotifications;
