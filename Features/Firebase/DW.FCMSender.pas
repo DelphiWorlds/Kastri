@@ -201,8 +201,8 @@ uses
   // RTL
   System.SysUtils, System.DateUtils, System.Net.HttpClient, System.Net.URLClient, System.NetEncoding,  System.NetConsts,
   System.Hash, System.IOUtils, System.TypInfo, System.Generics.Collections,
-  // Grijjy - from: https://github.com/grijjy/DelphiOpenSsl/blob/master/OpenSSL.Api_11.pas
-  OpenSSL.Api_11;
+  // DW
+  DW.OpenSSL;
 
 const
   CONTENTTYPE_APPLICATION_JSON = 'application/json'; // do not localize
@@ -282,17 +282,15 @@ var
   LPrivateKeyRef: PBIO;
   LPrivateKey: PEVP_PKEY;
   LContext: PEVP_MD_CTX;
-  SHA256: PEVP_MD;
   LSize: NativeUInt;
 begin
-	LPrivateKeyRef := BIO_new_mem_buf(@APrivateKey[0], Length(APrivateKey));
+  LPrivateKeyRef := BIO_new_mem_buf(@APrivateKey[0], Length(APrivateKey));
   try
     LPrivateKey := PEM_read_bio_PrivateKey(LPrivateKeyRef, nil, nil, nil);
     try
-      LContext := EVP_MD_CTX_create;
+      LContext := EVP_MD_CTX_new;
       try
-        SHA256 := EVP_sha256;
-        if (EVP_DigestSignInit(LContext, nil, SHA256, nil, LPrivateKey) > 0) and
+        if (EVP_DigestSignInit_ex(LContext, nil, 'SHA256', nil, nil, LPrivateKey, nil) > 0) and
           (EVP_DigestUpdate(LContext, @AData[0], Length(AData)) > 0) and
           (EVP_DigestSignFinal(LContext, nil, LSize) > 0) then
         begin
@@ -301,13 +299,13 @@ begin
             SetLength(Result, 0);
         end;
       finally
-        EVP_MD_CTX_destroy(LContext);
+        EVP_MD_CTX_free(LContext);
       end;
     finally
       EVP_PKEY_free(LPrivateKey);
     end;
   finally
-	  BIO_free(LPrivateKeyRef);
+    BIO_free(LPrivateKeyRef);
   end;
 end;
 
@@ -557,6 +555,8 @@ begin
       // imageUrl is used in FCM handling code in Kastri
       if not FImageURL.IsEmpty then
         LData.AddPair('imageUrl', TJSONString.Create(FImageURL));
+      if not FClickAction.IsEmpty then
+        LData.AddPair('click_action', FClickAction);
     end;
     LHasData := LData.Count > 0;
   finally
