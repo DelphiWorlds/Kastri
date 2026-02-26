@@ -124,7 +124,10 @@ This process could be done manually via the command line or in a batch file, how
 
    ..and click `Execute` to build the R classes for play-services-base and add the resulting jar to the project
    
-4. Rebuild/deploy your project
+4. This process creates the file `play-services-ads-22.2.0-Manifest.merge.xml` in the root of your project file. 
+   
+   **This file should be DELETED before the next step.**
+5. Rebuild/deploy your project
 
 This adds a library with the same name as the project, with an extension of `.R.jar`, to the Libraries node of the Android 32-bit target in Project Manager. If you compile for Android 64-bit, the jar will still be compiled in with your app.
 
