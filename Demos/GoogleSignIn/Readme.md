@@ -6,13 +6,13 @@ A demo of the _very_ basic (so far) support in Kastri for Google SignIn on Andro
 
 ## Supported Delphi versions
 
-Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
+Delphi 13, Delphi 12.x. It *might* also work in earlier versions.
 
 ## Project Configuration
 
 In order to use this demo, you will need to follow the steps at the ["Getting Started with the Google SignIn SDK"](https://github.com/grijjy/DelphiGoogleSignIn#getting-started-with-the-google-signin-sdk) section of Grijjy's readme. Note that at the time of writing, the Grijjy implementation is based on Delphi 10.2, and is a few years out of date, so please just focus on that section.
 
-In `Unit1.pas` of the demo, replace the values for `cClientID` with the respective ClientID for Android and iOS. As per the Grijjy documentation, the Client ID value for Android is in the `google-services.json` file in the `oauth_client` member where `client_type` has a value of `3`. The Client ID value for iOS is at the Google Cloud Credentials page, in the OAuth 2.0 Client IDs section, where the name will be of the format:
+In `Unit1.pas` of the demo, replace the value for `cClientID` with the respective ClientID for Android. As per the Grijjy documentation, the Client ID value for Android is in the `google-services.json` file in the `oauth_client` member where `client_type` has a value of `3`. The Client ID value for iOS is at the Google Cloud Credentials page, in the OAuth 2.0 Client IDs section, where the name will be of the format:
 
 ```
 iOS client for com.yourdomain.projectname (auto created by Google Service)`
@@ -20,80 +20,97 @@ iOS client for com.yourdomain.projectname (auto created by Google Service)`
 
 where `com.yourdomain.projectname` is the identifier you used for the project in Firebase Console.
 
-### Build Event/Android Manifest
+### Android
 
-**Delphi 12.1, when not [using Codex 2.3.1](../../Delphi12.1.AndroidManifestIssue.md):**
+1. Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
+2. Modify `AndroidManifest.template.xml` to add the following *just before* `<%application-metadata%>`
 
-Due to changes in the Android build process:
+   ```
+   <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
+   ```
 
-* **Remove** the Build Events in Project Options for Android 32-bit and Android 64-bit 
-* Deploy the project *at least once* - this will create `AndroidManifest.template.xml`
-* Modify `AndroidManifest.template.xml` to add the following *just before* `<%application-metadata%>`
+   ..add the following just *after* `<%services%>`:
 
-  ```
-  <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
-  ```
-
-  ..add the following just *after* `<%services%>`:
-
-  ```
-    <service android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+   ```
+   <service android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
       android:exported="true"
       android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
       android:visibleToInstantApps="true" />
-  ```
+   ```
 
-  ..add the following just *after* the `</application>` end tag:
+   ..add the following just *after* the `</application>` end tag:
 
-  ```
-    <activity android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
-      android:excludeFromRecents="true"
-      android:exported="false"
-      android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-  ```
-
-**Delphi 12.0 or earlier:**
-
-Configure Build Events in Project Options to add a Post-Build event with the command:  
-
-```
-  [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
-```  
-Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
-
-`AndroidManifest.merge.xml` can be found in the root folder of the demo, and should be copied to the root folder of your project
-
-### Android (32 bit and 64 bit where required)
-
-* In the Project Options, modify the `Package` value in the Version Info section to be the value specified in your Firebase Project
+   ```
+     <activity android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+       android:excludeFromRecents="true"
+       android:exported="false"
+       android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+   ```
+3. In the Project Options, modify the `Package` value in the Version Info section to be the value specified in your Firebase Project
+4. In the Project Manager, under the Android target, right-click the Libraries node and add (from the Kastri files):
+   ```
+   Lib\dw-google-signin.jar
+   ThirdParty\Android\play-services-auth-19.2.0.jar
+   ThirdParty\Android\play-services-auth-base-17.1.3.jar
+   ```
+   *These have already been added in the demo*.
 
 ### iOS
 
-1. Go to [this link](https://github.com/firebase/firebase-ios-sdk/releases/tag/v8.15.0), download Firebase.zip, and extract it somewhere convenient
-2. In the IDE Options > Environment Variables, create a user override called `Firebase` which points to the unzipped SDK, **or** modify `Framework search path` in the Project Options for iOS Device 64-bit to point to the unzipped SDK
-3. In the Project Options for iOS Device 64-bit, modify the `CFBundleIndentifier` value in the Version Info section to use the identifier that corresponds to your App ID
-4. Modify `info.plist.TemplateiOS.xml` to replace the string value inside the array for the `CFBundleURLSchemes` key with your iOS ClientID **however in REVERSE notation**. (See the example in the demo files)
-5. Add the following iOS SDK frameworks as per [these instructions](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks#readme):
-   
+#### Firebase SDK
+
+Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now successfully be linked with Delphi code. Download the Firebase iOS SDK from one of these links:
+
+* Delphi 12.2 - [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
+* Delphi 12.1 and earlier - [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
+
+..and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK.
+
+In order to compile successfully for iOS, it's also necessary to:
+
+1. Add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
+2. Add the following frameworks to the iOS SDK in Delphi's SDK Manager (if they are not already added):
+   ```
    AuthenticationServices
+   DeviceCheck
+   ```
+  
+#### Project Options
+
+1. For the `Framework search path` value, you can either:
+   * Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo.
+  
+    **OR**
+   * Modify the **`Framework Search path`** value in the Project Options from the demo to use the path to the root of the Firebase SDK.
+
+2. In the Version Info section for iOS Device 64-bit, modify the `CFBundleIndentifier` value in the Version Info section to use the identifier that corresponds to your App ID
+
+#### info.plist
+
+Modify the `info.plist.TemplateiOS.xml` file in the root of your project. Inside the `<dict>` key (e.g. just below `<%StoryboardInfoPListKey%>`), add:
+```xml
+<key>GIDClientID</key>
+<string>YOUR_CLIENT_ID</string>
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>YOUR_CLIENT_ID_REVERSED</string>
+    </array>
+  </dict>
+</array>
+```
+Where `YOUR_CLIENT_ID` is the client ID value mentioned [in the Grijjy instructions](https://github.com/grijjy/DelphiGoogleSignIn?tab=readme-ov-file#getting-started-with-the-google-signin-sdk), and `YOUR_CLIENT_ID_REVERSED` is the same value **REVERSED** e.g if you have a client ID of:
+```
+1234567890123-ojgronkhr7acm8adc3hacljfse19or88.apps.googleusercontent.com
+```
+the *reverse* will be:
+```
+com.googleusercontent.apps.1234567890123-ojgronkhr7acm8adc3hacljfse19or88
+```
 
 
-## Integration into your own project
-
-* Please follow the steps as per the [Configuration](#configuration) section
-* In the Project Manager, under the Android target, right-click the Libraries node and add (from the Kastri files):
-    ```
-    Lib\dw-google-signin.jar
-    ThirdParty\Android\play-services-auth-19.2.0.jar
-    ThirdParty\Android\play-services-auth-base-17.1.3.jar
-    ```
-* In the Project Options, ensure that you have a Post Build event for merging the manifest, as per the demo. You may need to modify the command to suit your file locations.
-* In the Project Options, ensure that the search path for **all** platforms includes folders from the Kastri repo _as per the demo_
-* In the Project Options, ensure that the `Framework search path` for iOS Device 64-bit includes the Firebase SDK paths _as per the demo_
-
-**Note**:
-
-Due to a bug in Delphi 11.3 **ONLY**, if you need to compile for Android 64-bit, you will either need to apply [this workaround](https://docs.code-kungfu.com/books/hotfix-113-alexandria/page/fix-jar-libraries-added-to-android-64-bit-platform-target-are-not-compiled) (which will apply to **all** projects), **OR** copy the jar file(s) to _another folder_, and add them to the Libraries node of the Android 64-bit target. (Adding the same `.jar` file(s) to Android 64-bit does _not_ work)
 
 
 
