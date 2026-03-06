@@ -128,6 +128,7 @@ type
     {class} function _GetPLAY_SERVICES_VERSION_OUTDATED: Integer; cdecl;
     {class} function _GetPLAY_STORE_NOT_FOUND: Integer; cdecl;
     {class} function _GetPLAY_STORE_VERSION_OUTDATED: Integer; cdecl;
+    {class} function _GetSDK_VERSION_OUTDATED: Integer; cdecl;
     {class} property API_NOT_AVAILABLE: Integer read _GetAPI_NOT_AVAILABLE;
     {class} property APP_NOT_OWNED: Integer read _GetAPP_NOT_OWNED;
     {class} property CANNOT_BIND_TO_SERVICE: Integer read _GetCANNOT_BIND_TO_SERVICE;
@@ -139,6 +140,7 @@ type
     {class} property PLAY_SERVICES_VERSION_OUTDATED: Integer read _GetPLAY_SERVICES_VERSION_OUTDATED;
     {class} property PLAY_STORE_NOT_FOUND: Integer read _GetPLAY_STORE_NOT_FOUND;
     {class} property PLAY_STORE_VERSION_OUTDATED: Integer read _GetPLAY_STORE_VERSION_OUTDATED;
+    {class} property SDK_VERSION_OUTDATED: Integer read _GetSDK_VERSION_OUTDATED;
   end;
 
   [JavaSignature('com/google/android/play/agesignals/model/AgeSignalsErrorCode')]
@@ -149,11 +151,13 @@ type
 
   JAgeSignalsVerificationStatusClass = interface(JAnnotationClass)
     ['{AADD02F8-500A-42EC-BD0F-649C736C30C3}']
+    {class} function _GetDECLARED: Integer; cdecl;
     {class} function _GetSUPERVISED: Integer; cdecl;
     {class} function _GetSUPERVISED_APPROVAL_DENIED: Integer; cdecl;
     {class} function _GetSUPERVISED_APPROVAL_PENDING: Integer; cdecl;
     {class} function _GetUNKNOWN: Integer; cdecl;
     {class} function _GetVERIFIED: Integer; cdecl;
+    {class} property DECLARED: Integer read _GetDECLARED;
     {class} property SUPERVISED: Integer read _GetSUPERVISED;
     {class} property SUPERVISED_APPROVAL_DENIED: Integer read _GetSUPERVISED_APPROVAL_DENIED;
     {class} property SUPERVISED_APPROVAL_PENDING: Integer read _GetSUPERVISED_APPROVAL_PENDING;
