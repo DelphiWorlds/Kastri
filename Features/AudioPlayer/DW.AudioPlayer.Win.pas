@@ -121,9 +121,9 @@ end;
 
 procedure TPlatformAudioPlayer.Stop;
 begin
-  if FMediaControl <> nil then
+  if (FMediaControl <> nil) and (AudioState <> TAudioState.Stopped) then
   begin
-    if Succeeded(FMediaControl.StopWhenReady) then
+    if Succeeded(FMediaControl.Stop) then
       Stopped;
   end;
 end;
@@ -172,28 +172,29 @@ procedure TPlatformAudioPlayer.WMGraphEvent(var Msg: TMessage);
 var
   LCode: Integer;
   LParam1, LParam2: LONG_PTR;
+  LMediaEvent: IMediaEventEx;
 begin
-  if FMediaEventEx <> nil then
-  begin
-    while Succeeded(FMediaEventEx.GetEvent(LCode, LParam1, LParam2, 0)) do
-    try
-      case LCode of
-        EC_COMPLETE, EC_USERABORT, EC_ERRORABORT:
-          Stopped;
-        EC_PAUSED:
+  LMediaEvent := FMediaEventEx;
+  if LMediaEvent = nil then
+    Exit;
+
+  while Succeeded(LMediaEvent.GetEvent(LCode, LParam1, LParam2, 0)) do begin
+    // Always free first
+    LMediaEvent.FreeEventParams(LCode, LParam1, LParam2);
+    case LCode of
+      EC_COMPLETE, EC_USERABORT, EC_ERRORABORT:
+        Stopped;
+      EC_PAUSED:
+      begin
+        if AudioState <> TAudioState.Playing then
         begin
-          if AudioState <> TAudioState.Playing then
-          begin
-            if FDelay = 0 then
-              FDelay := MilliSecondsBetween(Now, FPlayStartTime);
-            DoAudioStateChange(TAudioState.Playing);
-          end
-          else
-            DoAudioStateChange(TAudioState.Paused);
-        end;
+          if FDelay = 0 then
+            FDelay := MilliSecondsBetween(Now, FPlayStartTime);
+          DoAudioStateChange(TAudioState.Playing);
+        end
+        else
+          DoAudioStateChange(TAudioState.Paused);
       end;
-    finally
-      FMediaEventEx.FreeEventParams(LCode, LParam1, LParam2);
     end;
   end;
 end;
