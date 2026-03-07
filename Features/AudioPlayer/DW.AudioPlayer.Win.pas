@@ -172,6 +172,7 @@ procedure TPlatformAudioPlayer.WMGraphEvent(var Msg: TMessage);
 var
   LCode: Integer;
   LParam1, LParam2: LONG_PTR;
+  LHasStopped: Boolean;
 begin
   if FMediaEventEx <> nil then
   begin
@@ -179,7 +180,7 @@ begin
     try
       case LCode of
         EC_COMPLETE, EC_USERABORT, EC_ERRORABORT:
-          Stopped;
+          LHasStopped := True;
         EC_PAUSED:
         begin
           if AudioState <> TAudioState.Playing then
@@ -195,6 +196,8 @@ begin
     finally
       FMediaEventEx.FreeEventParams(LCode, LParam1, LParam2);
     end;
+    if LHasStopped then
+      Stopped;
   end;
 end;
 
