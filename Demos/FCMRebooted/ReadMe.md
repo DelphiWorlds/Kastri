@@ -50,7 +50,7 @@ To use FCM, download the appropriate Firebase iOS binaries.
 
 For those using Delphi 12.1 (e.g. Delphi CE) or earlier, see [below](#legacy). 
 
-Previously this involved the official releases from Firebase. They are now sourced from the [Binaries repo from Delphi Worlds](). The current [release to support FCM is here]().
+Previously this involved the official releases from Firebase. They are now sourced from the [Binaries repo from Delphi Worlds](https://github.com/DelphiWorlds/Binaries). The current [release to support FCM is here](https://github.com/DelphiWorlds/Binaries/releases/tag/iOS-Arm64-Firebase-Messaging-12.6.0-ML-Kit-Barcode-Scanning-9.0.0-v1.0.0).
 
 Unzip the file to a folder of your choice and create an [Environment Variable Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) named `Firebase` pointing to the folder. Alternatively, update the [Framework Search Path](#framework-search-path).
 
