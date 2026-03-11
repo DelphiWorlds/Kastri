@@ -10,5 +10,5 @@ TPDFControl simply renders the pages of the PDF, and provides page count and pag
 
 ## Supported Delphi versions
 
-The demo should compile and work for at least versions 10.4.x and 11.x
+The demo should compile and work for at least versions 13.x and possibly earlier
 
