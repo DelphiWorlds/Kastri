@@ -21,6 +21,7 @@ The "full screen" ad types:
 * TInterstitialAd
 * TRewardedInterstitialAd
 * TRewardedAd
+* TOpenAd
 
 ..have an option of performing the load of an ad, and showing an ad, all in one call by calling `Load` with no parameters, **OR** the load can be performed separately by calling `Load(False)`, and once the ad is loaded (which happens in the background), the `OnAdLoaded` event is called, and at that point the `Show` method can be called to show the ad.  
 
@@ -38,7 +39,7 @@ A package containing the component is available as [KastriAdMob.dproj](https://g
 
 ### User Messaging Platform (UMP) support
 
-As [required by Google](https://support.google.com/admob/answer/10114014), if using AdMob, your app must show a consent message before ads can be shown. Kastri supports this via the `DW.AdMob` unit. Call RequestConsent when your app is ready to request constent.
+As [required by Google](https://support.google.com/admob/answer/10114014), if using AdMob, your app must show a consent message before ads can be shown. Kastri supports this via the `DW.AdMob` unit. Call `RequestConsent` when your app is ready to request constent.
 
 ```delphi
   AdMob.RequestConsent; // Call RequestConsent(True) to bypass UMP
@@ -137,22 +138,17 @@ If you are using Ad UnitIds that are **not** for testing, please see [this secti
 
 ### iOS
 
-#### Firebase SDK
+#### AdMob Frameworks
 
-Delphi 12.2 has an updated linker, which means that newer iOS SDKs can now successfully be linked with Delphi code. Download the Firebase iOS SDK from one of these links:
+The frameworks required for AdMob support on iOS have been re-packaged into a convenient folder structure, and [published in the binaries repo on Github](https://github.com/DelphiWorlds/Binaries/releases/tag/iOS-Arm64-AdMobFrameworks-v1.0.0).
 
-* Delphi 12.2 - [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
-* Delphi 12.1 and earlier - [Firebase iOS SDK 10.8.0](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip)
+Download the .zip file listed in the Assets section and unzip to a convenient folder.
 
-..and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. 
-
-Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
-
-**NOTE:** Using GoogleMobileAds from Firebase iOS SDK 11.2.0 requires that the **minimum version of iOS be set to 12.0** (see [Linker Options](#linker-options))
+**NOTE:** Using the AdMob Frameworks requires that the **minimum version of iOS be set to 13.0** (see [Linker Options](#linker-options))
 
 In order to compile successfully for iOS, it's also necessary to:
 
-1. Add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
+1. **If using earlier than Delphi 13.0**, add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
 2. Add the following frameworks to the iOS SDK in Delphi's SDK Manager (if they are not already added):
 
 * Accessibility
@@ -162,39 +158,23 @@ In order to compile successfully for iOS, it's also necessary to:
 * CoreMotion
 * CoreTransferable
 * DataDetection
-* MarketplaceKit (if using Firebase iOS SDK v11.2.0)
-* Network (if using Firebase iOS SDK v11.2.0)
+* MarketplaceKit
+* Network
 * SwiftCore
 * SwiftUI
 * UniformTypeIdentifiers
 
-Remember that using Firebase iOS SDK v11.2.0 requires **Delphi 12.2 or later**
-
 [This link](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSDKFrameworks) describes how to add the frameworks.
 
-### Project Options
+### Framework search path
 
-If creating your own project:
+In the demo, this value is set to: `$(AdMob)`, which is a macro for an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `AdMob` that is intended to point to the folder where the AdMob Frameworks are unzipped to. 
 
-#### Framework search path
-
-In Project Options, set the Framework Search Path value for iOS Device 64-bit target to:
-
-When using Firebase iOS SDK 10.8.0:
-
-```
-$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64_armv7;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64_armv7;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64_armv7
-```
-
-When using Firebase iOS SDK 11.2.0 - **Delphi 12.2 or later**:
-
-```
-$(Firebase)\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurement.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleAppMeasurementIdentitySupport.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;$(Firebase)\FirebaseAnalytics\nanopb.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\GoogleMobileAds.xcframework\ios-arm64;$(Firebase)\Google-Mobile-Ads-SDK\UserMessagingPlatform.xcframework\ios-arm64
-```
+If you use this macro, you will need to create the User System Override in the **IDE** options. Otherwise, update the `Framework search path` value.
 
 #### Linker Options
 
-For `Minimum iOS version supported`, when using **Firebase iOS SDK 11.2.0 - Delphi 12.2 or later**, ensure the value is set to: `12.0`
+For `Minimum iOS version supported`, ensure the value is set to: `13.0`.
 
 For the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit, ensure you have a value of: 
 ```
