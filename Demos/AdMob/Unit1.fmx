@@ -18,11 +18,11 @@ object Form1: TForm1
     Margins.Right = 4.000000000000000000
     Margins.Bottom = 4.000000000000000000
     Size.Width = 448.000000000000000000
-    Size.Height = 492.000000000000000000
+    Size.Height = 440.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     Viewport.Width = 444.000000000000000000
-    Viewport.Height = 488.000000000000000000
+    Viewport.Height = 436.000000000000000000
   end
   object ButtonsLayout: TLayout
     Align = Bottom
@@ -30,12 +30,12 @@ object Form1: TForm1
     Padding.Top = 4.000000000000000000
     Padding.Right = 4.000000000000000000
     Padding.Bottom = 4.000000000000000000
-    Position.Y = 500.000000000000000000
+    Position.Y = 448.000000000000000000
     Size.Width = 456.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
-    object ShowBanner: TButton
+    object ShowBannerAdButton: TButton
       Align = Left
       Enabled = False
       Position.X = 4.000000000000000000
@@ -45,10 +45,9 @@ object Form1: TForm1
       Size.PlatformDefault = False
       TabOrder = 3
       Text = 'Banner'
-      TextSettings.Trimming = None
-      OnClick = ShowBannerClick
+      OnClick = ShowBannerAdButtonClick
     end
-    object ShowInterstitial: TButton
+    object ShowInterstitialAdButton: TButton
       Align = Left
       Enabled = False
       Margins.Left = 8.000000000000000000
@@ -59,10 +58,9 @@ object Form1: TForm1
       Size.PlatformDefault = False
       TabOrder = 2
       Text = 'Interstitial'
-      TextSettings.Trimming = None
-      OnClick = ShowInterstitialClick
+      OnClick = ShowInterstitialAdButtonClick
     end
-    object ShowReward: TButton
+    object ShowRewardAdButton: TButton
       Align = Left
       Enabled = False
       Margins.Left = 8.000000000000000000
@@ -73,21 +71,20 @@ object Form1: TForm1
       Size.PlatformDefault = False
       TabOrder = 1
       Text = 'Reward'
-      TextSettings.Trimming = None
-      OnClick = ShowRewardClick
+      OnClick = ShowRewardAdButtonClick
     end
-    object ConsentButton: TButton
-      Align = Right
+    object ShowOpenAdButton: TButton
+      Align = Left
+      Enabled = False
       Margins.Left = 8.000000000000000000
-      Position.X = 372.000000000000000000
+      Position.X = 268.000000000000000000
       Position.Y = 4.000000000000000000
       Size.Width = 80.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
-      Text = 'Consent'
-      TextSettings.Trimming = None
-      OnClick = ConsentButtonClick
+      Text = 'Open'
+      OnClick = ShowOpenAdButtonClick
     end
   end
   object AdMobBannerAd1: TAdMobBannerAd
@@ -104,5 +101,30 @@ object Form1: TForm1
     OnAdImpression = AdMobBannerAd1AdImpression
     OnAdLoaded = AdMobBannerAd1AdLoaded
     OnAdOpened = AdMobBannerAd1AdOpened
+  end
+  object ConsentLayout: TLayout
+    Align = Bottom
+    Padding.Left = 4.000000000000000000
+    Padding.Top = 4.000000000000000000
+    Padding.Right = 4.000000000000000000
+    Padding.Bottom = 4.000000000000000000
+    Margins.Top = 12.000000000000000000
+    Position.Y = 500.000000000000000000
+    Size.Width = 456.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    object ConsentButton: TButton
+      Align = HorzCenter
+      Margins.Left = 8.000000000000000000
+      Position.X = 192.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Consent'
+      OnClick = ConsentButtonClick
+    end
   end
 end
