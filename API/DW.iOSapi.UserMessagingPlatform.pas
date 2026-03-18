@@ -22,6 +22,8 @@ uses
 const
   UMPDebugGeographyDisabled = 0;
   UMPDebugGeographyEEA = 1;
+  UMPDebugGeographyRegulatedUSState = 3;
+  UMPDebugGeographyOther = 4;
   UMPDebugGeographyNotEEA = 2;
   UMPConsentStatusUnknown = 0;
   UMPConsentStatusRequired = 1;
@@ -30,6 +32,9 @@ const
   UMPFormStatusUnknown = 0;
   UMPFormStatusAvailable = 1;
   UMPFormStatusUnavailable = 2;
+  UMPPrivacyOptionsRequirementStatusUnknown = 0;
+  UMPPrivacyOptionsRequirementStatusRequired = 1;
+  UMPPrivacyOptionsRequirementStatusNotRequired = 2;
   UMPRequestErrorCodeInternal = 1;
   UMPRequestErrorCodeInvalidAppID = 2;
   UMPRequestErrorCodeNetwork = 3;
@@ -38,6 +43,7 @@ const
   UMPFormErrorCodeAlreadyUsed = 6;
   UMPFormErrorCodeUnavailable = 7;
   UMPFormErrorCodeTimeout = 8;
+  UMPFormErrorCodeInvalidViewController = 9;
 
 type
   UMPDebugSettings = interface;
@@ -48,6 +54,7 @@ type
   UMPDebugGeography = NSInteger;
   UMPConsentStatus = NSInteger;
   UMPFormStatus = NSInteger;
+  UMPPrivacyOptionsRequirementStatus = NSInteger;
 
   UMPConsentInformationUpdateCompletionHandler = procedure(error: NSError) of object;
 
@@ -77,6 +84,7 @@ type
   UMPRequestParameters = interface(NSObject)
     ['{BB4E84D3-D839-4759-BDF7-2FCCA158DBDC}']
     function debugSettings: UMPDebugSettings; cdecl;
+    procedure setConsentSyncID(consentSyncID: NSString); cdecl;
     procedure setDebugSettings(debugSettings: UMPDebugSettings); cdecl;
     procedure setTagForUnderAgeOfConsent(tagForUnderAgeOfConsent: Boolean); cdecl;
     function tagForUnderAgeOfConsent: Boolean; cdecl;
@@ -90,8 +98,10 @@ type
 
   UMPConsentInformation = interface(NSObject)
     ['{DA65165D-70A3-4E44-AD44-F7FD3E55F147}']
+    function canRequestAds: Boolean; cdecl;
     function consentStatus: UMPConsentStatus; cdecl;
     function formStatus: UMPFormStatus; cdecl;
+    function privacyOptionsRequirementStatus: UMPPrivacyOptionsRequirementStatus; cdecl;
     procedure requestConsentInfoUpdateWithParameters(parameters: UMPRequestParameters; completionHandler: UMPConsentInformationUpdateCompletionHandler); cdecl;
     procedure reset; cdecl;
   end;
@@ -99,7 +109,9 @@ type
 
   UMPConsentFormClass = interface(NSObjectClass)
     ['{31A61A37-706C-4024-A629-E40C99C6F915}']
+    {class} procedure loadAndPresentIfRequiredFromViewController(viewController: UIViewController; completionHandler: UMPConsentFormPresentCompletionHandler); cdecl;
     {class} procedure loadWithCompletionHandler(completionHandler: UMPConsentFormLoadCompletionHandler); cdecl;
+    {class} procedure presentPrivacyOptionsFormFromViewController(viewController: UIViewController; completionHandler: UMPConsentFormPresentCompletionHandler); cdecl;
   end;
 
   UMPConsentForm = interface(NSObject)
