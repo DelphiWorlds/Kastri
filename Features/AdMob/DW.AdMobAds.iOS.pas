@@ -95,7 +95,6 @@ type
     FAd: GADAppOpenAd;
     FDelegate: TFullScreenContentDelegate;
     procedure AdLoadCompletionHandler(appOpenAd: GADAppOpenAd; error: NSError);
-    function GetOrientation: UIInterfaceOrientation;
     procedure LoadAd;
     procedure PaidEventHandler(value: GADAdValue);
     procedure ShowAdIfAvailable(const ACanShow: Boolean);
@@ -103,6 +102,8 @@ type
     procedure ApplicationBecameActive; override;
     procedure ApplicationEnteredBackground; override;
     procedure DoAdDismissedFullScreenContent; override;
+    procedure DoLoad; override;
+    procedure DoShow; override;
   public
     constructor Create(const AAppOpenAd: TAppOpenAd); override;
     destructor Destroy; override;
@@ -389,6 +390,16 @@ begin
   inherited;
 end;
 
+procedure TPlatformAppOpenAd.DoLoad;
+begin
+  LoadAd;
+end;
+
+procedure TPlatformAppOpenAd.DoShow;
+begin
+  ShowAdIfAvailable(True);
+end;
+
 procedure TPlatformAppOpenAd.ApplicationBecameActive;
 begin
   ShowAdIfAvailable(IsWarmStart);
@@ -397,14 +408,6 @@ end;
 procedure TPlatformAppOpenAd.ApplicationEnteredBackground;
 begin
   //
-end;
-
-function TPlatformAppOpenAd.GetOrientation: UIInterfaceOrientation;
-begin
-  if Orientation = TAppOpenAdOrientation.Landscape then
-    Result := UIInterfaceOrientationLandscapeLeft
-  else
-    Result := UIInterfaceOrientationPortrait;
 end;
 
 procedure TPlatformAppOpenAd.AdLoadCompletionHandler(appOpenAd: GADAppOpenAd; error: NSError);
@@ -423,7 +426,7 @@ end;
 
 procedure TPlatformAppOpenAd.LoadAd;
 begin
-  TGADAppOpenAd.OCClass.loadWithAdUnitID(StrToNSStr(AdUnitID), TGADHelper.GetRequest, GetOrientation, AdLoadCompletionHandler);
+  TGADAppOpenAd.OCClass.loadWithAdUnitID(StrToNSStr(AdUnitID), TGADHelper.GetRequest, AdLoadCompletionHandler);
 end;
 
 procedure TPlatformAppOpenAd.PaidEventHandler(value: GADAdValue);
@@ -435,7 +438,7 @@ procedure TPlatformAppOpenAd.ShowAdIfAvailable(const ACanShow: Boolean);
 begin
   if (FAd <> nil) and ACanShow then // and load time was less than 4 hours ago??
     FAd.presentFromRootViewController(SharedApplication.keyWindow.rootViewController)
-  else if FAd = nil then
+  else if (FAd = nil) and AdMob.IsStarted then
     LoadAd;
 end;
 
