@@ -53,7 +53,7 @@ type
     procedure AddSelectedFile(const ASelectedFile: TSelectedFile);
     procedure DoComplete(const AOK: Boolean);
     procedure DoImageStream(const AFileName: string; const AImageStream: TStream);
-    procedure DoSelect(const AMode: TSelectionMode); virtual; abstract;
+    procedure DoSelect(const AMode: TSelectionMode); virtual;
     procedure FileKindsChanged; virtual;
     procedure FileTypesChanged; virtual;
     procedure Select(const AMode: TSelectionMode);
@@ -186,6 +186,11 @@ end;
 procedure TCustomPlatformFilesSelector.DoImageStream(const AFileName: string; const AImageStream: TStream);
 begin
   FSelector.DoImageStream(AFileName, AImageStream);
+end;
+
+procedure TCustomPlatformFilesSelector.DoSelect(const AMode: TSelectionMode);
+begin
+  //
 end;
 
 procedure TCustomPlatformFilesSelector.FileKindsChanged;

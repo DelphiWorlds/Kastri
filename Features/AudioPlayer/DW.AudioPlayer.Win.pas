@@ -176,6 +176,7 @@ var
 begin
   if FMediaEventEx <> nil then
   begin
+    LHasStopped := False;
     while Succeeded(FMediaEventEx.GetEvent(LCode, LParam1, LParam2, 0)) do
     try
       case LCode of
