@@ -1146,6 +1146,7 @@ var
   LOutputChannel: JFileChannel;
   LPFD: JParcelFileDescriptor;
 begin
+  Result := False;
   LInputStream := TJFileInputStream.JavaClass.init(AFile);
   if LInputStream <> nil then
   try
