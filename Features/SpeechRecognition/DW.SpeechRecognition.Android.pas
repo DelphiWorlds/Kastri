@@ -37,6 +37,7 @@ type
     procedure onEndOfSpeech; cdecl;
     procedure onError(error: Integer); cdecl;
     procedure onEvent(eventType: Integer; params: JBundle); cdecl;
+    procedure onLanguageDetection(results: JBundle); cdecl;
     procedure onPartialResults(partialResults: JBundle); cdecl;
     procedure onReadyForSpeech(params: JBundle); cdecl;
     procedure onResults(results: JBundle); cdecl;
@@ -133,6 +134,11 @@ end;
 procedure TSpeechRecognitionListener.onEvent(eventType: Integer; params: JBundle);
 begin
   FPlatformSpeech.Event(eventType, params);
+end;
+
+procedure TSpeechRecognitionListener.onLanguageDetection(results: JBundle);
+begin
+  //
 end;
 
 procedure TSpeechRecognitionListener.onPartialResults(partialResults: JBundle);
