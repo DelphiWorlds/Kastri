@@ -340,16 +340,8 @@ begin
 end;
 
 procedure TPlatformVideoPlayer.ItemDidPlayToEndTime;
-const
-  NSEC_PER_SEC = 1000000000;
 begin
-  if NeedsLoop then
-  begin
-    FPlayer.seekToTime(CMTimeMakeWithSeconds(0, NSEC_PER_SEC));
-    FPlayer.play;
-  end
-  else
-    SetPlayerState(TPlayerState.Completed);
+  SetPlayerState(TPlayerState.Completed);
 end;
 
 procedure TPlatformVideoPlayer.ItemFailedToPlayToEndTime;

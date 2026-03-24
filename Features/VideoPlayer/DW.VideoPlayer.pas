@@ -49,6 +49,7 @@ type
     procedure ViewTouched;
     procedure WillBecomeInactive; virtual;
     property ControllerTimeout: Integer read FControllerTimeout write SetControllerTimeout;
+    property PlayerState: TPlayerState read FPlayerState;
     property UseController: Boolean read FUseController write SetUseController;
     property View: TPresentedControl read FView;
   public
