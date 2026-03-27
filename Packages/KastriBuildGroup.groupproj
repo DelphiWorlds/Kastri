@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{00A0894F-2D17-413A-9D67-DA63719B25D4}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="KastriBuild.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="KastriBuildWin.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="KastriBuild">
+        <MSBuild Projects="KastriBuild.dproj"/>
+    </Target>
+    <Target Name="KastriBuild:Clean">
+        <MSBuild Projects="KastriBuild.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KastriBuild:Make">
+        <MSBuild Projects="KastriBuild.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="KastriBuildWin">
+        <MSBuild Projects="KastriBuildWin.dproj"/>
+    </Target>
+    <Target Name="KastriBuildWin:Clean">
+        <MSBuild Projects="KastriBuildWin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="KastriBuildWin:Make">
+        <MSBuild Projects="KastriBuildWin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="KastriBuild;KastriBuildWin"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="KastriBuild:Clean;KastriBuildWin:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="KastriBuild:Make;KastriBuildWin:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
