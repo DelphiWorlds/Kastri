@@ -13,11 +13,7 @@ unit DW.FCMSender;
 
 
 // ********* NOTE *************
-// This unit is dependent on code/binaries from Grijjy, which can be found here:
-//   https://github.com/grijjy/DelphiOpenSsl
-// This unit requires the OpenSSL.Api_11 unit from DelphiOpenSsl (see the implementation section of this unit)
-// For Windows, it is also dependent on the Open SSL DLLs, located here:
-//   https://github.com/grijjy/DelphiOpenSsl/tree/master/Bin
+// This unit requires OpenSSL 3.x. See the DW.OpenSSL unit in the Core folder.
 // The DLLs for the relevant platform (i.e. Win32 or Win64) will need to be in the same folder as your executable, or in the system path
 
 interface
