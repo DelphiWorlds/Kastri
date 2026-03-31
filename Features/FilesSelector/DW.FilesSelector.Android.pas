@@ -96,6 +96,8 @@ begin
       end;
     TFileKind.Key:
       Result := 'application/pgp-keys';
+    TFileKind.Generic:
+      Result := 'application/octet-stream';
   else
     Result := '';
   end;

@@ -163,6 +163,8 @@ begin
       Result := 'com.adobe.pdf';
     TFileKind.QuickTimeMovie:
       Result := 'com.apple.quicktime-movie';
+    TFileKind.Generic:
+      Result := 'public.data';
   else
     Result := 'public.item';
   end;

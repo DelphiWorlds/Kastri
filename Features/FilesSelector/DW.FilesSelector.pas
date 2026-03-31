@@ -32,7 +32,7 @@ type
 
   TSelectedFiles = TArray<TSelectedFile>;
 
-  TFileKind = (Image, Audio, Movie, Text, Item, Content, SourceCode, PDF, X509Certificate, Key, Photo, QuickTimeMovie);
+  TFileKind = (Image, Audio, Movie, Text, Item, Content, SourceCode, PDF, X509Certificate, Key, Photo, QuickTimeMovie, Generic);
 
   TFileKinds = set of TFileKind;
 
