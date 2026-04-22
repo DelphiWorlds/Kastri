@@ -111,7 +111,7 @@ In order to compile successfully for iOS, it's also necessary to:
 - Set the **Minimum iOS version supported** to `13.0`
 - Add the following linker options:
   ```text
-  -ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib -weak_library /usr/lib/swift/libswiftFileProvider.dylib -weak_library /usr/lib/swift/libswiftOSLog.dylib -weak_library /usr/lib/swift/libswiftXPC.dylib
+  -ObjC -rpath /usr/lib/swift -weak_library /usr/lib/swift/libswift_Builtin_float.dylib -weak_library /usr/lib/swift/libswift_Concurrency.dylib -weak_library /usr/lib/swift/libswift_errno.dylib -weak_library /usr/lib/swift/libswift_math.dylib -weak_library /usr/lib/swift/libswift_signal.dylib -weak_library /usr/lib/swift/libswift_stdio.dylib -weak_library /usr/lib/swift/libswift_StringProcessing.dylib -weak_library /usr/lib/swift/libswift_time.dylib -weak_library /usr/lib/swift/libswiftDataDetection.dylib -weak_library /usr/lib/swift/libswiftFileProvider.dylib -weak_library /usr/lib/swift/libswiftObservation.dylib -weak_library /usr/lib/swift/libswiftOSLog.dylib -weak_library /usr/lib/swift/libswiftunistd.dylib -weak_library /usr/lib/swift/libswiftXPC.dylib
   ```
 
 ---
