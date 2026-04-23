@@ -381,7 +381,7 @@ end;
 procedure TLocation.Pause;
 begin
   TOSLog.d('TLocation.Pause calling stopLocationUpdates');
-  FClient.stopLocationUpdates;
+  FClient.stopLocationUpdates(False);
 end;
 
 procedure TLocation.Resume;
