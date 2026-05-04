@@ -46,6 +46,14 @@ begin
 end;
 ```
 
+In the procedure `TFcmPushService.Register` method, **REMOVE** this line:
+
+```delphi
+  TFIRApp.OCClass.configure;
+```
+
+..as it is called elsewhere by the Kastri code
+
 i.e. the calls to `RequestAuthorization` and `Register` are **swapped**.
 
 ### Additional changes for Delphi 13.1 - See below for additional changes for Delphi 13.0 or earlier
@@ -94,12 +102,6 @@ procedure TFIRMessagingDelegate.messaging(messaging: FIRMessaging; didReceiveReg
 begin
   FPushService.SetDeviceToken(NSStrToStr(didReceiveRegistrationToken));
 end;
-```
-
-In the procedure `TFcmPushService.Register` method, **REMOVE** this line:
-
-```delphi
-  TFIRApp.OCClass.configure;
 ```
 
 Modify the `TFcmPushService.RegisterRemoteNotificationsIOS10OrLater` method to look like this:
