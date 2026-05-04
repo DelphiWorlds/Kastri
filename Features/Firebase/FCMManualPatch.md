@@ -8,8 +8,6 @@ Copy `FMX.PushNotification.FCM.iOS.pas` from the the Delphi `source\fmx` folder 
 
 ## Modify the copied source file
 
-In the `implementation` section:
-
 Modify the uses clause to:
 
 ```delphi
@@ -20,6 +18,50 @@ uses
   DW.iOSapi.FirebaseCore, DW.iOSapi.FirebaseMessaging, DW.FCMManager,
   FMX.Forms, FMX.Platform;
 ```
+Modify the `TFcmPushService` **declaration** to add this method just before the `Unregister` method:
+
+```delphi
+    procedure RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
+```
+
+Add this method:
+
+```delphi
+procedure TFcmPushService.RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
+begin
+  if not TiOSHelper.SharedApplication.isRegisteredForRemoteNotifications then
+    TiOSHelper.SharedApplication.registerForRemoteNotifications;
+end;
+```
+
+Modify the `TFcmPushService.StartService` method to:
+
+```delphi
+procedure TFcmPushService.StartService;
+begin
+  FStatus := TPushService.TStatus.Starting;
+  DoChange([TChange.Status]);
+  RequestAuthorization;
+  Register;
+end;
+```
+
+i.e. the calls to `RequestAuthorization` and `Register` are **swapped**.
+
+### Additional changes for Delphi 13.1 - See below for additional changes for Delphi 13.0 or earlier
+
+Modify the `TFcmPushService.RequestAuthorization` method to:
+
+```delphi
+procedure TFcmPushService.RequestAuthorization;
+begin
+  UserNotificationCenter.requestAuthorizationWithOptions(FCM.GetNativeAuthOptions, RequestAuthorizationWithOptionsCompletionHandler);
+end;
+```
+
+This enables the support for the full authorization options available via the `AuthOptions` property of `IFCMManager`
+
+### Additional changes for Delphi 13.0 or earlier
 
 Modify the `TFIRMessagingDelegate` declaration to:
 
@@ -33,12 +75,6 @@ Modify the `TFIRMessagingDelegate` declaration to:
   public
     constructor Create(const APushService: TFcmPushService);
   end;
-```
-
-Modify the `TFcmPushService` **declaration** to add this method just before the `Unregister` method:
-
-```delphi
-    procedure RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
 ```
 
 Remove these methods:
@@ -66,30 +102,6 @@ In the procedure `TFcmPushService.Register` method, **REMOVE** this line:
   TFIRApp.OCClass.configure;
 ```
 
-Modify the method to:
-
-```delphi
-procedure TFcmPushService.StartService;
-begin
-  FStatus := TPushService.TStatus.Starting;
-  DoChange([TChange.Status]);
-  RequestAuthorization;
-  Register;
-end;
-```
-
-i.e. the calls to `RequestAuthorization` and `Register` are **swapped**.
-
-Add this method:
-
-```delphi
-procedure TFcmPushService.RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
-begin
-  if not TiOSHelper.SharedApplication.isRegisteredForRemoteNotifications then
-    TiOSHelper.SharedApplication.registerForRemoteNotifications;
-end;
-```
-
 Modify the `TFcmPushService.RegisterRemoteNotificationsIOS10OrLater` method to look like this:
 
 ```delphi
@@ -100,4 +112,3 @@ end;
 ```
 
 This enables the support for the full authorization options available via the `AuthOptions` property of `IFCMManager`
-
