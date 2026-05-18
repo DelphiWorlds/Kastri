@@ -44,6 +44,8 @@ Modify `AndroidManifest.template.xml` by adding the following line under `<%appl
 
 #### Firebase iOS SDK
 
+**NOTE: If you are combining the Barcode Reader feature with Firebase Cloud Messaging, see [this section](#barcode-reader-plus-firebase-cloud-messaging).**
+
 The Firebase iOS SDK version you use depends on your Delphi version:
 
 - **Delphi 12.2**: [Firebase iOS SDK 11.2.0](https://github.com/firebase/firebase-ios-sdk/releases/download/11.2.0/Firebase.zip)
@@ -51,11 +53,19 @@ The Firebase iOS SDK version you use depends on your Delphi version:
 
 Unzip the SDK to a folder accessible to your projects. Ideally, use a common folder for multiple projects.
 
-**Note**:
-- If combining with [Firebase Cloud Messaging (Kastri)](https://github.com/DelphiWorlds/Kastri/tree/master/Demos/FCMRebooted), you must use **Firebase iOS SDK 10.8.0** due to library conflicts.
-- For **Firebase iOS SDK 11.2.0**, set the minimum iOS version to **12.0** (see [Linker Options](#linker-options)).
-
 Set an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) named `Firebase`, pointing to the folder where the SDK is unzipped. This corresponds to the `$(Firebase)` macro in the Project Options. Alternatively, modify the [Framework Search Path](#framework-search-path) to point to the SDK folder.
+
+#### Barcode Reader plus Firebase Cloud Messaging
+
+Due to potential conflicts in compatibility between the official releases of the Firebase iOS SDK and MLKit Barcode Scanning iOS SDK, a [release of pre-built binaries](https://github.com/DelphiWorlds/Binaries/releases/tag/iOS-Arm64-Firebase-Messaging-12.6.0-ML-Kit-Barcode-Scanning-9.0.0-v1.0.0) has been made available in the Binaries repo. 
+
+If using these binaries, unzip the release and in the Project Options for the iOS Device - 64 bit platform:
+
+1. Update the **Framework Search Path** value to the folder where the binaries were unzipped to
+2. Remove the `ThirdParty\iOS` folder from the **Search Path** value
+3. In the Linker Options, set the Minimum iOS Version value to 15.5, if you wish to avoid linker warnings.
+
+The binaries were built to support iOS 15.5 or higher - at present, there are approximately 5% of devices running less than iOS 16.0
 
 #### Swift Compatibility Libraries
 
