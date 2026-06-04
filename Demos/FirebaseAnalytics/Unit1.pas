@@ -13,6 +13,7 @@ type
     procedure LoginEventButtonClick(Sender: TObject);
   private
     FAnalytics: TFirebaseAnalytics;
+    procedure SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -30,6 +31,9 @@ implementation
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
+  {$IF CompilerVersion > 36}
+  OnSafeAreaChanged := SafeAreaChangedHandler;
+  {$ENDIF}
   FAnalytics := TFirebaseAnalytics.Create;
 end;
 
@@ -45,6 +49,11 @@ var
 begin
   LParams := [];
   FAnalytics.LogEvent(TAnalyticsEvent.Login, LParams);
+end;
+
+procedure TForm1.SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Rect := AInsets;
 end;
 
 end.
