@@ -729,4 +729,9 @@ begin
   Result := StrToNSStr('allow_personalized_ads');
 end;
 
+procedure FirebaseAnalyticsLoader; cdecl; external framework 'FirebaseAnalytics';
+
+procedure libswiftsimdLoader; cdecl; external '/usr/lib/swift/libswiftsimd.dylib';
+procedure libswiftSpatialLoader; cdecl; external '/usr/lib/swift/libswiftSpatial.dylib';  // iOS 16.0
+
 end.

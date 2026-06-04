@@ -120,7 +120,6 @@ procedure CLangRTLoader; cdecl;
   external '/usr/lib/clang/lib/darwin/libclang_rt.iossim.a'; // Fixes linker error: ___isOSVersionAtLeast missing (iOS SDK 12.x)
   {$ENDIF}
 procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
-// procedure FirebaseAnalyticsLoader; cdecl; external framework 'FirebaseAnalytics';
 procedure FirebaseCoreLoader; cdecl; external framework 'FirebaseCore';
 procedure FirebaseCoreInternalLoader; cdecl; external framework 'FirebaseCoreInternal';
 procedure FirebaseInstallationsLoader cdecl; external framework 'FirebaseInstallations';
