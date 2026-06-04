@@ -4,6 +4,10 @@
 
 Demonstrates the Firebase Analytics features implemented in Kastri.
 
+## Supported Delphi versions
+
+Delphi 12.2, 13.x
+
 ## IMPORTANT
 
 Please read the Android Notes and iOS Notes sections below - they are important for configuration, especially if you are creating your own project and wish to include the Firebase Analytics implementation
@@ -23,7 +27,7 @@ You will need to create a project in [Firebase Console](https://console.firebase
 
 The rest of the video can be ignored, since it deals specifically with Android Studio, however if you're going to support Firebase Analytics in iOS, you'll need to add iOS to the Firebase project, which is similar to the steps for adding Android. In this instance, you will need to save the `GoogleService-Info.plist` file. In the demo, Deployment Manager is configured to expect this file in the root folder of the Delphi project.
 
-## Delphi Project setup
+## Delphi Project Configuration
 
 ### Application identifiers
 
@@ -31,65 +35,47 @@ In Project Options of the Delphi project, select the Version Info section, and s
 
 ### Android
 
+#### Add Dependent Packages
+
+In Project Manager, expand the Target Platforms node and:
+
+1. For Android 32-bit **ONLY**, right-click the Libraries node, click `Add`, and add the following files from the ThirdParty\Android folder in Kastri:
+   * `play-services-basement-18.4.0.aar`
+   * `play-services-measurement-api-20.1.0.aar`
+   
+   **Note that these are `.aar` files**
+2. For **BOTH** Android 32-bit **and** Android 64-bit, expand the Libraries node, right click `play-services-basement-18.4.0.dex.jar`, and click **Disable**. This is required since the equivalent `.aar` file was added in the previous step.
+
 #### Import the `google-services.json` file
 
 In Project Options of the Delphi project, select the Services section and select Android as the target. Click the `Import` button and select the `google-services.json` file that was saved earlier. Do this step for Android 32 bit and Android 64 bit if you are targeting both.
 
 #### Entitlements
 
-In the EntitlementList section of Project Options, select the `Receive push notifications` option. This may appear unusual, however it is necessary for the required entries to appear the manifest for Android.
+In order to have Firebase Analytics work on Android, the easiest way to ensure that the necessary entries are in the Android manifest:
 
-## Android Notes
+* In the Entitlements section of the  Project Options, enable the `Receive Push Notifications` entitlement
 
-Official Firebase Analytics support for Android is yet to be added to Delphi (though the foundations are present in Delphi 11), so a couple of "tweaks" are required to make it work.
-
-#### Build Event/Android Manifest
-
-**Delphi 12.1 ONLY**
-
-Please see [this link](../../Delphi12.1.AndroidManifestIssue.md).
-
-**Delphi 12.0 or earlier:**
-
-Configure Build Events in Project Options to add a Post-Build event with the command:  
-
-```
-  [kastri]\Tools\manifestmerge AndroidManifest.merge.xml $(Platform)\$(Config)\AndroidManifest.xml
-```  
-Where `[kastri]` is the path to the Kastri library. Do this for each required Android platform target (i.e. 32-bit and/or 64-bit)
-
-`AndroidManifest.merge.xml` can be found in the root folder of the respective demo (i.e. FCMBaseDemo and FCMRelayDemo), and should be copied to the root folder of your project
-
-### Additional jar files
-
-There are 4 additional jar files added to the project, which are necessary for Firebase Analytics to work. They have already been added to the Kastri repo and the demo has been configured to use them, however when creating your own project you will need to add them to the Libraries node of the Android target in Project Manager. **The rest of the details here are for information only.**
-
-The following 3 were obtained from the [Maven Repository](https://mvnrepository.com/):
-
-* `firebase-iid-21.1.0.jar`
-* `play-services-measurement-api.18.0.0.jar`
-* `play-services-measurement-impl.18.0.0.jar`
-
-The other file, `play-services-basement-17.6.0.R.jar` is compiled from files in the Android Archive file (`aar`) located [here](https://mvnrepository.com/artifact/com.google.android.gms/play-services-basement/17.6.0)
+This is regardless of whether or not your app will support Push Notifications.
 
 ### iOS
 
 #### Firebase SDK
 
-Firebase support in Kastri has now been aligned with Firebase SDK for iOS version 10.8.0. Firebase SDK versions 9.x and older have now been **deprecated*, and are not guaranteed to work, so support for them has been removed entirely.
+A [release of pre-built binaries](https://github.com/DelphiWorlds/Binaries/releases/tag/iOS-Arm64-Firebase-Messaging-12.6.0-ML-Kit-Barcode-Scanning-9.0.0-v1.0.0) which ensures compatibility with barcode scanning (even if you do not use that feature) has been made available in the Binaries repo.
 
-Please [download the SDK from here](https://github.com/firebase/firebase-ios-sdk/releases/download/10.8.0/Firebase-10.8.0.zip), and unzip it somewhere, preferably in a folder that can be common to other projects that use the SDK. Create an [Environment Variable User System Override](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Environment_Variables) called `Firebase`, and set it to the folder where the SDK was unzipped to. This corresponds to the `$(Firebase)` macro in the Project Options of the demo. You can use the framework search path value from the Project Options in your own project.
+Unzip it to somewhere convenient, and in the Project Options for the iOS Device - 64 bit platform:
 
-In order to compile successfully for iOS, it's also necessary to add [Swift Support Files in Delphi's SDK Manager](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) (follow the link for instructions)
+1. In the **Framework Search Path** value, include the folder where the binaries were unzipped to
+2. In the Linker Options, set the Minimum iOS Version value to 15.5, if you wish to avoid linker warnings.
+
+#### Swift Compatibility Libraries
+
+If using Delphi 12.2, you must add [Swift Support Files](https://github.com/DelphiWorlds/HowTo/tree/main/Solutions/AddSwiftSupport) via Delphi's SDK Manager.
 
 #### Deployment of GoogleServices-info.plist
 
-Download the `GoogleServices-info.plist` file from your project configured in [Firebase Console](https://console.firebase.google.com/), and save it to the Resources folder in the demo. Add `GoogleServices-info.plist` to the deployment, as per the demo, as described above.
+Download the `GoogleServices-info.plist` file from your project configured in [Firebase Console](https://console.firebase.google.com/), and save it to the Resources folder in the demo. Add `GoogleServices-info.plist` to the deployment, as per the demo.
 
-#### Linker Options
-
-Ensure you have a value of: `-ObjC -rpath /usr/lib/swift` for the `Options passed to the LD linker` option in the Project Options for iOS Device 64-bit:
-
-   <img src="../AdMob//Screenshots/ObjCLinkerOption.png" alt="ObjC linker option" height="400">
 
 
