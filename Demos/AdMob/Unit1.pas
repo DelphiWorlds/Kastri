@@ -42,6 +42,7 @@ type
     procedure AdMobConsentCompleteHandler(Sender: TObject; const AStatus: TConsentStatus);
     procedure AdWillPresentFullScreenContentHandler(Sender: TObject);
     function GetErrorMessage(const AEvent: string; const ASender: TObject; const AError: TAdError): string;
+    procedure SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
     procedure UserEarnedRewardHandler(Sender: TObject; const AReward: TAdReward);
   public
     constructor Create(AOwner: TComponent); override;
@@ -62,6 +63,9 @@ const
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
+  {$IF CompilerVersion > 36}
+  OnSafeAreaChanged := SafeAreaChangedHandler;
+  {$ENDIF}
   AdMob.OnConsentComplete := AdMobConsentCompleteHandler;
   AdMob.OnConsentError := AdMobConsentErrorHandler;
   // AdMob.ResetConsent; // <---- Simulates users first install experience
@@ -116,6 +120,11 @@ begin
   Result := Format('%s (%s)'#13#10'%d: %s ', [AEvent, ASender.ClassName, AError.ErrorCode, AError.Message]);
 end;
 
+procedure TForm1.SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Rect := AInsets;
+end;
+
 procedure TForm1.ShowBannerAdButtonClick(Sender: TObject);
 begin
   AdMobBannerAd1.AdSize := TAdMobBannerAdSize.Adaptive;
@@ -152,7 +161,9 @@ begin
   if Sender = FIntAd then
     FIntAd.Load(False)
   else if Sender = FRewAd then
-    FRewAd.Load(False);
+    FRewAd.Load(False)
+  else if Sender = FOpenAd then
+    FOpenAd.Load(False);
 end;
 
 procedure TForm1.AdFailedToLoadHandler(Sender: TObject; const AError: TAdError);
@@ -215,8 +226,6 @@ procedure TForm1.AdMobConsentCompleteHandler(Sender: TObject; const AStatus: TCo
 begin
   Memo.Lines.Add(Format('Consent complete - Status: %s, CanRequestAds: %s', [cConsentStatusValues[AStatus], BoolToStr(AdMob.CanRequestAds, True)]));
   ShowBannerAdButton.Enabled := True;
-  // ShowInterstitial.Enabled := True;
-  // ShowReward.Enabled := True;
   FIntAd.Load(False);
   FRewAd.Load(False);
   FOpenAd.Load(False);
