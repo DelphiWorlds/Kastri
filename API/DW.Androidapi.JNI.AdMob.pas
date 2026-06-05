@@ -34,8 +34,10 @@ type
   JAdManagerAdRequest_Builder = interface;
   JAppOpenAd = interface;
   JAppOpenAd_AppOpenAdLoadCallback = interface;
+  JAgeRestrictedTreatment = interface; // play services ads 25.x.x
   JOnAdMetadataChangedListener = interface;
   JOnUserEarnedRewardListener = interface;
+  JRequestConfiguration_Builder = interface; // play services ads 25.x.x
   JRewardedAd = interface;
   JRewardedAdLoadCallback = interface;
   JRewardedInterstitialAd = interface;
@@ -184,6 +186,42 @@ type
   end;
   TJinterstitial_InterstitialAd = class(TJavaGenericImport<Jinterstitial_InterstitialAdClass, Jinterstitial_InterstitialAd>) end;
   {$ENDIF}
+
+  JRequestConfiguration_BuilderClass = interface(JObjectClass)
+    ['{7502C2A5-9CE7-4393-955F-09AA71D147A9}']
+    {class} function init: JRequestConfiguration_Builder; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/gms/ads/RequestConfiguration$Builder')]
+  JRequestConfiguration_Builder = interface(JObject)
+    ['{CDFD4672-779C-49D4-8132-E59394CB0460}']
+    function build: JRequestConfiguration; cdecl;
+    function setAgeRestrictedTreatment(ageRestrictedTreatment: JAgeRestrictedTreatment): JRequestConfiguration_Builder; cdecl;
+    function setMaxAdContentRating(maxAdContentRating: JString): JRequestConfiguration_Builder; cdecl;
+    function setTagForChildDirectedTreatment(tagForChildDirectedTreatment: Integer): JRequestConfiguration_Builder; cdecl;
+    function setTagForUnderAgeOfConsent(tagForUnderAgeOfConsent: Integer): JRequestConfiguration_Builder; cdecl;
+    function setTestDeviceIds(testDeviceIds: JList): JRequestConfiguration_Builder; cdecl;
+  end;
+  TJRequestConfiguration_Builder = class(TJavaGenericImport<JRequestConfiguration_BuilderClass, JRequestConfiguration_Builder>) end;
+
+  JAgeRestrictedTreatmentClass = interface(JEnumClass)
+    ['{39C97A66-7EA2-4219-AFE4-6CFF16996967}']
+    {class} function _GetCHILD: JAgeRestrictedTreatment; cdecl;
+    {class} function _GetTEEN: JAgeRestrictedTreatment; cdecl;
+    {class} function _GetUNSPECIFIED: JAgeRestrictedTreatment; cdecl;
+    {class} function valueOf(string_1: JString): JAgeRestrictedTreatment; cdecl;
+    {class} function values: TJavaObjectArray<JAgeRestrictedTreatment>; cdecl;
+    {class} property CHILD: JAgeRestrictedTreatment read _GetCHILD;
+    {class} property TEEN: JAgeRestrictedTreatment read _GetTEEN;
+    {class} property UNSPECIFIED: JAgeRestrictedTreatment read _GetUNSPECIFIED;
+  end;
+
+  [JavaSignature('com/google/android/gms/ads/AgeRestrictedTreatment')]
+  JAgeRestrictedTreatment = interface(JEnum)
+    ['{3B1863DC-3C3A-4906-B68A-25330C6A021D}']
+    function getValue: Integer; cdecl;
+  end;
+  TJAgeRestrictedTreatment = class(TJavaGenericImport<JAgeRestrictedTreatmentClass, JAgeRestrictedTreatment>) end;
 
   JAdManagerAdRequestClass = interface(JAdRequestClass)
     ['{8E42703E-BFF3-47D3-8F96-051881577F4F}']
@@ -351,28 +389,25 @@ type
   TJRewardItem = class(TJavaGenericImport<JRewardItemClass, JRewardItem>) end;
 
   JAppOpenAdClass = interface(JObjectClass)
-    ['{CF7B2FAF-2AD3-4FEC-8C7C-039FF2B6D17C}']
-    {class} function _GetAPP_OPEN_AD_ORIENTATION_LANDSCAPE: Integer; cdecl;
-    {class} function _GetAPP_OPEN_AD_ORIENTATION_PORTRAIT: Integer; cdecl;
+    ['{198E5E3F-8099-4E9F-93C6-5F59219D3102}']
     {class} function init: JAppOpenAd; cdecl;
-    {class} procedure load(context: JContext; adUnitId: JString; adRequest: JAdRequest; orientation: Integer;
-      loadCallback: JAppOpenAd_AppOpenAdLoadCallback); cdecl; overload;
-    {class} procedure load(context: JContext; adUnitId: JString; adManagerAdRequest: JAdManagerAdRequest; orientation: Integer;
-      loadCallback: JAppOpenAd_AppOpenAdLoadCallback); cdecl; overload;
-    {class} property APP_OPEN_AD_ORIENTATION_LANDSCAPE: Integer read _GetAPP_OPEN_AD_ORIENTATION_LANDSCAPE;
-    {class} property APP_OPEN_AD_ORIENTATION_PORTRAIT: Integer read _GetAPP_OPEN_AD_ORIENTATION_PORTRAIT;
+    {class} function isAdAvailable(context: JContext; string_1: JString): Boolean; cdecl;
+    {class} procedure load(context: JContext; string_1: JString; adRequest: JAdRequest; appOpenAdLoadCallback: JAppOpenAd_AppOpenAdLoadCallback); cdecl;
+    {class} function pollAd(context: JContext; string_1: JString): JAppOpenAd; cdecl;
   end;
 
   [JavaSignature('com/google/android/gms/ads/appopen/AppOpenAd')]
   JAppOpenAd = interface(JObject)
-    ['{BC8CEE4E-CD43-42E0-8781-64459942580A}']
+    ['{F9FAD879-CFAC-4C87-A638-BCDAAB61D171}']
     function getAdUnitId: JString; cdecl;
     function getFullScreenContentCallback: JFullScreenContentCallback; cdecl;
     function getOnPaidEventListener: JOnPaidEventListener; cdecl;
+    function getPlacementId: Int64; cdecl;
     function getResponseInfo: JResponseInfo; cdecl;
     procedure setFullScreenContentCallback(fullScreenContentCallback: JFullScreenContentCallback); cdecl;
-    procedure setImmersiveMode(immersiveModeEnabled: Boolean); cdecl;
-    procedure setOnPaidEventListener(listener: JOnPaidEventListener); cdecl;
+    procedure setImmersiveMode(boolean: Boolean); cdecl;
+    procedure setOnPaidEventListener(onPaidEventListener: JOnPaidEventListener); cdecl;
+    procedure setPlacementId(long: Int64); cdecl;
     procedure show(activity: JActivity); cdecl;
   end;
   TJAppOpenAd = class(TJavaGenericImport<JAppOpenAdClass, JAppOpenAd>) end;
