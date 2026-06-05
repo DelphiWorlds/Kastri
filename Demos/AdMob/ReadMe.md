@@ -10,9 +10,7 @@ See [below](#user-messaging-platform-ump-support) for further information about 
 
 ## Supported Delphi versions
 
-Delphi 13.x, 12.x
-
-**NOTE: The project for Delphi 12 or later is `AdTestD12.dproj` and the project for Delphi 11.x is `AdTest.dproj`** (Delphi 11.x is considered legacy here)
+Delphi 13.x, 12.2 (Support for earlier than Delphi 12.2 has been dropped, as it is too complicated)
 
 ## Usage Notes
 
@@ -21,7 +19,7 @@ The "full screen" ad types:
 * TInterstitialAd
 * TRewardedInterstitialAd
 * TRewardedAd
-* TOpenAd
+* TAppOpenAd
 
 ..have an option of performing the load of an ad, and showing an ad, all in one call by calling `Load` with no parameters, **OR** the load can be performed separately by calling `Load(False)`, and once the ad is loaded (which happens in the background), the `OnAdLoaded` event is called, and at that point the `Show` method can be called to show the ad.  
 
@@ -72,17 +70,23 @@ See the `TForm1.Create` method in the demo for examples.
 
 #### Adding dependent libraries
 
-If creating your own project, you will need to add the supporting library:
+If creating your own project, in Project Manager:
 
-* For Delphi 11.x (considered legacy, here): [`dw-admob.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob.jar) 
-* For Delphi 12.x or later: [`dw-admob-3.0.0.jar`](https://github.com/DelphiWorlds/Kastri/blob/master/Lib/dw-admob-3.0.0.jar)
-
-to the Libraries node under the Android 32-bit platform in Project Manager. To do this, in Project Manager:
-
-1. Expand the Target Platforms
-2. Expand Android 32-bit
-3. Right-click the Libraries node and click Add..
-4. Select the relevant .jar file and click Open
+1. Expand Target Platforms
+2. Expand **Android 32-bit**
+3. Right-click the `Libraries` node and click `Add..`
+4. Select `dw-admob-3.0.0.jar` from the `Lib` folder of Kastri and click Open
+5. Repeat step 3, this time selecting the following files from the `ThirdParty\Android` folder of Kastri:
+   * `play-services-ads-25.3.0.aar`
+   * `play-services-ads-api-25.3.0.aar`
+   * `play-services-ads-identifier-18.0.0.aar`
+6. Right-click each of the following, and click `Disable` for each:
+   * `play-services-ads-22.2.0.dex.jar`
+   * `play-services-ads-base-22.2.0.dex.jar`
+   * `play-services-ads-identifier-18.0.0.dex.jar`
+   * `play-services-ads-lite-22.2.0.dex.jar`
+7. Expand **Android 64-bit**
+8. Under the `Libraries` node, repeat step 6 **ONLY** (i.e. no additions are required for Android 64-bit)
 
 #### Android Entitlements
 
@@ -92,46 +96,6 @@ Ensure your project has the `AdMob Service` enabled in the Entitlement List in P
 
 Ensure your project has the `Access Network State` permission in Project Options
 
-#### Generating a jar that contains R classes
-
-This process is required **ONLY if you are using UMP support** ([see above](#user-messaging-platform-ump-support))
-
-User Messaging Platform (UMP) requires `R` classes associated with the play-services-ads-22.2.0.jar file that is part of the "default" libraries used by Delphi 12.x **or later**. When using Android Studio, these are generated automatically; with Delphi, they need to be generated separately. 
-
-This process could be done manually via the command line or in a batch file, however an easier way is through the use of [Codex](https://github.com/DelphiWorlds/Codex). Once you install Codex, you can follow these steps:
-
-1. Build and deploy your project **at least once**. This step is important for merging the resources Delphi creates, with resources in the Play Services Base library
-2. From the Codex menu in Delphi, in the Android Tools section, use the Download Package function:
-
-   <img src="./Screenshots/CodexPackageDownload.png" alt="Codex Package Download" height="200">
-   
-   ..to download/extract play-services-basement, using this value in the Packages edit:
-
-   ```
-   com.google.android.gms:play-services-ads:22.2.0
-   ```
-
-   <img src="./Screenshots/PackageDownloadPlayServicesBase.png" alt="Package Download Play Services Base" height="400">
-   
-   ..and click `Extract`
-
-3. Right-click the project in Project Manager, and click `Add Android Package`:
-   
-   <img src="./Screenshots/CodexAddAndroidPackageMenu.png" alt="Codex Add Android Package Menu" height="200">
-
-   ..and add the folder that the package was extracted to in step 2:
-   
-   <img src="./Screenshots/CodexAddAndroidPackage.png" alt="Codex Add Android Package" height="200">
-
-   ..and click `Execute` to build the R classes for play-services-base and add the resulting jar to the project
-   
-4. This process creates the file `play-services-ads-22.2.0-Manifest.merge.xml` in the root of your project file. 
-   
-   **This file should be DELETED before the next step.**
-5. Rebuild/deploy your project
-
-This adds a library with the same name as the project, with an extension of `.R.jar`, to the Libraries node of the Android 32-bit target in Project Manager. If you compile for Android 64-bit, the jar will still be compiled in with your app.
-
 #### Ad UnitIds
 
 If you are using Ad UnitIds that are **not** for testing, please see [this section](#using-non-test-ad-unitids).
@@ -140,7 +104,7 @@ If you are using Ad UnitIds that are **not** for testing, please see [this secti
 
 #### AdMob Frameworks
 
-The frameworks required for AdMob support on iOS have been re-packaged into a convenient folder structure, and [published in the binaries repo on Github](https://github.com/DelphiWorlds/Binaries/releases/tag/iOS-Arm64-AdMobFrameworks-v1.0.0).
+The frameworks required for AdMob support on iOS have been re-packaged into a convenient folder structure, and [published in the binaries repo on Github](https://github.com/DelphiWorlds/Binaries/releases/tag/iOS-Arm64-AdMobFrameworks-v2.0.0).
 
 Download the .zip file listed in the Assets section and unzip to a convenient folder.
 
@@ -185,10 +149,11 @@ The `-weak_library` entries ensure compatibility with iOS 15 or lower.
 
 #### NSUserTrackingUsageDescription
 
-Add a `NSUserTrackingUsageDescription` key and value to the Version Info section of the project options. The value should be indicative of why your app requires user tracking. Since this is for AdMob, an example of this could be:
+Add a `NSUserTrackingUsageDescription` key and value to the info.plist.TemplateiOS.xml file. The value should be indicative of why your app requires user tracking. Since this is for AdMob, an example of this could be (as per the demo):
 
-```
-This app uses tracking data to help deliver ads that are relevant to you
+```xml
+  <key>NSUserTrackingUsageDescription</key>
+  <string>This app uses tracking data to help deliver ads that are relevant to you</string>
 ```
 
 ### Using non-test Ad UnitIds
@@ -204,6 +169,3 @@ When configuring your app for non-test Ad UnitIds, you will need to:
 <img style="margin-left: 3em;" src="./Screenshots/iOSInfoPListTemplateAppId.png" alt="PM" height="150"/>
 
 * Ensure that the `TestMode` property of the instances of AdMob classes is set to False, and the AdUnitId is set to a valid AdUnitId for your application.
-
-
-
