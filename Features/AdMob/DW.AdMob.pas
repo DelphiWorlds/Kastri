@@ -39,6 +39,7 @@ type
 
   TAdsStartedMessage = TMessage;
 
+  TAgeRestrictedTreatment = (Unspecified, Child, Teen);
   TDebugGeography = (Disabled, EEA, NotEEA);
 
   TConsentError = record
@@ -63,6 +64,7 @@ type
     function IsStarted: Boolean;
     procedure RequestConsent(const ABypass: Boolean = False);
     procedure ResetConsent;
+    procedure SetAgeRestrictedTreatment(const AAgeRestrictedTreatment: TAgeRestrictedTreatment);
     procedure SetDebugGeography(const AGeography: TDebugGeography);
     procedure SetTestDeviceHashedId(const AHashedId: string);
     procedure SetOnConsentComplete(const Value: TConsentCompleteEvent);
@@ -75,6 +77,7 @@ type
 
   TAdMob = class(TInterfacedObject, IAdMob)
   private
+    FAgeRestrictedTreatment: TAgeRestrictedTreatment;
     FDebugGeography: TDebugGeography;
     FIsComplete: Boolean;
     FIsStarted: Boolean;
@@ -89,6 +92,7 @@ type
     procedure DoRequestConsent; virtual;
     procedure DoResetConsent; virtual;
     function NeedsDebugSettings: Boolean;
+    property AgeRestrictedTreatment: TAgeRestrictedTreatment read FAgeRestrictedTreatment;
     property DebugGeography: TDebugGeography read FDebugGeography;
     property ShowATTPrompt: Boolean read FShowATTPrompt;
     property TestDeviceHashedId: string read FTestDeviceHashedId;
@@ -102,6 +106,7 @@ type
     function IsStarted: Boolean;
     procedure RequestConsent(const ABypass: Boolean = False);
     procedure ResetConsent;
+    procedure SetAgeRestrictedTreatment(const AAgeRestrictedTreatment: TAgeRestrictedTreatment);
     procedure SetDebugGeography(const AGeography: TDebugGeography);
     procedure SetTestDeviceHashedId(const AHashedId: string);
     procedure SetOnConsentComplete(const Value: TConsentCompleteEvent);
@@ -236,6 +241,11 @@ begin
   FIsComplete := False;
   DoResetConsent;
   FIsStarted := False;
+end;
+
+procedure TAdMob.SetAgeRestrictedTreatment(const AAgeRestrictedTreatment: TAgeRestrictedTreatment);
+begin
+  FAgeRestrictedTreatment := AAgeRestrictedTreatment;
 end;
 
 procedure TAdMob.SetDebugGeography(const AGeography: TDebugGeography);

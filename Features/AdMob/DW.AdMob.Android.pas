@@ -22,7 +22,7 @@ uses
   Androidapi.Helpers, Androidapi.JNIBridge, Androidapi.JNI.App, Androidapi.JNI.AdMob, Androidapi.JNI.JavaTypes,
   // DW
   DW.OSLog,
-  DW.AdMob, DW.Androidapi.JNI.UserMessagingPlatform;
+  DW.AdMob, DW.Androidapi.JNI.UserMessagingPlatform, DW.Androidapi.JNI.AdMob;
 
 type
   TPlatformAdMob = class;
@@ -251,15 +251,25 @@ end;
 
 procedure TPlatformAdMob.StartAds;
 var
-  LConfiguration: JRequestConfiguration;
+  LConfigurationBuilder: JRequestConfiguration_Builder;
 begin
   if not IsStarted then
   begin
+    LConfigurationBuilder := TJRequestConfiguration_Builder.JavaClass.init;
     if not TestDeviceHashedId.IsEmpty then
-    begin
-      LConfiguration := TJRequestConfiguration_Builder.JavaClass.init.setTestDeviceIds(StringArrayToJList([TestDeviceHashedId])).build;
-      TJMobileAds.JavaClass.setRequestConfiguration(LConfiguration);
+      LConfigurationBuilder.setTestDeviceIds(StringArrayToJList([TestDeviceHashedId]));
+    TOSLog.d('+LConfigurationBuilder.setAgeRestrictedTreatment');
+    case AgeRestrictedTreatment of
+      TAgeRestrictedTreatment.Unspecified:
+        LConfigurationBuilder.setAgeRestrictedTreatment(TJAgeRestrictedTreatment.JavaClass.UNSPECIFIED);
+      TAgeRestrictedTreatment.Child:
+        LConfigurationBuilder.setAgeRestrictedTreatment(TJAgeRestrictedTreatment.JavaClass.CHILD);
+      TAgeRestrictedTreatment.Teen:
+        LConfigurationBuilder.setAgeRestrictedTreatment(TJAgeRestrictedTreatment.JavaClass.TEEN);
     end;
+    TOSLog.d('-LConfigurationBuilder.setAgeRestrictedTreatment');
+    TJMobileAds.JavaClass.setRequestConfiguration(LConfigurationBuilder.build);
+    TOSLog.d('-TJMobileAds.JavaClass.setRequestConfiguration');
     TJMobileAds.JavaClass.initialize(TAndroidHelper.Context);
     AdsStarted;
   end;

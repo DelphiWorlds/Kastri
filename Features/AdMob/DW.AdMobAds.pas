@@ -28,25 +28,19 @@ type
 
   TCustomPlatformBaseAd = class(TObject)
   private
-    class var FIsWarmStart: Boolean;
-  private
     FBaseAd: TBaseAd;
     FNeedsLoadState: TNeedsLoadState;
     FShouldShow: Boolean;
     FTestMode: Boolean;
-    procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
     procedure AdsStartedMessageHandler(const Sender: TObject; const M: TMessage);
   protected
     FAdUnitId: string;
-    procedure ApplicationBecameActive; virtual;
-    procedure ApplicationEnteredBackground; virtual;
     procedure DoAdFailedToLoad(const AError: TAdError); virtual;
     procedure DoAdLoaded; virtual;
     procedure DoLoad; virtual;
     procedure DoShow; virtual;
     function GetAdUnitId: string; virtual;
     procedure Load(const AShow: Boolean);
-    function IsWarmStart: Boolean;
     procedure Show;
     property AdUnitId: string read GetAdUnitId write FAdUnitId;
     property ShouldShow: Boolean read FShouldShow write FShouldShow;
@@ -118,17 +112,13 @@ type
     constructor Create(const ARewardedInterstitialAd: TRewardedInterstitialAd); virtual;
   end;
 
-  TAppOpenAdOrientation = (Portrait, Landscape);
-
   TAppOpenAd = class;
 
   TCustomPlatformAppOpenAd = class(TCustomPlatformFullScreenAd)
   private
     FAppOpenAd: TAppOpenAd;
-    FOrientation: TAppOpenAdOrientation;
   protected
     function GetAdUnitId: string; override;
-    property Orientation: TAppOpenAdOrientation read FOrientation write FOrientation;
   public
     constructor Create(const AAppOpenAd: TAppOpenAd); virtual;
   end;
@@ -215,14 +205,11 @@ type
   TAppOpenAd = class(TFullScreenAd)
   private
     FPlatformAppOpenAd: TCustomPlatformAppOpenAd;
-    function GetOrientation: TAppOpenAdOrientation;
-    procedure SetOrientation(const Value: TAppOpenAdOrientation);
   protected
     function GetPlatformBaseAd: TCustomPlatformBaseAd; override;
   public
     constructor Create;
     destructor Destroy; override;
-    property Orientation: TAppOpenAdOrientation read GetOrientation write SetOrientation;
   end;
 
 implementation
@@ -255,13 +242,11 @@ constructor TCustomPlatformBaseAd.Create(const ABaseAd: TBaseAd);
 begin
   inherited Create;
   FBaseAd := ABaseAd;
-  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   TMessageManager.DefaultManager.SubscribeToMessage(TAdsStartedMessage, AdsStartedMessageHandler);
 end;
 
 destructor TCustomPlatformBaseAd.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventMessageHandler);
   TMessageManager.DefaultManager.Unsubscribe(TAdsStartedMessage, AdsStartedMessageHandler);
   inherited;
 end;
@@ -283,11 +268,6 @@ begin
   Result := FAdUnitId;
 end;
 
-function TCustomPlatformBaseAd.IsWarmStart: Boolean;
-begin
-  Result := FIsWarmStart;
-end;
-
 procedure TCustomPlatformBaseAd.Load(const AShow: Boolean);
 begin
   if AdMob.IsStarted then
@@ -305,19 +285,6 @@ begin
   DoShow;
 end;
 
-procedure TCustomPlatformBaseAd.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
-begin
-  case TApplicationEventMessage(M).Value.Event of
-    TApplicationEvent.BecameActive:
-    begin
-      ApplicationBecameActive;
-      FIsWarmStart := True;
-    end;
-    TApplicationEvent.EnteredBackground:
-      ApplicationEnteredBackground;
-  end;
-end;
-
 procedure TCustomPlatformBaseAd.AdsStartedMessageHandler(const Sender: TObject; const M: TMessage);
 begin
   if FNeedsLoadState <> TNeedsLoadState.None then
@@ -326,16 +293,6 @@ begin
     FNeedsLoadState := TNeedsLoadState.None;
     DoLoad;
   end;
-end;
-
-procedure TCustomPlatformBaseAd.ApplicationBecameActive;
-begin
-  //
-end;
-
-procedure TCustomPlatformBaseAd.ApplicationEnteredBackground;
-begin
-  //
 end;
 
 procedure TCustomPlatformBaseAd.DoLoad;
@@ -494,6 +451,7 @@ end;
 
 procedure TBaseAd.Show;
 begin
+  TOSLog.d('TBaseAd (%s).Show', [ClassName]);
   if FIsLoaded then
     PlatformBaseAd.Show;
 end;
@@ -598,19 +556,9 @@ begin
   inherited;
 end;
 
-function TAppOpenAd.GetOrientation: TAppOpenAdOrientation;
-begin
-  Result := FPlatformAppOpenAd.Orientation;
-end;
-
 function TAppOpenAd.GetPlatformBaseAd: TCustomPlatformBaseAd;
 begin
   Result := FPlatformAppOpenAd;
-end;
-
-procedure TAppOpenAd.SetOrientation(const Value: TAppOpenAdOrientation);
-begin
-  FPlatformAppOpenAd.Orientation := Value;
 end;
 
 end.

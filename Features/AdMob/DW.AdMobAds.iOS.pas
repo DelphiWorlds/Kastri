@@ -48,7 +48,7 @@ type
     FDelegate: TFullScreenContentDelegate;
     procedure AdLoadCompletionHandler(interstitialAd: GADInterstitialAd; error: NSError);
     procedure PaidEventHandler(value: GADAdValue);
-   protected
+  protected
     procedure DoAdDismissedFullScreenContent; override;
     procedure DoLoad; override;
     procedure DoShow; override;
@@ -95,12 +95,8 @@ type
     FAd: GADAppOpenAd;
     FDelegate: TFullScreenContentDelegate;
     procedure AdLoadCompletionHandler(appOpenAd: GADAppOpenAd; error: NSError);
-    procedure LoadAd;
     procedure PaidEventHandler(value: GADAdValue);
-    procedure ShowAdIfAvailable(const ACanShow: Boolean);
   protected
-    procedure ApplicationBecameActive; override;
-    procedure ApplicationEnteredBackground; override;
     procedure DoAdDismissedFullScreenContent; override;
     procedure DoLoad; override;
     procedure DoShow; override;
@@ -386,28 +382,22 @@ end;
 
 procedure TPlatformAppOpenAd.DoAdDismissedFullScreenContent;
 begin
+  FAd.release;
   FAd := nil;
   inherited;
 end;
 
 procedure TPlatformAppOpenAd.DoLoad;
 begin
-  LoadAd;
+  TGADAppOpenAd.OCClass.loadWithAdUnitID(StrToNSStr(AdUnitID), TGADHelper.GetRequest, AdLoadCompletionHandler);
 end;
 
 procedure TPlatformAppOpenAd.DoShow;
 begin
-  ShowAdIfAvailable(True);
-end;
-
-procedure TPlatformAppOpenAd.ApplicationBecameActive;
-begin
-  ShowAdIfAvailable(IsWarmStart);
-end;
-
-procedure TPlatformAppOpenAd.ApplicationEnteredBackground;
-begin
-  //
+  if FAd <> nil then // and load time was less than 4 hours ago??
+    FAd.presentFromRootViewController(SharedApplication.keyWindow.rootViewController)
+  else if AdMob.IsStarted then
+    DoLoad
 end;
 
 procedure TPlatformAppOpenAd.AdLoadCompletionHandler(appOpenAd: GADAppOpenAd; error: NSError);
@@ -424,22 +414,9 @@ begin
     DoAdFailedToLoad(TGADHelper.GetAdError(error));
 end;
 
-procedure TPlatformAppOpenAd.LoadAd;
-begin
-  TGADAppOpenAd.OCClass.loadWithAdUnitID(StrToNSStr(AdUnitID), TGADHelper.GetRequest, AdLoadCompletionHandler);
-end;
-
 procedure TPlatformAppOpenAd.PaidEventHandler(value: GADAdValue);
 begin
   // Future implementation
-end;
-
-procedure TPlatformAppOpenAd.ShowAdIfAvailable(const ACanShow: Boolean);
-begin
-  if (FAd <> nil) and ACanShow then // and load time was less than 4 hours ago??
-    FAd.presentFromRootViewController(SharedApplication.keyWindow.rootViewController)
-  else if (FAd = nil) and AdMob.IsStarted then
-    LoadAd;
 end;
 
 end.

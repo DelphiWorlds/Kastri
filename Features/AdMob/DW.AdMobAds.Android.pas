@@ -283,18 +283,15 @@ type
   private
     FAd: JAppOpenAd;
     FCallbackDelegate: TAppOpenAdLoadCallbackDelegate;
-    function GetOrientation: Integer;
-    procedure LoadAd;
-    procedure ShowAdIfAvailable(const ACanShow: Boolean);
   protected
     procedure AdLoaded(const AAd: JAppOpenAd);
-    procedure ApplicationBecameActive; override;
-    procedure ApplicationEnteredBackground; override;
     procedure DoAdDismissedFullScreenContent; override;
     procedure DoAdFailedToLoad(const AError: TAdError); override;
     procedure DoAdFailedToShowFullScreenContent(const AError: TAdError); override;
     procedure DoAdLoaded; override;
     procedure DoAdWillPresentFullScreenContent; override;
+    procedure DoLoad; override;
+    procedure DoShow; override;
   public
     constructor Create(const AAppOpenAd: TAppOpenAd); override;
     destructor Destroy; override;
@@ -672,16 +669,6 @@ begin
   DoAdLoaded;
 end;
 
-procedure TPlatformAppOpenAd.ApplicationBecameActive;
-begin
-  ShowAdIfAvailable(IsWarmStart);
-end;
-
-procedure TPlatformAppOpenAd.ApplicationEnteredBackground;
-begin
-  //
-end;
-
 procedure TPlatformAppOpenAd.DoAdDismissedFullScreenContent;
 begin
   FAd := nil;
@@ -708,15 +695,7 @@ begin
   inherited;
 end;
 
-function TPlatformAppOpenAd.GetOrientation: Integer;
-begin
-  if Orientation = TAppOpenAdOrientation.Landscape then
-    Result := TJAppOpenAd.JavaClass.APP_OPEN_AD_ORIENTATION_LANDSCAPE
-  else
-    Result := TJAppOpenAd.JavaClass.APP_OPEN_AD_ORIENTATION_PORTRAIT;
-end;
-
-procedure TPlatformAppOpenAd.LoadAd;
+procedure TPlatformAppOpenAd.DoLoad;
 var
   LRequest: JAdRequest;
   LAdUnitId: JString;
@@ -725,16 +704,14 @@ begin
   begin
     LRequest := TJAdRequest_Builder.JavaClass.init.build;
     LAdUnitId := StringToJString(AdUnitID);
-    TJAppOpenAd.JavaClass.load(TAndroidHelper.Context, LAdUnitId, LRequest, GetOrientation, FCallbackDelegate.Callback);
+    TJAppOpenAd.JavaClass.load(TAndroidHelper.Context, LAdUnitId, LRequest, FCallbackDelegate.Callback);
   end;
 end;
 
-procedure TPlatformAppOpenAd.ShowAdIfAvailable(const ACanShow: Boolean);
+procedure TPlatformAppOpenAd.DoShow;
 begin
-  if (FAd <> nil) and ACanShow then // and load time was less than 4 hours ago??
-    FAd.show(TAndroidHelper.Activity)
-  else if FAd = nil then
-    LoadAd;
+  if FAd <> nil then // and load time was less than 4 hours ago??
+    FAd.show(TAndroidHelper.Activity);
 end;
 
 end.

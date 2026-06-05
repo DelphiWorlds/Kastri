@@ -178,10 +178,21 @@ begin
 end;
 
 procedure TPlatformAdMob.StartAds;
+var
+  LMobileAds: GADMobileAds;
 begin
   if not IsStarted then
   begin
-    TGADMobileAds.OCClass.sharedInstance.startWithCompletionHandler(nil);
+    LMobileAds := TGADMobileAds.OCClass.sharedInstance;
+    case AgeRestrictedTreatment of
+      TAgeRestrictedTreatment.Unspecified:
+        LMobileAds.requestConfiguration.setAgeRestrictedTreatment(GADAgeRestrictedTreatmentUnspecified);
+      TAgeRestrictedTreatment.Child:
+        LMobileAds.requestConfiguration.setAgeRestrictedTreatment(GADAgeRestrictedTreatmentChild);
+      TAgeRestrictedTreatment.Teen:
+        LMobileAds.requestConfiguration.setAgeRestrictedTreatment(GADAgeRestrictedTreatmentTeen);
+    end;
+    LMobileAds.startWithCompletionHandler(nil);
     AdsStarted;
   end;
 end;
