@@ -79,11 +79,9 @@ If creating your own project, in Project Manager:
 5. Repeat step 3, this time selecting the following files from the `ThirdParty\Android` folder of Kastri:
    * `play-services-ads-25.3.0.aar`
    * `play-services-ads-api-25.3.0.aar`
-   * `play-services-ads-identifier-18.0.0.aar`
 6. Right-click each of the following, and click `Disable` for each:
    * `play-services-ads-22.2.0.dex.jar`
    * `play-services-ads-base-22.2.0.dex.jar`
-   * `play-services-ads-identifier-18.0.0.dex.jar`
    * `play-services-ads-lite-22.2.0.dex.jar`
 7. Expand **Android 64-bit**
 8. Under the `Libraries` node, repeat step 6 **ONLY** (i.e. no additions are required for Android 64-bit)
