@@ -47,6 +47,9 @@ const
   GADPublisherPrivacyPersonalizationStateDefault = 0;
   GADPublisherPrivacyPersonalizationStateEnabled = 1;
   GADPublisherPrivacyPersonalizationStateDisabled = 2;
+  GADAgeRestrictedTreatmentUnspecified = 0;
+  GADAgeRestrictedTreatmentChild = 1;
+  GADAgeRestrictedTreatmentTeen = 2;
   GADErrorInvalidRequest = 0;
   GADErrorNoFill = 1;
   GADErrorNetworkError = 2;
@@ -165,7 +168,6 @@ type
   GADNativeAdMediaAdLoaderOptions = interface;
   GADNativeAdViewAdOptions = interface;
   GADNativeMuteThisAdLoaderOptions = interface;
-  GADQueryInfo = interface;
   GADRewardedAd = interface;
   GADRewardedInterstitialAd = interface;
   GADVideoControllerDelegate = interface;
@@ -192,7 +194,6 @@ type
   GADMediationAppOpenAd = interface;
   GADMediationAppOpenAdConfiguration = interface;
   GADMediationBannerAd = interface;
-  GADMediationInterscrollerAd = interface;
   GADMediationBannerAdConfiguration = interface;
   GADMediationInterstitialAd = interface;
   GADMediationInterstitialAdConfiguration = interface;
@@ -245,6 +246,7 @@ type
   GADMediaAspectRatio = NSInteger;
   GADMaxAdContentRating = NSString;
   GADPublisherPrivacyPersonalizationState = NSInteger;
+  GADAgeRestrictedTreatment = NSInteger;
 
   GADInitializationCompletionHandler = procedure(status: GADInitializationStatus) of object;
 
@@ -254,8 +256,6 @@ type
   GADErrorCode = NSInteger;
   GADPresentationErrorCode = NSInteger;
 
-  GADQueryInfoCreationCompletionHandler = procedure(queryInfo: GADQueryInfo; error: NSError) of object;
-
   GADRewardedAdLoadCompletionHandler = procedure(rewardedAd: GADRewardedAd; error: NSError) of object;
 
   GADRewardedInterstitialAdLoadCompletionHandler = procedure(rewardedInterstitialAd: GADRewardedInterstitialAd; error: NSError) of object;
@@ -264,8 +264,6 @@ type
   GADMBannerAnimationType = NSInteger;
 
   GADMediationBannerLoadCompletionHandler = function(ad: Pointer; error: NSError): Pointer of object;
-
-  GADMediationInterscrollerAdLoadCompletionHandler = function(ad: Pointer; error: NSError): Pointer of object;
 
   GADMediationInterstitialLoadCompletionHandler = function(ad: Pointer; error: NSError): Pointer of object;
 
@@ -306,7 +304,6 @@ type
   GADRequest = interface(NSObject)
     ['{E0A662DA-9893-47E6-A2D2-36AD9F32CE56}']
     function adNetworkExtrasFor(aClass: Pointer): Pointer; cdecl;
-    function adString: NSString; cdecl;
     function contentURL: NSString; cdecl;
     function customTargeting: NSDictionary; cdecl;
     function keywords: NSArray; cdecl;
@@ -316,7 +313,6 @@ type
     procedure removeAdNetworkExtrasFor(aClass: Pointer); cdecl;
     function requestAgent: NSString; cdecl;
     function scene: UIWindowScene; cdecl;
-    procedure setAdString(adString: NSString); cdecl;
     procedure setContentURL(contentURL: NSString); cdecl;
     procedure setCustomTargeting(customTargeting: NSDictionary); cdecl;
     procedure setKeywords(keywords: NSArray); cdecl;
@@ -841,8 +837,10 @@ type
 
   GADRequestConfiguration = interface(NSObject)
     ['{E02A9846-B146-47D4-A734-4854E0436F08}']
+    function ageRestrictedTreatment: GADAgeRestrictedTreatment; cdecl;
     function maxAdContentRating: GADMaxAdContentRating; cdecl;
     function publisherPrivacyPersonalizationState: GADPublisherPrivacyPersonalizationState; cdecl;
+    procedure setAgeRestrictedTreatment(ageRestrictedTreatment: GADAgeRestrictedTreatment); cdecl;
     procedure setMaxAdContentRating(maxAdContentRating: GADMaxAdContentRating); cdecl;
     procedure setPublisherFirstPartyIDEnabled(enabled: Boolean); cdecl;
     procedure setPublisherPrivacyPersonalizationState(publisherPrivacyPersonalizationState: GADPublisherPrivacyPersonalizationState); cdecl;
@@ -977,7 +975,6 @@ type
     function placementID: Int64; cdecl;
     function price: NSString; cdecl;
     procedure recordCustomClickGesture; cdecl;
-    procedure registerAdView(adView: UIView; clickableAssetViews: NSDictionary; nonclickableAssetViews: NSDictionary); cdecl;
     procedure registerClickConfirmingView(view: UIView); cdecl;
     function responseInfo: GADResponseInfo; cdecl;
     function rootViewController: UIViewController; cdecl;
@@ -989,7 +986,6 @@ type
     function starRating: NSDecimalNumber; cdecl;
     function store: NSString; cdecl;
     function unconfirmedClickDelegate: Pointer; cdecl;
-    procedure unregisterAdView; cdecl;
   end;
   TGADNativeAd = class(TOCGenericImport<GADNativeAdClass, GADNativeAd>) end;
 
@@ -1096,18 +1092,6 @@ type
     procedure setCustomMuteThisAdRequested(customMuteThisAdRequested: Boolean); cdecl;
   end;
   TGADNativeMuteThisAdLoaderOptions = class(TOCGenericImport<GADNativeMuteThisAdLoaderOptionsClass, GADNativeMuteThisAdLoaderOptions>) end;
-
-  GADQueryInfoClass = interface(NSObjectClass)
-    ['{9054D8F2-23E6-4229-8467-7DF6E17D44D5}']
-    {class} procedure createQueryInfoWithRequest(request: GADRequest; adFormat: GADAdFormat; completionHandler: GADQueryInfoCreationCompletionHandler); overload; cdecl;
-    {class} procedure createQueryInfoWithRequest(request: GADRequest; adFormat: GADAdFormat; adUnitID: NSString; completionHandler: GADQueryInfoCreationCompletionHandler); overload; cdecl;
-  end;
-
-  GADQueryInfo = interface(NSObject)
-    ['{1FF2E749-ED98-4750-AD47-6E852AC65915}']
-    function query: NSString; cdecl;
-  end;
-  TGADQueryInfo = class(TOCGenericImport<GADQueryInfoClass, GADQueryInfo>) end;
 
   GADRewardedAdClass = interface(NSObjectClass)
     ['{300B55B1-3448-4203-A65C-D67D5F361DFD}']
@@ -1413,12 +1397,6 @@ type
     function view: UIView; cdecl;
   end;
 
-  GADMediationInterscrollerAd = interface(IObjectiveC)
-    ['{B511D142-3AF6-413B-8721-D2F3FD2F1BD6}']
-    function delegateInterscrollerEffect: Boolean; cdecl;
-    procedure setDelegateInterscrollerEffect(delegateInterscrollerEffect: Boolean); cdecl;
-  end;
-
   GADMediationBannerAdConfigurationClass = interface(GADMediationAdConfigurationClass)
     ['{47FB5B7E-29F5-474D-985B-F9FEF2DDB67A}']
   end;
@@ -1480,7 +1458,6 @@ type
     function init: Pointer; cdecl;
     procedure loadAppOpenAdForAdConfiguration(adConfiguration: GADMediationAppOpenAdConfiguration; completionHandler: GADMediationAppOpenLoadCompletionHandler); cdecl;
     procedure loadBannerForAdConfiguration(adConfiguration: GADMediationBannerAdConfiguration; completionHandler: GADMediationBannerLoadCompletionHandler); cdecl;
-    procedure loadInterscrollerAdForAdConfiguration(adConfiguration: GADMediationBannerAdConfiguration; completionHandler: GADMediationInterscrollerAdLoadCompletionHandler); cdecl;
     procedure loadInterstitialForAdConfiguration(adConfiguration: GADMediationInterstitialAdConfiguration; completionHandler: GADMediationInterstitialLoadCompletionHandler); cdecl;
     procedure loadNativeAdForAdConfiguration(adConfiguration: GADMediationNativeAdConfiguration; completionHandler: GADMediationNativeLoadCompletionHandler); cdecl;
     procedure loadRewardedAdForAdConfiguration(adConfiguration: GADMediationRewardedAdConfiguration; completionHandler: GADMediationRewardedLoadCompletionHandler); cdecl;
