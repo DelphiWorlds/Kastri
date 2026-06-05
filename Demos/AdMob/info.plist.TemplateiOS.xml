@@ -158,5 +158,7 @@
       <string>3qcr597p9d.skadnetwork</string>
     </dict>
   </array>
+  <key>NSUserTrackingUsageDescription</key>
+  <string>This app uses tracking data to help deliver ads that are relevant to you</string>
 </dict>
 </plist>
