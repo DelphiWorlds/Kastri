@@ -45,6 +45,7 @@ begin
   Register;
 end;
 ```
+i.e. the calls to `RequestAuthorization` and `Register` are **swapped**.
 
 In the procedure `TFcmPushService.Register` method, **REMOVE** this line:
 
@@ -53,8 +54,6 @@ In the procedure `TFcmPushService.Register` method, **REMOVE** this line:
 ```
 
 ..as it is called elsewhere by the Kastri code
-
-i.e. the calls to `RequestAuthorization` and `Register` are **swapped**.
 
 ### Additional changes for Delphi 13.1 - See below for additional changes for Delphi 13.0 or earlier
 
