@@ -69,6 +69,7 @@ begin
   LogMemo.Lines.Add(Format('DeviceID: %s', [FPushNotifications.DeviceID]));
   Log.d('Token Received: %s', [FPushNotifications.DeviceToken]);
   Log.d('DeviceID: %s', [FPushNotifications.DeviceID]);
+  FPushNotifications.SubscribeToTopic('EMBTFCMDemo');
 end;
 
 end.
