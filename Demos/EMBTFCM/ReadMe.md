@@ -1,55 +1,40 @@
 # EMBTFCM Demo
 
-## **NOTE**
-
-**This implementation is now considered legacy, and should be used only in Delphi 10.4.x or earlier.**
-
-You can find the newer implementation [here](https://github.com/DelphiWorlds/Playground/tree/main/Demos/FCMRebooted).
-
-_No further changes will be made to this demo_
-
 ## Description
 
 This demo makes use of Embarcadero's FCM implementations for Android and iOS and packages them into something more convenient
 
-For iOS, Embarcadero has implemented FCM in Delphi 10.4.2 or later. For 10.4.1 or earlier, **this demo** uses the implementation from Kastri.
+## Supported Delphi versions
 
-**NOTE: For Delphi 10.4.2 or later, you will need to patch the `iOSapi.FirebaseMessaging` unit in order to use Firebase iOS SDK 7.0 or later. See below for details**
+The demo should compile and work for at least versions 12.2 and later
 
-### Supported Delphi versions
-
-The demo should compile and work for at least versions 10.3.3 and 10.4.x
-
-### Supported Platforms
+## Supported Platforms
 
 Supported platforms are: Android and iOS
 
-### Configuration
+## Project Configuration
 
-For iOS, please ensure that you put your `GoogleServices-info.plist` file (from your Firebase Console project) in the `Resources` folder of the demo.
+Although [this link](http://docwiki.embarcadero.com/RADStudio/Florence/en/Firebase_Android_Support) relates to Android support for FCM in Delphi, the first 5 steps covers Firebase configuration that applies to **both Android and iOS**
 
-For Android, please follow the instructions as per the [Embarcadero documentation](http://docwiki.embarcadero.com/RADStudio/Sydney/en/Firebase_Android_Support)
+### iOS
 
-Please ensure that you change the values for `CFBundleIdentifier` (for iOS) and `Package` (for Android) in the Version Info of the Project Options to match the identifier you have created for your FCM app
+Ensure that the `CFBundleIdentifier` value in the Version Info section of the Project Options matches the App ID that your provisioning profile is configured for.
 
-### Firebase iOS SDK and Framework search path for the project
+Ensure that the `GoogleServices-info.plist` file (from your Firebase Console project) is added to the deployment.
 
-At the time of writing, the current version of the Firebase iOS SDK is v7.7.0. You can download the current version using [this link](https://firebase.google.com/download/ios)
+As at Delphi 13.1, the officially supported Firebase iOS SDK is v12.7.0, which can be obtained via the GetIt package manager in the IDE.
 
-The `Framework search path` value in the Project Options is configured to use an environment variable, `$(Firebase)`, that points to the Firebase iOS SDK
-
-You can set up an Environment Variable in Delphi - Tools|Options, IDE > Environment Variables, User System Overrides, name it `Firebase` and select the path to the SDK.
-
-For Firebase iOS SDK earlier than version 7.0, use the paths recommended by Embarcadero
-
-### Using Firebase iOS SDK 7.0 or later requires patching the `iOSapi.FirebaseMessaging` unit
-
-Embarcadero's implementation of FCM for iOS (introduced in Delphi 10.4.2) was tested with Firebase iOS SDK v6.18.0
-
-In order to use the newer versions of the Firebase iOS SDK, copy `iOSapi.FirebaseMessaging.pas` from $(BDS)\source\rtl\ios (where $(BDS) is where Delphi is installed) to the project directory, and comment out this line (just before the end of the unit):
+The `Framework search path` value in the `Building > Delphi Compiler` section of the Project Options should be updated to:
 
 ```
-procedure ProtobufLoader; cdecl; external {$IFNDEF IOS32}framework{$ENDIF} 'Protobuf';
+$(Firebase_EMBT)\FirebaseAnalytics\FBLPromises.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseAnalytics\FirebaseAnalytics.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseAnalytics\FirebaseCore.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseAnalytics\FirebaseCoreInternal.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseAnalytics\FirebaseInstallations.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseAnalytics\GoogleAppMeasurement.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseAnalytics\GoogleUtilities.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseAnalytics\nanoPB.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseMessaging\GoogleDataTransport.xcframework/ios-arm64;$(Firebase_EMBT)\FirebaseMessaging\FirebaseMessaging.xcframework/ios-arm64
 ```
 
-As this framework is now incorporated into another part of the Firebase iOS SDK
+Where `$(Firebase_EMBT)` is either configured as a [User System Override in the IDE options](https://docwiki.embarcadero.com/RADStudio/Florence/en/Environment_Variables) to point to the root of the Firebase SDK, **OR** replaced with the SDK path.
+
+### Android
+
+Complete steps 6 to 8 of the instructions [in the docwiki](http://docwiki.embarcadero.com/RADStudio/Florence/en/Firebase_Android_Support).
+
+Ensure that the `package` value in the Version Info section of the Project Options matches the identifier you configured for your project in Firebase Console.
+
