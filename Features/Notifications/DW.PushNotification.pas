@@ -46,6 +46,8 @@ type
     constructor Create(const AChannelTitle: string);
     destructor Destroy; override;
     procedure Start;
+    procedure SubscribeToTopic(const ATopic: string);
+    procedure UnsubscribeFromTopic(const ATopic: string);
     property DeviceID: string read FDeviceID;
     property DeviceToken: string read FDeviceToken;
     property ShowBannerIfForeground: Boolean read FShowBannerIfForeground write FShowBannerIfForeground;
@@ -62,14 +64,13 @@ uses
   // FMX
   FMX.Platform,
   {$IF Defined(ANDROID)}
+  Androidapi.Helpers, Androidapi.JNI.Firebase, Androidapi.JNI.JavaTypes,
   FMX.PushNotification.Android,
   {$ENDIF}
   {$IF Defined(IOS)}
-  {$IF Declared(RTLVersion1042) or (RTLVersion > 34)} // i.e. Delphi 10.4.2 or later
+  Macapi.Helpers,
+  iOSapi.FirebaseMessaging,
   FMX.PushNotification.FCM.iOS,
-  {$ELSE}
-  DW.PushNotification.iOS,
-  {$ENDIF}
   {$ENDIF}
   {$IF Defined(ANDROID)}
   DW.OSMetadata.Android,
@@ -121,23 +122,24 @@ var
   LChannel: TChannel;
 begin
   FChannelId := GetChannelId;
-  if FChannelId.IsEmpty or FChannelTitle.IsEmpty then
-    Exit; // <======
-  LNotificationCenter := TNotificationCenter.Create(nil);
-  try
-    LChannel := TChannel.Create;
+  if not FChannelId.IsEmpty and not FChannelTitle.IsEmpty then
+  begin
+    LNotificationCenter := TNotificationCenter.Create(nil);
     try
-      LChannel.Id := FChannelId;
-      LChannel.Title := FChannelTitle;
-      LChannel.Description := '';
-      // Required for appearing as a banner when the app is not running, or when in the foreground
-      LChannel.Importance := TImportance.High;
-      LNotificationCenter.CreateOrUpdateChannel(LChannel);
+      LChannel := TChannel.Create;
+      try
+        LChannel.Id := FChannelId;
+        LChannel.Title := FChannelTitle;
+        LChannel.Description := '';
+        // Required for appearing as a banner when the app is not running, or when in the foreground
+        LChannel.Importance := TImportance.High;
+        LNotificationCenter.CreateOrUpdateChannel(LChannel);
+      finally
+        LChannel.Free;
+      end;
     finally
-      LChannel.Free;
+      LNotificationCenter.Free;
     end;
-  finally
-    LNotificationCenter.Free;
   end;
 end;
 
@@ -218,6 +220,26 @@ begin
   CreateChannel;
   CreateConnection;
   CheckStartupNotifications;
+end;
+
+procedure TPushNotifications.SubscribeToTopic(const ATopic: string);
+begin
+  {$IF Defined(IOS)}
+  TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).subscribeToTopic(StrToNSStr(ATopic));
+  {$ENDIF}
+  {$IF Defined(ANDROID)}
+  TJFirebaseMessaging.JavaClass.getInstance.subscribeToTopic(StringToJString(ATopic));
+  {$ENDIF}
+end;
+
+procedure TPushNotifications.UnsubscribeFromTopic(const ATopic: string);
+begin
+  {$IF Defined(IOS)}
+  TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).unsubscribeFromTopic(StrToNSStr(ATopic));
+  {$ENDIF}
+  {$IF Defined(ANDROID)}
+  TJFirebaseMessaging.JavaClass.getInstance.unsubscribeFromTopic(StringToJString(ATopic));
+  {$ENDIF}
 end;
 
 end.
