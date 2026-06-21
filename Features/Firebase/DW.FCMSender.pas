@@ -259,17 +259,21 @@ var
   LSignable: string;
   LSignature: TBytes;
 begin
-  Header.Algorithm := 'RS256';
-  Header.TokenType := 'JWT';
-  Claim.Aud := cFCMJWTAudience;
-  Claim.Scope := cFCMJWTScopes;
-  LBase64 := TBase64Encoding.Create(0, '');
-  try
-    LSignable := Header.Generate(LBase64) + '.' + Claim.Generate(LBase64);
-    LSignature := SignSHA256WithRSA(TEncoding.UTF8.GetBytes(APrivateKey), TEncoding.UTF8.GetBytes(LSignable));
-    Result := LSignable + '.' + LBase64.EncodeBytesToString(LSignature);
-  finally
-    LBase64.Free;
+  Result := '';
+  if LoadOpenSSL then
+  begin
+    Header.Algorithm := 'RS256';
+    Header.TokenType := 'JWT';
+    Claim.Aud := cFCMJWTAudience;
+    Claim.Scope := cFCMJWTScopes;
+    LBase64 := TBase64Encoding.Create(0, '');
+    try
+      LSignable := Header.Generate(LBase64) + '.' + Claim.Generate(LBase64);
+      LSignature := SignSHA256WithRSA(TEncoding.UTF8.GetBytes(APrivateKey), TEncoding.UTF8.GetBytes(LSignable));
+      Result := LSignable + '.' + LBase64.EncodeBytesToString(LSignature);
+    finally
+      LBase64.Free;
+    end;
   end;
 end;
 
