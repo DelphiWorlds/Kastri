@@ -14,7 +14,7 @@ unit DW.OpenSSL;
 // NOTE: This unit contains the *bare minimum* for signing using SHA256 with RSA, on Windows, iOS, macOS and Android
 // Extended with AES encryption/decryption functionality
 
-// Binaries for OpenSSL 3.x are here:
+// Binaries for OpenSSL are here:
 //   https://github.com/TaurusTLS-Developers/OpenSSL-Distribution/releases
 
 interface
@@ -24,11 +24,10 @@ uses
 
 const
   {$IF Defined(MSWINDOWS)}
-  {$IF Defined(WIN32)}
-  LIB_CRYPTO = 'libcrypto-3.dll';
-  {$ELSEIF Defined(WIN64)}
-  LIB_CRYPTO = 'libcrypto-3-x64.dll';
-  {$ENDIF}
+  LIB_CRYPTO_4_32 = 'libcrypto-4.dll';
+  LIB_CRYPTO_4_64 = 'libcrypto-4-x64.dll';
+  LIB_CRYPTO_3_32 = 'libcrypto-3.dll';
+  LIB_CRYPTO_3_64 = 'libcrypto-3-x64.dll';
   _PU = '';
   {$ENDIF}
   {$IF Defined(POSIX)}
@@ -67,78 +66,206 @@ type
 
   Ppem_password_cb = function(buf: PUTF8Char; size: Integer; rwflag: Integer; userdata: Pointer): Integer; cdecl;
 
-function BIO_free(a: PBIO): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'BIO_free';
-function BIO_new_mem_buf(buf: Pointer; len: Integer): PBIO; cdecl;
-  external LIB_CRYPTO name _PU + 'BIO_new_mem_buf';
-function EVP_DigestSignFinal(ctx: PEVP_MD_CTX; sigret: PByte; var siglen: NativeUInt): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_DigestSignFinal';
-function EVP_DigestSignInit(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; &type: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_DigestSignInit';
-function EVP_DigestSignInit_ex(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; mdname: PUTF8Char; libctx: POSSL_LIB_CTX; props: PUTF8Char; pkey: PEVP_PKEY;
-  params: POSSL_PARAM): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_DigestSignInit_ex';
-function EVP_DigestUpdate(ctx: PEVP_MD_CTX; d: Pointer; cnt: NativeUInt): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_DigestUpdate';
-procedure EVP_MD_CTX_free(ctx: PEVP_MD_CTX); cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_MD_CTX_free';
-function EVP_MD_CTX_new: PEVP_MD_CTX; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_MD_CTX_new';
-function EVP_PKEY_CTX_ctrl(ctx: PEVP_PKEY_CTX; keytype: Integer; optype: Integer; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_ctrl';
-procedure EVP_PKEY_CTX_free(ctx: PEVP_PKEY_CTX); cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_free';
-function EVP_PKEY_CTX_new(pkey: PEVP_PKEY; e: PENGINE): PEVP_PKEY_CTX; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_new';
-function EVP_PKEY_CTX_set_signature_md(ctx: PEVP_PKEY_CTX; md: Pointer): integer;
-procedure EVP_PKEY_free(pkey: PEVP_PKEY); cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_PKEY_free';
-function EVP_PKEY_sign(ctx: PEVP_PKEY_CTX; sig: PByte; var siglen: NativeUInt; tbs: PByte; tbslen: NativeUInt): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_PKEY_sign';
-function EVP_PKEY_sign_init(ctx: PEVP_PKEY_CTX): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_PKEY_sign_init';
-function EVP_sha256: PEVP_MD; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_sha256';
-function PEM_read_bio_PrivateKey(bp: PBIO; x: PPEVP_PKEY; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl;
-  external LIB_CRYPTO name _PU + 'PEM_read_bio_PrivateKey';
-function EVP_aes_256_cbc: PEVP_CIPHER; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_aes_256_cbc';
-function EVP_CIPHER_CTX_new: PEVP_CIPHER_CTX; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_new';
-procedure EVP_CIPHER_CTX_free(ctx: PEVP_CIPHER_CTX); cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_free';
-function EVP_EncryptInit_ex(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; engine: PENGINE; key: PByte; iv: PByte): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_EncryptInit_ex';
-function EVP_EncryptUpdate(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer; in_data: PByte; in_len: Integer): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_EncryptUpdate';
-function EVP_EncryptFinal_ex(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_EncryptFinal_ex';
-function EVP_DecryptInit_ex(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; engine: PENGINE; key: PByte; iv: PByte): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_DecryptInit_ex';
-function EVP_DecryptUpdate(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer; in_data: PByte; in_len: Integer): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_DecryptUpdate';
-function EVP_DecryptFinal_ex(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer): Integer; cdecl;
-  external LIB_CRYPTO name _PU + 'EVP_DecryptFinal_ex';
-function ERR_get_error: Cardinal; cdecl;
-  external LIB_CRYPTO name _PU + 'ERR_get_error';
-function ERR_peek_last_error: Cardinal; cdecl;
-  external LIB_CRYPTO name _PU + 'ERR_peek_last_error';
-procedure ERR_error_string_n(e: Cardinal; buf: PAnsiChar; len: NativeUInt); cdecl;
-  external LIB_CRYPTO name _PU + 'ERR_error_string_n';
-function ERR_lib_error_string(e: Cardinal): PAnsiChar; cdecl;
-  external LIB_CRYPTO name _PU + 'ERR_lib_error_string';
-function ERR_func_error_string(e: Cardinal): PAnsiChar; cdecl;
-  external LIB_CRYPTO name _PU + 'ERR_func_error_string';
-function ERR_reason_error_string(e: Cardinal): PAnsiChar; cdecl;
-  external LIB_CRYPTO name _PU + 'ERR_reason_error_string';
-procedure ERR_clear_error; cdecl;
-  external LIB_CRYPTO name _PU + 'ERR_clear_error';
+{$IF Defined(MSWINDOWS)}
+var
+  // Function pointers for dynamic loading
+  BIO_free: function(a: PBIO): Integer; cdecl;
+  BIO_new_mem_buf: function(buf: Pointer; len: Integer): PBIO; cdecl;
+  EVP_DigestSignFinal: function(ctx: PEVP_MD_CTX; sigret: PByte; var siglen: NativeUInt): Integer; cdecl;
+  EVP_DigestSignInit: function(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; &type: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl;
+  EVP_DigestSignInit_ex: function(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; mdname: PUTF8Char; libctx: POSSL_LIB_CTX; props: PUTF8Char; pkey: PEVP_PKEY; params: POSSL_PARAM): Integer; cdecl;
+  EVP_DigestUpdate: function(ctx: PEVP_MD_CTX; d: Pointer; cnt: NativeUInt): Integer; cdecl;
+  EVP_MD_CTX_free: procedure(ctx: PEVP_MD_CTX); cdecl;
+  EVP_MD_CTX_new: function: PEVP_MD_CTX; cdecl;
+  EVP_PKEY_CTX_ctrl: function(ctx: PEVP_PKEY_CTX; keytype: Integer; optype: Integer; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
+  EVP_PKEY_CTX_free: procedure(ctx: PEVP_PKEY_CTX); cdecl;
+  EVP_PKEY_CTX_new: function(pkey: PEVP_PKEY; e: PENGINE): PEVP_PKEY_CTX; cdecl;
+  EVP_PKEY_free: procedure(pkey: PEVP_PKEY); cdecl;
+  EVP_PKEY_sign: function(ctx: PEVP_PKEY_CTX; sig: PByte; var siglen: NativeUInt; tbs: PByte; tbslen: NativeUInt): Integer; cdecl;
+  EVP_PKEY_sign_init: function(ctx: PEVP_PKEY_CTX): Integer; cdecl;
+  EVP_sha256: function: PEVP_MD; cdecl;
+  PEM_read_bio_PrivateKey: function(bp: PBIO; x: PPEVP_PKEY; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl;
+  EVP_aes_256_cbc: function: PEVP_CIPHER; cdecl;
+  EVP_CIPHER_CTX_new: function: PEVP_CIPHER_CTX; cdecl;
+  EVP_CIPHER_CTX_free: procedure(ctx: PEVP_CIPHER_CTX); cdecl;
+  EVP_EncryptInit_ex: function(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; engine: PENGINE; key: PByte; iv: PByte): Integer; cdecl;
+  EVP_EncryptUpdate: function(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer; in_data: PByte; in_len: Integer): Integer; cdecl;
+  EVP_EncryptFinal_ex: function(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer): Integer; cdecl;
+  EVP_DecryptInit_ex: function(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; engine: PENGINE; key: PByte; iv: PByte): Integer; cdecl;
+  EVP_DecryptUpdate: function(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer; in_data: PByte; in_len: Integer): Integer; cdecl;
+  EVP_DecryptFinal_ex: function(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer): Integer; cdecl;
+  ERR_get_error: function: Cardinal; cdecl;
+  ERR_peek_last_error: function: Cardinal; cdecl;
+  ERR_error_string_n: procedure(e: Cardinal; buf: PAnsiChar; len: NativeUInt); cdecl;
+  ERR_lib_error_string: function(e: Cardinal): PAnsiChar; cdecl;
+  ERR_func_error_string: function(e: Cardinal): PAnsiChar; cdecl;
+  ERR_reason_error_string: function(e: Cardinal): PAnsiChar; cdecl;
+  ERR_clear_error: procedure; cdecl;
+{$ELSE}
+  function BIO_free(a: PBIO): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'BIO_free';
+  function BIO_new_mem_buf(buf: Pointer; len: Integer): PBIO; cdecl;
+    external LIB_CRYPTO name _PU + 'BIO_new_mem_buf';
+  function EVP_DigestSignFinal(ctx: PEVP_MD_CTX; sigret: PByte; var siglen: NativeUInt): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_DigestSignFinal';
+  function EVP_DigestSignInit(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; &type: PEVP_MD; e: PENGINE; pkey: PEVP_PKEY): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_DigestSignInit';
+  function EVP_DigestSignInit_ex(ctx: PEVP_MD_CTX; pctx: PPEVP_PKEY_CTX; mdname: PUTF8Char; libctx: POSSL_LIB_CTX; props: PUTF8Char;
+    pkey: PEVP_PKEY; params: POSSL_PARAM): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_DigestSignInit_ex';
+  function EVP_DigestUpdate(ctx: PEVP_MD_CTX; d: Pointer; cnt: NativeUInt): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_DigestUpdate';
+  procedure EVP_MD_CTX_free(ctx: PEVP_MD_CTX); cdecl; external LIB_CRYPTO name _PU + 'EVP_MD_CTX_free';
+  function EVP_MD_CTX_new: PEVP_MD_CTX; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_MD_CTX_new';
+  function EVP_PKEY_CTX_ctrl(ctx: PEVP_PKEY_CTX; keytype: Integer; optype: Integer; cmd: Integer; p1: Integer; p2: Pointer): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_ctrl';
+  procedure EVP_PKEY_CTX_free(ctx: PEVP_PKEY_CTX); cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_free';
+  function EVP_PKEY_CTX_new(pkey: PEVP_PKEY; e: PENGINE): PEVP_PKEY_CTX; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_PKEY_CTX_new';
+  procedure EVP_PKEY_free(pkey: PEVP_PKEY); cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_PKEY_free';
+  function EVP_PKEY_sign(ctx: PEVP_PKEY_CTX; sig: PByte; var siglen: NativeUInt; tbs: PByte; tbslen: NativeUInt): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_PKEY_sign';
+  function EVP_PKEY_sign_init(ctx: PEVP_PKEY_CTX): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_PKEY_sign_init';
+  function EVP_sha256: PEVP_MD; cdecl; external LIB_CRYPTO name _PU + 'EVP_sha256';
+  function PEM_read_bio_PrivateKey(bp: PBIO; x: PPEVP_PKEY; cb: Ppem_password_cb; u: Pointer): PEVP_PKEY; cdecl;
+    external LIB_CRYPTO name _PU + 'PEM_read_bio_PrivateKey';
+  function EVP_aes_256_cbc: PEVP_CIPHER; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_aes_256_cbc';
+  function EVP_CIPHER_CTX_new: PEVP_CIPHER_CTX; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_new';
+  procedure EVP_CIPHER_CTX_free(ctx: PEVP_CIPHER_CTX); cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_CIPHER_CTX_free';
+  function EVP_EncryptInit_ex(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; engine: PENGINE; key: PByte; iv: PByte): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_EncryptInit_ex';
+  function EVP_EncryptUpdate(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer; in_data: PByte; in_len: Integer): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_EncryptUpdate';
+  function EVP_EncryptFinal_ex(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_EncryptFinal_ex';
+  function EVP_DecryptInit_ex(ctx: PEVP_CIPHER_CTX; cipher: PEVP_CIPHER; engine: PENGINE; key: PByte; iv: PByte): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_DecryptInit_ex';
+  function EVP_DecryptUpdate(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer; in_data: PByte; in_len: Integer): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_DecryptUpdate';
+  function EVP_DecryptFinal_ex(ctx: PEVP_CIPHER_CTX; out_data: PByte; var out_len: Integer): Integer; cdecl;
+    external LIB_CRYPTO name _PU + 'EVP_DecryptFinal_ex';
+  function ERR_get_error: Cardinal; cdecl;
+    external LIB_CRYPTO name _PU + 'ERR_get_error';
+  function ERR_peek_last_error: Cardinal; cdecl;
+    external LIB_CRYPTO name _PU + 'ERR_peek_last_error';
+  procedure ERR_error_string_n(e: Cardinal; buf: PAnsiChar; len: NativeUInt); cdecl;
+    external LIB_CRYPTO name _PU + 'ERR_error_string_n';
+  function ERR_lib_error_string(e: Cardinal): PAnsiChar; cdecl;
+    external LIB_CRYPTO name _PU + 'ERR_lib_error_string';
+  function ERR_func_error_string(e: Cardinal): PAnsiChar; cdecl;
+    external LIB_CRYPTO name _PU + 'ERR_func_error_string';
+  function ERR_reason_error_string(e: Cardinal): PAnsiChar; cdecl;
+    external LIB_CRYPTO name _PU + 'ERR_reason_error_string';
+  procedure ERR_clear_error; cdecl;
+    external LIB_CRYPTO name _PU + 'ERR_clear_error';
+{$ENDIF}
 
+function EVP_PKEY_CTX_set_signature_md(ctx: PEVP_PKEY_CTX; md: Pointer): integer;
 function DecryptData(const AData: TBytes; const AKey: TBytes; const AIV: TBytes = []): TBytes;
 function EncryptData(const AData: TBytes; const AKey: TBytes; const AIV: TBytes = []): TBytes;
 function GetErrorString: string;
 
+function LoadOpenSSL: Boolean;
+
 implementation
+
+{$IF Defined(MSWINDOWS)}
+uses
+  Winapi.Windows;
+
+var
+  LibHandle: THandle = 0;
+
+function GetProc(const AName: string): Pointer;
+begin
+  Result := GetProcAddress(LibHandle, PChar(AName));
+  if not Assigned(Result) then
+    raise Exception.CreateFmt('Failed to load OpenSSL function: %s', [AName]);
+end;
+
+procedure UnloadOpenSSL;
+begin
+  if LibHandle <> 0 then
+  begin
+    FreeLibrary(LibHandle);
+    LibHandle := 0;
+  end;
+end;
+
+function LoadOpenSSL: Boolean;
+var
+  LLibNames: TArray<string>;
+  LName: string;
+begin
+  Result := False;
+  if LibHandle = 0 then
+  begin
+    // Prefer 4.x, fallback to 3.x
+    {$IF Defined(WIN32)}
+    LLibNames := [LIB_CRYPTO_4_32, LIB_CRYPTO_3_32];
+    {$ELSEIF Defined(WIN64)}
+    LLibNames := [LIB_CRYPTO_4_64, LIB_CRYPTO_3_64];
+    {$ENDIF}
+    for LName in LLibNames do
+    begin
+      LibHandle := LoadLibrary(PChar(LName));
+      if LibHandle <> 0 then
+        Break;
+    end;
+    if LibHandle <> 0 then
+    try
+      @BIO_free := GetProc('BIO_free');
+      @BIO_new_mem_buf := GetProc('BIO_new_mem_buf');
+      @EVP_DigestSignFinal := GetProc('EVP_DigestSignFinal');
+      @EVP_DigestSignInit := GetProc('EVP_DigestSignInit');
+      @EVP_DigestSignInit_ex := GetProc('EVP_DigestSignInit_ex');
+      @EVP_DigestUpdate := GetProc('EVP_DigestUpdate');
+      @EVP_MD_CTX_free := GetProc('EVP_MD_CTX_free');
+      @EVP_MD_CTX_new := GetProc('EVP_MD_CTX_new');
+      @EVP_PKEY_CTX_ctrl := GetProc('EVP_PKEY_CTX_ctrl');
+      @EVP_PKEY_CTX_free := GetProc('EVP_PKEY_CTX_free');
+      @EVP_PKEY_CTX_new := GetProc('EVP_PKEY_CTX_new');
+      @EVP_PKEY_free := GetProc('EVP_PKEY_free');
+      @EVP_PKEY_sign := GetProc('EVP_PKEY_sign');
+      @EVP_PKEY_sign_init := GetProc('EVP_PKEY_sign_init');
+      @EVP_sha256 := GetProc('EVP_sha256');
+      @PEM_read_bio_PrivateKey := GetProc('PEM_read_bio_PrivateKey');
+      @EVP_aes_256_cbc := GetProc('EVP_aes_256_cbc');
+      @EVP_CIPHER_CTX_new := GetProc('EVP_CIPHER_CTX_new');
+      @EVP_CIPHER_CTX_free := GetProc('EVP_CIPHER_CTX_free');
+      @EVP_EncryptInit_ex := GetProc('EVP_EncryptInit_ex');
+      @EVP_EncryptUpdate := GetProc('EVP_EncryptUpdate');
+      @EVP_EncryptFinal_ex := GetProc('EVP_EncryptFinal_ex');
+      @EVP_DecryptInit_ex := GetProc('EVP_DecryptInit_ex');
+      @EVP_DecryptUpdate := GetProc('EVP_DecryptUpdate');
+      @EVP_DecryptFinal_ex := GetProc('EVP_DecryptFinal_ex');
+      @ERR_get_error := GetProc('ERR_get_error');
+      @ERR_peek_last_error := GetProc('ERR_peek_last_error');
+      @ERR_error_string_n := GetProc('ERR_error_string_n');
+      @ERR_lib_error_string := GetProc('ERR_lib_error_string');
+      @ERR_func_error_string := GetProc('ERR_func_error_string');
+      @ERR_reason_error_string := GetProc('ERR_reason_error_string');
+      @ERR_clear_error := GetProc('ERR_clear_error');
+      Result := True;
+    except
+      UnloadOpenSSL;
+      raise;
+    end;
+  end;
+end;
+{$ELSE}
+function LoadOpenSSL: Boolean;
+begin
+  Result := True;
+end;
+{$ENDIF}
 
 function EVP_PKEY_CTX_set_signature_md(ctx: PEVP_PKEY_CTX; md: Pointer): integer;
 begin
@@ -238,5 +365,12 @@ begin
     EVP_CIPHER_CTX_free(LCTX);
   end;
 end;
+
+{$IF Defined(MSWINDOWS)}
+initialization
+
+finalization
+  UnloadOpenSSL;
+{$ENDIF}
 
 end.
