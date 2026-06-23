@@ -1,0 +1,105 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 654
+  ClientWidth = 500
+  Padding.Left = 4.000000000000000000
+  Padding.Top = 4.000000000000000000
+  Padding.Right = 4.000000000000000000
+  Padding.Bottom = 4.000000000000000000
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object CrashDelphiButton: TButton
+    Align = Top
+    StyledSettings = [Family, Size]
+    Position.X = 4.000000000000000000
+    Position.Y = 4.000000000000000000
+    Size.Width = 492.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'Delphi crash'
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claRed
+    TextSettings.Trimming = None
+    OnClick = CrashDelphiButtonClick
+  end
+  object CrashIntentButton: TButton
+    Align = Top
+    StyledSettings = [Family, Size]
+    Position.X = 4.000000000000000000
+    Position.Y = 44.000000000000000000
+    Size.Width = 492.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Intent crash'
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claRed
+    TextSettings.Trimming = None
+    OnClick = CrashIntentButtonClick
+  end
+  object CrashReportButton: TButton
+    Align = Top
+    StyledSettings = [Family, Size]
+    Position.X = 4.000000000000000000
+    Position.Y = 84.000000000000000000
+    Size.Width = 492.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Report crash'
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claRed
+    TextSettings.Trimming = None
+    OnClick = CrashReportButtonClick
+  end
+  object RuntimeCrashButton: TButton
+    Align = Top
+    StyledSettings = [Family, Size]
+    Position.X = 4.000000000000000000
+    Position.Y = 124.000000000000000000
+    Size.Width = 492.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Text = 'Native Runtime crash'
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claRed
+    TextSettings.Trimming = None
+    OnClick = RuntimeCrashButtonClick
+  end
+  object ANRButton: TButton
+    Align = Top
+    StyledSettings = [Family, Size]
+    Position.X = 4.000000000000000000
+    Position.Y = 164.000000000000000000
+    Size.Width = 492.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    Text = 'ANR Error'
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claRed
+    TextSettings.Trimming = None
+    OnClick = ANRButtonClick
+  end
+  object ThreadButton: TButton
+    Align = Top
+    StyledSettings = [Family, Size]
+    Position.X = 4.000000000000000000
+    Position.Y = 204.000000000000000000
+    Size.Width = 492.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    Text = 'Thread crash'
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claRed
+    TextSettings.Trimming = None
+    OnClick = ThreadButtonClick
+  end
+end
