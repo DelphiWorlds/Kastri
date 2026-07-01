@@ -219,45 +219,45 @@ begin
       if LibHandle <> 0 then
         Break;
     end;
-    if LibHandle <> 0 then
-    try
-      @BIO_free := GetProc('BIO_free');
-      @BIO_new_mem_buf := GetProc('BIO_new_mem_buf');
-      @EVP_DigestSignFinal := GetProc('EVP_DigestSignFinal');
-      @EVP_DigestSignInit := GetProc('EVP_DigestSignInit');
-      @EVP_DigestSignInit_ex := GetProc('EVP_DigestSignInit_ex');
-      @EVP_DigestUpdate := GetProc('EVP_DigestUpdate');
-      @EVP_MD_CTX_free := GetProc('EVP_MD_CTX_free');
-      @EVP_MD_CTX_new := GetProc('EVP_MD_CTX_new');
-      @EVP_PKEY_CTX_ctrl := GetProc('EVP_PKEY_CTX_ctrl');
-      @EVP_PKEY_CTX_free := GetProc('EVP_PKEY_CTX_free');
-      @EVP_PKEY_CTX_new := GetProc('EVP_PKEY_CTX_new');
-      @EVP_PKEY_free := GetProc('EVP_PKEY_free');
-      @EVP_PKEY_sign := GetProc('EVP_PKEY_sign');
-      @EVP_PKEY_sign_init := GetProc('EVP_PKEY_sign_init');
-      @EVP_sha256 := GetProc('EVP_sha256');
-      @PEM_read_bio_PrivateKey := GetProc('PEM_read_bio_PrivateKey');
-      @EVP_aes_256_cbc := GetProc('EVP_aes_256_cbc');
-      @EVP_CIPHER_CTX_new := GetProc('EVP_CIPHER_CTX_new');
-      @EVP_CIPHER_CTX_free := GetProc('EVP_CIPHER_CTX_free');
-      @EVP_EncryptInit_ex := GetProc('EVP_EncryptInit_ex');
-      @EVP_EncryptUpdate := GetProc('EVP_EncryptUpdate');
-      @EVP_EncryptFinal_ex := GetProc('EVP_EncryptFinal_ex');
-      @EVP_DecryptInit_ex := GetProc('EVP_DecryptInit_ex');
-      @EVP_DecryptUpdate := GetProc('EVP_DecryptUpdate');
-      @EVP_DecryptFinal_ex := GetProc('EVP_DecryptFinal_ex');
-      @ERR_get_error := GetProc('ERR_get_error');
-      @ERR_peek_last_error := GetProc('ERR_peek_last_error');
-      @ERR_error_string_n := GetProc('ERR_error_string_n');
-      @ERR_lib_error_string := GetProc('ERR_lib_error_string');
-      @ERR_func_error_string := GetProc('ERR_func_error_string');
-      @ERR_reason_error_string := GetProc('ERR_reason_error_string');
-      @ERR_clear_error := GetProc('ERR_clear_error');
-      Result := True;
-    except
-      UnloadOpenSSL;
-      raise;
-    end;
+  end;
+  if LibHandle <> 0 then
+  try
+    @BIO_free := GetProc('BIO_free');
+    @BIO_new_mem_buf := GetProc('BIO_new_mem_buf');
+    @EVP_DigestSignFinal := GetProc('EVP_DigestSignFinal');
+    @EVP_DigestSignInit := GetProc('EVP_DigestSignInit');
+    @EVP_DigestSignInit_ex := GetProc('EVP_DigestSignInit_ex');
+    @EVP_DigestUpdate := GetProc('EVP_DigestUpdate');
+    @EVP_MD_CTX_free := GetProc('EVP_MD_CTX_free');
+    @EVP_MD_CTX_new := GetProc('EVP_MD_CTX_new');
+    @EVP_PKEY_CTX_ctrl := GetProc('EVP_PKEY_CTX_ctrl');
+    @EVP_PKEY_CTX_free := GetProc('EVP_PKEY_CTX_free');
+    @EVP_PKEY_CTX_new := GetProc('EVP_PKEY_CTX_new');
+    @EVP_PKEY_free := GetProc('EVP_PKEY_free');
+    @EVP_PKEY_sign := GetProc('EVP_PKEY_sign');
+    @EVP_PKEY_sign_init := GetProc('EVP_PKEY_sign_init');
+    @EVP_sha256 := GetProc('EVP_sha256');
+    @PEM_read_bio_PrivateKey := GetProc('PEM_read_bio_PrivateKey');
+    @EVP_aes_256_cbc := GetProc('EVP_aes_256_cbc');
+    @EVP_CIPHER_CTX_new := GetProc('EVP_CIPHER_CTX_new');
+    @EVP_CIPHER_CTX_free := GetProc('EVP_CIPHER_CTX_free');
+    @EVP_EncryptInit_ex := GetProc('EVP_EncryptInit_ex');
+    @EVP_EncryptUpdate := GetProc('EVP_EncryptUpdate');
+    @EVP_EncryptFinal_ex := GetProc('EVP_EncryptFinal_ex');
+    @EVP_DecryptInit_ex := GetProc('EVP_DecryptInit_ex');
+    @EVP_DecryptUpdate := GetProc('EVP_DecryptUpdate');
+    @EVP_DecryptFinal_ex := GetProc('EVP_DecryptFinal_ex');
+    @ERR_get_error := GetProc('ERR_get_error');
+    @ERR_peek_last_error := GetProc('ERR_peek_last_error');
+    @ERR_error_string_n := GetProc('ERR_error_string_n');
+    @ERR_lib_error_string := GetProc('ERR_lib_error_string');
+    @ERR_func_error_string := GetProc('ERR_func_error_string');
+    @ERR_reason_error_string := GetProc('ERR_reason_error_string');
+    @ERR_clear_error := GetProc('ERR_clear_error');
+    Result := True;
+  except
+    UnloadOpenSSL;
+    raise;
   end;
 end;
 {$ELSE}
