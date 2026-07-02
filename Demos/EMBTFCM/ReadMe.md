@@ -48,7 +48,7 @@ Using this implementation:
   ```delphi
   FPushNotifications := TPushNotifications.Create('EMBTFCM Push Notifications', 'RedAlert.mp3');
   ```
-  If no path is specified, it is assumed that sound files have been deployed to `.\assets\internal`
+  If no path is specified in the sound name, it is assumed that sound files have been deployed to `.\assets\internal`. If a path **is** specified in the sound name, it **must** be the _full path_ to the file.
 * If additional channels are required (each channel can have only one sound), use the `AddChannel` method of the `TPushNotifications` instance. This ensures that the `SoundName` value is compatible when the channel is created. See the `CreateCustomChannel` method of the main form in the demo for an example.
 
 These measures were added to work around an issue with notification sounds in the EMBT implementation
