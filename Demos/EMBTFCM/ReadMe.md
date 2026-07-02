@@ -38,3 +38,17 @@ Complete steps 6 to 8 of the instructions [in the docwiki](http://docwiki.embarc
 
 Ensure that the `package` value in the Version Info section of the Project Options matches the identifier you configured for your project in Firebase Console.
 
+#### Sound
+
+Using this implementation:
+
+* The Secure File Sharing checkbox in the Entitlements section of the Project Options **MUST** be checked
+* The sound file should be added to the deployment with a Remote Path that is accessible via secure file sharing, e.g. `.\assets\internal` or a subfolder thereof e.g. `.\assets\internal\sounds`
+* Specify the filename with extension when creating the instance of `TPushNotifications`, e.g. as per the demo:
+  ```delphi
+  FPushNotifications := TPushNotifications.Create('EMBTFCM Push Notifications', 'RedAlert.mp3');
+  ```
+  If no path is specified, it is assumed that sound files have been deployed to `.\assets\internal`
+* If additional channels are required (each channel can have only one sound), use the `AddChannel` method of the `TPushNotifications` instance. This ensures that the `SoundName` value is compatible when the channel is created. See the `CreateCustomChannel` method of the main form in the demo for an example.
+
+These measures were added to work around an issue with notification sounds in the EMBT implementation
