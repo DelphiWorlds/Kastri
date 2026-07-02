@@ -6,7 +6,7 @@
         <MainSource>EMBTFCMDemo.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">iOSDevice64</Platform>
+        <Platform Condition="'$(Platform)'==''">Android64</Platform>
         <TargetedPlatforms>693267</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
@@ -322,13 +322,7 @@
         <PF_MobileProvisionPathDebug>/Users/dave/Library/Developer/Xcode/UserData/Provisioning Profiles/ad898217-5fdf-4cf3-9d17-46d23be9f456.mobileprovision</PF_MobileProvisionPathDebug>
         <PF_KeyChainAccessDebug>LDM7R2GDFK.com.delphiworlds.fcmtest;com.apple.token;</PF_KeyChainAccessDebug>
         <PF_AppIdentifierDebug>LDM7R2GDFK.com.delphiworlds.fcmtest</PF_AppIdentifierDebug>
-        <PF_EntitlementExtraKeyValuesDebug>&lt;key&gt;aps-environment&lt;/key&gt;
-	&lt;string&gt;development&lt;/string&gt;
-	&lt;key&gt;get-task-allow&lt;/key&gt;
-	&lt;true/&gt;
-	&lt;key&gt;com.apple.developer.team-identifier&lt;/key&gt;
-	&lt;string&gt;LDM7R2GDFK&lt;/string&gt;
-	</PF_EntitlementExtraKeyValuesDebug>
+        <PF_EntitlementExtraKeyValuesDebug>&lt;key&gt;aps-environment&lt;/key&gt;&lt;string&gt;development&lt;/string&gt;&lt;key&gt;get-task-allow&lt;/key&gt;&lt;true/&gt;&lt;key&gt;com.apple.developer.team-identifier&lt;/key&gt;&lt;string&gt;LDM7R2GDFK&lt;/string&gt;</PF_EntitlementExtraKeyValuesDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_iOSSimARM64)'!=''">
         <Cfg_1>true</Cfg_1>
@@ -770,6 +764,11 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Android64\Debug\libEMBTFCMDemoD11.so" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="Android64\Debug\provider_paths.xml" Configuration="Debug" Class="AndroidFileProvider">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Android64\Debug\splash_image_def.xml" Configuration="Debug" Class="AndroidSplashImageDef"/>
                 <DeployFile LocalName="Android64\Debug\splash_image_def.xml" Configuration="Debug" Class="AndroidSplashImageDef">
                     <Platform Name="Android64">
@@ -820,8 +819,35 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="Resources\RedAlert.mp3" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>RedAlert.mp3</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Resources\RedAlert.mp3" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>RedAlert.mp3</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Resources\RedAlert.wav" Configuration="Debug" Class="File"/>
                 <DeployFile LocalName="Resources\RedAlert.wav" Configuration="Release" Class="File"/>
+                <DeployFile LocalName="Resources\SlideWhistleDown.mp3" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>SlideWhistleDown.mp3</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Resources\SlideWhistleDown.mp3" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteName>SlideWhistleDown.mp3</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Win32\Debug\EMBTFCMDemoD11.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="iOSDevice64\Debug\EMBTFCMDemo.dSYM" Configuration="Debug" Class="ProjectiOSDeviceDebug">
                     <Platform Name="iOSDevice64">
