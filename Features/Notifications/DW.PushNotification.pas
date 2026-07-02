@@ -15,7 +15,7 @@ interface
 
 uses
   // RTL
-  System.Classes, System.PushNotification, System.Json, System.Messaging;
+  System.Classes, System.PushNotification, System.Json, System.Messaging, System.Notification;
 
 type
   TNotificationReceivedEvent = procedure(Sender: TObject; const Notification: TPushServiceNotification) of object;
@@ -24,6 +24,7 @@ type
   TPushNotifications = class(TObject)
   private
     FChannelId: string;
+    FChannelSoundName: string;
     FChannelTitle: string;
     FDeviceID: string;
     FDeviceToken: string;
@@ -43,8 +44,9 @@ type
     procedure ReceiveNotificationHandler(Sender: TObject; const AServiceNotification: TPushServiceNotification);
     procedure ServiceConnectionChangeHandler(Sender: TObject; APushChanges: TPushService.TChanges);
   public
-    constructor Create(const AChannelTitle: string);
+    constructor Create(const AChannelTitle: string; const AChannelSoundName: string = '');
     destructor Destroy; override;
+    procedure AddChannel(const AChannel: TChannel);
     procedure Start;
     procedure SubscribeToTopic(const ATopic: string);
     procedure UnsubscribeFromTopic(const ATopic: string);
@@ -60,11 +62,11 @@ implementation
 
 uses
   // RTL
-  System.SysUtils, System.Notification,
+  System.SysUtils, System.IOUtils,
   // FMX
   FMX.Platform,
   {$IF Defined(ANDROID)}
-  Androidapi.Helpers, Androidapi.JNI.Firebase, Androidapi.JNI.JavaTypes,
+  Androidapi.Helpers, Androidapi.JNI.Firebase, Androidapi.JNI.JavaTypes, Androidapi.JNI.Net,
   FMX.PushNotification.Android,
   {$ENDIF}
   {$IF Defined(IOS)}
@@ -79,12 +81,13 @@ uses
 
 { TPushNotifications }
 
-constructor TPushNotifications.Create(const AChannelTitle: string);
+constructor TPushNotifications.Create(const AChannelTitle: string; const AChannelSoundName: string = '');
 begin
   inherited Create;
   FShowBannerIfForeground := True;
   TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventMessageHandler);
   FChannelTitle := AChannelTitle;
+  FChannelSoundName := AChannelSoundName;
 end;
 
 destructor TPushNotifications.Destroy;
@@ -116,29 +119,48 @@ begin
   FDeviceId := LPushService.DeviceIDValue[TPushService.TDeviceIDNames.DeviceId];
 end;
 
-procedure TPushNotifications.CreateChannel;
+procedure TPushNotifications.AddChannel(const AChannel: TChannel);
 var
   LNotificationCenter: TNotificationCenter;
+begin
+  LNotificationCenter := TNotificationCenter.Create(nil);
+  try
+    {$IF Defined(ANDROID)}
+    // Workaround for an issue regarding sound
+    if not AChannel.SoundName.IsEmpty then
+    begin
+      if TPath.GetDirectoryName(AChannel.SoundName).IsEmpty then
+        AChannel.SoundName := TPath.Combine(TPath.GetDocumentsPath, AChannel.SoundName);
+      if TFile.Exists(AChannel.SoundName) then
+        AChannel.SoundName := JStringToString(JFileToJURI(TJFile.JavaClass.init(StringToJString(AChannel.SoundName))).toString)
+      else
+        AChannel.SoundName := '';
+    end;
+    {$ENDIF}
+    LNotificationCenter.CreateOrUpdateChannel(AChannel);
+  finally
+    LNotificationCenter.Free;
+  end;
+end;
+
+procedure TPushNotifications.CreateChannel;
+var
   LChannel: TChannel;
 begin
   FChannelId := GetChannelId;
   if not FChannelId.IsEmpty and not FChannelTitle.IsEmpty then
   begin
-    LNotificationCenter := TNotificationCenter.Create(nil);
+    LChannel := TChannel.Create;
     try
-      LChannel := TChannel.Create;
-      try
-        LChannel.Id := FChannelId;
-        LChannel.Title := FChannelTitle;
-        LChannel.Description := '';
-        // Required for appearing as a banner when the app is not running, or when in the foreground
-        LChannel.Importance := TImportance.High;
-        LNotificationCenter.CreateOrUpdateChannel(LChannel);
-      finally
-        LChannel.Free;
-      end;
+      LChannel.Id := FChannelId;
+      LChannel.Title := FChannelTitle;
+      LChannel.Description := '';
+      // Required for appearing as a banner when the app is not running, or when in the foreground
+      LChannel.Importance := TImportance.High;
+      LChannel.SoundName := FChannelSoundName;
+      AddChannel(LChannel);
     finally
-      LNotificationCenter.Free;
+      LChannel.Free;
     end;
   end;
 end;
@@ -177,7 +199,11 @@ begin
   try
     LNotification := TNotification.Create;
     try
-      LNotification.ChannelId := FChannelId;
+      if not AJSON.TryGetValue('android_channel_id', LNotification.ChannelId)
+        and not AJSON.TryGetValue('["gcm.notification.android_channel_id"]', LNotification.ChannelId) then
+      begin
+        LNotification.ChannelId := FChannelId;
+      end;
       if not AJSON.TryGetValue('title', LNotification.Title) then
         AJSON.TryGetValue('["gcm.notification.title"]', LNotification.Title);
       if not AJSON.TryGetValue('body', LNotification.AlertBody) then
