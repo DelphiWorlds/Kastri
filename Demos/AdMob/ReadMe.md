@@ -79,12 +79,16 @@ If creating your own project, in Project Manager:
 5. Repeat step 3, this time selecting the following files from the `ThirdParty\Android` folder of Kastri:
    * `play-services-ads-25.3.0.aar`
    * `play-services-ads-api-25.3.0.aar`
+   * `play-services-basement-18.9.0-repack.aar`
 6. Right-click each of the following, and click `Disable` for each:
    * `play-services-ads-22.2.0.dex.jar`
    * `play-services-ads-base-22.2.0.dex.jar`
    * `play-services-ads-lite-22.2.0.dex.jar`
+   * `play-services-basement-18.4.0.dex.jar`
 7. Expand **Android 64-bit**
 8. Under the `Libraries` node, repeat step 6 **ONLY** (i.e. no additions are required for Android 64-bit)
+
+**NOTE**: `play-services-basement-18.9.0-repack.aar` is (as the name implies) a re-pack of the original `play-services-basement-18.9.0.aar` - this was necessary as the `AndroidManifest.xml` in the original `.aar` file would create a second metadata entry for Play Services.
 
 #### Android Entitlements
 
