@@ -21,7 +21,7 @@ uses
   // FMX
   FMX.WebBrowser.Delegate.Mac,
   // DW
-  DW.WebBrowserExt, DW.WebBrowserExt.Cocoa, DW.JavaScript, DW.Macapi.AppKit;
+  DW.WebBrowserExt, DW.WebBrowserExt.Cocoa, DW.Types, DW.Macapi.AppKit;
 
 type
   TPlatformWebBrowserExt = class;
@@ -116,11 +116,12 @@ type
 implementation
 
 uses
-  SimpleLog.Log,
   // RTL
   System.SysUtils,
   // macOS
-  Macapi.Helpers, Macapi.CocoaTypes, Macapi.ObjCRuntime;
+  Macapi.Helpers, Macapi.CocoaTypes, Macapi.ObjCRuntime,
+  // DW
+  DW.JavaScript;
 
 // Declarations missing from Macapi.WebKit
 

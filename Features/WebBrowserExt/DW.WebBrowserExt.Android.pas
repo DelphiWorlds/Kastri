@@ -22,7 +22,7 @@ uses
   // FMX
   FMX.Graphics,
   // DW
-  DW.WebBrowserExt, DW.JavaScript, DW.Androidapi.JNI.App, DW.MultiReceiver.Android, DW.Androidapi.JNI.AndroidX.WebKit;
+  DW.WebBrowserExt, DW.Types, DW.Androidapi.JNI.App, DW.MultiReceiver.Android, DW.Androidapi.JNI.AndroidX.WebKit;
 
 type
   TPlatformWebBrowserExt = class;
@@ -35,17 +35,6 @@ type
     procedure onPostMessage(webView: JWebView; webMessageCompat: JWebMessageCompat; uri: Jnet_Uri; b: Boolean; javaScriptReplyProxy: JJavaScriptReplyProxy); cdecl;
   public
     constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt);
-  end;
-
-  TValueCallback = class(TJavaLocal, JValueCallback)
-  private
-    FPlatformWebBrowserExt: TPlatformWebBrowserExt;
-    FHandler: TJavaScriptResultProc;
-  public
-    { JValueCallback }
-    procedure onReceiveValue(value: JObject); cdecl;
-  public
-    constructor Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt; const AHandler: TJavaScriptResultProc);
   end;
 
   TTouchListener = class(TJavaLocal, JView_OnTouchListener)
@@ -92,8 +81,6 @@ type
     FValueCallbacks: TArray<JValueCallback>;
     FWebView: JWebView;
     FWebMessageListener: JWebViewCompat_WebMessageListener;
-    function CreateValueCallback(const AHandler: TJavaScriptResultProc): JValueCallback;
-    procedure RemoveValueCallback(const ACallback: JValueCallback);
   protected
     procedure ClearCache(const ADataKinds: TCacheDataKinds); override;
     procedure DoCaptureBitmap; override;
@@ -119,12 +106,12 @@ implementation
 
 uses
   // RTL
-  System.SysUtils, System.IOUtils,
+  System.SysUtils, System.IOUtils, System.TypInfo,
   // Android
   Androidapi.Helpers, Androidapi.JNI.Print,
   // DW
-  DW.OSLog, System.TypInfo,
-  DW.Graphics.Helpers.Android;
+  DW.OSLog,
+  DW.Graphics.Helpers.Android, DW.JavaScript, DW.Android.Helpers;
 
 { TWebMessageListener }
 
@@ -138,22 +125,6 @@ procedure TWebMessageListener.onPostMessage(webView: JWebView; webMessageCompat:
   javaScriptReplyProxy: JJavaScriptReplyProxy);
 begin
   FPlatformWebBrowserExt.WebViewPostMessage(webView, webMessageCompat, uri, b, javaScriptReplyProxy);
-end;
-
-{ TValueCallback }
-
-constructor TValueCallback.Create(const APlatformWebBrowserExt: TPlatformWebBrowserExt; const AHandler: TJavaScriptResultProc);
-begin
-  inherited Create;
-  FPlatformWebBrowserExt := APlatformWebBrowserExt;
-  FHandler := AHandler;
-end;
-
-procedure TValueCallback.onReceiveValue(value: JObject);
-begin
-  if Assigned(FHandler) then
-    FHandler(JStringToString(TJString.Wrap(value)).DeQuotedString('"'), 0);
-  FPlatformWebBrowserExt.RemoveValueCallback(Self);
 end;
 
 { TTouchListener }
@@ -280,27 +251,6 @@ begin
     end
     else
       FWebView.clearCache(True);
-  end;
-end;
-
-function TPlatformWebBrowserExt.CreateValueCallback(const AHandler: TJavaScriptResultProc): JValueCallback;
-begin
-  Result := TValueCallback.Create(Self, AHandler);
-  FValueCallbacks := FValueCallbacks + [Result];
-end;
-
-procedure TPlatformWebBrowserExt.RemoveValueCallback(const ACallback: JValueCallback);
-var
-  I: Integer;
-begin
-  for I := 0 to Length(FValueCallbacks) - 1 do
-  begin
-    if FValueCallbacks[I] = ACallback then
-    begin
-      FValueCallbacks[I] := nil;
-      Delete(FValueCallbacks, I, 1);
-      Break;
-    end;
   end;
 end;
 
@@ -442,7 +392,7 @@ end;
 procedure TPlatformWebBrowserExt.ExecuteJavaScript(const AJavaScript: string; const AHandler: TJavaScriptResultProc);
 begin
   if FWebView <> nil then
-    FWebView.evaluateJavascript(StringToJString(AJavaScript), CreateValueCallback(AHandler))
+    FWebView.evaluateJavascript(StringToJString(AJavaScript), TValueCallback.Create(AHandler))
   else
     AHandler(cJavaScriptNullResult, -1);
 end;

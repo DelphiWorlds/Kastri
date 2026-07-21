@@ -21,7 +21,7 @@ uses
   //
   FMX.WebBrowser.Delegate.iOS,
   // DW
-  DW.WebBrowserExt, DW.WebBrowserExt.Cocoa, DW.JavaScript;
+  DW.WebBrowserExt, DW.WebBrowserExt.Cocoa, DW.Types;
 
 type
   TPlatformWebBrowserExt = class;
@@ -110,7 +110,7 @@ uses
   // FMX
   FMX.Graphics,
   // DW
-  DW.OSLog, DW.OSDevice, DW.Graphics.Helpers.Mac;
+  DW.OSLog, DW.OSDevice, DW.Graphics.Helpers.Mac, DW.JavaScript;
 
 type
   WKWebViewEx = interface(WKWebView)

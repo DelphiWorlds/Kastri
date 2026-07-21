@@ -293,7 +293,7 @@ var
 begin
   FURLSessionDelegate := TURLSessionDelegate.Create(Self);
   LConfig := TNSURLSessionConfiguration.OCClass.defaultSessionConfiguration;
-  {$IF (CompilerVersion < 37) or Defined(OSX)} //!!!!!
+  {$IF (CompilerVersion < 37) or Defined(OSX)}
   FDownloadSession := TNSURLSession.OCClass.sessionWithConfigurationDelegateDelegateQueue(LConfig, FURLSessionDelegate.GetObjectID, nil);
   {$ELSE}
   FDownloadSession := TNSURLSession.OCClass.sessionWithConfiguration(LConfig, FURLSessionDelegate.GetObjectID, nil);
@@ -305,7 +305,7 @@ var
   LFileName: string;
   LState: TDownloadState;
   LFileURL: NSURL;
-  {$IF CompilerVersion > 36}
+  {$IF (CompilerVersion > 36) and not Defined(OSX)}
   LError: Pointer;
   {$ENDIF}
 begin

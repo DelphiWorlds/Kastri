@@ -3,8 +3,10 @@ unit DW.JavaScript.WebView2;
 interface
 
 uses
+  // Win
   Winapi.WebView2,
-  DW.JavaScript;
+  // DW
+  DW.Types;
 
 type
   TJavaScriptResultCallback = class(TInterfacedObject, ICoreWebView2ExecuteScriptCompletedHandler)

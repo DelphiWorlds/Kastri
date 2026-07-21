@@ -21,7 +21,7 @@ uses
   // FMX
   FMX.WebBrowser, FMX.Graphics,
   // DW
-  DW.JavaScript;
+  DW.Types;
 
 type
   TPrintJobStatus = (None, Blocked, Cancelled, Completed, Failed, Queued, Started);
@@ -144,11 +144,10 @@ type
 implementation
 
 uses
+  // RTL
   System.Net.Mime, System.IOUtils, System.StrUtils,
-
-  DW.OSLog,
-
-  DW.IOUtils.Helpers,
+  // DW
+  DW.IOUtils.Helpers, DW.JavaScript,
 {$IF Defined(ANDROID)}
   DW.WebBrowserExt.Android;
 {$ENDIF}

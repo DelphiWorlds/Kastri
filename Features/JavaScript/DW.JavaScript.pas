@@ -17,6 +17,7 @@ const
   cJSEventScheme = 'jsevent';
   cJSEventProtocol = cJSEventScheme + ':blank?';
 
+  cJavaScriptNullResult = 'null';
   cJavaScriptClickAtXY = '(function() {'#13#10 +
     'var windowX = %d, windowY = %d;'#13#10 +
     'var x = windowX + (window.scrollX || window.pageXOffset)'#13#10 +
@@ -39,7 +40,6 @@ const
     '})()';
   cJavaScriptGetInputValueByName = '(function() { return document.getElementsByName("%s")[0].value; })()';
   cJavaScriptGetPageContents = '(function() { return document.getElementsByTagName("html")[0].innerHTML; })()';
-  cJavaScriptNullResult = 'null';
   cJavaScriptSetInputValueById = '(function() { document.getElementById("%s").value = "%s"; })()';
   cJavaScriptSetInputValueByName = '(function() { '#13#10 +
     '  var element = document.querySelector("input[name=''%s'']"); '#13#10 +
@@ -103,8 +103,6 @@ type
     function ParseEvent(const AURL: string): Boolean;
     function ToString: string;
   end;
-
-  TJavaScriptResultProc = reference to procedure(const JavaScriptResult: string; const ErrorCode: Integer);
 
 function IsTrue(const AJavaScriptResult: string): Boolean;
 

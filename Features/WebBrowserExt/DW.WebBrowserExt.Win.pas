@@ -17,7 +17,7 @@ uses
   // RTL
   System.Classes,
   // DW
-  DW.WebBrowserExt, DW.JavaScript;
+  DW.WebBrowserExt, DW.Types;
 
 type
   TPlatformWebBrowserExt = class(TCustomPlatformWebBrowserExt)
@@ -38,7 +38,7 @@ uses
   // Win
   Winapi.WebView2,
   // DW
-  DW.JavaScript.WebView2;
+  DW.JavaScript, DW.JavaScript.WebView2;
 
 { TPlatformWebBrowserExt }
 
