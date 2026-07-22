@@ -271,24 +271,26 @@ type
 
   NSNetServiceDelegate = interface(IObjectiveC)
     ['{00728682-DC04-47C4-9497-43D2BBA88F2F}']
-    procedure netServiceDidAcceptConnectionWithInputStream(sender: NSNetService; didAcceptConnectionWithInputStream: NSInputStream;
-      outputStream: NSOutputStream); cdecl;
-    procedure netServiceDidNotPublish(sender: NSNetService; didNotPublish: NSDictionary); cdecl;
+    procedure netService(sender: NSNetService; didUpdateTXTRecordData: NSData); overload; cdecl;
+    procedure netService(sender: NSNetService; didNotPublish: NSDictionary); overload; cdecl;
+    procedure netService(sender: NSNetService; didAcceptConnectionWithInputStream: NSInputStream; outputStream: NSOutputStream); overload; cdecl;
+    [MethodName('netService:didNotResolve:')]
     procedure netServiceDidNotResolve(sender: NSNetService; didNotResolve: NSDictionary); cdecl;
     procedure netServiceDidPublish(sender: NSNetService); cdecl;
     procedure netServiceDidResolveAddress(sender: NSNetService); cdecl;
     procedure netServiceDidStop(sender: NSNetService); cdecl;
-    procedure netServiceDidUpdateTXTRecordData(sender: NSNetService; didUpdateTXTRecordData: NSData); cdecl;
     procedure netServiceWillPublish(sender: NSNetService); cdecl;
     procedure netServiceWillResolve(sender: NSNetService); cdecl;
   end;
 
   NSNetServiceBrowserDelegate = interface(IObjectiveC)
     ['{CAB8636E-EDE2-4456-91AD-657247F3EB5A}']
-    procedure netServiceBrowserDidFindDomain(browser: NSNetServiceBrowser; didFindDomain: NSString; moreComing: Boolean); cdecl;
-    procedure netServiceBrowserDidFindService(browser: NSNetServiceBrowser; didFindService: NSNetService; moreComing: Boolean); cdecl;
-    procedure netServiceBrowserDidNotSearch(browser: NSNetServiceBrowser; didNotSearch: NSDictionary); cdecl;
+    procedure netServiceBrowser(browser: NSNetServiceBrowser; didFindService: NSNetService; moreComing: Boolean); overload; cdecl;
+    procedure netServiceBrowser(browser: NSNetServiceBrowser; didFindDomain: NSString; moreComing: Boolean); overload; cdecl;
+    procedure netServiceBrowser(browser: NSNetServiceBrowser; didNotSearch: NSDictionary); overload; cdecl;
+    [MethodName('netServiceBrowser:didRemoveDomain:moreComing:')]
     procedure netServiceBrowserDidRemoveDomain(browser: NSNetServiceBrowser; didRemoveDomain: NSString; moreComing: Boolean); cdecl;
+    [MethodName('netServiceBrowser:didRemoveService:moreComing:')]
     procedure netServiceBrowserDidRemoveService(browser: NSNetServiceBrowser; didRemoveService: NSNetService; moreComing: Boolean); cdecl;
     procedure netServiceBrowserDidStopSearch(browser: NSNetServiceBrowser); cdecl;
     procedure netServiceBrowserWillSearch(browser: NSNetServiceBrowser); cdecl;
