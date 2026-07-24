@@ -50,6 +50,7 @@ type
     procedure Start;
     procedure SubscribeToTopic(const ATopic: string);
     procedure UnsubscribeFromTopic(const ATopic: string);
+    property ChannelSoundName: string read FChannelSoundName write FChannelSoundName;
     property DeviceID: string read FDeviceID;
     property DeviceToken: string read FDeviceToken;
     property ShowBannerIfForeground: Boolean read FShowBannerIfForeground write FShowBannerIfForeground;
