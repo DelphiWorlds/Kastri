@@ -121,6 +121,7 @@ type
   [JavaSignature('com/google/android/ump/ConsentDebugSettings')]
   JConsentDebugSettings = interface(JObject)
     ['{EE61383F-3BEA-4DAA-868B-458A5C580B8F}']
+    function getDebugGeography: Integer; cdecl; // v3.0.0
     function isTestDevice: Boolean; cdecl;
   end;
   TJConsentDebugSettings = class(TJavaGenericImport<JConsentDebugSettingsClass, JConsentDebugSettings>) end;
@@ -145,9 +146,13 @@ type
     {class} function _GetDEBUG_GEOGRAPHY_DISABLED: Integer; cdecl;
     {class} function _GetDEBUG_GEOGRAPHY_EEA: Integer; cdecl;
     {class} function _GetDEBUG_GEOGRAPHY_NOT_EEA: Integer; cdecl;
+    {class} function _GetDEBUG_GEOGRAPHY_OTHER: Integer; cdecl;
+    {class} function _GetDEBUG_GEOGRAPHY_REGULATED_US_STATE: Integer; cdecl;
     {class} property DEBUG_GEOGRAPHY_DISABLED: Integer read _GetDEBUG_GEOGRAPHY_DISABLED;
     {class} property DEBUG_GEOGRAPHY_EEA: Integer read _GetDEBUG_GEOGRAPHY_EEA;
     {class} property DEBUG_GEOGRAPHY_NOT_EEA: Integer read _GetDEBUG_GEOGRAPHY_NOT_EEA;
+    {class} property DEBUG_GEOGRAPHY_OTHER: Integer read _GetDEBUG_GEOGRAPHY_OTHER; // v4.0.0
+    {class} property DEBUG_GEOGRAPHY_REGULATED_US_STATE: Integer read _GetDEBUG_GEOGRAPHY_REGULATED_US_STATE; // v4.0.0
   end;
 
   [JavaSignature('com/google/android/ump/ConsentDebugSettings$DebugGeography')]
@@ -214,6 +219,7 @@ type
   JConsentRequestParameters = interface(JObject)
     ['{E9016BAC-948C-403D-B50C-B8BFB188B0D4}']
     function getConsentDebugSettings: JConsentDebugSettings; cdecl;
+    function getConsentSyncId: JString; cdecl; // v4.0.0
     function isTagForUnderAgeOfConsent: Boolean; cdecl;
   end;
   TJConsentRequestParameters = class(TJavaGenericImport<JConsentRequestParametersClass, JConsentRequestParameters>) end;
