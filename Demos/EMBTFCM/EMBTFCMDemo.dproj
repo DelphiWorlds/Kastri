@@ -99,6 +99,12 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Cfg_2)'=='true') or '$(Cfg_2_Android)'!=''">
+        <Cfg_2_Android>true</Cfg_2_Android>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
         <Cfg_2_Win32>true</Cfg_2_Win32>
         <CfgParent>Cfg_2</CfgParent>
@@ -159,6 +165,9 @@
         <EL_ApsEnvironment>true</EL_ApsEnvironment>
         <Android_GcmDefaultNotificationChannelId>EMBTFCMv2</Android_GcmDefaultNotificationChannelId>
         <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
+        <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
+        <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
+        <EL_SecureFileSharing>true</EL_SecureFileSharing>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
         <VerInfo_Keys>package=com.delphiworlds.test;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36</VerInfo_Keys>
@@ -186,8 +195,11 @@
         <VerInfo_Build>1</VerInfo_Build>
         <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
         <EL_ApsEnvironment>true</EL_ApsEnvironment>
-        <Android_GcmDefaultNotificationChannelId>EMBTFCMv2</Android_GcmDefaultNotificationChannelId>
         <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
+        <Android_GcmDefaultNotificationChannelId>EMBTFCMv2</Android_GcmDefaultNotificationChannelId>
+        <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
+        <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
+        <EL_SecureFileSharing>true</EL_SecureFileSharing>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -303,6 +315,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Android)'!=''">
         <VerInfo_Build>1</VerInfo_Build>
+        <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
+        <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Android64)'!=''">
         <Cfg_1_Android>true</Cfg_1_Android>
@@ -346,6 +360,11 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Android)'!=''">
+        <VerInfo_Build>1</VerInfo_Build>
+        <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
+        <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -845,6 +864,22 @@
                 <DeployFile LocalName="Resources\SlideWhistleDown.mp3" Configuration="Release" Class="File">
                     <Platform Name="Android64">
                         <RemoteName>SlideWhistleDown.mp3</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Resources\swd" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <Operation>1</Operation>
+                        <RemoteName>swd</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Resources\swd" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <Operation>1</Operation>
+                        <RemoteName>swd</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
