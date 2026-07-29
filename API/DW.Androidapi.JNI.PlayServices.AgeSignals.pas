@@ -13,29 +13,85 @@ unit DW.Androidapi.JNI.PlayServices.AgeSignals;
 
 // NOTES:
 //   This unit requires the .jar file for Age Signals to be added to the Libraries node of the Android platform.
-//   As at 19-DEC-2025, this is age-signals-0.0.2.jar in the ThirdParty/Android folder
-//   The Age Signals service should be live on 01-JAN-2026, so AgeSignalsManager will error until that time.
-//   Use FakeAgeSignalsManager for testing
+//   As at 28-JUL-2026, this is: age-signals-0.0.4.jar in the ThirdParty/Android folder
 
 interface
 
 uses
   // Android
   Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Java.Security, Androidapi.JNI.JavaTypes,
-  Androidapi.JNI.Os, Androidapi.JNI.PlayServices.Tasks;
+  Androidapi.JNI.Os, Androidapi.JNI.PlayServices.Tasks, Androidapi.JNI.App;
 
 type
+  JAgeRangeSource = interface;
+  JAgeSignalsAccessRequest = interface;
+  JAgeSignalsAccessRequest_Builder = interface;
+  JAgeSignalsAccessResult = interface;
+  JAgeSignalsAccessResult_Builder = interface;
+  JAgeSignalsErrorCode = interface;
   JAgeSignalsManager = interface;
   JAgeSignalsManagerFactory = interface;
   JAgeSignalsRequest = interface;
   JAgeSignalsRequest_Builder = interface;
   JAgeSignalsResult = interface;
   JAgeSignalsResult_Builder = interface;
-  JAgeSignalsErrorCode = interface;
+  JAgeSignalsStatus = interface;
   JAgeSignalsVerificationStatus = interface;
+  JFakeAgeSignalsManager = interface;
   JIAgeSignalsService = interface;
   JIAgeSignalsServiceCallback = interface;
-  JFakeAgeSignalsManager = interface;
+  JSignificantChangeStatus = interface;
+
+  JAgeSignalsAccessRequestClass = interface(JObjectClass)
+    ['{19CBFF14-7C5D-40EB-9242-309E9B659D61}']
+    {class} function builder: JAgeSignalsAccessRequest_Builder; cdecl;
+    {class} function init: JAgeSignalsAccessRequest; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/play/agesignals/AgeSignalsAccessRequest')]
+  JAgeSignalsAccessRequest = interface(JObject)
+    ['{3B69DA61-B74D-4E7E-A7E6-FF52CE2E870C}']
+    function activity: JActivity; cdecl;
+  end;
+  TJAgeSignalsAccessRequest = class(TJavaGenericImport<JAgeSignalsAccessRequestClass, JAgeSignalsAccessRequest>) end;
+
+  JAgeSignalsAccessRequest_BuilderClass = interface(JObjectClass)
+    ['{E6D28841-829E-4824-ADCC-248F0880E12B}']
+    {class} function init: JAgeSignalsAccessRequest_Builder; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/play/agesignals/AgeSignalsAccessRequest$Builder')]
+  JAgeSignalsAccessRequest_Builder = interface(JObject)
+    ['{600CEFA1-A3A7-44E6-A0CE-51C54D0D226F}']
+    function build: JAgeSignalsAccessRequest; cdecl;
+    function setActivity(activity: JActivity): JAgeSignalsAccessRequest_Builder; cdecl;
+  end;
+  TJAgeSignalsAccessRequest_Builder = class(TJavaGenericImport<JAgeSignalsAccessRequest_BuilderClass, JAgeSignalsAccessRequest_Builder>) end;
+  JAgeSignalsAccessResultClass = interface(JObjectClass)
+    ['{9A252508-9901-4571-85F1-79E78162ACF0}']
+    {class} function builder: JAgeSignalsAccessResult_Builder; cdecl;
+    {class} function init: JAgeSignalsAccessResult; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/play/agesignals/AgeSignalsAccessResult')]
+  JAgeSignalsAccessResult = interface(JObject)
+    ['{7477960D-BB69-45A5-8A60-B119F3DFE8D6}']
+    function ageSignalsStatus: JInteger; cdecl;
+  end;
+  TJAgeSignalsAccessResult = class(TJavaGenericImport<JAgeSignalsAccessResultClass, JAgeSignalsAccessResult>) end;
+
+  JAgeSignalsAccessResult_BuilderClass = interface(JObjectClass)
+    ['{2A2E2ECB-A322-4BE0-B250-EFBC489EC714}']
+    {class} function init: JAgeSignalsAccessResult_Builder; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/play/agesignals/AgeSignalsAccessResult$Builder')]
+  JAgeSignalsAccessResult_Builder = interface(JObject)
+    ['{AC631A1B-A3FB-4E62-9F21-50DC19DC1C1F}']
+    function build: JAgeSignalsAccessResult; cdecl;
+    function setAgeSignalsStatus(integer: JInteger): JAgeSignalsAccessResult_Builder; cdecl;
+  end;
+  TJAgeSignalsAccessResult_Builder = class(TJavaGenericImport<JAgeSignalsAccessResult_BuilderClass, JAgeSignalsAccessResult_Builder>) end;
 
   JAgeSignalsManagerClass = interface(IJavaClass)
     ['{50F291A9-5114-4155-A17F-BC52B2773536}']
@@ -45,6 +101,7 @@ type
   JAgeSignalsManager = interface(IJavaInstance)
     ['{59657CCC-0F08-41E9-9746-333AF0B84C27}']
     function checkAgeSignals(ageSignalsRequest: JAgeSignalsRequest): JTask; cdecl;
+    function requestAgeSignalsAccess(ageSignalsAccessRequest: JAgeSignalsAccessRequest): JTask; cdecl;
   end;
   TJAgeSignalsManager = class(TJavaGenericImport<JAgeSignalsManagerClass, JAgeSignalsManager>) end;
 
@@ -91,10 +148,11 @@ type
   JAgeSignalsResult = interface(JObject)
     ['{1AD1114C-2965-407A-A832-C84DBEFD6B4A}']
     function ageLower: JInteger; cdecl;
+    function ageRangeSource: JInteger; cdecl;
     function ageUpper: JInteger; cdecl;
     function installId: JString; cdecl;
-    function mostRecentApprovalDate: JDate; cdecl;
-    function userStatus: JInteger; cdecl;
+    function significantChangeApprovalDate: JDate; cdecl;
+    function significantChangeStatus: JInteger; cdecl;
   end;
   TJAgeSignalsResult = class(TJavaGenericImport<JAgeSignalsResultClass, JAgeSignalsResult>) end;
 
@@ -108,10 +166,11 @@ type
     ['{E9F9AA85-5019-42DC-8DF6-E2961E61D349}']
     function build: JAgeSignalsResult; cdecl;
     function setAgeLower(integer_: JInteger): JAgeSignalsResult_Builder; cdecl;
+    function setAgeRangeSource(int: JInteger): JAgeSignalsResult_Builder; cdecl;
     function setAgeUpper(integer_: JInteger): JAgeSignalsResult_Builder; cdecl;
     function setInstallId(string_: JString): JAgeSignalsResult_Builder; cdecl;
-    function setMostRecentApprovalDate(date: JDate): JAgeSignalsResult_Builder; cdecl;
-    function setUserStatus(integer_: JInteger): JAgeSignalsResult_Builder; cdecl;
+    function setSignificantChangeApprovalDate(date: JDate): JAgeSignalsResult_Builder; cdecl;
+    function setSignificantChangeStatus(int: JInteger): JAgeSignalsResult_Builder; cdecl;
   end;
   TJAgeSignalsResult_Builder = class(TJavaGenericImport<JAgeSignalsResult_BuilderClass, JAgeSignalsResult_Builder>) end;
 
@@ -171,6 +230,62 @@ type
   end;
   TJAgeSignalsVerificationStatus = class(TJavaGenericImport<JAgeSignalsVerificationStatusClass, JAgeSignalsVerificationStatus>) end;
 
+  JAgeRangeSourceClass = interface(JAnnotationClass)
+    ['{345C200E-60DF-4216-AF27-0D15A38201FB}']
+    {class} function _GetTIER_A: Integer; cdecl;
+    {class} function _GetTIER_B: Integer; cdecl;
+    {class} function _GetTIER_C: Integer; cdecl;
+    {class} function _GetTIER_D: Integer; cdecl;
+    {class} function _GetUNSPECIFIED: Integer; cdecl;
+    {class} property TIER_A: Integer read _GetTIER_A;
+    {class} property TIER_B: Integer read _GetTIER_B;
+    {class} property TIER_C: Integer read _GetTIER_C;
+    {class} property TIER_D: Integer read _GetTIER_D;
+    {class} property UNSPECIFIED: Integer read _GetUNSPECIFIED;
+  end;
+
+  [JavaSignature('com/google/android/play/agesignals/model/AgeRangeSource')]
+  JAgeRangeSource = interface(JAnnotation)
+    ['{BBDA4F12-08E6-46CC-B14C-8402363095EB}']
+  end;
+  TJAgeRangeSource = class(TJavaGenericImport<JAgeRangeSourceClass, JAgeRangeSource>) end;
+
+  JAgeSignalsStatusClass = interface(JAnnotationClass)
+    ['{22252E09-16D7-4453-9DA4-82CB12F5B0BE}']
+    {class} function _GetNOT_SHARED: Integer; cdecl;
+    {class} function _GetSHARED: Integer; cdecl;
+    {class} function _GetUNSPECIFIED: Integer; cdecl;
+    {class} function _GetVERIFICATION_REQUIRED: Integer; cdecl;
+    {class} property NOT_SHARED: Integer read _GetNOT_SHARED;
+    {class} property SHARED: Integer read _GetSHARED;
+    {class} property UNSPECIFIED: Integer read _GetUNSPECIFIED;
+    {class} property VERIFICATION_REQUIRED: Integer read _GetVERIFICATION_REQUIRED;
+  end;
+
+  [JavaSignature('com/google/android/play/agesignals/model/AgeSignalsStatus')]
+  JAgeSignalsStatus = interface(JAnnotation)
+    ['{9F2EECBA-E347-4401-B7E9-372B9365E086}']
+  end;
+  TJAgeSignalsStatus = class(TJavaGenericImport<JAgeSignalsStatusClass, JAgeSignalsStatus>) end;
+
+  JSignificantChangeStatusClass = interface(JAnnotationClass)
+    ['{B6451CA8-8E9D-47EF-A7CE-A8E07DB466F9}']
+    {class} function _GetAPPROVED: Integer; cdecl;
+    {class} function _GetDECLINED: Integer; cdecl;
+    {class} function _GetPENDING: Integer; cdecl;
+    {class} function _GetUNSPECIFIED: Integer; cdecl;
+    {class} property APPROVED: Integer read _GetAPPROVED;
+    {class} property DECLINED: Integer read _GetDECLINED;
+    {class} property PENDING: Integer read _GetPENDING;
+    {class} property UNSPECIFIED: Integer read _GetUNSPECIFIED;
+  end;
+
+  [JavaSignature('com/google/android/play/agesignals/model/SignificantChangeStatus')]
+  JSignificantChangeStatus = interface(JAnnotation)
+    ['{4FB37E22-6680-4128-85CE-309A7BCE57AD}']
+  end;
+  TJSignificantChangeStatus = class(TJavaGenericImport<JSignificantChangeStatusClass, JSignificantChangeStatus>) end;
+
   JIAgeSignalsServiceClass = interface(JIInterfaceClass)
     ['{B389CA65-7D95-4DAB-BC0F-C04BB0BF6BA7}']
   end;
@@ -203,6 +318,8 @@ type
   JFakeAgeSignalsManager = interface(JObject)
     ['{411A0939-619A-4929-BC4F-3647375A6D5A}']
     function checkAgeSignals(ageSignalsRequest: JAgeSignalsRequest): JTask; cdecl;
+    function requestAgeSignalsAccess(ageSignalsAccessRequest: JAgeSignalsAccessRequest): JTask; cdecl;
+    procedure setNextAgeSignalsAccessResult(ageSignalsAccessResult: JAgeSignalsAccessResult); cdecl;
     procedure setNextAgeSignalsResult(ageSignalsResult: JAgeSignalsResult); cdecl;
   end;
   TJFakeAgeSignalsManager = class(TJavaGenericImport<JFakeAgeSignalsManagerClass, JFakeAgeSignalsManager>) end;
