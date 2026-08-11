@@ -30,6 +30,8 @@ type
     procedure DoFakeCheck(const ADetails: TFakeAgeStatusDetails; const AHandler: TAgeStatusResultProc);
     procedure FakeAgeSignalsAccessRequestSuccessHandler(const ADetails: TFakeAgeStatusDetails; const AResult: JAgeSignalsAccessResult;
       const AHandler: TAgeStatusResultProc);
+    function GetAgeRangeSource(const AValue: JInteger): TAgeRangeSource;
+    function GetAgeRangeSourceNative(const AValue: TAgeRangeSource): JInteger;
     function GetAgeSignalsStatusNative(const AStatus: TAgeSignalsStatus): JInteger;
     function GetSignificantChangeStatus(const AStatus: JInteger): TSignificantChangeStatus;
     function GetSignificantChangeStatusNative(const AStatus: TSignificantChangeStatus): JInteger;
@@ -149,6 +151,42 @@ begin
     );
 end;
 
+function TPlatformAgeStatus.GetAgeRangeSource(const AValue: JInteger): TAgeRangeSource;
+begin
+  Result := TAgeRangeSource.None;
+  if AValue <> nil then
+  begin
+    if AValue.intValue = TJAgeRangeSource.JavaClass.TIER_A then
+      Result := TAgeRangeSource.TierA
+    else if AValue.intValue = TJAgeRangeSource.JavaClass.TIER_B then
+      Result := TAgeRangeSource.TierB
+    else if AValue.intValue = TJAgeRangeSource.JavaClass.TIER_C then
+      Result := TAgeRangeSource.TierC
+    else if AValue.intValue = TJAgeRangeSource.JavaClass.TIER_D then
+      Result := TAgeRangeSource.TierD
+    else if AValue.intValue = TJAgeRangeSource.JavaClass.UNSPECIFIED then
+      Result := TAgeRangeSource.Unspecified;
+  end;
+end;
+
+function TPlatformAgeStatus.GetAgeRangeSourceNative(const AValue: TAgeRangeSource): JInteger;
+begin
+  case AValue of
+    TAgeRangeSource.TierA:
+      Result := TJInteger.JavaClass.init(TJAgeRangeSource.JavaClass.TIER_A);
+    TAgeRangeSource.TierB:
+      Result := TJInteger.JavaClass.init(TJAgeRangeSource.JavaClass.TIER_B);
+    TAgeRangeSource.TierC:
+      Result := TJInteger.JavaClass.init(TJAgeRangeSource.JavaClass.TIER_C);
+    TAgeRangeSource.TierD:
+      Result := TJInteger.JavaClass.init(TJAgeRangeSource.JavaClass.TIER_D);
+    TAgeRangeSource.Unspecified:
+      Result := TJInteger.JavaClass.init(TJAgeRangeSource.JavaClass.UNSPECIFIED);
+  else
+    Result := nil;
+  end;
+end;
+
 function TPlatformAgeStatus.GetAgeSignalsStatusNative(const AStatus: TAgeSignalsStatus): JInteger;
 begin
   case AStatus of
@@ -207,6 +245,7 @@ begin
     GetSignificantChangeStatus(AResult.significantChangeStatus),
     JDateToDateTime(AResult.significantChangeApprovalDate)
   );
+  LStatusResult.AgeRangeSource := GetAgeRangeSource(AResult.ageRangeSource);
   AHandler(LStatusResult);
 end;
 
@@ -269,6 +308,7 @@ begin
     LBuilder.setAgeLower(TJInteger.JavaClass.init(ADetails.AgeLower));
   if ADetails.AgeUpper > -1 then
     LBuilder.setAgeUpper(TJInteger.JavaClass.init(ADetails.AgeUpper));
+  LBuilder.setAgeRangeSource(GetAgeRangeSourceNative(ADetails.AgeRangeSource));
   LFakeAgeSignalsManager.setNextAgeSignalsResult(LBuilder.build);
   FCheckAgeSignalsEvents.SetTask(LFakeAgeSignalsManager.checkAgeSignals(TJAgeSignalsRequest.JavaClass.builder.build))
     .OnSuccess(
