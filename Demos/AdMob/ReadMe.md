@@ -77,10 +77,13 @@ If creating your own project, in Project Manager:
 3. Right-click the `Libraries` node and click `Add..`
 4. Select `dw-admob-3.0.0.jar` from the `Lib` folder of Kastri and click Open
 5. Repeat step 3, this time selecting the following files from the `ThirdParty\Android` folder of Kastri:
+   * `core-1.17.0.aar`
    * `play-services-ads-25.4.0.aar`
    * `play-services-ads-api-25.4.0.aar`
    * `play-services-basement-18.9.0-repack.aar`
+   * `webkit-1.12.1.aar`
 6. Right-click each of the following, and click `Disable` for each:
+   * `core-1.17.0.dex.jar`
    * `play-services-ads-22.2.0.dex.jar`
    * `play-services-ads-base-22.2.0.dex.jar`
    * `play-services-ads-lite-22.2.0.dex.jar`
