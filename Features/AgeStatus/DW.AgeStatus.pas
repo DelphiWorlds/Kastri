@@ -20,8 +20,15 @@ type
 
   TSignificantChangeStatus = (None, Unspecified, Approved, Pending, Declined);
 
+  // TierA: User has self declared their age.
+  // TierB: User's age is managed by a parent or a guardian.
+  // TierC: User's age is assessed by using credit card, email address, selfie assessment, Government ID, or Tax ID.
+  // TierD: User's age is checked by using a combination of Government ID and selfie assessment, or Digital ID.
+  TAgeRangeSource = (None, Unspecified, TierA, TierB, TierC, TierD);
+
   TAgeStatusResult = record
     AgeLower: Integer;
+    AgeRangeSource: TAgeRangeSource;
     AgeUpper: Integer;
     Kind: TAgeStatusResultKind;
     SignificantChangeApprovalDate: TDateTime;
@@ -32,13 +39,6 @@ type
   end;
 
   TAgeStatusResultProc = reference to procedure(const StatusResult: TAgeStatusResult);
-
-  // TierA: User has self declared their age.
-  // TierB: User's age is managed by a parent or a guardian.
-  // TierC: User's age is assessed by using credit card, email address, selfie assessment, Government ID, or Tax ID.
-  // TierD: User's age is checked by using a combination of Government ID and selfie assessment, or Digital ID.
-
-  TAgeRangeSource = (Unspecified, TierA, TierB, TierC, TierD);
 
   TAgeSignalsStatus = (NotShared, Shared, Unspecified, VerificationRequired);
 
