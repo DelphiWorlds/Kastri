@@ -70,7 +70,7 @@ begin
       for I := 0 to LFileNames.Length - 1 do
       begin
         LFileName := JStringToString(LFileNames[I]);
-        if MatchStr(LFileName, AFileNames) then
+        if (Length(AFileNames) = 0) or MatchStr(LFileName, AFileNames) then
         begin
           LInputStream := LAssetManager.open(LSourceFolder.concat(StringToJString(PathDelim + LFileName)));
           try
@@ -120,9 +120,14 @@ begin
       LDestPath := TPath.GetDocumentsPath + PathDelim + AParentFolder;
     for LSourceFileName in TDirectory.GetFiles(LSourcePath, '*.*', TSearchOption.soTopDirectoryOnly) do
     begin
-      LIndex := IndexStr(TPath.GetFileName(LSourceFileName), AFileNames);
-      if LIndex > -1 then
-        TFile.Copy(LSourceFileName, TPath.Combine(LDestPath, AFileNames[LIndex]), True);
+      if Length(AFileNames) > 0 then
+      begin
+        LIndex := IndexStr(TPath.GetFileName(LSourceFileName), AFileNames);
+        if LIndex > -1 then
+          TFile.Copy(LSourceFileName, TPath.Combine(LDestPath, AFileNames[LIndex]), True);
+      end
+      else
+        TFile.Copy(LSourceFileName, TPath.Combine(LDestPath, TPath.GetFileName(LSourceFileName), True));
     end;
   end;
 end;
