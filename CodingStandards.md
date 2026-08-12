@@ -104,21 +104,21 @@ Interfaces must be declared similarly to classes, with method declarations first
 
 Under **no** circumstances is `with` to be used. **No discussions will be entered into**.
 
+### Exit
+
+Exit is to be avoided where possible. Instead, use an if conditional block for the case where the code should _continue_
+
 ### Uses clauses
 
 Units that are used by another, must appear in the **section of lowest scope**, i.e. if a unit imports symbols from another unit that are required only the implementation section, the used unit **must appear in the implementation section** of the unit using it. This is to **avoid creating greater dependency than is required**, and avoids having to resolve circular references.
 
 ### Finally Blocks
 
-Code inside a `finally` block is to execute resource deallocation or restoring of state only, e.g. calling `Free`, `DisposeOf`, releasing of handles, etc.
+Code inside a `finally` block is to execute resource deallocation or restoring of state only, e.g. calling `Free`, releasing of handles, etc.
 
 ### Checking For Assignment
 
 Use the Assigned method for event handlers **only**. All other checks for assignment shall be compared against `nil`.
-
-## Global Variables
-
-Global variables must be avoided, unless there is a very good reason to use them. Globals created by the IDE such as frmMain etc are to be ignored. Instead, consider the scope of use, and perhaps access via a class variable
 
 ## Formatting
 
@@ -173,7 +173,7 @@ The `begin` in a `begin..end` code block must start on a new line.
 
 #### if/while statements:
 
-Where the conditional code of an `if`/`while` statement spans more than one line, even if it is only one statement, the conditional code is to be enclosed in a `begin..end` block. The `begin` is to be aligned to the `if`. An `if` following the `else` in another `if` statement is to appear immediately after the `else`. e.g.
+Where the conditional code of an `if`/`while` statement spans _more than one line_, even if it is only one statement, the conditional code is to be enclosed in a `begin..end` block. The `begin` is to be aligned to the `if`. An `if` following the `else` in another `if` statement is to appear immediately after the `else`. e.g.
 
 ```
 if SomeCondition then 
