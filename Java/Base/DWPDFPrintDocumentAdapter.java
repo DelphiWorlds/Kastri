@@ -12,7 +12,6 @@ package com.delphiworlds.kastri;
  *******************************************************/
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
 import android.os.CancellationSignal;
@@ -21,93 +20,122 @@ import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentInfo;
-import android.print.PrintManager;
-import android.print.pdf.PrintedPdfDocument;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-
+/**
+ * PrintDocumentAdapter that sends an existing PDF file to the Android print
+ * framework unchanged. The destination of onWrite() is itself a PDF, so the
+ * original file is copied byte-for-byte. Vector text and line art are preserved.
+ */
 public class DWPDFPrintDocumentAdapter extends PrintDocumentAdapter {
-  private Context context;
-  private ParcelFileDescriptor fileDescriptor;
-  private PdfRenderer pdfRenderer;
-  private PrintedPdfDocument printedPdfDocument;
+  private final Context mContext;
+  private final File mPdfFile;
+  private int mPageCount = PrintDocumentInfo.PAGE_COUNT_UNKNOWN;
 
   public DWPDFPrintDocumentAdapter(Context context, File pdfFile) {
-    this.context = context;
+    mContext = context;
+    mPdfFile = pdfFile;
+    mPageCount = queryPageCount(pdfFile);
+  }
+
+  private static int queryPageCount(File file) {
+    if (file == null || !file.exists()) {
+      return PrintDocumentInfo.PAGE_COUNT_UNKNOWN;
+    }
+    ParcelFileDescriptor fd = null;
+    PdfRenderer renderer = null;
     try {
-      openRenderer(pdfFile);
+      fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+      renderer = new PdfRenderer(fd);
+      return renderer.getPageCount();
     } catch (IOException e) {
       e.printStackTrace();
+      return PrintDocumentInfo.PAGE_COUNT_UNKNOWN;
+    } finally {
+      if (renderer != null) {
+        renderer.close();
+      }
+      if (fd != null) {
+        try {
+          fd.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
     }
   }
 
-  private void openRenderer(File file) throws IOException {
-    fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
-    pdfRenderer = new PdfRenderer(fileDescriptor);
-  } 
-  
-  private void closeRenderer() throws IOException {
-    pdfRenderer.close();
-    fileDescriptor.close();
-  }
-
-  private Bitmap renderPageToBitmap(int pageIndex) {
-    PdfRenderer.Page page = pdfRenderer.openPage(pageIndex);
-    Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
-    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-    page.close();
-    return bitmap;
-  }
-
   @Override
-  public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras) {
-    printedPdfDocument = new PrintedPdfDocument(context, newAttributes);
+  public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes,
+      CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras) {
     if (cancellationSignal.isCanceled()) {
       callback.onLayoutCancelled();
       return;
     }
-    PrintDocumentInfo info = new PrintDocumentInfo.Builder("pdf_print")
-      .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-      .setPageCount(pdfRenderer.getPageCount())
-      .build();
-    callback.onLayoutFinished(info, true);
+    if (mPdfFile == null || !mPdfFile.exists()) {
+      callback.onLayoutFailed("PDF file is missing");
+      return;
+    }
+    PrintDocumentInfo info = new PrintDocumentInfo.Builder(mPdfFile.getName())
+        .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+        .setPageCount(mPageCount)
+        .build();
+    // Content is the original file; attributes do not change what we write.
+    boolean layoutChanged = oldAttributes == null || !oldAttributes.equals(newAttributes);
+    callback.onLayoutFinished(info, layoutChanged);
   }
 
   @Override
-  public void onWrite(PageRange[] pages, ParcelFileDescriptor destination, CancellationSignal cancellationSignal, WriteResultCallback callback) {
-    for (int i = 0; i < pdfRenderer.getPageCount(); i++) {
-      if (cancellationSignal.isCanceled()) {
-        callback.onWriteCancelled();
-        printedPdfDocument.close();
-        printedPdfDocument = null;
-        return;
-      }
-      PrintedPdfDocument.Page page = printedPdfDocument.startPage(i);
-      Bitmap bitmap = renderPageToBitmap(i);
-      page.getCanvas().drawBitmap(bitmap, 0, 0, null);
-      printedPdfDocument.finishPage(page);
+  public void onWrite(PageRange[] pages, ParcelFileDescriptor destination,
+      CancellationSignal cancellationSignal, WriteResultCallback callback) {
+    if (cancellationSignal.isCanceled()) {
+      callback.onWriteCancelled();
+      return;
     }
-    try (FileOutputStream out = new FileOutputStream(destination.getFileDescriptor())) {
-      printedPdfDocument.writeTo(out);
+    if (mPdfFile == null || !mPdfFile.exists()) {
+      callback.onWriteFailed("PDF file is missing");
+      return;
+    }
+
+    InputStream in = null;
+    OutputStream out = null;
+    try {
+      in = new FileInputStream(mPdfFile);
+      out = new FileOutputStream(destination.getFileDescriptor());
+      byte[] buffer = new byte[8192];
+      int read;
+      while ((read = in.read(buffer)) >= 0) {
+        if (cancellationSignal.isCanceled()) {
+          callback.onWriteCancelled();
+          return;
+        }
+        out.write(buffer, 0, read);
+      }
+      out.flush();
+      callback.onWriteFinished(new PageRange[] { PageRange.ALL_PAGES });
     } catch (IOException e) {
       callback.onWriteFailed(e.toString());
-      return;
     } finally {
-      printedPdfDocument.close();
-      printedPdfDocument = null;
-    }
-    callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
-  }
-
-  @Override
-  public void onFinish() {
-    try {
-      closeRenderer();
-    } catch (IOException e) {
-      e.printStackTrace();
+      if (in != null) {
+        try {
+          in.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      if (out != null) {
+        try {
+          out.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
     }
   }
 }
