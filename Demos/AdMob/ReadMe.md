@@ -79,7 +79,7 @@ If creating your own project, in Project Manager:
 5. Repeat step 3, this time selecting the following files from the `ThirdParty\Android` folder of Kastri:
    * `core-1.17.0.aar`
    * `datastore-1.0.0.aar` 
-   * `datastore-core-1.0.0.aar`
+   * `datastore-core-1.0.0.jar`
    * `play-services-ads-25.4.0.aar`
    * `play-services-ads-api-25.4.0.aar`
    * `play-services-basement-18.9.0-repack.aar`
