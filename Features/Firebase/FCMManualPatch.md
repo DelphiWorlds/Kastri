@@ -29,8 +29,13 @@ Add this method:
 ```delphi
 procedure TFcmPushService.RequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
 begin
-  if not TiOSHelper.SharedApplication.isRegisteredForRemoteNotifications then
-    TiOSHelper.SharedApplication.registerForRemoteNotifications;
+  TThread.Queue(nil,
+    procedure
+    begin
+      if not TiOSHelper.SharedApplication.isRegisteredForRemoteNotifications then
+        TiOSHelper.SharedApplication.registerForRemoteNotifications;
+    end
+  );
 end;
 ```
 
