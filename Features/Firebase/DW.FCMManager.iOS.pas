@@ -126,6 +126,8 @@ procedure TPlatformFCMManager.PushDeviceTokenMessageHandler(const Sender: TObjec
 begin
   TUserDefaults.SetValue('APNS', TPushDeviceTokenMessage(AMsg).Value.Token);
   TOSLog.d('Received APNS of: %s', [TUserDefaults.GetValue('APNS')]);
+  if FMessaging <> nil then
+    FMessaging.setAPNSToken(HexStringToNSData(TUserDefaults.GetValue('APNS')));
   if not IsStarted then
     Started;
 end;
@@ -195,6 +197,8 @@ begin
     AddCategories;
   TFirebaseCommon.Configure;
   FMessaging := TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging);
+  if not TUserDefaults.GetValue('APNS').IsEmpty then
+    FMessaging.setAPNSToken(HexStringToNSData(TUserDefaults.GetValue('APNS')));
   DoStart;
 end;
 
@@ -245,7 +249,6 @@ end;
 
 procedure TPlatformFCMManager.SubscribeToTopic(const ATopic: string);
 begin
-  FMessaging.setAPNSToken(HexStringToNSData(TUserDefaults.GetValue('APNS')));
   FMessaging.subscribeToTopic(StrToNSStr(ATopic), SubscribeToTopicCompletionHandler);
 end;
 
@@ -283,7 +286,6 @@ end;
 
 procedure TPlatformFCMManager.UnsubscribeFromTopic(const ATopic: string);
 begin
-  FMessaging.setAPNSToken(HexStringToNSData(TUserDefaults.GetValue('APNS')));
   FMessaging.unsubscribeFromTopic(StrToNSStr(ATopic), UnsubscribeFromTopicCompletionHandler);
 end;
 
