@@ -17,6 +17,7 @@ type
     FPDFControl: TPDFControl;
     procedure LoadBrowser(const AFileName: string);
     procedure LoadPDF;
+    procedure SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -42,6 +43,9 @@ uses
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
+  {$IF CompilerVersion > 36}
+  OnSafeAreaChanged := SafeAreaChangedHandler;
+  {$ENDIF}
   if TOSVersion.Platform = TOSVersion.TPlatform.pfAndroid then
   begin
     WebBrowser.Visible := False;
@@ -49,6 +53,11 @@ begin
     FPDFControl.Align := TAlignLayout.Client;
     FPDFControl.Parent := Self;
   end;
+end;
+
+procedure TForm1.SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Rect := AInsets;
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
