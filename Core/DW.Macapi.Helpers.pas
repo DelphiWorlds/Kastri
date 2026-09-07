@@ -53,8 +53,10 @@ type
     function GetValuePtr(const AKey: string): Pointer;
   public
     constructor Create(const ADictionary: NSDictionary);
+    function GetValue(const AKey: string; const ADefault: Boolean = False): Boolean; overload;
     function GetValue(const AKey: string; const ADefault: Double = 0): Double; overload;
     function GetValue(const AKey: string; const ADefault: Integer = 0): Integer; overload;
+    function GetValue(const AKey: string; const ADefault: NSArray = nil): NSArray; overload;
     function GetValue(const AKey: string; const ADefault: string = ''): string; overload;
   end;
 
@@ -202,6 +204,26 @@ begin
     Result := NSStrToStr(TNSString.Wrap(LValuePtr));
 end;
 
+function TNSDictionaryHelper.GetValue(const AKey: string; const ADefault: NSArray): NSArray;
+var
+  LValuePtr: Pointer;
+begin
+  Result := ADefault;
+  LValuePtr := GetValuePtr(AKey);
+  if LValuePtr <> nil then
+    Result := TNSArray.Wrap(LValuePtr);
+end;
+
+function TNSDictionaryHelper.GetValue(const AKey: string; const ADefault: Boolean): Boolean;
+var
+  LValuePtr: Pointer;
+begin
+  Result := ADefault;
+  LValuePtr := GetValuePtr(AKey);
+  if LValuePtr <> nil then
+    Result := TNSNumber.Wrap(LValuePtr).boolValue;
+end;
+
 { TNSMutableDictionaryHelper }
 
 constructor TNSMutableDictionaryHelper.Create(const ADictionary: NSMutableDictionary);
@@ -260,7 +282,6 @@ end;
 function GetDictionaryStringValue(const ADictionary: NSDictionary; const AKey: NSString; const ADefault: string = ''): string;
 var
   LValuePtr: Pointer;
-  LObject: NSObject;
 begin
   Result := ADefault;
   LValuePtr := ADictionary.valueForKey(AKey);
