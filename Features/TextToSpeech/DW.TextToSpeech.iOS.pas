@@ -53,7 +53,7 @@ type
     FSpeechSynthesizer: AVSpeechSynthesizer;
   protected
     function IsSpeaking: Boolean; override;
-    function Speak(const AText: String): Boolean; override;
+    function Speak(const AText: string): Boolean; override;
     procedure SpeakingStarted;
     procedure SpeakingStopped;
     procedure Stop; override;
@@ -140,7 +140,7 @@ begin
   Result := FSpeechSynthesizer.isSpeaking;
 end;
 
-function TPlatformTextToSpeech.Speak(const AText: String): Boolean;
+function TPlatformTextToSpeech.Speak(const AText: string): Boolean;
 var
   LUtterance: AVSpeechUtterance;
 begin
