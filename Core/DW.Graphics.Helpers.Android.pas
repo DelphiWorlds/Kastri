@@ -15,7 +15,7 @@ interface
 
 uses
   // Android
-  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Net, Androidapi.JNI.JavaTypes,
   // FMX
   FMX.Graphics;
 
@@ -34,11 +34,21 @@ type
     ///   Rescales to the destination, natively
     /// </summary>
     function RescaleBitmap(const ABitmap: TBitmap): Boolean;
+    /// <summary>
+    ///   Loads bitmap content from an Android URI (e.g. content://, file://)
+    /// </summary>
+    function LoadFromURI(const AURI: Jnet_Uri): Boolean;
+    /// <summary>
+    ///   Loads bitmap content from an Android InputStream
+    /// </summary>
+    function LoadFromInputStream(const AInputStream: JInputStream): Boolean;
   end;
 
 implementation
 
 uses
+  // Android
+  Androidapi.Helpers,
   // FMX
   FMX.Surfaces, FMX.Helpers.Android;
 
@@ -94,6 +104,30 @@ begin
     end;
   finally
     LSurface.Free;
+  end;
+end;
+
+function TBitmapHelper.LoadFromInputStream(const AInputStream: JInputStream): Boolean;
+var
+  LJBitmap: JBitmap;
+begin
+  LJBitmap := TJBitmapFactory.JavaClass.decodeStream(AInputStream);
+  if LJBitmap <> nil then
+    Result := FromJBitmap(LJBitmap);
+end;
+
+function TBitmapHelper.LoadFromURI(const AURI: Jnet_Uri): Boolean;
+var
+  LInputStream: JInputStream;
+  LJBitmap: JBitmap;
+begin
+  Result := False;
+  LInputStream := TAndroidHelper.Context.getContentResolver.openInputStream(AURI);
+  if LInputStream <> nil then
+  try
+    Result := LoadFromInputStream(LInputStream);
+  finally
+    LInputStream.close;
   end;
 end;
 
