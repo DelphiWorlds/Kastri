@@ -43,7 +43,7 @@ To add them to your project, in Project Manager expand the relevant Android targ
 
 ### Android Manifest
 
-Location services require metadata indicating the Google Play Services version. Unless your app is already configured to use a Google Play Services feature (in the Entitlements section of the Project Options, such as AdMob, Biometric, In App Purchase, Maps or Push Notifications), you will need to add this entry (just after the `<%application-meta-data%>` tag is a good spot):
+Location services require metadata indicating the Google Play Services version. Unless your app is already configured to use a Google Play Services feature (in the Entitlements section of the Project Options, such as AdMob, Biometric, In App Purchase, Maps or Push Notifications), you will need to add this entry in `AndroidManifest.template.xml` (just after the `<%application-meta-data%>` tag is a good spot):
 
 ```xml
     <meta-data android:name="com.google.android.gms.version" android:value="12451000" />
