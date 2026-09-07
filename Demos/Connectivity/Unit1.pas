@@ -14,6 +14,7 @@ type
     FConnectivity: TConnectivity;
     procedure ConnectivityChangeHandler(Sender: TObject; const AIsConnected: Boolean);
     procedure DumpIPAddresses;
+    procedure SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -31,6 +32,9 @@ implementation
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
+  {$IF CompilerVersion > 36}
+  OnSafeAreaChanged := SafeAreaChangedHandler;
+  {$ENDIF}
   if TConnectivity.IsConnectedToInternet then
   begin
     Memo1.Lines.Add('Device is connected to the internet');
@@ -64,6 +68,11 @@ begin
     if LAddress.Version = TIPVersion.IPv6 then
       Memo1.Lines.Add(LAddress.IP);
   end;
+end;
+
+procedure TForm1.SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Rect := AInsets;
 end;
 
 procedure TForm1.ConnectivityChangeHandler(Sender: TObject; const AIsConnected: Boolean);
