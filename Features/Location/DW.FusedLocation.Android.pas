@@ -77,12 +77,13 @@ type
     function UseCallback: Boolean;
   public
     constructor Create(const AOwner: IFusedLocationOwner; const AUseCallback: Boolean = False);
+    destructor Destroy; override;
   end;
 
 implementation
 
 uses
-  DW.OSLog,
+  DW.OSLog, System.SysUtils,
   Androidapi.JNIBridge, Androidapi.Helpers, Androidapi.JNI.JavaTypes,
   DW.Androidapi.JNI.Location;
 
@@ -149,6 +150,12 @@ begin
   FClient := TJDWFusedLocationClient.JavaClass.init(TAndroidHelper.Context, FDelegate);
   FClient.setInterval(cDefaultLocationInterval);
   FClient.setFastestInterval(cDefaultLocationFastestInterval);
+end;
+
+destructor TFusedLocation.Destroy;
+begin
+  FClient.stopLocationUpdates(True);
+  inherited;
 end;
 
 function TFusedLocation.GetOptions: TFusedLocationOptions;
