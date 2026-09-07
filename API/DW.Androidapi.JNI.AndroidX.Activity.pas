@@ -30,12 +30,34 @@ type
   JActivityResultRegistry = interface;
   JCancellable = interface;
   JComponentActivity = interface;
+  JComponentDialog = interface;
   JOnBackPressedCallback = interface;
   JOnBackPressedDispatcher = interface;
   JOnContextAvailableListener = interface;
   JContextAware = interface;
   JContextAwareHelper = interface;
   JFragmentActivity = interface;
+
+  JComponentDialogClass = interface(JDialogClass)
+    ['{15FD16DC-8C7A-4C1A-A443-D698B87E5DA6}']
+    {class} function init(context: JContext; int: Integer): JComponentDialog; overload; cdecl;
+    {class} function init(context: JContext): JComponentDialog; overload; cdecl;
+    // Kotlin related:
+    // {class} function init(context: JContext; int: Integer; int_1: Integer; defaultConstructorMarker: JDefaultConstructorMarker): JComponentDialog; overload; cdecl;
+  end;
+
+  [JavaSignature('androidx/activity/ComponentDialog')]
+  JComponentDialog = interface(JDialog)
+    ['{B05977CC-2FB5-4935-82DE-0E0EE7E4648C}']
+    procedure addContentView(view: JView; layoutParams: JViewGroup_LayoutParams); cdecl;
+    function getLifecycle: JLifecycle; cdecl;
+    function getOnBackPressedDispatcher: JOnBackPressedDispatcher; cdecl;
+    procedure onBackPressed; cdecl;
+    procedure setContentView(int: Integer); overload; cdecl;
+    procedure setContentView(view: JView; layoutParams: JViewGroup_LayoutParams); overload; cdecl;
+    procedure setContentView(view: JView); overload; cdecl;
+  end;
+  TJComponentDialog = class(TJavaGenericImport<JComponentDialogClass, JComponentDialog>) end;
 
   JContextAwareClass = interface(IJavaClass)
     ['{0A0825FB-ADEB-40AA-BA90-C5B7F200EB32}']
