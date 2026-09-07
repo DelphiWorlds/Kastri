@@ -15,8 +15,9 @@ interface
 
 uses
   // Android
-  Androidapi.JNI.JavaTypes, Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os,
-  Androidapi.JNI.PlayServices;
+  Androidapi.JNI.JavaTypes, Androidapi.JNIBridge, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Os, Androidapi.JNI.App,
+  Androidapi.JNI.PlayServices, Androidapi.JNI.Net,
+  DW.Androidapi.JNI.AndroidX.Activity;
 
 type
   JAbstractDataBuffer = interface;
@@ -28,8 +29,159 @@ type
   JGoogleApi = interface;
   JGoogleApiClient = interface;
   JListenableFuture = interface;
+  JPendingResult = interface;
+  JPendingResult_StatusListener = interface;
   JReleasable = interface;
+  JResult = interface;
+  JResultCallback = interface;
+  JResultCallbacks = interface;
+  JResultTransform = interface;
   JScope = interface;
+  JStatus = interface;
+  JTransformedResult = interface;
+  JWebImage = interface;
+
+  JResultClass = interface(IJavaClass)
+    ['{B378401C-A2A3-4AA1-BEEC-AA55B6F04D87}']
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/Result')]
+  JResult = interface(IJavaInstance)
+    ['{142D7820-6FAA-4EA7-BEC6-EE7DA416E259}']
+    function getStatus: JStatus; cdecl;
+  end;
+  TJResult = class(TJavaGenericImport<JResultClass, JResult>) end;
+
+  JStatusClass = interface(JAbstractSafeParcelableClass)
+    ['{AE0BAF66-790D-4A3B-8A64-A625181BBB76}']
+    {class} function _GetCREATOR: JParcelable_Creator; cdecl;
+    {class} function _GetRESULT_API_NOT_CONNECTED: JStatus; cdecl;
+    {class} function _GetRESULT_CANCELED: JStatus; cdecl;
+    {class} function _GetRESULT_DEAD_CLIENT: JStatus; cdecl;
+    {class} function _GetRESULT_INTERNAL_ERROR: JStatus; cdecl;
+    {class} function _GetRESULT_INTERRUPTED: JStatus; cdecl;
+    {class} function _GetRESULT_SUCCESS: JStatus; cdecl;
+    {class} function _GetRESULT_SUCCESS_CACHE: JStatus; cdecl;
+    {class} function _GetRESULT_TIMEOUT: JStatus; cdecl;
+    {class} function init(int: Integer; string_1: JString; pendingIntent: JPendingIntent): JStatus; overload; cdecl;
+    {class} function init(int: Integer; string_1: JString): JStatus; overload; cdecl;
+    {class} function init(int: Integer): JStatus; overload; cdecl;
+    {class} function init(connectionResult: JConnectionResult; string_1: JString): JStatus; overload; cdecl;
+    {class} function init(connectionResult: JConnectionResult; string_1: JString; int: Integer): JStatus; overload; cdecl;
+    {class} property CREATOR: JParcelable_Creator read _GetCREATOR;
+    {class} property RESULT_API_NOT_CONNECTED: JStatus read _GetRESULT_API_NOT_CONNECTED;
+    {class} property RESULT_CANCELED: JStatus read _GetRESULT_CANCELED;
+    {class} property RESULT_DEAD_CLIENT: JStatus read _GetRESULT_DEAD_CLIENT;
+    {class} property RESULT_INTERNAL_ERROR: JStatus read _GetRESULT_INTERNAL_ERROR;
+    {class} property RESULT_INTERRUPTED: JStatus read _GetRESULT_INTERRUPTED;
+    {class} property RESULT_SUCCESS: JStatus read _GetRESULT_SUCCESS;
+    {class} property RESULT_SUCCESS_CACHE: JStatus read _GetRESULT_SUCCESS_CACHE;
+    {class} property RESULT_TIMEOUT: JStatus read _GetRESULT_TIMEOUT;
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/Status')]
+  JStatus = interface(JAbstractSafeParcelable)
+    ['{01199EEA-6D2D-4859-975D-4F37D9DE5A84}']
+    function equals(object_1: JObject): Boolean; cdecl;
+    function getConnectionResult: JConnectionResult; cdecl;
+    function getResolution: JPendingIntent; cdecl;
+    function getStatus: JStatus; cdecl;
+    function getStatusCode: Integer; cdecl;
+    function getStatusMessage: JString; cdecl;
+    function hasResolution: Boolean; cdecl;
+    function hashCode: Integer; cdecl;
+    function isCanceled: Boolean; cdecl;
+    function isInterrupted: Boolean; cdecl;
+    function isSuccess: Boolean; cdecl;
+    procedure startResolutionForResult(activityResultLauncher: JActivityResultLauncher); overload; cdecl;
+    procedure startResolutionForResult(activity: JActivity; int: Integer); overload; cdecl;
+    function toString: JString; cdecl;
+    procedure writeToParcel(parcel: JParcel; int: Integer); cdecl;
+  end;
+  TJStatus = class(TJavaGenericImport<JStatusClass, JStatus>) end;
+
+  JPendingResult_StatusListenerClass = interface(IJavaClass)
+    ['{B260E15F-07D2-4090-A5DF-D3CA806AE6D4}']
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/PendingResult$StatusListener')]
+  JPendingResult_StatusListener = interface(IJavaInstance)
+    ['{BDAD131D-2C49-493A-8903-A379938295F5}']
+    procedure onComplete(status: JStatus); cdecl;
+  end;
+  TJPendingResult_StatusListener = class(TJavaGenericImport<JPendingResult_StatusListenerClass, JPendingResult_StatusListener>) end;
+
+  JResultCallbackClass = interface(IJavaClass)
+    ['{EA2BAE3F-0A07-4262-A27E-60CD9A83F86C}']
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/ResultCallback')]
+  JResultCallback = interface(IJavaInstance)
+    ['{CFB7C487-B2B2-4D45-AF79-A6B224B0B1F2}']
+    procedure onResult(R: JObject); cdecl;
+  end;
+  TJResultCallback = class(TJavaGenericImport<JResultCallbackClass, JResultCallback>) end;
+
+  JResultTransformClass = interface(JObjectClass)
+    ['{34A50DFA-6BE6-4456-B372-A1E5DB3B65FA}']
+    {class} function init: JResultTransform; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/ResultTransform')]
+  JResultTransform = interface(JObject)
+    ['{C93D9966-06B3-4F03-8E51-D0C82EEC601F}']
+    function createFailedResult(status: JStatus): JPendingResult; cdecl;
+    function onFailure(status: JStatus): JStatus; cdecl;
+    function onSuccess(R: JObject): JPendingResult; cdecl;
+  end;
+  TJResultTransform = class(TJavaGenericImport<JResultTransformClass, JResultTransform>) end;
+
+  JResultCallbacksClass = interface(JObjectClass)
+    ['{7724AB73-797A-4443-BA7E-8B6DDED6EE75}']
+    {class} function init: JResultCallbacks; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/ResultCallbacks')]
+  JResultCallbacks = interface(JObject)
+    ['{F3C7BEEC-A75A-4B48-8C1F-A48D7E920043}']
+    procedure onFailure(status: JStatus); cdecl;
+    procedure onResult(R: JObject); cdecl;
+    procedure onSuccess(R: JObject); cdecl;
+  end;
+  TJResultCallbacks = class(TJavaGenericImport<JResultCallbacksClass, JResultCallbacks>) end;
+
+  JTransformedResultClass = interface(JObjectClass)
+    ['{72E8E8EF-69AE-45B1-B2AA-F99F8A101446}']
+    {class} function init: JTransformedResult; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/TransformedResult')]
+  JTransformedResult = interface(JObject)
+    ['{6EBC925B-A625-4BF4-974E-A9AC684237EE}']
+    procedure andFinally(resultcallbacks: JResultCallbacks); cdecl;
+    function &then(resulttransform: JResultTransform): JTransformedResult; cdecl;
+  end;
+  TJTransformedResult = class(TJavaGenericImport<JTransformedResultClass, JTransformedResult>) end;
+
+  JPendingResultClass = interface(JObjectClass)
+    ['{F4D25687-3A3B-4E07-AA64-216112D5EE36}']
+    {class} function init: JPendingResult; cdecl;
+  end;
+
+  [JavaSignature('com/google/android/gms/common/api/PendingResult')]
+  JPendingResult = interface(JObject)
+    ['{18CC0862-D22D-4284-8F4F-65AB69D93849}']
+    procedure addStatusListener(statusListener: JPendingResult_StatusListener); cdecl;
+    function await: JResult; cdecl; overload;
+    function await(l: Int64; timeUnit: JTimeUnit): JResult; cdecl; overload;
+    procedure cancel; cdecl;
+    function isCanceled: Boolean; cdecl;
+    procedure setResultCallback(resultCallback: JResultCallback); cdecl; overload;
+    procedure setResultCallback(resultCallback: JResultCallback; l: Int64; timeUnit: JTimeUnit); cdecl; overload;
+    function &then(resultTransform: JResultTransform): JTransformedResult; cdecl;
+    function zam: JInteger; cdecl;
+  end;
+  TJPendingResult = class(TJavaGenericImport<JPendingResultClass, JPendingResult>) end;
 
   JScopeClass = interface(JObjectClass)
     ['{92B24AEE-2F21-4421-BEA0-56D622112E1C}']
@@ -236,6 +388,29 @@ type
     // **** Just a placeholder class, for now ****
   end;
   TJGoogleApiClient = class(TJavaGenericImport<JGoogleApiClientClass, JGoogleApiClient>) end;
+
+  JWebImageClass = interface(JAbstractSafeParcelableClass)
+    ['{28F274B2-377D-47B9-BEC0-7108493E1188}']
+    {class} function _GetCREATOR: JParcelable_Creator; cdecl;
+    {class} function init(jsonobject: JJSONObject): JWebImage; overload; cdecl;
+    {class} function init(uri: Jnet_Uri): JWebImage; overload; cdecl;
+    {class} function init(uri: Jnet_Uri; int: Integer; int_1: Integer): JWebImage; overload; cdecl;
+    {class} property CREATOR: JParcelable_Creator read _GetCREATOR;
+  end;
+
+  [JavaSignature('com/google/android/gms/common/images/WebImage')]
+  JWebImage = interface(JAbstractSafeParcelable)
+    ['{71B27E21-35FC-48D7-9498-72C0C73D6BA3}']
+    function equals(object_1: JObject): Boolean; cdecl;
+    function getHeight: Integer; cdecl;
+    function getUrl: Jnet_Uri; cdecl;
+    function getWidth: Integer; cdecl;
+    function hashCode: Integer; cdecl;
+    function toJson: JJSONObject; cdecl;
+    function toString: JString; cdecl;
+    procedure writeToParcel(parcel: JParcel; int: Integer); cdecl;
+  end;
+  TJWebImage = class(TJavaGenericImport<JWebImageClass, JWebImage>) end;
 
 implementation
 
