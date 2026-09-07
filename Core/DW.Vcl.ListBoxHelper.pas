@@ -64,7 +64,10 @@ begin
   for I := Count - 1 downto 0 do
   begin
     if Selected[I] then
+    begin
       Items.Delete(I);
+      Result := True;
+    end;
   end;
 end;
 
