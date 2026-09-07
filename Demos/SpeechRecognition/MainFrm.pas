@@ -21,6 +21,7 @@ type
     FSpeech: TSpeechRecognition;
     FText: string;
     procedure DoStopped;
+    procedure SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
     procedure SpeechAuthorizationHandler(Sender: TObject; const AStatus: TAuthorizationStatus);
     procedure SpeechRecordingHandler(Sender: TObject; const IsRecording: Boolean);
     procedure SpeechTextHandler(Sender: TObject; const AText: string);
@@ -42,6 +43,9 @@ implementation
 constructor TfrmMain.Create(AOwner: TComponent);
 begin
   inherited;
+  {$IF CompilerVersion > 36}
+  OnSafeAreaChanged := SafeAreaChangedHandler;
+  {$ENDIF}
   FSpeech := TSpeechRecognition.Create;
   FSpeech.WantPartialResults := True;
   FSpeech.OnAuthorizationStatus := SpeechAuthorizationHandler;
@@ -61,6 +65,11 @@ end;
 procedure TfrmMain.DoStopped;
 begin
   MessageLabel.Text := 'Tap/click the button, and say something!';
+end;
+
+procedure TfrmMain.SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Rect := AInsets;
 end;
 
 procedure TfrmMain.SpeechAuthorizationHandler(Sender: TObject; const AStatus: TAuthorizationStatus);
