@@ -173,8 +173,13 @@ var
 begin
   LOptions := TNSMutableDictionary.Create;
   {$IF (CompilerVersion < 37) or Defined(OSX)}
+  {$IF Defined(OSX)}
+  LBuffer := nil;
+  Result := nil;
+  {$ELSE}
   Result := 0;
   LBuffer := 0;
+  {$ENDIF}
   LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGImageCompatibilityKey);
   LOptions.setObject(TNSNumber.OCClass.numberWithBool(True), kCVPixelBufferCGBitmapContextCompatibilityKey);
   {$ELSE}
