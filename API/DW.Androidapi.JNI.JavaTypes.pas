@@ -14,6 +14,7 @@ unit DW.Androidapi.JNI.JavaTypes;
 interface
 
 uses
+  // Android
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes;
 
 type
@@ -21,6 +22,7 @@ type
   JBufferedOutputStream = interface;
   JBufferedReader = interface;
   JChannels = interface;
+  JFileReader = interface;
   JFilterInputStream = interface;
   JFilterOutputStream = interface;
   JInputStreamReader = interface;
@@ -123,6 +125,41 @@ type
   end;
   TJBufferedInputStream = class(TJavaGenericImport<JBufferedInputStreamClass, JBufferedInputStream>) end;
 
+  JInputStreamReaderClass = interface(JReaderClass)
+    ['{9E22F91C-17E8-4AE8-95EB-1DC4225A0750}']
+    {class} function init(inputstream: JInputStream): JInputStreamReader; overload; cdecl;
+    {class} function init(inputstream: JInputStream; string_1: JString): JInputStreamReader; overload; cdecl;
+    {class} function init(inputstream: JInputStream; charset: JCharset): JInputStreamReader; overload; cdecl;
+    {class} function init(inputstream: JInputStream; charsetdecoder: JCharsetDecoder): JInputStreamReader; overload; cdecl;
+  end;
+
+  [JavaSignature('java/io/InputStreamReader')]
+  JInputStreamReader = interface(JReader)
+    ['{E0A8AC17-A78C-412B-8E2B-FEF92DAC1766}']
+    procedure close; cdecl;
+    function getEncoding: JString; cdecl;
+    function read(chars: TJavaArray<Char>; int: Integer; int_1: Integer): Integer; overload; cdecl;
+    function read: Integer; overload; cdecl;
+    function read(charbuffer: JCharBuffer): Integer; overload; cdecl;
+    function ready: Boolean; cdecl;
+  end;
+  TJInputStreamReader = class(TJavaGenericImport<JInputStreamReaderClass, JInputStreamReader>) end;
+
+  JFileReaderClass = interface(JInputStreamReaderClass)
+    ['{36A887AD-DEF9-457A-BAFB-3C517C6B347B}']
+    {class} function init(file_1: JFile; charset: JCharset): JFileReader; overload; cdecl;
+    {class} function init(string_1: JString; charset: JCharset): JFileReader; overload; cdecl;
+    {class} function init(filedescriptor: JFileDescriptor): JFileReader; overload; cdecl;
+    {class} function init(file_1: JFile): JFileReader; overload; cdecl;
+    {class} function init(string_1: JString): JFileReader; overload; cdecl;
+  end;
+
+  [JavaSignature('java/io/FileReader')]
+  JFileReader = interface(JInputStreamReader)
+    ['{A3984C2C-5ED9-415D-AD3A-897E5DB5D446}']
+  end;
+  TJFileReader = class(TJavaGenericImport<JFileReaderClass, JFileReader>) end;
+
   JBufferedReaderClass = interface(JReaderClass)
     ['{ED860F80-BCB7-4BC0-977F-95DE9CACE248}']
     {class} function init(in_: JReader): JBufferedReader; cdecl; overload;
@@ -143,23 +180,6 @@ type
     function skip(charCount: Int64): Int64; cdecl;
   end;
   TJBufferedReader = class(TJavaGenericImport<JBufferedReaderClass, JBufferedReader>) end;
-
-  JInputStreamReaderClass = interface(JReaderClass)
-    ['{E418421B-23F2-4AD7-814B-B18419BA54A4}']
-    { class } function init(in_: JInputStream): JInputStreamReader; cdecl;
-  end;
-
-  [JavaSignature('java/io/InputStreamReader')]
-  JInputStreamReader = interface(JReader)
-    ['{15A880FC-8D0E-4480-A05A-BFBEC0BF249D}']
-    procedure close; cdecl;
-    function getEncoding: JString; cdecl;
-    procedure mark(readAheadLimit: Integer); cdecl;
-    function read: Integer; cdecl; overload;
-    function read(cbuf: TJavaArray<Char>; off: Integer; len: Integer): Integer; cdecl; overload;
-    function ready: Boolean; cdecl;
-  end;
-  TJInputStreamReader = class(TJavaGenericImport<JInputStreamReaderClass, JInputStreamReader>) end;
 
   JStringWriterClass = interface(JWriterClass)
     ['{CF281518-33EA-42C7-B15D-3E53DF6316BC}']
