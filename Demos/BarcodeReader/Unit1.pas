@@ -29,6 +29,7 @@ type
     FProcessTime: TDateTime;
     FSectionBitmap: TBitmap;
     procedure ReaderBarcodeHandler(Sender: TObject; const ABarcodes: TBarcodes; const AError: string);
+    procedure SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
     procedure StartCamera;
     procedure StopCamera;
     procedure UpdateScanButton;
@@ -56,6 +57,9 @@ const
 constructor TForm1.Create(AOwner: TComponent);
 begin
   inherited;
+  {$IF CompilerVersion > 36}
+  OnSafeAreaChanged := SafeAreaChangedHandler;
+  {$ENDIF}
   FSectionBitmap := TBitmap.Create;
   FReader := TBarcodeReader.Create;
   FReader.Formats := [TBarcodeFormat.All];
@@ -79,6 +83,11 @@ begin
     for LBarcode in ABarcodes do
       Memo.Lines.Add(Format('%s - (%s)', [LBarcode.Value, LBarcode.FormatDescription]));
   end;
+end;
+
+procedure TForm1.SafeAreaChangedHandler(Sender: TObject; const AInsets: TRectF);
+begin
+  Padding.Rect := AInsets;
 end;
 
 procedure TForm1.ScanButtonClick(Sender: TObject);
