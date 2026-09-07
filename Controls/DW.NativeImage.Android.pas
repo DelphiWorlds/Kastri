@@ -107,8 +107,12 @@ begin
 end;
 
 procedure TAndroidNativeImage.MMImageChanged(var AMessage: TDispatchMessage);
+var
+  LBitmap: JBitmap;
 begin
-  FImageView.setImageBitmap(Model.Image.ToJBitmap);
+  LBitmap := Model.Image.ToJBitmap;
+  if LBitmap <> nil then
+    FImageView.setImageBitmap(Model.Image.ToJBitmap);
 end;
 
 procedure TAndroidNativeImage.MMLoadFromFile(var AMessage: TDispatchMessageWithValue<string>);
@@ -120,6 +124,7 @@ procedure TAndroidNativeImage.MMLoadFromStream(var AMessage: TDispatchMessageWit
 var
   LBytes: TBytes;
   LJBytes: TJavaArray<Byte>;
+  LBitmap: JBitmap;
 begin
   if AMessage.Value.Size > 0 then
   begin
@@ -127,7 +132,9 @@ begin
     AMessage.Value.Position := 0;
     AMessage.Value.Read(LBytes, 0, Length(LBytes));
     LJBytes := TAndroidHelper.TBytesToTJavaArray(LBytes);
-    FImageView.setImageBitmap(TJBitmapFactory.JavaClass.decodeByteArray(LJBytes, 0, LJBytes.Length));
+    LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LJBytes, 0, LJBytes.Length);
+    if LBitmap <> nil then
+      FImageView.setImageBitmap(LBitmap);
   end
   else
     FImageView.setImageBitmap(nil);
