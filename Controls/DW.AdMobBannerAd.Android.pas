@@ -51,7 +51,7 @@ type
     ['{345A1684-3CEF-4567-B6B9-E3B5C9883AE5}']
     procedure onAdClicked; cdecl;
     procedure onAdClosed; cdecl;
-    procedure onAdFailedToLoad(adError: JAdError); cdecl;
+    procedure onAdFailedToLoad(adError: JLoadAdError); cdecl;
     procedure onAdImpression; cdecl;
     procedure onAdLoaded; cdecl;
     procedure onAdOpened; cdecl;
@@ -70,7 +70,7 @@ type
     { JDWAdListener }
     procedure onAdClicked; cdecl;
     procedure onAdClosed; cdecl;
-    procedure onAdFailedToLoad(adError: JAdError); cdecl;
+    procedure onAdFailedToLoad(adError: JLoadAdError); cdecl;
     procedure onAdImpression; cdecl;
     procedure onAdLoaded; cdecl;
     procedure onAdOpened; cdecl;
@@ -98,7 +98,7 @@ type
     function DefineModelClass: TDataModelClass; override;
     procedure AdClicked;
     procedure AdClosed;
-    procedure AdFailedToLoad(const AAdError: JAdError);
+    procedure AdFailedToLoad(const AAdError: JLoadAdError);
     procedure AdImpression;
     procedure AdLoaded;
     procedure AdOpened;
@@ -134,7 +134,7 @@ begin
   FAdMobBannerAd.AdClosed;
 end;
 
-procedure TAdListenerDelegate.onAdFailedToLoad(adError: JAdError);
+procedure TAdListenerDelegate.onAdFailedToLoad(adError: JLoadAdError);
 begin
   FAdMobBannerAd.AdFailedToLoad(adError);
 end;
@@ -314,12 +314,14 @@ begin
   AdControl.DoAdClosed;
 end;
 
-procedure TAndroidAdMobBannerAd.AdFailedToLoad(const AAdError: JAdError);
+procedure TAndroidAdMobBannerAd.AdFailedToLoad(const AAdError: JLoadAdError);
 var
   LError: TAdError;
 begin
   LError.ErrorCode := AAdError.getCode;
   LError.Message := JStringToString(AAdError.getMessage);
+  if AAdError.getResponseInfo <> nil then
+    LError.ExtraInfo := JStringToString(AAdError.getResponseInfo.toString);
   AdControl.DoAdFailedToLoad(LError);
 end;
 
