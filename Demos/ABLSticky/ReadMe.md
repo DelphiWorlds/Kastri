@@ -4,7 +4,7 @@
 
 Demonstrates a means of having location updates occur whether the app is not running, or is running in the background, or foreground
 
-This demo was featured in the "Modern Android Services" session at CodeRage 2025, so you may wish to watch the replay video (link to the replay is coming soon)
+This demo was featured in the "Modern Android Services" session at CodeRage 2025, so you may wish to [watch the replay video](https://www.youtube.com/watch?v=6yACeLqNqkM). **It also describes other types of foreground services**
 
 As the name implies, the demo is for **Android ONLY**
 
