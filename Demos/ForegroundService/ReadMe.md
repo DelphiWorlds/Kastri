@@ -1,15 +1,8 @@
 # Foreground Service Demo
 
-## Description
+**This demo is outdated, and will not be updated**. 
 
-
-
-## Supported Delphi versions
-
-Delphi 12, Delphi 11.x. It _should_ also work in Delphi 10.4.2, and perhaps earlier.
-
-## Usage
-
+Please see the [ABLSticky](https://github.com/DelphiWorlds/Kastri/tree/master/Demos/ABLSticky) demo instead, for guidance about foreground services
 
 
 
