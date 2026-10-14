@@ -121,10 +121,13 @@ end;
 
 procedure TPlatformAudioPlayer.Stop;
 begin
-  if FMediaControl <> nil then
+  if (FMediaControl <> nil) and (AudioState <> TAudioState.Stopped) then
   begin
-    if Succeeded(FMediaControl.StopWhenReady) then
+    try
+      FMediaControl.Stop;
+    finally
       Stopped;
+    end;
   end;
 end;
 
@@ -136,15 +139,32 @@ end;
 
 procedure TPlatformAudioPlayer.TearDownGraph;
 begin
+  if FMediaControl <> nil then
+  begin
+    try
+      FMediaControl.Stop;
+    except
+      // ignore
+    end;
+  end;
   if FMediaEventEx <> nil then
-    FMediaEventEx.SetNotifyWindow(0, 0, 0);
-  FGraphBuilder := nil;
+  begin
+    try
+      FMediaEventEx.SetNotifyWindow(0, 0, 0);
+    except
+      // ignore
+    end;
+  end;
+  FMediaSeeking := nil;
   FMediaControl := nil;
   FMediaEventEx := nil;
+  FGraphBuilder := nil;
 end;
 
 procedure TPlatformAudioPlayer.LoadFromFile(const AFileName: string);
 begin
+  if AudioState = TAudioState.Playing then
+    Stop;
   FFileName := AFileName;
   DoSetup;
 end;
