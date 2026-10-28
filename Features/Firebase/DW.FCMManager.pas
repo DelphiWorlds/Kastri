@@ -87,9 +87,11 @@ type
     function GetAPNSToken: string;
     function GetAuthOptions: TAuthOptions;
     function GetDeviceID: string;
+    function GetIsHandlingStartupNotifications: Boolean;
     function GetNativeAuthOptions: LongInt;
     function GetOnMessageReceived: TMessageReceivedEvent;
     function GetOnNotificationCategory: TNotificationCategoryEvent;
+    function GetOnNotificationReceived: TNotificationReceivedEvent;
     function GetOnStatusChange: TNotifyEvent;
     function GetOnStarted: TNotifyEvent;
     function GetOnTokenReceived: TTokenReceivedEvent;
@@ -111,6 +113,7 @@ type
     procedure SetAuthOptions(const AValue: TAuthOptions);
     procedure SetOnMessageReceived(const AValue: TMessageReceivedEvent);
     procedure SetOnNotificationCategory(const AValue: TNotificationCategoryEvent);
+    procedure SetOnNotificationReceived(const AValue: TNotificationReceivedEvent);
     procedure SetOnStarted(const AValue: TNotifyEvent);
     procedure SetOnStatusChange(const AValue: TNotifyEvent);
     procedure SetOnTokenReceived(const AValue: TTokenReceivedEvent);
@@ -132,6 +135,15 @@ type
     /// </summary>
     property AuthOptions: TAuthOptions read GetAuthOptions write SetAuthOptions;
     /// <summary>
+    ///   True while OnMessageReceived/OnNotificationReceived are being raised for the notification(s) that
+    ///   launched the app (see TPushService.StartupNotifications) - i.e. the app was not already running, and
+    ///   the user tapped an OS notification to launch it. This is the only reliable way to tell that case apart
+    ///   from a live delivery, since by the time it fires the app's own "became active" lifecycle event (and
+    ///   therefore anything an app tracks from it, such as a foreground/background flag) has typically already
+    ///   fired too - app activation is driven by the OS opening the app, independently of and earlier than this.
+    /// </summary>
+    property IsHandlingStartupNotifications: Boolean read GetIsHandlingStartupNotifications;
+    /// <summary>
     ///   Provides access to the underlying push service
     /// </summary>
     property PushService: TPushService read GetPushService;
@@ -148,9 +160,13 @@ type
     /// </summary>
     property OnMessageReceived: TMessageReceivedEvent read GetOnMessageReceived write SetOnMessageReceived;
     /// <summary>
-    ///   This event is fired when the push service receives a message
+    ///   This event is fired when a notification category is present
     /// </summary>
     property OnNotificationCategory: TNotificationCategoryEvent read GetOnNotificationCategory write SetOnNotificationCategory;
+    /// <summary>
+    ///   This event is fired when the push service receives a notification
+    /// </summary>
+    property OnNotificationReceived: TNotificationReceivedEvent read GetOnNotificationReceived write SetOnNotificationReceived;
     /// <summary>
     ///   This event is fired when the status of the push service changes
     /// </summary>
@@ -172,6 +188,7 @@ type
     FDeviceID: string;
     FDeviceToken: string;
     FIsForeground: Boolean;
+    FIsHandlingStartupNotifications: Boolean;
     FIsStarted: Boolean;
     FServiceConnection: TPushServiceConnection;
     FShowBannerIfForeground: Boolean;
@@ -209,9 +226,11 @@ type
     function GetAPNSToken: string; virtual;
     function GetAuthOptions: TAuthOptions;
     function GetDeviceID: string;
+    function GetIsHandlingStartupNotifications: Boolean;
     function GetNativeAuthOptions: LongInt; virtual;
     function GetOnMessageReceived: TMessageReceivedEvent;
     function GetOnNotificationCategory: TNotificationCategoryEvent;
+    function GetOnNotificationReceived: TNotificationReceivedEvent;
     function GetOnStarted: TNotifyEvent;
     function GetOnStatusChange: TNotifyEvent;
     function GetOnTokenReceived: TTokenReceivedEvent;
@@ -224,6 +243,7 @@ type
     procedure SetAuthOptions(const AValue: TAuthOptions);
     procedure SetOnMessageReceived(const AValue: TMessageReceivedEvent);
     procedure SetOnNotificationCategory(const AValue: TNotificationCategoryEvent);
+    procedure SetOnNotificationReceived(const AValue: TNotificationReceivedEvent);
     procedure SetOnStarted(const AValue: TNotifyEvent);
     procedure SetOnStatusChange(const AValue: TNotifyEvent);
     procedure SetOnTokenReceived(const AValue: TTokenReceivedEvent);
@@ -249,7 +269,7 @@ uses
   // FMX
   FMX.Platform,
   // DW
-  {$IF Defined(IOS)}
+  {$IF Defined(IOS) and not Defined(IOSSIMULATOR)}
   DW.FCMManager.iOS,
   {$ENDIF}
   {$IF Defined(ANDROID)}
@@ -257,7 +277,7 @@ uses
   {$ENDIF}
   DW.OSLog;
 
-{$IF not (Defined(ANDROID) or Defined(IOS))}
+{$IF not (Defined(ANDROID) or Defined(IOS)) or Defined(IOSSIMULATOR)}
 type
   TPlatformFCMManager = class(TCustomPlatformFCMManager, IFCMManager);
 {$ENDIF}
@@ -508,6 +528,11 @@ begin
   Result := FDeviceID;
 end;
 
+function TCustomPlatformFCMManager.GetIsHandlingStartupNotifications: Boolean;
+begin
+  Result := FIsHandlingStartupNotifications;
+end;
+
 function TCustomPlatformFCMManager.GetNativeAuthOptions: LongInt;
 begin
   Result := 0;
@@ -521,6 +546,11 @@ end;
 function TCustomPlatformFCMManager.GetOnNotificationCategory: TNotificationCategoryEvent;
 begin
   Result := FOnNotificationCategory;
+end;
+
+function TCustomPlatformFCMManager.GetOnNotificationReceived: TNotificationReceivedEvent;
+begin
+  Result := FOnNotificationReceived;
 end;
 
 function TCustomPlatformFCMManager.GetOnStarted: TNotifyEvent;
@@ -553,6 +583,11 @@ begin
   FOnNotificationCategory := AValue;
 end;
 
+procedure TCustomPlatformFCMManager.SetOnNotificationReceived(const AValue: TNotificationReceivedEvent);
+begin
+  FOnNotificationReceived := AValue;
+end;
+
 procedure TCustomPlatformFCMManager.SetOnStarted(const AValue: TNotifyEvent);
 begin
   FOnStarted := AValue;
@@ -580,8 +615,13 @@ begin
   // Handle startup notifications
   if FServiceConnection <> nil then
   begin
-    for LNotification in FServiceConnection.Service.StartupNotifications do
-      ReceiveNotificationHandler(FServiceConnection, LNotification);
+    FIsHandlingStartupNotifications := True;
+    try
+      for LNotification in FServiceConnection.Service.StartupNotifications do
+        ReceiveNotificationHandler(FServiceConnection, LNotification);
+    finally
+      FIsHandlingStartupNotifications := False;
+    end;
   end;
 end;
 
@@ -625,7 +665,8 @@ end;
 
 procedure TCustomPlatformFCMManager.ReceiveNotification(const AServiceNotification: TPushServiceNotification);
 begin
-  //
+  if Assigned(FOnNotificationReceived) then
+    FOnNotificationReceived(Self, AServiceNotification);
 end;
 
 procedure TCustomPlatformFCMManager.ReceiveNotificationHandler(Sender: TObject; const AServiceNotification: TPushServiceNotification);
