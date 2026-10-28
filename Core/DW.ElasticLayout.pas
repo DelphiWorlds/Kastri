@@ -42,6 +42,13 @@ type
     procedure DoRealign; override;
   public
     /// <summary>
+    ///   Forces realign
+    /// </summary>
+    /// <remarks>
+    ///   Useful for when the margins of a child control are changed
+    /// </remarks>
+    procedure NeedsRealign;
+    /// <summary>
     ///   Set this property to True when you want the layout to adjust its size automatically
     /// </summary>
     /// <remarks>
@@ -63,6 +70,7 @@ type
   protected
     procedure DoRealign; override;
   public
+    procedure NeedsRealign;
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
     property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
    end;
@@ -76,6 +84,7 @@ type
   protected
     procedure DoRealign; override;
   public
+    procedure NeedsRealign;
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
     property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
   end;
@@ -89,6 +98,7 @@ type
   protected
     procedure DoRealign; override;
   public
+    procedure NeedsAlign;
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
     property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
   end;
@@ -100,6 +110,7 @@ type
   protected
     procedure DoRealign; override;
   public
+    procedure NeedsRealign;
     property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
   end;
 
@@ -194,6 +205,11 @@ begin
   TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
 end;
 
+procedure TLayout.NeedsRealign;
+begin
+  Realign;
+end;
+
 procedure TLayout.SetElasticDimensions(const Value: TElasticDimensions);
 begin
   FElasticDimensions := Value;
@@ -220,6 +236,11 @@ begin
   inherited;
   if FElasticDimensions <> [] then
     TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
+end;
+
+procedure TFlowLayout.NeedsRealign;
+begin
+  Realign;
 end;
 
 procedure TFlowLayout.SetElasticDimensions(const Value: TElasticDimensions);
@@ -250,6 +271,11 @@ begin
     TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
 end;
 
+procedure TGridPanelLayout.NeedsRealign;
+begin
+  Realign;
+end;
+
 procedure TGridPanelLayout.SetElasticDimensions(const Value: TElasticDimensions);
 begin
   FElasticDimensions := Value;
@@ -277,6 +303,11 @@ begin
   TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
 end;
 
+procedure TGridLayout.NeedsRealign;
+begin
+  Realign;
+end;
+
 procedure TGridLayout.SetElasticDimensions(const Value: TElasticDimensions);
 begin
   FElasticDimensions := Value;
@@ -302,6 +333,11 @@ procedure TPanel.DoRealign;
 begin
   inherited;
   TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
+end;
+
+procedure TPanel.NeedsRealign;
+begin
+  Realign;
 end;
 
 procedure TPanel.SetElasticDimensions(const Value: TElasticDimensions);
