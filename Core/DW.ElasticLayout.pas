@@ -98,7 +98,7 @@ type
   protected
     procedure DoRealign; override;
   public
-    procedure NeedsAlign;
+    procedure NeedsRealign;
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
     property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
   end;
