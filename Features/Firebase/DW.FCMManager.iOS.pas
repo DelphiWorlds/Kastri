@@ -281,7 +281,7 @@ begin
       LCategory.Handler()
     else
       DoNotificationCategory(LCategoryID, '');
- end;
+  end;
 end;
 
 procedure TPlatformFCMManager.UnsubscribeFromTopic(const ATopic: string);
