@@ -19,7 +19,7 @@ uses
   // RTL
   System.Types,
   // FMX
-  FMX.Types, FMX.Controls, FMX.Layouts;
+  FMX.Types, FMX.Controls, FMX.Layouts, FMX.StdCtrls;
 
 type
   TElasticDimension = (Width, Height);
@@ -90,6 +90,16 @@ type
     procedure DoRealign; override;
   public
     property IsElastic: Boolean read FIsElastic write SetIsElastic;
+    property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
+  end;
+
+  TPanel = class(FMX.StdCtrls.TPanel)
+  private
+    FElasticDimensions: TElasticDimensions;
+    procedure SetElasticDimensions(const Value: TElasticDimensions);
+  protected
+    procedure DoRealign; override;
+  public
     property ElasticDimensions: TElasticDimensions read FElasticDimensions write SetElasticDimensions;
   end;
 
@@ -284,6 +294,20 @@ begin
       FElasticDimensions := [];
     Realign;
   end;
+end;
+
+{ TPanel }
+
+procedure TPanel.DoRealign;
+begin
+  inherited;
+  TElasticLayoutHelper.ElasticRealign(Self, FElasticDimensions);
+end;
+
+procedure TPanel.SetElasticDimensions(const Value: TElasticDimensions);
+begin
+  FElasticDimensions := Value;
+  Realign;
 end;
 
 end.
