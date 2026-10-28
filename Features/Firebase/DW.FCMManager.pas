@@ -782,7 +782,7 @@ begin
   //
 end;
 
-{$IF not (Defined(ANDROID) or Defined(IOS))}
+{$IF not (Defined(ANDROID) or Defined(IOS)) or Defined(IOSSIMULATOR)}
 initialization
   FCM := TPlatformFCMManager.Create;
 {$ENDIF}
