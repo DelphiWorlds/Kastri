@@ -123,6 +123,10 @@ type
     /// </summary>
     class function IsPlatform(const APlatform: TOSPlatform): Boolean; static;
     /// <summary>
+    ///   Returns whether the device is a phone
+    /// </summary>
+    class function IsPhone: Boolean; static;
+    /// <summary>
     ///   Returns whether the screen is locked
     /// </summary>
     class function IsScreenLocked: Boolean; static;
@@ -153,6 +157,8 @@ type
 implementation
 
 uses
+  // RTL
+  System.Devices,
   // DW
   {$IF Defined(POSIX)}
   DW.OSDevice.Posix,
@@ -310,6 +316,11 @@ end;
 class function TOSDevice.IsMobile: Boolean;
 begin
   Result := TOSVersion.Platform in [TOSVersion.TPlatform.pfiOS, TOSVersion.TPlatform.pfAndroid];
+end;
+
+class function TOSDevice.IsPhone: Boolean;
+begin
+  Result := TDeviceInfo.ThisDevice.DeviceClass = TDeviceInfo.TDeviceClass.Phone;
 end;
 
 class function TOSDevice.IsPlatform(const APlatform: TOSPlatform): Boolean;
